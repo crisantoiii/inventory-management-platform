@@ -18,4 +18,18 @@
     <Folder Include="Services\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="10.0.10" />
+    <PackageReference Include="Serilog.AspNetCore" Version="10.0.0" />
+    <PackageReference Include="Serilog.Settings.Configuration" Version="10.0.1" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
+    <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\InventoryPlatform.Application\InventoryPlatform.Application.csproj" />
+    <ProjectReference Include="..\InventoryPlatform.Infrastructure\InventoryPlatform.Infrastructure.csproj" />
+    <ProjectReference Include="..\InventoryPlatform.Shared\InventoryPlatform.Shared.csproj" />
+  </ItemGroup>
+
 </Project>

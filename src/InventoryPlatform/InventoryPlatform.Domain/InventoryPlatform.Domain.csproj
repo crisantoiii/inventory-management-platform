@@ -13,4 +13,8 @@
     <Folder Include="ValueObjects\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\InventoryPlatform.Shared\InventoryPlatform.Shared.csproj" />
+  </ItemGroup>
+
 </Project>
