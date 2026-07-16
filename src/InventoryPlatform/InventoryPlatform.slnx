@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="InventoryPlatform.Application/InventoryPlatform.Application.csproj" />
+  <Project Path="InventoryPlatform.Domain/InventoryPlatform.Domain.csproj" />
+  <Project Path="InventoryPlatform.Infrastructure/InventoryPlatform.Infrastructure.csproj" />
+  <Project Path="InventoryPlatform.Shared/InventoryPlatform.Shared.csproj" />
+  <Project Path="InventoryPlatform.Web/InventoryPlatform.Web.csproj" />
+</Solution>
