@@ -1,23 +1,74 @@
 ﻿using InventoryPlatform.Domain.Common;
 
-namespace InventoryPlatform.Domain.Entities
+namespace InventoryPlatform.Domain.Entities;
+
+public sealed class Product : AuditableEntity
 {
-    public sealed class Product : AuditableEntity
+    public string Sku { get; private set; } = string.Empty;
+
+    public string? Barcode { get; private set; }
+
+    public string Name { get; private set; } = string.Empty;
+
+    public string? Description { get; private set; }
+
+    public string Unit { get; private set; } = string.Empty;
+
+    public decimal CostPrice { get; private set; }
+
+    public decimal SellingPrice { get; private set; }
+
+    public bool IsActive { get; private set; }
+
+    private Product()
     {
-        public string Sku { get; private set; } = string.Empty;
+    }
 
-        public string? Barcode { get; private set; }
+    public Product(
+        string sku,
+        string name,
+        string unit,
+        decimal costPrice,
+        decimal sellingPrice)
+    {
+        Sku = sku;
 
-        public string Name { get; private set; } = string.Empty;
+        Rename(name);
+        ChangeCostPrice(costPrice);
+        ChangeSellingPrice(sellingPrice);
 
-        public string? Description { get; private set; }
+        Unit = unit;
+        IsActive = true;
+    }
 
-        public string Unit { get; private set; } = string.Empty;
+    public void Rename(string name)
+    {
+        Name = name;
+    }
 
-        public decimal CostPrice { get; private set; }
+    public void UpdateDescription(string? description)
+    {
+        Description = description;
+    }
 
-        public decimal SellingPrice { get; private set; }
+    public void ChangeCostPrice(decimal costPrice)
+    {
+        CostPrice = costPrice;
+    }
 
-        public bool IsActive { get; private set; }
+    public void ChangeSellingPrice(decimal sellingPrice)
+    {
+        SellingPrice = sellingPrice;
+    }
+
+    public void Activate()
+    {
+        IsActive = true;
+    }
+
+    public void Deactivate()
+    {
+        IsActive = false;
     }
 }
+

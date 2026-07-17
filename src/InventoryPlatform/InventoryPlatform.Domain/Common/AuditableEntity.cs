@@ -2,12 +2,11 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace InventoryPlatform.Domain.Common
-{
-    public abstract class AuditableEntity : BaseEntity
-    {
-        public DateTime CreatedAtUtc { get; set; }
+namespace InventoryPlatform.Domain.Common;
 
-        public DateTime? UpdatedAtUtc { get; set; }
-    }
+public abstract class AuditableEntity : BaseEntity
+{
+    public DateTime CreatedAtUtc { get; set; }
+
+    public DateTime? UpdatedAtUtc { get; set; }
 }
