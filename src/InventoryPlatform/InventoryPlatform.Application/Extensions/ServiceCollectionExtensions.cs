@@ -2,7 +2,7 @@
 
 namespace InventoryPlatform.Application.Extensions
 {
-    public static class ApplicationServiceCollectionExtensions
+    public static class ServiceCollectionExtensions
     {
         public static IServiceCollection AddApplication(this IServiceCollection services)
         {
