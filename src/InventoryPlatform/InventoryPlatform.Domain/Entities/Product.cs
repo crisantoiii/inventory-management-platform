@@ -1,4 +1,5 @@
-﻿using InventoryPlatform.Domain.Common;
+﻿using InventoryPlatform.Shared.Guards;
+using InventoryPlatform.Domain.Common;
 
 namespace InventoryPlatform.Domain.Entities;
 
@@ -43,6 +44,8 @@ public sealed class Product : AuditableEntity
 
     public void Rename(string name)
     {
+        Guard.AgainstNullOrWhiteSpace(name, nameof(name));
+
         Name = name;
     }
 
@@ -53,11 +56,15 @@ public sealed class Product : AuditableEntity
 
     public void ChangeCostPrice(decimal costPrice)
     {
+        Guard.AgainstNegative(costPrice, nameof(costPrice));
+
         CostPrice = costPrice;
     }
 
     public void ChangeSellingPrice(decimal sellingPrice)
     {
+        Guard.AgainstNegative(sellingPrice, nameof(sellingPrice));
+
         SellingPrice = sellingPrice;
     }
 
