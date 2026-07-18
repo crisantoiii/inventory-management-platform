@@ -32,13 +32,12 @@ public sealed class Product : AuditableEntity
         decimal costPrice,
         decimal sellingPrice)
     {
-        Sku = sku;
-
+        SetSku(sku);
         Rename(name);
+        ChangeUnit(unit);
         ChangeCostPrice(costPrice);
         ChangeSellingPrice(sellingPrice);
 
-        Unit = unit;
         IsActive = true;
     }
 
@@ -73,6 +72,13 @@ public sealed class Product : AuditableEntity
         SellingPrice = sellingPrice;
     }
 
+    public void ChangeUnit(string unit)
+    {
+        Guard.AgainstNullOrWhiteSpace(unit, nameof(unit));
+
+        Unit = unit;
+    }
+
     public void Activate()
     {
         IsActive = true;
@@ -81,6 +87,13 @@ public sealed class Product : AuditableEntity
     public void Deactivate()
     {
         IsActive = false;
+    }
+
+    private void SetSku(string sku)
+    {
+        Guard.AgainstNullOrWhiteSpace(sku, nameof(sku));
+
+        Sku = sku;
     }
 }
 
