@@ -1,4 +1,5 @@
 ﻿using InventoryPlatform.Application.Interfaces.Persistence;
+using InventoryPlatform.Infrastructure.Persistence;
 using InventoryPlatform.Infrastructure.Persistence.Context;
 using InventoryPlatform.Infrastructure.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -20,6 +21,7 @@ public static class ServiceCollectionExtensions
         });
         services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
         services.AddScoped<IProductRepository, ProductRepository>();
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         return services;
     }
