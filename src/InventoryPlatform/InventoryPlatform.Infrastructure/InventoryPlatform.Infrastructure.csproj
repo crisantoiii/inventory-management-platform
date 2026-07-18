@@ -14,7 +14,6 @@
     <Folder Include="Persistence\Seeding\" />
     <Folder Include="Services\" />
     <Folder Include="Repositories\" />
-    <Folder Include="Persistence\Configurations\" />
   </ItemGroup>
 
   <ItemGroup>
