@@ -1,5 +1,6 @@
 ﻿using InventoryPlatform.Application.Interfaces.Persistence;
 using InventoryPlatform.Domain.Entities;
+using InventoryPlatform.Shared.Results;
 
 namespace InventoryPlatform.Application.Features.Products.CreateProduct;
 
@@ -16,16 +17,16 @@ public sealed class CreateProductHandler
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<CreateProductResponse> HandleAsync(
+    public async Task<Result<CreateProductResponse>> HandleAsync(
         CreateProductRequest request,
         CancellationToken cancellationToken = default)
     {
         if (await _productRepository.ExistsBySkuAsync(
-        request.Sku,
-        cancellationToken))
+            request.Sku,
+            cancellationToken))
         {
-            throw new InvalidOperationException(
-                $"Product with SKU '{request.Sku}' already exists.");
+            return Result<CreateProductResponse>.Failure(
+                ProductErrors.DuplicateSku);
         }
 
         var product = new Product(
@@ -42,10 +43,11 @@ public sealed class CreateProductHandler
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return new CreateProductResponse(
-                    product.Id,
-                    product.Sku,
-                    product.Name);
+        return Result<CreateProductResponse>.Success(
+            new CreateProductResponse(
+                product.Id,
+                product.Sku,
+                product.Name));
     }
 
 }
