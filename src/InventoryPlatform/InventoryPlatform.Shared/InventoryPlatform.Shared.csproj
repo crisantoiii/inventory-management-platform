@@ -13,7 +13,6 @@
     <Folder Include="Constants\" />
     <Folder Include="Helpers\" />
     <Folder Include="Pagination\" />
-    <Folder Include="Results\" />
   </ItemGroup>
 
 </Project>
