@@ -1,7 +1,9 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+﻿using InventoryPlatform.Application.Interfaces.Persistence;
 using InventoryPlatform.Infrastructure.Persistence.Context;
+using InventoryPlatform.Infrastructure.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace InventoryPlatform.Infrastructure.Extensions;
 
@@ -16,6 +18,8 @@ public static class ServiceCollectionExtensions
             options.UseSqlServer(
                 configuration.GetConnectionString("DefaultConnection"));
         });
+        services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+        services.AddScoped<IProductRepository, ProductRepository>();
 
         return services;
     }
