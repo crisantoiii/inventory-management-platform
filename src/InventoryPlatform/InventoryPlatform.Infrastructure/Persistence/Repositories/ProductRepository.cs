@@ -30,4 +30,13 @@ public sealed class ProductRepository
             x => x.Sku == sku,
             cancellationToken);
     }
+
+    public async Task<IReadOnlyList<Product>> GetActiveAsync(
+    CancellationToken cancellationToken = default)
+    {
+        return await DbSet
+            .Where(p => p.IsActive)
+            .OrderBy(p => p.Name)
+            .ToListAsync(cancellationToken);
+    }
 }

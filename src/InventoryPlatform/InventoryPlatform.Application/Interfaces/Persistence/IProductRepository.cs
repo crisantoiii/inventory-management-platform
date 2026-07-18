@@ -11,4 +11,7 @@ public interface IProductRepository : IRepository<Product>
     Task<bool> ExistsBySkuAsync(
         string sku,
         CancellationToken cancellationToken = default);
+
+    Task<IReadOnlyList<Product>> GetActiveAsync(
+        CancellationToken cancellationToken = default);
 }
