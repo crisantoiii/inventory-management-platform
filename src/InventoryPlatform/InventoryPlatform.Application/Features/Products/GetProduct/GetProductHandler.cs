@@ -1,4 +1,5 @@
 ﻿using InventoryPlatform.Application.Interfaces.Persistence;
+using InventoryPlatform.Shared.Results;
 
 namespace InventoryPlatform.Application.Features.Products.GetProduct;
 
@@ -12,7 +13,7 @@ public sealed class GetProductHandler
         _productRepository = productRepository;
     }
 
-    public async Task<GetProductResponse?> HandleAsync(
+    public async Task<Result<GetProductResponse>> HandleAsync(
         int id,
         CancellationToken cancellationToken = default)
     {
@@ -21,17 +22,18 @@ public sealed class GetProductHandler
             cancellationToken);
 
         if (product is null)
-            return null;
+            return Result<GetProductResponse>.Failure(
+            ProductErrors.NotFound);
 
-        return new GetProductResponse(
-            product.Id,
-            product.Sku,
-            product.Name,
-            product.Unit,
-            product.CostPrice,
-            product.SellingPrice,
-            product.Barcode,
-            product.Description,
-            product.IsActive);
+        return Result<GetProductResponse>.Success(new GetProductResponse(
+                                                    product.Id,
+                                                    product.Sku,
+                                                    product.Name,
+                                                    product.Unit,
+                                                    product.CostPrice,
+                                                    product.SellingPrice,
+                                                    product.Barcode,
+                                                    product.Description,
+                                                    product.IsActive));
     }
 }

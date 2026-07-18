@@ -1,4 +1,4 @@
-using InventoryPlatform.Application.Extensions;
+using InventoryPlatform.Application.DependencyInjection;
 using InventoryPlatform.Infrastructure.Extensions;
 using InventoryPlatform.Web.Extensions;
 

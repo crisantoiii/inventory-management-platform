@@ -1,5 +1,5 @@
 ﻿using InventoryPlatform.Application.Interfaces.Persistence;
-
+using InventoryPlatform.Shared.Results;
 namespace InventoryPlatform.Application.Features.Products.UpdateProduct;
 
 public sealed class UpdateProductHandler

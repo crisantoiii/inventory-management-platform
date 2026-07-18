@@ -1,0 +1,31 @@
+﻿@page
+@model InventoryPlatform.Web.Pages.Products.IndexModel
+
+<h1>Products</h1>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>SKU</th>
+            <th>Name</th>
+            <th>Cost</th>
+            <th>Selling</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+        @foreach (var product in Model.Products)
+        {
+            <tr>
+                <td>@product.Sku</td>
+                <td>@product.Name</td>
+                <td>@product.CostPrice</td>
+                <td>@product.SellingPrice</td>
+                <td>@(product.IsActive ? "Active" : "Inactive")</td>
+            </tr>
+        }
+
+    </tbody>
+</table>
