@@ -15,12 +15,8 @@ public class Result
     public Error Error { get; }
 
     public static Result Success()
-    {
-        return new Result(true, Error.None);
-    }
+        => new(true, Error.None);
 
     public static Result Failure(Error error)
-    {
-        return new Result(false, error);
-    }
+        => new(false, error);
 }

@@ -1,4 +1,4 @@
-﻿namespace InventoryPlatform.Shared.Results;
+﻿using InventoryPlatform.Shared.Results;
 
 public sealed class Result<T> : Result
 {
@@ -14,18 +14,8 @@ public sealed class Result<T> : Result
     public T? Value { get; }
 
     public static Result<T> Success(T value)
-    {
-        return new Result<T>(
-            value,
-            true,
-            Error.None);
-    }
+        => new(value, true, Error.None);
 
     public static new Result<T> Failure(Error error)
-    {
-        return new Result<T>(
-            default,
-            false,
-            error);
-    }
+        => new(default, false, error);
 }

@@ -15,7 +15,7 @@ public sealed class UpdateProductHandler
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<UpdateProductResponse?> HandleAsync(
+    public async Task<Result<UpdateProductResponse>> HandleAsync(
         UpdateProductRequest request,
         CancellationToken cancellationToken = default)
     {
@@ -25,7 +25,8 @@ public sealed class UpdateProductHandler
 
         if (product is null)
         {
-            return null;
+            return Result<UpdateProductResponse>.Failure(
+                        ProductErrors.NotFound);
         }
 
         product.Rename(request.Name);
@@ -39,8 +40,9 @@ public sealed class UpdateProductHandler
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return new UpdateProductResponse(
-            product.Id,
-            product.Name);
+        return Result<UpdateProductResponse>.Success(
+            new UpdateProductResponse(
+                product.Id,
+                product.Name));
     }
 }
