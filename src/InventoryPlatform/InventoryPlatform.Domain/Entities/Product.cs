@@ -49,6 +49,11 @@ public sealed class Product : AuditableEntity
         Name = name;
     }
 
+    public void ChangeBarcode(string? barcode)
+    {
+        Barcode = barcode;
+    }
+
     public void UpdateDescription(string? description)
     {
         Description = description;
