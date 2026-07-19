@@ -12,7 +12,6 @@
     <Folder Include="Exceptions\" />
     <Folder Include="Constants\" />
     <Folder Include="Helpers\" />
-    <Folder Include="Pagination\" />
   </ItemGroup>
 
 </Project>

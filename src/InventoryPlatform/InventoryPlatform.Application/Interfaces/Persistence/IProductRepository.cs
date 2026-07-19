@@ -1,4 +1,5 @@
 ﻿using InventoryPlatform.Domain.Entities;
+using InventoryPlatform.Shared.Paging;
 
 namespace InventoryPlatform.Application.Interfaces.Persistence;
 
@@ -12,7 +13,7 @@ public interface IProductRepository : IRepository<Product>
         string sku,
         CancellationToken cancellationToken = default);
 
-    Task<IReadOnlyList<Product>> GetActiveAsync(
-        string? search,
+    Task<PagedResult<Product>> GetPagedActiveAsync(
+        PagedQuery request,
         CancellationToken cancellationToken = default);
 }

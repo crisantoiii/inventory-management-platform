@@ -1,6 +1,7 @@
 ﻿using InventoryPlatform.Application.Interfaces.Persistence;
 using InventoryPlatform.Domain.Entities;
 using InventoryPlatform.Infrastructure.Persistence.Context;
+using InventoryPlatform.Shared.Paging;
 using Microsoft.EntityFrameworkCore;
 
 namespace InventoryPlatform.Infrastructure.Persistence.Repositories;
@@ -31,24 +32,37 @@ public sealed class ProductRepository
             cancellationToken);
     }
 
-    public async Task<IReadOnlyList<Product>> GetActiveAsync(
-        string? search = null,
-        CancellationToken cancellationToken = default)
+    public async Task<PagedResult<Product>> GetPagedActiveAsync(
+    PagedQuery request,
+    CancellationToken cancellationToken = default)
     {
-        IQueryable<Product> query = DbSet
-            .Where(p => p.IsActive);
+        IQueryable<Product> query =
+            DbSet.Where(p => p.IsActive);
 
-        if (!string.IsNullOrWhiteSpace(search))
+        if (!string.IsNullOrWhiteSpace(request.Search))
         {
-            search = search.Trim();
+            var search = request.Search.Trim();
 
             query = query.Where(p =>
                 p.Sku.Contains(search) ||
                 p.Name.Contains(search));
         }
 
-        return await query
+        var totalCount =
+            await query.CountAsync(cancellationToken);
+
+        var items = await query
             .OrderBy(p => p.Name)
+            .Skip((request.Page - 1) * request.PageSize)
+            .Take(request.PageSize)
             .ToListAsync(cancellationToken);
+
+        return new PagedResult<Product>
+        {
+            Items = items,
+            Page = request.Page,
+            PageSize = request.PageSize,
+            TotalCount = totalCount
+        };
     }
 }

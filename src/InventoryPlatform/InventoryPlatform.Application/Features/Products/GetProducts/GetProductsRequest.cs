@@ -1,4 +1,8 @@
-﻿namespace InventoryPlatform.Application.Features.Products.GetProducts;
+﻿using InventoryPlatform.Shared.Paging;
 
-public sealed record GetProductsRequest(
-    string? Search = null);
+namespace InventoryPlatform.Application.Features.Products.GetProducts;
+
+public sealed record GetProductsRequest : PagedRequest
+{
+    public string? Search { get; init; }
+}

@@ -1,5 +1,5 @@
-﻿using InventoryPlatform.Application.Features.Products.GetProduct;
-using InventoryPlatform.Application.Interfaces.Persistence;
+﻿using InventoryPlatform.Application.Interfaces.Persistence;
+using InventoryPlatform.Shared.Paging;
 using InventoryPlatform.Shared.Results;
 namespace InventoryPlatform.Application.Features.Products.GetProducts;
 
@@ -13,35 +13,38 @@ public sealed class GetProductsHandler
         _productRepository = productRepository;
     }
 
-    public async Task<Result<IReadOnlyList<GetProductsResponse>>> HandleAsync(
+    public async Task<Result<PagedResult<GetProductsResponse>>> HandleAsync(
         GetProductsRequest request,
         CancellationToken cancellationToken = default)
     {
-        var products = await _productRepository.GetActiveAsync(
-                                        request.Search,
-                                        cancellationToken);
-
-        if (!string.IsNullOrWhiteSpace(request.Search))
+        var query = new PagedQuery
         {
-            var search = request.Search.Trim();
+            Search = request.Search,
+            Page = request.Page,
+            PageSize = request.PageSize
+        };
 
-            products = products
-                .Where(p =>
-                    p.Sku.Contains(search, StringComparison.OrdinalIgnoreCase) ||
-                    p.Name.Contains(search, StringComparison.OrdinalIgnoreCase))
-                .ToList();
-        }
+        var products = await _productRepository.GetPagedActiveAsync(
+            query,
+            cancellationToken);
 
-        var response = products
-            .Select(product => new GetProductsResponse(
-                product.Id,
-                product.Sku,
-                product.Name,
-                product.CostPrice,
-                product.SellingPrice,
-                product.IsActive))
-            .ToList();
+        var response = new PagedResult<GetProductsResponse>
+        {
+            Items = products.Items
+                .Select(product => new GetProductsResponse(
+                    product.Id,
+                    product.Sku,
+                    product.Name,
+                    product.CostPrice,
+                    product.SellingPrice,
+                    product.IsActive))
+                .ToList(),
 
-        return Result<IReadOnlyList<GetProductsResponse>>.Success(response);
+            Page = products.Page,
+            PageSize = products.PageSize,
+            TotalCount = products.TotalCount
+        };
+
+        return Result<PagedResult<GetProductsResponse>>.Success(response);
     }
 }

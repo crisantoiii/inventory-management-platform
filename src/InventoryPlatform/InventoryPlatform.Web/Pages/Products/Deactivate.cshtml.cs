@@ -21,7 +21,7 @@ public class DeactivateModel : PageModel
     public GetProductResponse Product { get; private set; } = default!;
 
     [BindProperty]
-    public DeactivateProductRequest Request { get; set; } = default!;
+    public DeactivateProductRequest DeactivateRequest { get; set; } = default!;
 
     [TempData]
     public string? SuccessMessage { get; set; }
@@ -37,14 +37,14 @@ public class DeactivateModel : PageModel
 
         Product = result.Value!;
 
-        Request = new DeactivateProductRequest(Product.Id);
+        DeactivateRequest = new DeactivateProductRequest(Product.Id);
 
         return Page();
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
-        var result = await _deactivateHandler.HandleAsync(Request);
+        var result = await _deactivateHandler.HandleAsync(DeactivateRequest);
 
         if (result.IsFailure)
         {

@@ -1,4 +1,5 @@
 using InventoryPlatform.Application.Features.Products.GetProducts;
+using InventoryPlatform.Shared.Paging;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -6,8 +7,8 @@ namespace InventoryPlatform.Web.Pages.Products;
 
 public class IndexModel : PageModel
 {
-    [BindProperty(SupportsGet = true)]
-    public string? Search { get; set; }
+    [FromQuery]
+    public GetProductsRequest Filter { get; set; } = new();
 
     [TempData]
     public string? SuccessMessage { get; set; }
@@ -19,12 +20,11 @@ public class IndexModel : PageModel
         _handler = handler;
     }
 
-    public IReadOnlyList<GetProductsResponse> Products { get; private set; }
-        = [];
+    public PagedResult<GetProductsResponse> Products { get; private set; } = default!;
 
     public async Task OnGetAsync()
     {
-        var result = await _handler.HandleAsync(new GetProductsRequest(Search));
+        var result = await _handler.HandleAsync(Filter);
 
         if (result.IsSuccess && result.Value is not null)
         {
