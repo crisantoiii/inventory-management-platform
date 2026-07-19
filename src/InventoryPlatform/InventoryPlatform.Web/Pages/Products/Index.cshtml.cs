@@ -6,6 +6,9 @@ namespace InventoryPlatform.Web.Pages.Products;
 
 public class IndexModel : PageModel
 {
+    [BindProperty(SupportsGet = true)]
+    public string? Search { get; set; }
+
     [TempData]
     public string? SuccessMessage { get; set; }
 
@@ -21,7 +24,7 @@ public class IndexModel : PageModel
 
     public async Task OnGetAsync()
     {
-        var result = await _handler.HandleAsync();
+        var result = await _handler.HandleAsync(new GetProductsRequest(Search));
 
         if (result.IsSuccess && result.Value is not null)
         {

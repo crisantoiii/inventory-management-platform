@@ -22,60 +22,92 @@
         </button>
     </div>
 }
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>SKU</th>
-            <th>Name</th>
-            <th>Cost</th>
-            <th>Selling</th>
-            <th>Status</th>
-            <th class="text-end">Actions</th>
-        </tr>
-    </thead>
+<form method="get" class="row g-3 mb-3">
 
-    <tbody>
+    <div class="col-md-4">
+        <input asp-for="Search"
+               class="form-control"
+               placeholder="Search SKU or Name..." />
+    </div>
 
-        @foreach (var product in Model.Products)
-        {
+    <div class="col-auto">
+        <button class="btn btn-primary">
+            Search
+        </button>
+    </div>
+
+    <div class="col-auto">
+        <a asp-page="Index"
+           class="btn btn-outline-secondary">
+            Clear
+        </a>
+    </div>
+
+</form>
+
+@if (!Model.Products.Any())
+{
+    <div class="alert alert-info">
+        No products found.
+    </div>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
             <tr>
-                <td>@product.Sku</td>
-                <td>
-                    <a asp-page="Details"
-                       asp-route-id="@product.Id">
-                        @product.Name
-                    </a>
-                </td>
-                <td>@product.CostPrice</td>
-                <td>@product.SellingPrice</td>
-                <td>@(product.IsActive ? "Active" : "Inactive")</td>
-                <td class="text-end">
-
-                    <div class="btn-group" role="group">
-
-                        <a asp-page="Details"
-                           asp-route-id="@product.Id"
-                           class="btn btn-sm btn-outline-secondary">
-                            Details
-                        </a>
-
-                        <a asp-page="Edit"
-                           asp-route-id="@product.Id"
-                           class="btn btn-sm btn-outline-primary">
-                            Edit
-                        </a>
-
-                        <a asp-page="Deactivate"
-                           asp-route-id="@product.Id"
-                           class="btn btn-sm btn-outline-danger">
-                            Deactivate
-                        </a>
-
-                    </div>
-
-                </td>
+                <th>SKU</th>
+                <th>Name</th>
+                <th>Cost</th>
+                <th>Selling</th>
+                <th>Status</th>
+                <th class="text-end">Actions</th>
             </tr>
-        }
+        </thead>
 
-    </tbody>
-</table>
+        <tbody>
+
+            @foreach (var product in Model.Products)
+            {
+                <tr>
+                    <td>@product.Sku</td>
+                    <td>
+                        <a asp-page="Details"
+                           asp-route-id="@product.Id">
+                            @product.Name
+                        </a>
+                    </td>
+                    <td>@product.CostPrice</td>
+                    <td>@product.SellingPrice</td>
+                    <td>@(product.IsActive ? "Active" : "Inactive")</td>
+                    <td class="text-end">
+
+                        <div class="btn-group" role="group">
+
+                            <a asp-page="Details"
+                               asp-route-id="@product.Id"
+                               class="btn btn-sm btn-outline-secondary">
+                                Details
+                            </a>
+
+                            <a asp-page="Edit"
+                               asp-route-id="@product.Id"
+                               class="btn btn-sm btn-outline-primary">
+                                Edit
+                            </a>
+
+                            <a asp-page="Deactivate"
+                               asp-route-id="@product.Id"
+                               class="btn btn-sm btn-outline-danger">
+                                Deactivate
+                            </a>
+
+                        </div>
+
+                    </td>
+                </tr>
+            }
+
+        </tbody>
+    </table>
+}
