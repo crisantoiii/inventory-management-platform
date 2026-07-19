@@ -1,10 +1,14 @@
 using InventoryPlatform.Application.Features.Products.GetProducts;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace InventoryPlatform.Web.Pages.Products;
 
 public class IndexModel : PageModel
 {
+    [TempData]
+    public string? SuccessMessage { get; set; }
+
     private readonly GetProductsHandler _handler;
 
     public IndexModel(GetProductsHandler handler)

@@ -33,6 +33,9 @@ public class CreateModel : PageModel
             return Page();
         }
 
+        TempData["SuccessMessage"] =
+            $"Product '{result.Value!.Name}' was created successfully.";
+
         return RedirectToPage("Index");
     }
 }

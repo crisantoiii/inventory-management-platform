@@ -1,0 +1,44 @@
+﻿@page
+@model InventoryPlatform.Web.Pages.Products.DetailsModel
+
+<h1>Product Details</h1>
+
+<div class="card">
+    <div class="card-body">
+
+        <dl class="row">
+
+            <dt class="col-sm-3">SKU</dt>
+            <dd class="col-sm-9">@Model.Product.Sku</dd>
+
+            <dt class="col-sm-3">Name</dt>
+            <dd class="col-sm-9">@Model.Product.Name</dd>
+
+            <dt class="col-sm-3">Unit</dt>
+            <dd class="col-sm-9">@Model.Product.Unit</dd>
+
+            <dt class="col-sm-3">Barcode</dt>
+            <dd class="col-sm-9">@Model.Product.Barcode</dd>
+
+            <dt class="col-sm-3">Cost Price</dt>
+            <dd class="col-sm-9">@Model.Product.CostPrice</dd>
+
+            <dt class="col-sm-3">Selling Price</dt>
+            <dd class="col-sm-9">@Model.Product.SellingPrice</dd>
+
+            <dt class="col-sm-3">Status</dt>
+            <dd class="col-sm-9">
+                @(Model.Product.IsActive ? "Active" : "Inactive")
+            </dd>
+
+            <dt class="col-sm-3">Description</dt>
+            <dd class="col-sm-9">@Model.Product.Description</dd>
+
+        </dl>
+
+        <a asp-page="Index" class="btn btn-secondary">
+            Back
+        </a>
+
+    </div>
+</div>

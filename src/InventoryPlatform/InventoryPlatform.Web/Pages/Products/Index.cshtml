@@ -9,7 +9,19 @@
         Add Product
     </a>
 </div>
+@if (!string.IsNullOrWhiteSpace(Model.SuccessMessage))
+{
+    <div class="alert alert-success alert-dismissible fade show"
+         role="alert">
 
+        @Model.SuccessMessage
+
+        <button type="button"
+                class="btn-close"
+                data-bs-dismiss="alert">
+        </button>
+    </div>
+}
 <table class="table table-striped">
     <thead>
         <tr>
@@ -27,7 +39,12 @@
         {
             <tr>
                 <td>@product.Sku</td>
-                <td>@product.Name</td>
+                <td>
+                    <a asp-page="Details"
+                       asp-route-id="@product.Id">
+                        @product.Name
+                    </a>
+                </td>
                 <td>@product.CostPrice</td>
                 <td>@product.SellingPrice</td>
                 <td>@(product.IsActive ? "Active" : "Inactive")</td>
