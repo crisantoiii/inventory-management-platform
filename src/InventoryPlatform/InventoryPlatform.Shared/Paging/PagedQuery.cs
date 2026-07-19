@@ -7,4 +7,8 @@ public sealed record PagedQuery
     public int PageSize { get; init; } = 10;
 
     public string? Search { get; init; }
+
+    public string? SortBy { get; init; }
+
+    public bool Descending { get; init; }
 }

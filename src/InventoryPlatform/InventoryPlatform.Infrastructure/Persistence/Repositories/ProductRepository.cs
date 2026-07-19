@@ -1,4 +1,5 @@
-﻿using InventoryPlatform.Application.Interfaces.Persistence;
+﻿using InventoryPlatform.Application.Features.Products.GetProducts;
+using InventoryPlatform.Application.Interfaces.Persistence;
 using InventoryPlatform.Domain.Entities;
 using InventoryPlatform.Infrastructure.Persistence.Context;
 using InventoryPlatform.Shared.Paging;
@@ -51,8 +52,9 @@ public sealed class ProductRepository
         var totalCount =
             await query.CountAsync(cancellationToken);
 
-        var items = await query
-            .OrderBy(p => p.Name)
+        var orderedQuery = ApplySorting(query, request);
+
+        var items = await orderedQuery
             .Skip((request.Page - 1) * request.PageSize)
             .Take(request.PageSize)
             .ToListAsync(cancellationToken);
@@ -63,6 +65,36 @@ public sealed class ProductRepository
             Page = request.Page,
             PageSize = request.PageSize,
             TotalCount = totalCount
+        };
+    }
+
+    private static IOrderedQueryable<Product> ApplySorting(
+    IQueryable<Product> query,
+    PagedQuery request)
+    {
+        return request.SortBy switch
+        {
+            ProductSortFields.Sku => request.Descending
+                ? query.OrderByDescending(p => p.Sku)
+                : query.OrderBy(p => p.Sku),
+
+            ProductSortFields.Name => request.Descending
+                ? query.OrderByDescending(p => p.Name)
+                : query.OrderBy(p => p.Name),
+
+            ProductSortFields.CostPrice => request.Descending
+                ? query.OrderByDescending(p => p.CostPrice)
+                : query.OrderBy(p => p.CostPrice),
+
+            ProductSortFields.SellingPrice => request.Descending
+                ? query.OrderByDescending(p => p.SellingPrice)
+                : query.OrderBy(p => p.SellingPrice),
+
+            ProductSortFields.IsActive => request.Descending
+                ? query.OrderByDescending(p => p.IsActive)
+                : query.OrderBy(p => p.IsActive),
+
+            _ => query.OrderBy(p => p.Name)
         };
     }
 }

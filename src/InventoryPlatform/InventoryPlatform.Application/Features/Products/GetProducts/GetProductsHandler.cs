@@ -21,7 +21,9 @@ public sealed class GetProductsHandler
         {
             Search = request.Search,
             Page = request.Page,
-            PageSize = request.PageSize
+            PageSize = request.PageSize,
+            SortBy = request.SortBy,
+            Descending = request.Descending
         };
 
         var products = await _productRepository.GetPagedActiveAsync(

@@ -27,4 +27,8 @@ public abstract record PagedRequest
                 _pageSize = value;
         }
     }
+
+    public string? SortBy { get; init; }
+
+    public bool Descending { get; init; }
 }
