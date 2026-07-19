@@ -17,7 +17,9 @@ public sealed class GetProductsHandler
         GetProductsRequest request,
         CancellationToken cancellationToken = default)
     {
-        var products = await _productRepository.GetActiveAsync(cancellationToken);
+        var products = await _productRepository.GetActiveAsync(
+                                        request.Search,
+                                        cancellationToken);
 
         if (!string.IsNullOrWhiteSpace(request.Search))
         {

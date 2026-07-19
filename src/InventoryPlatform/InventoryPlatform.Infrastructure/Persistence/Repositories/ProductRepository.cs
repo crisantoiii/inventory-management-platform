@@ -32,10 +32,22 @@ public sealed class ProductRepository
     }
 
     public async Task<IReadOnlyList<Product>> GetActiveAsync(
-    CancellationToken cancellationToken = default)
+        string? search = null,
+        CancellationToken cancellationToken = default)
     {
-        return await DbSet
-            .Where(p => p.IsActive)
+        IQueryable<Product> query = DbSet
+            .Where(p => p.IsActive);
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            search = search.Trim();
+
+            query = query.Where(p =>
+                p.Sku.Contains(search) ||
+                p.Name.Contains(search));
+        }
+
+        return await query
             .OrderBy(p => p.Name)
             .ToListAsync(cancellationToken);
     }

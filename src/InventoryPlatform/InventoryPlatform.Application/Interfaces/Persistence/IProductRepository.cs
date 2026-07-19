@@ -13,5 +13,6 @@ public interface IProductRepository : IRepository<Product>
         CancellationToken cancellationToken = default);
 
     Task<IReadOnlyList<Product>> GetActiveAsync(
+        string? search,
         CancellationToken cancellationToken = default);
 }
