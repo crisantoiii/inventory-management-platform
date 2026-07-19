@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using InventoryPlatform.Application.Features.Products.CreateProduct;
+using InventoryPlatform.Application.Features.Products.DeactivateProduct;
 using InventoryPlatform.Application.Features.Products.GetProduct;
 using InventoryPlatform.Application.Features.Products.GetProducts;
 using InventoryPlatform.Application.Features.Products.UpdateProduct;
@@ -16,6 +17,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<GetProductHandler>();
         services.AddScoped<GetProductsHandler>();
         services.AddScoped<UpdateProductHandler>();
+        services.AddScoped<DeactivateProductHandler>();
 
         services.AddValidatorsFromAssembly(
             typeof(ServiceCollectionExtensions).Assembly);

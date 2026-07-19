@@ -4,6 +4,8 @@
 <h1>Edit Product</h1>
 
 <form method="post">
+    <div asp-validation-summary="ModelOnly"
+             class="text-danger"></div>
     <input asp-for="Product.Id" type="hidden" />
 
     <div class="mb-3">

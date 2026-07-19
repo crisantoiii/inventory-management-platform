@@ -36,9 +36,20 @@
 
         </dl>
 
-        <a asp-page="Index" class="btn btn-secondary">
-            Back
-        </a>
+        <div class="mt-4">
+
+            <a asp-page="Index"
+               class="btn btn-secondary">
+                Back
+            </a>
+
+            <a asp-page="Edit"
+               asp-route-id="@Model.Product.Id"
+               class="btn btn-primary">
+                Edit
+            </a>
+
+        </div>
 
     </div>
 </div>
