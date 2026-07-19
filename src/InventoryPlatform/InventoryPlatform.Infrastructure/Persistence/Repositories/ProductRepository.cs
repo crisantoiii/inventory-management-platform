@@ -3,6 +3,7 @@ using InventoryPlatform.Application.Interfaces.Persistence;
 using InventoryPlatform.Domain.Entities;
 using InventoryPlatform.Infrastructure.Persistence.Context;
 using InventoryPlatform.Shared.Paging;
+using InventoryPlatform.Shared.Filtering;
 using Microsoft.EntityFrameworkCore;
 
 namespace InventoryPlatform.Infrastructure.Persistence.Repositories;
@@ -37,8 +38,22 @@ public sealed class ProductRepository
     PagedQuery request,
     CancellationToken cancellationToken = default)
     {
-        IQueryable<Product> query =
-            DbSet.Where(p => p.IsActive);
+        IQueryable<Product> query = DbSet;
+
+        query = request.Status switch
+        {
+            ProductStatusFilter.Active =>
+                query.Where(p => p.IsActive),
+
+            ProductStatusFilter.Inactive =>
+                query.Where(p => !p.IsActive),
+
+            ProductStatusFilter.All =>
+                query,
+
+            _ =>
+                query.Where(p => p.IsActive)
+        };
 
         if (!string.IsNullOrWhiteSpace(request.Search))
         {

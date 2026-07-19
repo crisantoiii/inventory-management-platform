@@ -1,4 +1,6 @@
-﻿namespace InventoryPlatform.Shared.Paging;
+﻿using InventoryPlatform.Shared.Filtering;
+
+namespace InventoryPlatform.Shared.Paging;
 
 public abstract record PagedRequest
 {
@@ -31,4 +33,7 @@ public abstract record PagedRequest
     public string? SortBy { get; init; }
 
     public bool Descending { get; init; }
+
+    public ProductStatusFilter Status { get; init; }
+    = ProductStatusFilter.Active;
 }

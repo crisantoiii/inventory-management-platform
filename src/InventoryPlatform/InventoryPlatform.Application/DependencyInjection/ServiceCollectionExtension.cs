@@ -4,6 +4,7 @@ using InventoryPlatform.Application.Features.Products.DeactivateProduct;
 using InventoryPlatform.Application.Features.Products.GetProduct;
 using InventoryPlatform.Application.Features.Products.GetProducts;
 using InventoryPlatform.Application.Features.Products.UpdateProduct;
+using InventoryPlatform.Application.Features.Products.ActivateProduct;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace InventoryPlatform.Application.DependencyInjection;
@@ -18,6 +19,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<GetProductsHandler>();
         services.AddScoped<UpdateProductHandler>();
         services.AddScoped<DeactivateProductHandler>();
+        services.AddScoped<ActivateProductHandler>();
 
         services.AddValidatorsFromAssembly(
             typeof(ServiceCollectionExtensions).Assembly);
