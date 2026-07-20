@@ -36,4 +36,6 @@ public abstract record PagedRequest
 
     public ProductStatusFilter Status { get; init; }
     = ProductStatusFilter.Active;
+
+    public string? Search { get; init; }
 }

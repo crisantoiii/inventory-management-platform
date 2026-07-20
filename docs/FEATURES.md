@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Inventory Management Platform is a modern ASP.NET Core Razor Pages application built using Clean Architecture principles. It provides reusable infrastructure for managing inventory-related modules through consistent CRUD operations, searching, sorting, filtering, and pagination.
+The Inventory Management Platform is a modern ASP.NET Core Razor Pages application built using Clean Architecture principles. It currently provides reusable infrastructure for Product and Category management through consistent CRUD operations, server-side searching, sorting, filtering, and pagination. The architecture is designed to support additional inventory modules with minimal duplication.
 
 ---
 
@@ -39,6 +39,34 @@ Each product supports:
 
 ---
 
+# Category Management
+
+## Category Lifecycle
+
+- ✅ Create Category
+- ✅ View Category Details
+- ✅ Edit Category
+- ✅ Activate Category
+- ✅ Deactivate Category
+
+## Category Listing
+
+- ✅ Server-side Search
+- ✅ Server-side Pagination
+- ✅ Server-side Sorting
+- ✅ Status Filtering
+- ✅ Success Notifications
+
+## Category Information
+
+Each category supports:
+
+- Name
+- Description
+- Active Status
+
+---
+
 # Shared Infrastructure
 
 ## Paging
@@ -66,12 +94,20 @@ Reusable Classes:
 
 Reusable server-side sorting.
 
-Supported:
+Currently implemented for:
+
+### Products
 
 - SKU
 - Name
 - Cost Price
 - Selling Price
+- Status
+
+### Categories
+
+- Name
+- Description
 - Status
 
 ---
@@ -90,10 +126,17 @@ Currently supports:
 
 ## Search
 
-Server-side search supports:
+Server-side search is implemented for:
+
+### Products
 
 - SKU
 - Product Name
+
+### Categories
+
+- Category Name
+- Description
 
 ---
 
@@ -118,14 +161,6 @@ Operation results are standardized using:
 ---
 
 # Planned Features
-
-## Category Management
-
-- Category CRUD
-- Search
-- Pagination
-- Sorting
-- Status Filtering
 
 ## Supplier Management
 

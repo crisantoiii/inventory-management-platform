@@ -1,9 +1,13 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using InventoryPlatform.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace InventoryPlatform.Infrastructure.Persistence.Context;
 
 public sealed class ApplicationDbContext : DbContext
 {
+    public DbSet<Category> Categories => Set<Category>();
+
+
     public ApplicationDbContext(
         DbContextOptions<ApplicationDbContext> options)
         : base(options)
