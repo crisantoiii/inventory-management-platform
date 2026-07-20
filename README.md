@@ -46,6 +46,24 @@ The long-term goal is to evolve this project into a complete inventory managemen
 - ✅ Status Filtering
 - ✅ Success Notifications
 
+## Category Management
+
+### Category Lifecycle
+
+- ✅ Create Category
+- ✅ View Category Details
+- ✅ Edit Category
+- ✅ Activate Category
+- ✅ Deactivate Category
+
+### Category Listing
+
+- ✅ Server-side Search
+- ✅ Server-side Pagination
+- ✅ Server-side Sorting
+- ✅ Status Filtering
+- ✅ Success Notifications
+
 ---
 
 # Architecture
@@ -90,11 +108,12 @@ Reusable infrastructure has been implemented to support future modules.
 
 ## Filtering
 
-- ProductStatusFilter
+- ProductStatusFilter (shared across modules)
 
 ## Sorting
 
 - ProductSortFields
+- CategorySortFields
 
 ## Result Pattern
 
@@ -140,7 +159,7 @@ Development Tools
 | Module | Status |
 |----------|--------|
 | Product Management | ✅ Complete |
-| Category Management | ⬜ Planned |
+| Category Management | ✅ Complete |
 | Supplier Management | ⬜ Planned |
 | Customer Management | ⬜ Planned |
 | Dashboard | ⬜ Planned |
@@ -152,7 +171,6 @@ Development Tools
 
 Upcoming development includes:
 
-- Category Management
 - Supplier Management
 - Customer Management
 - Inventory Transactions
