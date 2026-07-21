@@ -14,6 +14,13 @@ using InventoryPlatform.Application.Features.Categories.GetCategories;
 using InventoryPlatform.Application.Features.Categories.UpdateCategory;
 using InventoryPlatform.Application.Features.Categories.ActivateCategory;
 
+using InventoryPlatform.Application.Features.Suppliers.CreateSupplier;
+using InventoryPlatform.Application.Features.Suppliers.DeactivateSupplier;
+using InventoryPlatform.Application.Features.Suppliers.GetSupplier;
+using InventoryPlatform.Application.Features.Suppliers.GetSuppliers;
+using InventoryPlatform.Application.Features.Suppliers.UpdateSupplier;
+using InventoryPlatform.Application.Features.Suppliers.ActivateSupplier;
+
 using Microsoft.Extensions.DependencyInjection;
 
 namespace InventoryPlatform.Application.DependencyInjection;
@@ -38,6 +45,12 @@ public static class ServiceCollectionExtensions
         services.AddScoped<DeactivateCategoryHandler>();
         services.AddScoped<ActivateCategoryHandler>();
 
+        services.AddScoped<CreateSupplierHandler>();
+        services.AddScoped<GetSupplierHandler>();
+        services.AddScoped<GetSuppliersHandler>();
+        services.AddScoped<UpdateSupplierHandler>();
+        services.AddScoped<DeactivateSupplierHandler>();
+        services.AddScoped<ActivateSupplierHandler>();
 
         services.AddValidatorsFromAssembly(
             typeof(ServiceCollectionExtensions).Assembly);
