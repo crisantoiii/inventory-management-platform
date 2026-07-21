@@ -1,4 +1,5 @@
-﻿using InventoryPlatform.Application.Interfaces.Persistence;
+﻿using InventoryPlatform.Application.Features.Categories.ActivateCategory;
+using InventoryPlatform.Application.Interfaces.Persistence;
 using InventoryPlatform.Shared.Results;
 namespace InventoryPlatform.Application.Features.Categories.ActivateCategory;
 
@@ -16,7 +17,8 @@ public sealed class ActivateCategoryHandler
     }
 
     public async Task<Result<ActivateCategoryResponse>> HandleAsync(
-        ActivateCategoryRequest request)
+        ActivateCategoryRequest request,
+        CancellationToken cancellationToken = default)
     {
         var category = await _categoryRepository.GetByIdAsync(request.Id);
 

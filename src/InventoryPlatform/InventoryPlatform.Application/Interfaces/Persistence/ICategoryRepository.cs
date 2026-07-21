@@ -5,7 +5,7 @@ using InventoryPlatform.Shared.Paging;
 public interface ICategoryRepository
     : IRepository<Category>
 {
-    Task<PagedResult<Category>> GetPagedActiveAsync(
+    Task<PagedResult<Category>> GetPagedAsync(
         PagedQuery request,
         CancellationToken cancellationToken = default);
 

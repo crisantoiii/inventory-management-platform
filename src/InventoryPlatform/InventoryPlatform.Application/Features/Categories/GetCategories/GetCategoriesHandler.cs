@@ -27,7 +27,7 @@ public sealed class GetCategoriesHandler
             Status = request.Status
         };
 
-        var categorys = await _categoryRepository.GetPagedActiveAsync(
+        var categorys = await _categoryRepository.GetPagedAsync(
             query,
             cancellationToken);
 
