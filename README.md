@@ -104,7 +104,7 @@ Reusable infrastructure has been implemented to support future modules.
 
 - PagedRequest
 - PagedQuery
-- PagedResult<T>
+- PagedResult\<T>
 
 ## Filtering
 
@@ -118,7 +118,7 @@ Reusable infrastructure has been implemented to support future modules.
 ## Result Pattern
 
 - Result
-- Result<T>
+- Result\<T>
 
 This infrastructure is intended to be reused by all future modules such as Categories, Suppliers, Customers, and Inventory Transactions.
 
