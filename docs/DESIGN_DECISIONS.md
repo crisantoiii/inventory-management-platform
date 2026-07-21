@@ -87,11 +87,11 @@ Repositories centralize persistence concerns and keep handlers focused on busine
 Current implementation:
 
 - ProductRepository
-
-Future repositories:
-
 - CategoryRepository
 - SupplierRepository
+
+Planned repositories:
+
 - CustomerRepository
 
 ## Outcome
@@ -142,9 +142,10 @@ After validating the approach, paging was extracted into reusable infrastructure
 
 Benefits:
 
-- Consistent paging
+- Consistent paging behavior
 - Reduced duplication
-- Easier implementation of future modules
+- Faster implementation of new modules
+- Proven reusable across Product, Category, and Supplier modules
 
 ## Outcome
 
@@ -160,13 +161,11 @@ Introduce reusable filtering types.
 
 Current implementation:
 
-- ProductStatusFilter
+- Shared status filtering infrastructure
 
 ## Rationale
 
-Filtering should follow the same reusable pattern as paging.
-
-Future modules can extend this approach while maintaining consistency.
+The Product, Category, and Supplier modules all use the same filtering approach, providing a consistent user experience while minimizing duplicate code.
 
 ## Outcome
 
@@ -178,7 +177,7 @@ Accepted.
 
 ## Decision
 
-Move ProductSortFields into InventoryPlatform.Shared.
+Move module sort field definitions into InventoryPlatform.Shared.
 
 ## Rationale
 
@@ -187,6 +186,12 @@ Sorting definitions are used by:
 - Web
 - Application
 - Infrastructure
+
+Current implementation:
+
+- ProductSortFields
+- CategorySortFields
+- SupplierSortFields
 
 Keeping them in Shared prevents unnecessary project dependencies and improves reuse.
 
@@ -204,13 +209,13 @@ Shared project chosen.
 
 ## Decision
 
-Products are deactivated instead of permanently deleted.
+Business entities are deactivated instead of permanently deleted.
 
 ## Rationale
 
 Inventory systems should preserve historical data.
 
-Inactive products can later be:
+Inactive records can later be:
 
 - Restored
 - Reported
@@ -245,6 +250,34 @@ Accepted.
 
 ---
 
+# DD-010 — Consistent Module Architecture
+
+## Decision
+
+All business modules follow the same architectural structure.
+
+Each module implements:
+
+- Domain Entity
+- Repository Interface
+- Repository Implementation
+- CQRS-style Application Handlers
+- Razor Pages
+- Shared Paging
+- Shared Filtering
+- Shared Sorting
+- Result Pattern
+
+## Rationale
+
+Maintaining a consistent implementation pattern across modules improves readability, reduces onboarding time, simplifies maintenance, and enables new features to be developed with minimal duplication.
+
+## Outcome
+
+Accepted.
+
+---
+
 # Future Decisions
 
 This document will continue to evolve as the project grows.
@@ -258,3 +291,5 @@ Examples:
 - Reporting architecture
 - API design
 - Caching strategy
+- Inventory transaction workflow
+- Concurrency handling

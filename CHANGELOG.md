@@ -28,6 +28,17 @@ All notable changes to this project will be documented in this file.
 - Category create page
 - Category edit page
 
+#### Supplier Module
+- Supplier search
+- Server-side pagination
+- Server-side sorting
+- Supplier status filtering
+- Supplier activation
+- Supplier deactivation
+- Supplier details page
+- Supplier create page
+- Supplier edit page
+
 #### Shared Infrastructure
 - Reusable paging infrastructure
   - PagedRequest
@@ -36,13 +47,14 @@ All notable changes to this project will be documented in this file.
 - Shared status filter enum
 - Shared product sort field definitions
 - Shared category sort field definitions
+- Shared supplier sort field definitions
 
 ### Changed
 
 - Refactored product repository to support reusable filtering, sorting and paging.
 - Refactored product listing to use server-side search.
 - Refactored product queries to use reusable paging models.
-- Implemented Category module using the established Product module architecture.
+- Implemented Supplier module using the established Product and Category architecture.
 
 ### Improved
 
@@ -54,3 +66,7 @@ All notable changes to this project will be documented in this file.
 - Category listing preserves sorting state.
 - Category activation workflow.
 - Category deactivation workflow.
+- Supplier listing preserves filter state across pagination.
+- Supplier listing preserves sorting state.
+- Supplier activation workflow.
+- Supplier deactivation workflow.

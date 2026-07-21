@@ -48,7 +48,7 @@ The application layer contains business use cases.
 
 Responsibilities:
 
-- Feature Handlers
+- Feature Handlers (CQRS-style)
 - DTOs
 - Interfaces
 - Validation
@@ -131,6 +131,18 @@ The Domain project has no knowledge of Infrastructure or Web.
 
 # Current Architectural Patterns
 
+## Architecture Validation
+
+The architecture has been validated through the implementation of three independent business modules:
+
+- Product Management
+- Category Management
+- Supplier Management
+
+Each module follows the same layered architecture, repository pattern, CQRS-style application handlers, reusable paging/filtering/sorting infrastructure, and Razor Pages presentation model.
+
+This consistency demonstrates that the architecture scales across multiple business domains without requiring structural changes.
+
 ## Clean Architecture
 
 Separates business logic from infrastructure concerns.
@@ -144,11 +156,11 @@ Repositories abstract persistence from application logic.
 Current repositories include:
 
 - ProductRepository
-
-Future repositories:
-
 - CategoryRepository
 - SupplierRepository
+
+Planned repositories:
+
 - CustomerRepository
 
 ---
@@ -160,7 +172,7 @@ Application operations return standardized results.
 Examples:
 
 - Result
-- Result<T>
+- Result\<T>
 
 This provides consistent success and error handling.
 
@@ -172,9 +184,9 @@ Reusable paging is implemented through:
 
 - PagedRequest
 - PagedQuery
-- PagedResult<T>
+- PagedResult\<T>
 
-This infrastructure is shared across all future modules.
+This infrastructure is currently shared across the Product, Category, and Supplier modules and is designed to support future modules.
 
 ---
 
@@ -182,9 +194,9 @@ This infrastructure is shared across all future modules.
 
 Reusable filtering currently includes:
 
-- ProductStatusFilter
+- Shared status filtering infrastructure
 
-Future modules will introduce their own filters while following the same pattern.
+The Product, Category, and Supplier modules all use the same filtering approach, and future modules are expected to follow the same pattern.
 
 ---
 
@@ -193,6 +205,8 @@ Future modules will introduce their own filters while following the same pattern
 Reusable sorting currently includes:
 
 - ProductSortFields
+- CategorySortFields
+- SupplierSortFields
 
 The infrastructure supports server-side sorting through strongly typed sort definitions.
 
@@ -212,6 +226,10 @@ Razor Page
 ↓
 
 Application Handler
+
+↓
+
+Domain Entity
 
 ↓
 
@@ -245,6 +263,8 @@ The project follows:
 - Dependency Inversion
 - DRY (Don't Repeat Yourself)
 - Single Responsibility Principle
+- Consistency over Premature Abstraction
+- Vertical Slice Feature Organization
 
 ---
 
@@ -252,12 +272,13 @@ The project follows:
 
 Planned additions include:
 
+- Customer Management
+- Inventory Transactions
+- Dashboard
+- Reporting
 - Authentication
 - Authorization
 - Audit Logging
-- Inventory Transactions
-- Reporting
-- Dashboard
 - Background Jobs
 - API Endpoints
 

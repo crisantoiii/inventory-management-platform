@@ -64,6 +64,24 @@ The long-term goal is to evolve this project into a complete inventory managemen
 - ✅ Status Filtering
 - ✅ Success Notifications
 
+## Supplier Management
+
+### Supplier Lifecycle
+
+- ✅ Create Supplier
+- ✅ View Supplier Details
+- ✅ Edit Supplier
+- ✅ Activate Supplier
+- ✅ Deactivate Supplier
+
+### Supplier Listing
+
+- ✅ Server-side Search
+- ✅ Server-side Pagination
+- ✅ Server-side Sorting
+- ✅ Status Filtering
+- ✅ Success Notifications
+
 ---
 
 # Architecture
@@ -108,19 +126,20 @@ Reusable infrastructure has been implemented to support future modules.
 
 ## Filtering
 
-- ProductStatusFilter (shared across modules)
+- StatusFilter enum (shared across all modules)
 
 ## Sorting
 
 - ProductSortFields
 - CategorySortFields
+- SupplierSortFields
 
 ## Result Pattern
 
 - Result
 - Result\<T>
 
-This infrastructure is intended to be reused by all future modules such as Categories, Suppliers, Customers, and Inventory Transactions.
+This infrastructure is currently shared across the Product, Category, and Supplier modules and is intended to support future modules such as Customers and Inventory Transactions.
 
 ---
 
@@ -132,6 +151,7 @@ Backend
 - Razor Pages
 - Entity Framework Core 10
 - SQL Server
+- LINQ
 
 Architecture
 
@@ -151,6 +171,7 @@ Development Tools
 - Visual Studio 2026
 - Git
 - GitHub
+- SQL Server Management Studio
 
 ---
 
@@ -160,7 +181,7 @@ Development Tools
 |----------|--------|
 | Product Management | ✅ Complete |
 | Category Management | ✅ Complete |
-| Supplier Management | ⬜ Planned |
+| Supplier Management | ✅ Complete |
 | Customer Management | ⬜ Planned |
 | Dashboard | ⬜ Planned |
 | Inventory Transactions | ⬜ Planned |
@@ -171,7 +192,6 @@ Development Tools
 
 Upcoming development includes:
 
-- Supplier Management
 - Customer Management
 - Inventory Transactions
 - Dashboard

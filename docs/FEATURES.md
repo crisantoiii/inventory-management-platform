@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Inventory Management Platform is a modern ASP.NET Core Razor Pages application built using Clean Architecture principles. It currently provides reusable infrastructure for Product and Category management through consistent CRUD operations, server-side searching, sorting, filtering, and pagination. The architecture is designed to support additional inventory modules with minimal duplication.
+The Inventory Management Platform is a modern ASP.NET Core Razor Pages application built using Clean Architecture principles. It currently provides reusable infrastructure for Product, Category, and Supplier management through consistent CRUD operations, server-side searching, sorting, filtering, and pagination. The architecture is designed to support additional inventory modules with minimal duplication.
 
 ---
 
@@ -67,6 +67,37 @@ Each category supports:
 
 ---
 
+# Supplier Management
+
+## Supplier Lifecycle
+
+- ✅ Create Supplier
+- ✅ View Supplier Details
+- ✅ Edit Supplier
+- ✅ Activate Supplier
+- ✅ Deactivate Supplier
+
+## Supplier Listing
+
+- ✅ Server-side Search
+- ✅ Server-side Pagination
+- ✅ Server-side Sorting
+- ✅ Status Filtering
+- ✅ Success Notifications
+
+## Supplier Information
+
+Each supplier supports:
+
+- Name
+- Contact Person
+- Email
+- Phone
+- Address
+- Active Status
+
+---
+
 # Shared Infrastructure
 
 ## Paging
@@ -110,6 +141,14 @@ Currently implemented for:
 - Description
 - Status
 
+### Suppliers
+
+- Name
+- Contact Person
+- Email
+- Phone
+- Status
+
 ---
 
 ## Filtering
@@ -138,6 +177,12 @@ Server-side search is implemented for:
 - Category Name
 - Description
 
+### Suppliers
+
+- Supplier Name
+- Contact Person
+- Email
+
 ---
 
 ## Result Pattern
@@ -157,17 +202,12 @@ Operation results are standardized using:
 - Entity Framework Core
 - Razor Pages
 - Layered Project Structure
+- CQRS-style Application Handlers
+- Result Pattern
 
 ---
 
 # Planned Features
-
-## Supplier Management
-
-- Supplier CRUD
-- Contact Information
-- Search
-- Pagination
 
 ## Customer Management
 
