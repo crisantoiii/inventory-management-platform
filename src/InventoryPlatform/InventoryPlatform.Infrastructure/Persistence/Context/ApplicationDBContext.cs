@@ -5,8 +5,9 @@ namespace InventoryPlatform.Infrastructure.Persistence.Context;
 
 public sealed class ApplicationDbContext : DbContext
 {
+    public DbSet<Product> Products => Set<Product>();
     public DbSet<Category> Categories => Set<Category>();
-
+    public DbSet<Supplier> Suppliers => Set<Supplier>();
 
     public ApplicationDbContext(
         DbContextOptions<ApplicationDbContext> options)
