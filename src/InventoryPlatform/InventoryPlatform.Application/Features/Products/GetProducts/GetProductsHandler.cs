@@ -27,7 +27,7 @@ public sealed class GetProductsHandler
             Status = request.Status
         };
 
-        var products = await _productRepository.GetPagedActiveAsync(
+        var products = await _productRepository.GetPagedAsync(
             query,
             cancellationToken);
 

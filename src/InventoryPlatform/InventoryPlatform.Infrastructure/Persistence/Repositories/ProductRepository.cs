@@ -34,7 +34,7 @@ public sealed class ProductRepository
             cancellationToken);
     }
 
-    public async Task<PagedResult<Product>> GetPagedActiveAsync(
+    public async Task<PagedResult<Product>> GetPagedAsync(
     PagedQuery request,
     CancellationToken cancellationToken = default)
     {

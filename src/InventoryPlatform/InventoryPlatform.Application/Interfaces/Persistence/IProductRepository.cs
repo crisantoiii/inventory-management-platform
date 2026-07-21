@@ -13,7 +13,7 @@ public interface IProductRepository : IRepository<Product>
         string sku,
         CancellationToken cancellationToken = default);
 
-    Task<PagedResult<Product>> GetPagedActiveAsync(
+    Task<PagedResult<Product>> GetPagedAsync(
         PagedQuery request,
         CancellationToken cancellationToken = default);
 }

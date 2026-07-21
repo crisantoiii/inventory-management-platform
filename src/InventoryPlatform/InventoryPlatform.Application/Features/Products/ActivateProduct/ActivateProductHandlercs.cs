@@ -1,4 +1,5 @@
-﻿using InventoryPlatform.Application.Interfaces.Persistence;
+﻿using InventoryPlatform.Application.Features.Products.ActivateProduct;
+using InventoryPlatform.Application.Interfaces.Persistence;
 using InventoryPlatform.Shared.Results;
 namespace InventoryPlatform.Application.Features.Products.ActivateProduct;
 
@@ -16,7 +17,8 @@ public sealed class ActivateProductHandler
     }
 
     public async Task<Result<ActivateProductResponse>> HandleAsync(
-        ActivateProductRequest request)
+        ActivateProductRequest request,
+        CancellationToken cancellationToken = default)
     {
         var product = await _productRepository.GetByIdAsync(request.Id);
 
