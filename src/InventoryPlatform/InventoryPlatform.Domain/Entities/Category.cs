@@ -29,7 +29,7 @@ public sealed class Category : BaseEntity
         string? description)
     {
         Rename(name);
-        UpdateDescription(description);
+        Description = description;
     }
 
     public void Rename(string name)
@@ -37,11 +37,6 @@ public sealed class Category : BaseEntity
         Guard.AgainstNullOrWhiteSpace(name, nameof(name));
 
         Name = name;
-    }
-
-    public void UpdateDescription(string? description)
-    {
-        Description = description;
     }
 
     public void Activate()

@@ -29,8 +29,7 @@ public sealed class UpdateCategoryHandler
                         CategoryErrors.NotFound);
         }
 
-        product.Rename(request.Name);
-        product.UpdateDescription(request.Description);
+        product.Update(request.Name, request.Description);
 
         _productRepository.Update(product);
 

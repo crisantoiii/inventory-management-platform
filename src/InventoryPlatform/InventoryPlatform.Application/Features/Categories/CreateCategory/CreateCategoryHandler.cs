@@ -26,7 +26,7 @@ public sealed class CreateCategoryHandler
             cancellationToken))
         {
             return Result<CreateCategoryResponse>.Failure(
-                CategoryErrors.DuplicateSku);
+                CategoryErrors.DuplicateName);
         }
 
         var category = new Category(
