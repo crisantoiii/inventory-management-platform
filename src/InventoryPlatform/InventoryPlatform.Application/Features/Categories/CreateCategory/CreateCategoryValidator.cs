@@ -2,13 +2,13 @@
 
 namespace InventoryPlatform.Application.Features.Categories.CreateCategory;
 
-public sealed class CreateCategorytValidator
+public sealed class CreateCategoryValidator
     : AbstractValidator<CreateCategoryRequest>
 {
-    public CreateCategorytValidator()
+    public CreateCategoryValidator()
     {
         RuleFor(x => x.Name)
             .NotEmpty()
-            .MaximumLength(200);
+            .MaximumLength(100);
     }
 }

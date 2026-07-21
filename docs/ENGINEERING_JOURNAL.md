@@ -1,260 +1,283 @@
-# Design Decisions
+# Engineering Journal
 
 ## Overview
 
-This document records significant architectural and engineering decisions made during the development of the Inventory Management Platform.
+This journal records significant engineering milestones throughout the development of the Inventory Management Platform.
 
-The goal is to capture **why** a decision was made, what alternatives were considered, and the expected long-term benefits.
-
----
-
-# DD-001 — Clean Architecture
-
-## Decision
-
-The solution follows a layered Clean Architecture.
-
-```
-Web
-↓
-
-Application
-↓
-
-Domain
-
-Infrastructure
-```
-
-## Rationale
-
-Business logic should remain independent of UI and persistence technologies.
-
-This allows:
-
-- Better maintainability
-- Easier testing
-- Lower coupling
-- Easier future expansion
-
-## Alternatives Considered
-
-Traditional three-layer architecture.
-
-## Outcome
-
-Accepted.
+Rather than documenting daily work, it captures important architectural decisions, major feature implementations, refactorings, lessons learned, and the evolution of the codebase.
 
 ---
 
-# DD-002 — Razor Pages
+# Milestone 1 — Project Initialization
 
-## Decision
+## Summary
 
-Use Razor Pages instead of ASP.NET MVC.
+Created the initial solution structure following Clean Architecture.
 
-## Rationale
+Projects:
 
-The application is primarily business CRUD with page-oriented workflows.
+- InventoryPlatform.Web
+- InventoryPlatform.Application
+- InventoryPlatform.Domain
+- InventoryPlatform.Infrastructure
+- InventoryPlatform.Shared
 
-Razor Pages provide:
+### Outcome
 
-- Simpler folder organization
-- Better feature locality
-- Less boilerplate
-- Faster development
-
-## Alternatives
-
-ASP.NET MVC
-
-## Outcome
-
-Accepted.
+Established a modular architecture with clearly defined responsibilities.
 
 ---
 
-# DD-003 — Repository Pattern
+# Milestone 2 — Entity Framework Core Setup
 
-## Decision
+## Summary
 
-Repositories abstract Entity Framework Core from application logic.
+Configured Entity Framework Core and SQL Server.
 
-## Rationale
+Completed:
 
-Repositories centralize persistence concerns and keep handlers focused on business workflows.
+- DbContext
+- Initial Migration
+- Database Creation
+- Dependency Injection
+- Repository Registration
 
-Current implementation:
+### Lessons Learned
 
-- ProductRepository
-
-Future repositories:
-
-- CategoryRepository
-- SupplierRepository
-- CustomerRepository
-
-## Outcome
-
-Accepted.
+- Keep EF Core confined to the Infrastructure layer.
+- Avoid leaking persistence concerns into Application.
 
 ---
 
-# DD-004 — Result Pattern
+# Milestone 3 — Product Module
 
-## Decision
+## Summary
 
-Application handlers return Result or Result<T>.
+Implemented the first complete business module.
 
-## Rationale
+Completed:
 
-Standardizes success and failure responses.
+- Product CRUD
+- Product Details
+- Product Activation
+- Product Deactivation
 
-Benefits:
+### Outcome
 
-- Consistent error handling
-- Cleaner handlers
-- Easier validation
-
-## Outcome
-
-Accepted.
+Validated the overall Clean Architecture design.
 
 ---
 
-# DD-005 — Shared Paging Infrastructure
+# Milestone 4 — Shared Paging Infrastructure
 
-## Decision
+## Summary
 
-Create reusable paging classes in the Shared project.
+Initially implemented paging specifically for Products.
 
-Components:
+After validating the implementation, paging was extracted into reusable infrastructure.
+
+Introduced:
 
 - PagedRequest
 - PagedQuery
 - PagedResult<T>
 
-## Rationale
+### Lesson Learned
 
-Initially paging was implemented specifically for Products.
+Build for one feature first.
 
-After validating the approach, paging was extracted into reusable infrastructure.
+Generalize only after the implementation has proven to be reusable.
+
+---
+
+# Milestone 5 — Server-side Searching
+
+## Summary
+
+Moved searching into SQL queries instead of filtering in memory.
 
 Benefits:
 
-- Consistent paging
-- Reduced duplication
-- Easier implementation of future modules
+- Better scalability
+- Reduced memory usage
+- Improved response time
 
-## Outcome
+### Lesson Learned
 
-Accepted.
-
----
-
-# DD-006 — Shared Filtering Infrastructure
-
-## Decision
-
-Introduce reusable filtering types.
-
-Current implementation:
-
-- ProductStatusFilter
-
-## Rationale
-
-Filtering should follow the same reusable pattern as paging.
-
-Future modules can extend this approach while maintaining consistency.
-
-## Outcome
-
-Accepted.
+Filtering should occur as close to the database as possible.
 
 ---
 
-# DD-007 — Shared Sorting Infrastructure
+# Milestone 6 — Server-side Sorting
 
-## Decision
+## Summary
 
-Move ProductSortFields into InventoryPlatform.Shared.
+Implemented reusable sorting infrastructure.
 
-## Rationale
+Initially, sort definitions were implemented for the Product module before being generalized into shared infrastructure.
 
-Sorting definitions are used by:
+Later refactored to:
+
+InventoryPlatform.Shared.Sorting
+
+### Reason
+
+Sorting definitions are shared between:
 
 - Web
 - Application
 - Infrastructure
 
-Keeping them in Shared prevents unnecessary project dependencies and improves reuse.
+Moving them into Shared removed unnecessary project dependencies.
 
-## Alternatives
+### Lesson Learned
 
-Keeping ProductSortFields in the Application project.
-
-## Outcome
-
-Shared project chosen.
+Shared metadata belongs in the Shared project, not in a feature-specific layer.
 
 ---
 
-# DD-008 — Soft Delete
+# Milestone 7 — Status Filtering
 
-## Decision
+## Summary
 
-Products are deactivated instead of permanently deleted.
+Implemented reusable status filtering.
 
-## Rationale
+Added:
 
-Inventory systems should preserve historical data.
+- Shared status filtering infrastructure
+- Active
+- Inactive
+- All
 
-Inactive products can later be:
+Repository pipeline became:
 
-- Restored
-- Reported
-- Audited
+Status
 
-This approach better reflects real-world business requirements.
+↓
 
-## Outcome
+Search
 
-Accepted.
+↓
 
----
+Count
 
-# DD-009 — Server-side Processing
+↓
 
-## Decision
+Sort
 
-Searching, sorting, filtering, and paging are performed in SQL rather than in memory.
+↓
 
-## Rationale
+Paging
 
-Benefits include:
+### Lesson Learned
 
-- Better scalability
-- Reduced memory usage
-- Faster response times
-- Smaller data transfers
-
-## Outcome
-
-Accepted.
+Applying filters before sorting and paging results in a cleaner and more efficient query pipeline.
 
 ---
 
-# Future Decisions
+# Milestone 8 — Product Lifecycle
 
-This document will continue to evolve as the project grows.
+## Summary
 
-Examples:
+Completed the Product module.
 
-- Authentication strategy
-- Authorization model
-- Audit logging
-- Background jobs
-- Reporting architecture
-- API design
-- Caching strategy
+Implemented:
+
+- Create
+- Details
+- Edit
+- Activate
+- Deactivate
+- Search
+- Pagination
+- Sorting
+- Status Filtering
+
+### Outcome
+
+The Product module became the reference implementation for future modules.
+
+Future modules should reuse the shared infrastructure rather than introducing module-specific implementations.
+
+---
+
+# Milestone 9 — Category Module
+
+## Summary
+
+Implemented the second complete business module by reusing the established Product module architecture.
+
+Completed:
+
+- Category CRUD
+- Category Details
+- Category Activation
+- Category Deactivation
+- Server-side Search
+- Server-side Pagination
+- Server-side Sorting
+- Status Filtering
+
+### Outcome
+
+Validated that the shared paging, filtering, sorting, repository, and Result pattern infrastructure could be reused without architectural changes.
+
+### Lesson Learned
+
+Reusable infrastructure should be extracted only after proving its value through a real implementation.
+
+---
+
+# Milestone 10 — Supplier Module
+
+## Summary
+
+Implemented the third complete business module using the established application architecture.
+
+Completed:
+
+- Supplier CRUD
+- Supplier Details
+- Supplier Activation
+- Supplier Deactivation
+- Server-side Search
+- Server-side Pagination
+- Server-side Sorting
+- Status Filtering
+
+### Outcome
+
+Confirmed that the architecture scales across multiple business domains while maintaining consistent implementation patterns.
+
+### Lesson Learned
+
+Consistency across modules improves maintainability, readability, and development speed more than introducing module-specific abstractions.
+
+---
+# Engineering Principles Reinforced
+
+Throughout development the following principles have consistently guided implementation:
+
+- Separation of Concerns
+- SOLID Principles
+- Dependency Inversion
+- Reuse before duplication
+- Build first, generalize later
+- Prefer compile-time safety
+- Push processing to the database whenever practical
+- Maintain consistent module architecture
+- Favor proven patterns over premature abstraction
+
+---
+
+# Future Journal Entries
+
+Future milestones are expected to include:
+
+- Customer Module
+- Inventory Transactions
+- Dashboard
+- Authentication
+- Authorization
+- Reporting
+- Audit Logging

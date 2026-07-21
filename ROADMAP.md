@@ -10,7 +10,7 @@ The project is developed incrementally, with each completed module validating th
 
 # Current Release
 
-## Version 0.2
+## Version 0.3
 
 ### Completed
 
@@ -25,6 +25,28 @@ The project is developed incrementally, with each completed module validating th
 - ✅ Product Activation
 - ✅ Product Deactivation
 
+### Category Management
+
+- ✅ Category CRUD
+- ✅ Category Details
+- ✅ Server-side Search
+- ✅ Server-side Pagination
+- ✅ Server-side Sorting
+- ✅ Status Filtering
+- ✅ Category Activation
+- ✅ Category Deactivation
+
+### Supplier Management
+
+- ✅ Supplier CRUD
+- ✅ Supplier Details
+- ✅ Server-side Search
+- ✅ Server-side Pagination
+- ✅ Server-side Sorting
+- ✅ Status Filtering
+- ✅ Supplier Activation
+- ✅ Supplier Deactivation
+
 ### Shared Infrastructure
 
 - ✅ Clean Architecture
@@ -37,35 +59,6 @@ The project is developed incrementally, with each completed module validating th
 ---
 
 # Phase 1 — Core Master Data
-
-## Category Management
-
-Status: Planned
-
-Features:
-
-- Category CRUD
-- Search
-- Pagination
-- Sorting
-- Status Filtering
-- Activate / Deactivate
-
----
-
-## Supplier Management
-
-Status: Planned
-
-Features:
-
-- Supplier CRUD
-- Contact Information
-- Search
-- Pagination
-- Sorting
-
----
 
 ## Customer Management
 
@@ -94,7 +87,7 @@ Features:
 
 # Phase 2 — Inventory Operations
 
-## Inventory Transactions
+## Inventory Management
 
 Planned:
 
@@ -102,6 +95,7 @@ Planned:
 - Stock Out
 - Stock Adjustment
 - Inventory History
+- Stock Movement
 
 ---
 
@@ -180,12 +174,12 @@ Planned:
 
 Future enhancements may include:
 
+- Purchase Orders
+- Sales Orders
+- Multi-Warehouse Support
 - REST API
 - Mobile Application
 - Barcode Scanner Integration
-- Multi-Warehouse Support
-- Purchase Orders
-- Sales Orders
 - Inventory Forecasting
 
 ---
@@ -200,5 +194,9 @@ Each new module should:
 - Follow Clean Architecture.
 - Maintain consistent UI behavior.
 - Prefer composition over duplication.
+- Reuse established application handler patterns.
+- Maintain consistent Razor Pages workflows.
+- Keep business rules inside domain entities.
+- Favor consistency over premature abstraction.
 
 The architecture should evolve through reuse rather than introducing module-specific implementations whenever possible.

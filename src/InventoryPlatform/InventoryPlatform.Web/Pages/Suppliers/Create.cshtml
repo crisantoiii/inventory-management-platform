@@ -1,0 +1,54 @@
+﻿@page
+@model InventoryPlatform.Web.Pages.Suppliers.CreateModel
+
+<h1>Create Supplier</h1>
+
+<form method="post">
+
+    <div asp-validation-summary="ModelOnly"
+         class="text-danger"></div>
+
+    <div class="mb-3">
+        <label asp-for="Supplier.Name" class="form-label"></label>
+        <input asp-for="Supplier.Name" class="form-control" />
+        <span asp-validation-for="Supplier.Name" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Supplier.ContactPerson"
+               class="form-label"></label>
+        <input asp-for="Supplier.ContactPerson"
+               class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Supplier.Email"
+               class="form-label"></label>
+        <input asp-for="Supplier.Email"
+               class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Supplier.Phone"
+               class="form-label"></label>
+        <input asp-for="Supplier.Phone"
+               class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Supplier.Address"
+               class="form-label"></label>
+        <input asp-for="Supplier.Address"
+               class="form-control" />
+    </div>
+
+    <button class="btn btn-primary">
+        Save
+    </button>
+
+    <a asp-page="Index"
+       class="btn btn-secondary">
+        Cancel
+    </a>
+
+</form>

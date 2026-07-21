@@ -27,7 +27,7 @@ public sealed class CategoryRepository
     }
 
 
-    public async Task<PagedResult<Category>> GetPagedActiveAsync(
+    public async Task<PagedResult<Category>> GetPagedAsync(
     PagedQuery request,
     CancellationToken cancellationToken = default)
     {

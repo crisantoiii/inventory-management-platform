@@ -33,12 +33,12 @@ public class EditModel : PageModel
             return NotFound();
         }
 
-        var product = result.Value;
+        var category = result.Value;
 
         Category = new UpdateCategoryRequest(
-            product.Id,
-            product.Name,
-            product.Description);
+            category.Id,
+            category.Name,
+            category.Description);
 
         return Page();
     }

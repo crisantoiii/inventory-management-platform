@@ -4,14 +4,14 @@ namespace InventoryPlatform.Application.Features.Categories.UpdateCategory;
 
 public sealed class UpdateCategoryHandler
 {
-    private readonly ICategoryRepository _productRepository;
+    private readonly ICategoryRepository _categoryRepository;
     private readonly IUnitOfWork _unitOfWork;
 
     public UpdateCategoryHandler(
-        ICategoryRepository productRepository,
+        ICategoryRepository categoryRepository,
         IUnitOfWork unitOfWork)
     {
-        _productRepository = productRepository;
+        _categoryRepository = categoryRepository;
         _unitOfWork = unitOfWork;
     }
 
@@ -19,25 +19,25 @@ public sealed class UpdateCategoryHandler
         UpdateCategoryRequest request,
         CancellationToken cancellationToken = default)
     {
-        var product = await _productRepository.GetByIdAsync(
+        var category = await _categoryRepository.GetByIdAsync(
             request.Id,
             cancellationToken);
 
-        if (product is null)
+        if (category is null)
         {
             return Result<UpdateCategoryResponse>.Failure(
                         CategoryErrors.NotFound);
         }
 
-        product.Update(request.Name, request.Description);
+        category.Update(request.Name, request.Description);
 
-        _productRepository.Update(product);
+        _categoryRepository.Update(category);
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Result<UpdateCategoryResponse>.Success(
             new UpdateCategoryResponse(
-                product.Id,
-                product.Name));
+                category.Id,
+                category.Name));
     }
 }
