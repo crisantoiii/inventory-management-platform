@@ -34,15 +34,15 @@ public sealed class GetCustomersHandler
         var response = new PagedResult<GetCustomersResponse>
         {
             Items = customers.Items
-                .Select(customer => new GetCustomersResponse
+                .Select(c => new GetCustomersResponse
                 {
-                    Id = customer.Id,
-                    Name = customer.Name,
-                    ContactPerson = customer.ContactPerson,
-                    Email = customer.Email,
-                    Phone = customer.Phone,
-                    Address = customer.Address,
-                    IsActive = customer.IsActive
+                    Id = c.Id,
+                    Name = c.Name,
+                    ContactPerson = c.ContactPerson,
+                    Email = c.Email,
+                    Phone = c.Phone,
+                    Address = c.Address,
+                    IsActive = c.IsActive
                 }
                     )
                 .ToList(),

@@ -5,9 +5,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 namespace InventoryPlatform.Infrastructure.Persistence.Configurations;
 
 public sealed class CustomerConfiguration
-    : IEntityTypeConfiguration<Supplier>
+    : IEntityTypeConfiguration<Customer>
 {
-    public void Configure(EntityTypeBuilder<Supplier> builder)
+    public void Configure(EntityTypeBuilder<Customer> builder)
     {
         builder.ToTable("Customers");
 

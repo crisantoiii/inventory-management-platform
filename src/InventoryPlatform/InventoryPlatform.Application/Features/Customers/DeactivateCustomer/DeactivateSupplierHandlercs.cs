@@ -16,9 +16,10 @@ public sealed class DeactivateCustomerHandler
     }
 
     public async Task<Result<DeactivateCustomerResponse>> HandleAsync(
-        DeactivateCustomerRequest request)
+        DeactivateCustomerRequest request,
+        CancellationToken cancellationToken = default)
     {
-        var customer = await _customerRepository.GetByIdAsync(request.Id);
+        var customer = await _customerRepository.GetByIdAsync(request.Id, cancellationToken);
 
         if (customer is null)
         {
@@ -28,7 +29,7 @@ public sealed class DeactivateCustomerHandler
 
         customer.Deactivate();
 
-        await _unitOfWork.SaveChangesAsync();
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Result<DeactivateCustomerResponse>.Success(
             new DeactivateCustomerResponse(

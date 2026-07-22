@@ -46,16 +46,16 @@ public sealed class CustomerRepository
         query = request.Status switch
         {
             ProductStatusFilter.Active =>
-                query.Where(p => p.IsActive),
+                query.Where(c => c.IsActive),
 
             ProductStatusFilter.Inactive =>
-                query.Where(p => !p.IsActive),
+                query.Where(c => !c.IsActive),
 
             ProductStatusFilter.All =>
                 query,
 
             _ =>
-                query.Where(p => p.IsActive)
+                query.Where(c => c.IsActive)
         };
 
         if (!string.IsNullOrWhiteSpace(request.Search))
@@ -95,27 +95,27 @@ public sealed class CustomerRepository
     {
         return request.SortBy switch
         {
-            SupplierSortFields.Name =>
+            CustomerSortFields.Name =>
                 request.Descending
                     ? query.OrderByDescending(c => c.Name)
                     : query.OrderBy(c => c.Name),
 
-            SupplierSortFields.ContactPerson =>
+            CustomerSortFields.ContactPerson =>
                 request.Descending
                     ? query.OrderByDescending(c => c.ContactPerson)
                     : query.OrderBy(c => c.ContactPerson),
 
-            SupplierSortFields.Email =>
+            CustomerSortFields.Email =>
                 request.Descending
                     ? query.OrderByDescending(c => c.Email)
                     : query.OrderBy(c => c.Email),
 
-            SupplierSortFields.Phone =>
+            CustomerSortFields.Phone =>
                 request.Descending
                     ? query.OrderByDescending(c => c.Phone)
                     : query.OrderBy(c => c.Phone),
 
-            SupplierSortFields.IsActive =>
+            CustomerSortFields.IsActive =>
                 request.Descending
                     ? query.OrderByDescending(c => c.IsActive)
                     : query.OrderBy(c => c.IsActive),
