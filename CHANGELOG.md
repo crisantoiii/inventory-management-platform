@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [v0.4.0] - 2026-07-22
 
 ### Added
 
@@ -39,6 +39,17 @@ All notable changes to this project will be documented in this file.
 - Supplier create page
 - Supplier edit page
 
+#### Customer Module
+- Customer search
+- Server-side pagination
+- Server-side sorting
+- Customer status filtering
+- Customer activation
+- Customer deactivation
+- Customer details page
+- Customer create page
+- Customer edit page
+
 #### Shared Infrastructure
 - Reusable paging infrastructure
   - PagedRequest
@@ -48,13 +59,14 @@ All notable changes to this project will be documented in this file.
 - Shared product sort field definitions
 - Shared category sort field definitions
 - Shared supplier sort field definitions
+- Shared customer sort field definitions
 
 ### Changed
 
 - Refactored product repository to support reusable filtering, sorting and paging.
 - Refactored product listing to use server-side search.
 - Refactored product queries to use reusable paging models.
-- Implemented Supplier module using the established Product and Category architecture.
+- Implemented Customer module using the established Product, Category, and Supplier architecture.
 
 ### Improved
 
@@ -70,3 +82,7 @@ All notable changes to this project will be documented in this file.
 - Supplier listing preserves sorting state.
 - Supplier activation workflow.
 - Supplier deactivation workflow.
+- Customer listing preserves filter state across pagination.
+- Customer listing preserves sorting state.
+- Customer activation workflow.
+- Customer deactivation workflow.
