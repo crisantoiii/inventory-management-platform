@@ -16,9 +16,10 @@ public sealed class DeactivateProductHandler
     }
 
     public async Task<Result<DeactivateProductResponse>> HandleAsync(
-        DeactivateProductRequest request)
+        DeactivateProductRequest request,
+        CancellationToken cancellationToken = default)
     {
-        var product = await _productRepository.GetByIdAsync(request.Id);
+        var product = await _productRepository.GetByIdAsync(request.Id, cancellationToken);
 
         if (product is null)
         {
@@ -28,7 +29,7 @@ public sealed class DeactivateProductHandler
 
         product.Deactivate();
 
-        await _unitOfWork.SaveChangesAsync();
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Result<DeactivateProductResponse>.Success(
             new DeactivateProductResponse(

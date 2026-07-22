@@ -16,9 +16,10 @@ public sealed class DeactivateCategoryHandler
     }
 
     public async Task<Result<DeactivateCategoryResponse>> HandleAsync(
-        DeactivateCategoryRequest request)
+        DeactivateCategoryRequest request,
+        CancellationToken cancellationToken = default)
     {
-        var category = await _categoryRepository.GetByIdAsync(request.Id);
+        var category = await _categoryRepository.GetByIdAsync(request.Id,cancellationToken);
 
         if (category is null)
         {
@@ -28,7 +29,7 @@ public sealed class DeactivateCategoryHandler
 
         category.Deactivate();
 
-        await _unitOfWork.SaveChangesAsync();
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Result<DeactivateCategoryResponse>.Success(
             new DeactivateCategoryResponse(
