@@ -1,7 +1,9 @@
 ﻿using InventoryPlatform.Domain.Common;
 using InventoryPlatform.Shared.Guards;
 
-public sealed class Supplier : BaseEntity
+namespace InventoryPlatform.Domain.Entities;
+
+public sealed class Customer : AuditableEntity
 {
     public string Name { get; private set; } = string.Empty;
 
@@ -9,22 +11,22 @@ public sealed class Supplier : BaseEntity
 
     public string? Email { get; private set; }
 
-    public string? Phone { get; private set; }
+    public string? Phone{ get; private set; }
 
     public string? Address { get; private set; }
 
     public bool IsActive { get; private set; }
 
-    private Supplier() { }
+    private Customer() { }
 
-    public Supplier(
+    public Customer(
         string name,
         string? contactPerson,
         string? email,
         string? phone,
         string? address)
     {
-       Rename(name);
+        Rename(name);
         ContactPerson = contactPerson;
         Email = email;
         Phone = phone;
@@ -53,7 +55,13 @@ public sealed class Supplier : BaseEntity
         Name = name;
     }
 
-    public void Activate() => IsActive = true;
+    public void Activate()
+    {
+        IsActive = true;
+    }
 
-    public void Deactivate() => IsActive = false;
+    public void Deactivate()
+    {
+        IsActive = false;
+    }
 }
