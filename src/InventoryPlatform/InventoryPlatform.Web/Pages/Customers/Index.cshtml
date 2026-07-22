@@ -1,0 +1,237 @@
+﻿@page
+@model InventoryPlatform.Web.Pages.Customers.IndexModel
+@using InventoryPlatform.Shared.Sorting;
+
+@{
+    var start = (Model.Customers.Page - 1) * Model.Customers.PageSize + 1;
+
+    var end = Math.Min(
+        Model.Customers.Page * Model.Customers.PageSize,
+        Model.Customers.TotalCount);
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="mb-0">Customers</h1>
+
+    <a asp-page="Create"
+       class="btn btn-primary">
+        Add customer
+    </a>
+</div>
+@if (!string.IsNullOrWhiteSpace(Model.SuccessMessage))
+{
+    <div class="alert alert-success alert-dismissible fade show"
+         role="alert">
+
+        @Model.SuccessMessage
+
+        <button type="button"
+                class="btn-close"
+                data-bs-dismiss="alert">
+        </button>
+    </div>
+}
+<form method="get">
+    <div class="row g-3 align-items-end">
+        <div class="col-md-4">
+            <input asp-for="Filter.Search"
+                   class="form-control"
+                   placeholder="Search by name, contact person, or email..." />
+        </div>
+
+        <div class="col-md-3">
+            <select asp-for="Filter.Status"
+                    class="form-select"
+                    asp-items="Model.StatusOptions">
+            </select>
+        </div>
+
+        <div class="col-auto">
+            <button class="btn btn-primary">
+                Search
+            </button>
+        </div>
+
+        <div class="col-auto">
+            <a asp-page="Index"
+               class="btn btn-outline-secondary">
+                Clear
+            </a>
+        </div>
+    </div>
+</form>
+
+<p class="text-muted">
+    Showing @start–@end of @Model.Customers.TotalCount customers
+</p>
+
+@if (!Model.Customers.Items.Any())
+{
+    <div class="alert alert-info">
+        No customers found.
+    </div>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>
+                    <a asp-page="./Index"
+                       asp-route-SortBy="Name"
+                       asp-route-Descending="@(Model.Filter.SortBy == CustomerSortFields.Name && !Model.Filter.Descending)"
+                       asp-route-Search="@Model.Filter.Search"
+                       asp-route-Status="@Model.Filter.Status"
+                       asp-route-Page="1">
+                        Name
+                    </a>
+                </th>
+                <th>
+                    <a asp-page="./Index"
+                       asp-route-SortBy="ContactPerson"
+                       asp-route-Descending="@(Model.Filter.SortBy == CustomerSortFields.ContactPerson && !Model.Filter.Descending)"
+                       asp-route-Search="@Model.Filter.Search"
+                       asp-route-Status="@Model.Filter.Status"
+                       asp-route-Page="1">
+                        Contact Person
+                    </a>
+                </th>
+                <th>
+                    <a asp-page="./Index"
+                       asp-route-SortBy="Email"
+                       asp-route-Descending="@(Model.Filter.SortBy == CustomerSortFields.Email && !Model.Filter.Descending)"
+                       asp-route-Search="@Model.Filter.Search"
+                       asp-route-Status="@Model.Filter.Status"
+                       asp-route-Page="1">
+                        Email
+                    </a>
+                </th>
+                <th>
+                    <a asp-page="./Index"
+                       asp-route-SortBy="Phone"
+                       asp-route-Descending="@(Model.Filter.SortBy == CustomerSortFields.Phone && !Model.Filter.Descending)"
+                       asp-route-Search="@Model.Filter.Search"
+                       asp-route-Status="@Model.Filter.Status"
+                       asp-route-Page="1">
+                        Phone
+                    </a>
+                </th>
+                <th>
+                    <a asp-page="./Index"
+                       asp-route-SortBy="IsActive"
+                       asp-route-Descending="@(Model.Filter.SortBy == CustomerSortFields.IsActive && !Model.Filter.Descending)"
+                       asp-route-Search="@Model.Filter.Search"
+                       asp-route-Status="@Model.Filter.Status"
+                       asp-route-Page="1">
+                        Status
+                    </a>
+                </th>
+                <th class="text-end">Actions</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            @foreach (var customer in Model.Customers.Items)
+            {
+                <tr>
+                    <td>
+                        <a asp-page="Details"
+                           asp-route-id="@customer.Id">
+                            @customer.Name
+                        </a>
+                    </td>
+                    <td>@customer.ContactPerson</td>
+                    <td>@customer.Email</td>
+                    <td>@customer.Phone</td>
+                    <td>@(customer.IsActive ? "Active" : "Inactive")</td>
+                    <td class="text-end">
+
+                        <div class="btn-group" role="group">
+
+                            <a asp-page="Details"
+                               asp-route-id="@customer.Id"
+                               asp-route-Page="@Model.Filter.Page"
+                               asp-route-Search="@Model.Filter.Search"
+                               asp-route-Status="@Model.Filter.Status"
+                               asp-route-SortBy="@Model.Filter.SortBy"
+                               asp-route-Descending="@Model.Filter.Descending" 
+                               class="btn btn-sm btn-outline-secondary">
+                                Details
+                            </a>
+
+                            <a asp-page="Edit"
+                               asp-route-id="@customer.Id"
+                               class="btn btn-sm btn-outline-primary">
+                                Edit
+                            </a>
+
+                            @if (customer.IsActive)
+                            {
+                                <a asp-page="Deactivate"
+                                   asp-route-id="@customer.Id"
+                                   class="btn btn-sm btn-outline-danger">
+                                    Deactivate
+                                </a>
+                            }
+                            else
+                            {
+                                <a asp-page="Activate"
+                                   asp-route-id="@customer.Id"
+                                   class="btn btn-sm btn-outline-success">
+                                    Activate
+                                </a>
+                            }
+
+                        </div>
+
+                    </td>
+                </tr>
+            }
+
+        </tbody>
+    </table>
+    <nav>
+
+        <ul class="pagination">
+
+            @if (Model.Customers.HasPreviousPage)
+            {
+                <li class="page-item">
+
+                    <a class="page-link"
+                       href="?Page=@(Model.Customers.Page - 1)&Search=@Model.Filter.Search&Status=@Model.Filter.Status&SortBy=@Model.Filter.SortBy&Descending=@Model.Filter.Descending">
+                        Previous
+                    </a>
+
+                </li>
+            }
+
+            @for (int i = 1; i <= Model.Customers.TotalPages; i++)
+            {
+                <li class="page-item @(i == Model.Customers.Page ? "active" : "")">
+                    <a class="page-link"
+                       href="?Page=@i&Search=@Model.Filter.Search&Status=@Model.Filter.Status&SortBy=@Model.Filter.SortBy&Descending=@Model.Filter.Descending">
+                        @i
+                    </a>
+
+                </li>
+            }
+
+            @if (Model.Customers.HasNextPage)
+            {
+                <li class="page-item">
+
+                    <a class="page-link"
+                       href="?Page=@(Model.Customers.Page + 1)&Search=@Model.Filter.Search&Status=@Model.Filter.Status&SortBy=@Model.Filter.SortBy&Descending=@Model.Filter.Descending">
+                        Next
+                    </a>
+
+                </li>
+            }
+
+        </ul>
+
+    </nav>
+}
+

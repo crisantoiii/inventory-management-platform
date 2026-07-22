@@ -1,0 +1,49 @@
+﻿@page
+@model InventoryPlatform.Web.Pages.Customers.DetailsModel
+
+<h1>Customer Details</h1>
+
+<div class="card">
+    <div class="card-body">
+
+        <dl class="row">
+
+            <dt class="col-sm-3">Name</dt>
+            <dd class="col-sm-9">@Model.Customer.Name</dd>
+
+            <dt class="col-sm-3">Contact Person</dt>
+            <dd class="col-sm-9">@Model.Customer.ContactPerson</dd>
+
+            <dt class="col-sm-3">Email</dt>
+            <dd class="col-sm-9">@Model.Customer.Email</dd>
+
+            <dt class="col-sm-3">Phone</dt>
+            <dd class="col-sm-9">@Model.Customer.Phone</dd>
+
+            <dt class="col-sm-3">Address</dt>
+            <dd class="col-sm-9">@Model.Customer.Address</dd>
+
+            <dt class="col-sm-3">Status</dt>
+            <dd class="col-sm-9">
+                @(Model.Customer.IsActive ? "Active" : "Inactive")
+            </dd>
+
+        </dl>
+
+        <div class="mt-4">
+
+            <a asp-page="Index"
+               class="btn btn-secondary">
+                Back
+            </a>
+
+            <a asp-page="Edit"
+               asp-route-id="@Model.Customer.Id"
+               class="btn btn-primary">
+                Edit
+            </a>
+
+        </div>
+
+    </div>
+</div>

@@ -1,0 +1,53 @@
+﻿@page "{id:int}"
+@model InventoryPlatform.Web.Pages.Customers.EditModel
+
+<h1>Edit Customer</h1>
+
+<form method="post">
+    <div asp-validation-summary="ModelOnly"
+             class="text-danger"></div>
+    <input asp-for="Customer.Id" type="hidden" />
+
+    <div class="mb-3">
+        <label asp-for="Customer.Name" class="form-label"></label>
+        <input asp-for="Customer.Name" class="form-control" />
+        <span asp-validation-for="Customer.Name" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Customer.ContactPerson"
+               class="form-label"></label>
+        <input asp-for="Customer.ContactPerson"
+               class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Customer.Email"
+               class="form-label"></label>
+        <input asp-for="Customer.Email"
+               class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Customer.Phone"
+               class="form-label"></label>
+        <input asp-for="Customer.Phone"
+               class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Customer.Address"
+               class="form-label"></label>
+        <input asp-for="Customer.Address"
+               class="form-control" />
+    </div>
+
+    <button class="btn btn-primary">
+        Save
+    </button>
+
+    <a asp-page="Index"
+       class="btn btn-secondary">
+        Cancel
+    </a>
+</form>
