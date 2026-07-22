@@ -10,7 +10,7 @@ The project is developed incrementally, with each completed module validating th
 
 # Current Release
 
-## Version 0.3
+## Version 0.4
 
 ### Completed
 
@@ -47,6 +47,17 @@ The project is developed incrementally, with each completed module validating th
 - ✅ Supplier Activation
 - ✅ Supplier Deactivation
 
+### Customer Management
+
+- ✅ Customer CRUD
+- ✅ Customer Details
+- ✅ Server-side Search
+- ✅ Server-side Pagination
+- ✅ Server-side Sorting
+- ✅ Status Filtering
+- ✅ Customer Activation
+- ✅ Customer Deactivation
+
 ### Shared Infrastructure
 
 - ✅ Clean Architecture
@@ -58,34 +69,7 @@ The project is developed incrementally, with each completed module validating th
 
 ---
 
-# Phase 1 — Core Master Data
-
-## Customer Management
-
-Status: Planned
-
-Features:
-
-- Customer CRUD
-- Search
-- Pagination
-- Sorting
-
----
-
-## Unit Management
-
-Status: Planned
-
-Features:
-
-- Unit CRUD
-- Search
-- Pagination
-
----
-
-# Phase 2 — Inventory Operations
+# Phase 1 — Inventory Operations
 
 ## Inventory Management
 
@@ -109,7 +93,7 @@ Planned:
 
 ---
 
-# Phase 3 — Dashboard & Reporting
+# Phase 2 — Dashboard & Reporting
 
 ## Dashboard
 
@@ -140,7 +124,7 @@ Export Options:
 
 ---
 
-# Phase 4 — Security
+# Phase 3 — Security
 
 Authentication
 
@@ -156,7 +140,7 @@ Authorization
 
 ---
 
-# Phase 5 — Advanced Features
+# Phase 4 — Advanced Features
 
 Planned:
 
@@ -174,12 +158,23 @@ Planned:
 
 Future enhancements may include:
 
+## Business Modules
+
 - Purchase Orders
 - Sales Orders
 - Multi-Warehouse Support
+
+## Integrations
+
 - REST API
-- Mobile Application
 - Barcode Scanner Integration
+
+## Client Applications
+
+- Mobile Application
+
+## Intelligence
+
 - Inventory Forecasting
 
 ---

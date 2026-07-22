@@ -12,5 +12,5 @@ public static class SupplierErrors
     public static readonly Error DuplicateName =
         new(
             "Supplier.DuplicateName",
-            "A category with the same Name already exists.");
+            "A supplier with the same Name already exists.");
 }

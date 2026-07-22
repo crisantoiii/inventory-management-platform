@@ -5,24 +5,22 @@ namespace InventoryPlatform.Domain.Entities;
 
 public sealed class Category : BaseEntity
 {
-    private Category()
-    {
-    }
-
-    public Category(
-        string name,
-        string? description)
-    {
-        Name = name;
-        Description = description;
-        IsActive = true;
-    }
-
     public string Name { get; private set; } = string.Empty;
 
     public string? Description { get; private set; }
 
     public bool IsActive { get; private set; }
+
+    private Category() { }
+
+    public Category(
+        string name,
+        string? description)
+    {
+        Rename(name);
+        Description = description;
+        IsActive = true;
+    }
 
     public void Update(
         string name,

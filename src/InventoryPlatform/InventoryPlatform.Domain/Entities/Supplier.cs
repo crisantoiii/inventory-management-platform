@@ -3,23 +3,6 @@ using InventoryPlatform.Shared.Guards;
 
 public sealed class Supplier : BaseEntity
 {
-    private Supplier() { }
-
-    public Supplier(
-        string name,
-        string? contactPerson,
-        string? email,
-        string? phone,
-        string? address)
-    {
-        Name = name;
-        ContactPerson = contactPerson;
-        Email = email;
-        Phone = phone;
-        Address = address;
-        IsActive = true;
-    }
-
     public string Name { get; private set; } = string.Empty;
 
     public string? ContactPerson { get; private set; }
@@ -32,6 +15,23 @@ public sealed class Supplier : BaseEntity
 
     public bool IsActive { get; private set; }
 
+    private Supplier() { }
+
+    public Supplier(
+        string name,
+        string? contactPerson,
+        string? email,
+        string? phone,
+        string? address)
+    {
+       Rename(name);
+        ContactPerson = contactPerson;
+        Email = email;
+        Phone = phone;
+        Address = address;
+        IsActive = true;
+    }
+
     public void Update(
         string name,
         string? contactPerson,
@@ -39,7 +39,7 @@ public sealed class Supplier : BaseEntity
         string? phone,
         string? address)
     {
-        Name = name;
+        Rename(name);
         ContactPerson = contactPerson;
         Email = email;
         Phone = phone;

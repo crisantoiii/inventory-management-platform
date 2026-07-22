@@ -2,7 +2,25 @@
 
 ## Overview
 
-The Inventory Management Platform is a modern ASP.NET Core Razor Pages application built using Clean Architecture principles. It currently provides reusable infrastructure for Product, Category, and Supplier management through consistent CRUD operations, server-side searching, sorting, filtering, and pagination. The architecture is designed to support additional inventory modules with minimal duplication.
+The Inventory Management Platform is a modern ASP.NET Core Razor Pages application built using Clean Architecture principles. It currently provides reusable infrastructure for Product, Category, Supplier, and Customer management through consistent CRUD operations, server-side searching, sorting, filtering, and pagination. The architecture is designed to support additional inventory modules with minimal duplication.
+
+## Current Implementation
+
+Completed business modules:
+
+- ✅ Product Management
+- ✅ Category Management
+- ✅ Supplier Management
+- ✅ Customer Management
+
+Shared capabilities:
+
+- CRUD
+- Search
+- Sorting
+- Filtering
+- Pagination
+- Activate / Deactivate
 
 ---
 
@@ -98,6 +116,37 @@ Each supplier supports:
 
 ---
 
+# Customer Management
+
+## Customer Lifecycle
+
+- ✅ Create Customer
+- ✅ View Customer Details
+- ✅ Edit Customer
+- ✅ Activate Customer
+- ✅ Deactivate Customer
+
+## Customer Listing
+
+- ✅ Server-side Search
+- ✅ Server-side Pagination
+- ✅ Server-side Sorting
+- ✅ Status Filtering
+- ✅ Success Notifications
+
+## Customer Information
+
+Each customer supports:
+
+- Name
+- Contact Person
+- Email
+- Phone
+- Address
+- Active Status
+
+---
+
 # Shared Infrastructure
 
 ## Paging
@@ -149,6 +198,14 @@ Currently implemented for:
 - Phone
 - Status
 
+### Customers
+
+- Name
+- Contact Person
+- Email
+- Phone
+- Status
+
 ---
 
 ## Filtering
@@ -183,6 +240,12 @@ Server-side search is implemented for:
 - Contact Person
 - Email
 
+### Customers
+
+- Customer Name
+- Contact Person
+- Email
+
 ---
 
 ## Result Pattern
@@ -204,16 +267,17 @@ Operation results are standardized using:
 - Layered Project Structure
 - CQRS-style Application Handlers
 - Result Pattern
+- Unit of Work Pattern
+- Fluent Entity Configurations
+- Server-side Paging
+- Server-side Sorting
+- Server-side Filtering
+- Soft Activation / Deactivation
+- Reusable Shared Infrastructure
 
 ---
 
 # Planned Features
-
-## Customer Management
-
-- Customer CRUD
-- Search
-- Pagination
 
 ## Inventory
 

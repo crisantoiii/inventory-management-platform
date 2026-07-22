@@ -6,6 +6,22 @@ The project is designed as a production-style portfolio application that demonst
 
 ---
 
+## Project Status
+
+**Current Version:** v0.4.0
+
+✅ Product Management
+
+✅ Category Management
+
+✅ Supplier Management
+
+✅ Customer Management
+
+🚧 Next: Inventory Transactions
+
+---
+
 # Project Goals
 
 This project aims to demonstrate:
@@ -23,6 +39,22 @@ This project aims to demonstrate:
 - Scalable Module Design
 
 The long-term goal is to evolve this project into a complete inventory management system suitable for small and medium-sized businesses.
+
+---
+
+# Enterprise Features
+
+- Clean Architecture
+- Repository Pattern
+- Unit of Work
+- Result Pattern
+- CQRS-style Application Layer
+- Entity Framework Core Configurations
+- Server-side Paging
+- Server-side Sorting
+- Server-side Filtering
+- Soft Activation / Deactivation
+- Shared Infrastructure
 
 ---
 
@@ -82,6 +114,24 @@ The long-term goal is to evolve this project into a complete inventory managemen
 - ✅ Status Filtering
 - ✅ Success Notifications
 
+## Customer Management
+
+### Customer Lifecycle
+
+- ✅ Create Customer
+- ✅ View Customer Details
+- ✅ Edit Customer
+- ✅ Activate Customer
+- ✅ Deactivate Customer
+
+### Customer Listing
+
+- ✅ Server-side Search
+- ✅ Server-side Pagination
+- ✅ Server-side Sorting
+- ✅ Status Filtering
+- ✅ Success Notifications
+
 ---
 
 # Architecture
@@ -133,13 +183,14 @@ Reusable infrastructure has been implemented to support future modules.
 - ProductSortFields
 - CategorySortFields
 - SupplierSortFields
+- CustomerSortFields
 
 ## Result Pattern
 
 - Result
 - Result\<T>
 
-This infrastructure is currently shared across the Product, Category, and Supplier modules and is intended to support future modules such as Customers and Inventory Transactions.
+This infrastructure is currently shared across the Product, Category, Supplier, and Customer modules and provides a consistent foundation for future business modules.
 
 ---
 
@@ -182,7 +233,7 @@ Development Tools
 | Product Management | ✅ Complete |
 | Category Management | ✅ Complete |
 | Supplier Management | ✅ Complete |
-| Customer Management | ⬜ Planned |
+| Customer Management | ✅ Complete |
 | Dashboard | ⬜ Planned |
 | Inventory Transactions | ⬜ Planned |
 
@@ -192,7 +243,6 @@ Development Tools
 
 Upcoming development includes:
 
-- Customer Management
 - Inventory Transactions
 - Dashboard
 - Authentication & Authorization
@@ -203,7 +253,12 @@ Upcoming development includes:
 
 # Screenshots
 
-Screenshots will be added as the project progresses.
+The following screenshots demonstrate the current implementation:
+
+- Product Management
+- Category Management
+- Supplier Management
+- Customer Management
 
 ---
 

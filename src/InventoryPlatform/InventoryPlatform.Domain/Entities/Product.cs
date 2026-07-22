@@ -21,9 +21,7 @@ public sealed class Product : AuditableEntity
 
     public bool IsActive { get; private set; }
 
-    private Product()
-    {
-    }
+    private Product() { }
 
     public Product(
         string sku,
