@@ -4,6 +4,7 @@ using InventoryPlatform.Domain.Entities;
 using InventoryPlatform.Infrastructure.Persistence.Context;
 using InventoryPlatform.Shared.Paging;
 using InventoryPlatform.Shared.Filtering;
+using InventoryPlatform.Shared.Sorting;
 using Microsoft.EntityFrameworkCore;
 
 namespace InventoryPlatform.Infrastructure.Persistence.Repositories;
