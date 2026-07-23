@@ -12,6 +12,7 @@ Completed business modules:
 - ✅ Category Management
 - ✅ Supplier Management
 - ✅ Customer Management
+- ✅ Unit Management
 
 Shared capabilities:
 
@@ -51,6 +52,7 @@ Each product supports:
 - Name
 - Description
 - Unit
+- Quantity On Hand
 - Cost Price
 - Selling Price
 - Active Status
@@ -147,6 +149,35 @@ Each customer supports:
 
 ---
 
+# Unit Management
+
+## Unit Lifecycle
+
+- ✅ Create Unit
+- ✅ View Unit Details
+- ✅ Edit Unit
+- ✅ Activate Unit
+- ✅ Deactivate Unit
+
+## Unit Listing
+
+- ✅ Server-side Search
+- ✅ Server-side Pagination
+- ✅ Server-side Sorting
+- ✅ Status Filtering
+- ✅ Success Notifications
+
+## Unit Information
+
+Each Unit supports:
+
+- Code
+- Name
+- Symbol
+- Active Status
+
+---
+
 # Shared Infrastructure
 
 ## Paging
@@ -180,6 +211,9 @@ Currently implemented for:
 
 - SKU
 - Name
+- Category
+- Unit
+- Quantity On Hand
 - Cost Price
 - Selling Price
 - Status
@@ -206,6 +240,13 @@ Currently implemented for:
 - Phone
 - Status
 
+### Unit
+
+- Code
+- Unit Name
+- Symbol
+- Status
+
 ---
 
 ## Filtering
@@ -228,6 +269,9 @@ Server-side search is implemented for:
 
 - SKU
 - Product Name
+- Category
+- Unit
+- Quantity On Hand
 
 ### Categories
 
@@ -245,6 +289,12 @@ Server-side search is implemented for:
 - Customer Name
 - Contact Person
 - Email
+
+### Unit
+
+- Code
+- Unit Name
+- Symbol
 
 ---
 

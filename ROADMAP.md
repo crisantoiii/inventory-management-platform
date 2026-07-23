@@ -10,7 +10,7 @@ The project is developed incrementally, with each completed module validating th
 
 # Current Release
 
-## Version 0.4
+## Version 0.6
 
 ### Completed
 
@@ -57,6 +57,24 @@ The project is developed incrementally, with each completed module validating th
 - ✅ Status Filtering
 - ✅ Customer Activation
 - ✅ Customer Deactivation
+
+### Unit Management
+
+- ✅ Unit CRUD
+- ✅ Unit Details
+- ✅ Server-side Search
+- ✅ Server-side Pagination
+- ✅ Server-side Sorting
+- ✅ Status Filtering
+- ✅ Unit Activation
+- ✅ Unit Deactivation
+
+### Product Foundation
+
+- ✅ Product → Category
+- ✅ Product → Unit
+- ✅ Quantity On Hand
+- ✅ Barcode
 
 ### Shared Infrastructure
 

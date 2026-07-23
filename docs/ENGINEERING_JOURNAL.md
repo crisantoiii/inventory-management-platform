@@ -282,6 +282,26 @@ A well-designed shared infrastructure enables feature development to focus on bu
 
 ---
 
+# Milestone 12 — Product Foundation Improvements
+
+Completed:
+
+- Unit Management
+- Product Category relationship
+- Product Unit relationship
+- Barcode
+- QuantityOnHand
+
+### Outcome
+
+Product evolved from a standalone CRUD entity into the central aggregate root for future inventory operations.
+
+### Lesson Learned
+
+Establish a complete domain model before implementing transactional workflows. A stable aggregate reduces rework and keeps future features focused on business behavior rather than structural changes.
+
+---
+
 # Architecture Validation
 
 After completing four independent business modules (Product, Category, Supplier, and Customer), the shared architecture has demonstrated:

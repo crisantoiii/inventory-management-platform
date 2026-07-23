@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [v0.4.0] - 2026-07-22
+## [v0.5.0] - 2026-07-23
 
 ### Added
 
@@ -16,6 +16,10 @@ All notable changes to this project will be documented in this file.
 - Product details page
 - Product create page
 - Product edit page
+- Product barcode support
+- Product category relationship
+- Product unit relationship
+- Product quantity tracking
 
 #### Category Module
 - Category search
@@ -50,6 +54,17 @@ All notable changes to this project will be documented in this file.
 - Customer create page
 - Customer edit page
 
+#### Unit Module
+- Unit search
+- Server-side pagination
+- Server-side sorting
+- Unit status filtering
+- Unit activation
+- Unit deactivation
+- Unit details page
+- Unit create page
+- Unit edit page
+
 #### Shared Infrastructure
 - Reusable paging infrastructure
   - PagedRequest
@@ -60,6 +75,7 @@ All notable changes to this project will be documented in this file.
 - Shared category sort field definitions
 - Shared supplier sort field definitions
 - Shared customer sort field definitions
+- Shared unit sort field definitions
 
 ### Changed
 
@@ -67,6 +83,11 @@ All notable changes to this project will be documented in this file.
 - Refactored product listing to use server-side search.
 - Refactored product queries to use reusable paging models.
 - Implemented Customer module using the established Product, Category, and Supplier architecture.
+- Product now references Category
+- Product now references Unit
+- Product no longer stores Unit as string
+- Product pages updated to use dropdowns
+- Product repository updated to load Category and Unit
 
 ### Improved
 
@@ -86,3 +107,9 @@ All notable changes to this project will be documented in this file.
 - Customer listing preserves sorting state.
 - Customer activation workflow.
 - Customer deactivation workflow.
+- Unit listing preserves filter state across pagination.
+- Unit listing preserves sorting state.
+- Unit activation workflow.
+- Unit deactivation workflow.
+- Stronger inventory domain model
+- Foundation prepared for Inventory Transactions
