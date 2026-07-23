@@ -38,6 +38,11 @@ public sealed class GetProductsHandler
                     product.Id,
                     product.Sku,
                     product.Name,
+                    product.CategoryId,
+                    product.UnitId,
+                    product.Category.Name,
+                    product.Unit.Name,
+                    product.QuantityOnHand,
                     product.CostPrice,
                     product.SellingPrice,
                     product.IsActive))

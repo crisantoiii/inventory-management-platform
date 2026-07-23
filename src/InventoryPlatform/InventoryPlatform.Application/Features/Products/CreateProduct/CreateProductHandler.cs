@@ -32,7 +32,9 @@ public sealed class CreateProductHandler
         var product = new Product(
                         request.Sku,
                         request.Name,
-                        request.Unit,
+                        request.CategoryId,
+                        request.UnitId,
+                        request.QuantityOnHand,
                         request.CostPrice,
                         request.SellingPrice);
 

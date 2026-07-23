@@ -98,6 +98,36 @@ else
                 </th>
                 <th>
                     <a asp-page="./Index"
+                       asp-route-SortBy="Category"
+                       asp-route-Descending="@(Model.Filter.SortBy == ProductSortFields.Category && !Model.Filter.Descending)"
+                       asp-route-Search="@Model.Filter.Search"
+                       asp-route-Status="@Model.Filter.Status"
+                       asp-route-Page="1">
+                        Category
+                    </a>
+                </th>
+                <th>
+                    <a asp-page="./Index"
+                       asp-route-SortBy="Unit"
+                       asp-route-Descending="@(Model.Filter.SortBy == ProductSortFields.Unit && !Model.Filter.Descending)"
+                       asp-route-Search="@Model.Filter.Search"
+                       asp-route-Status="@Model.Filter.Status"
+                       asp-route-Page="1">
+                        Unit
+                    </a>
+                </th>
+                <th>
+                    <a asp-page="./Index"
+                       asp-route-SortBy="QuantityOnHand"
+                       asp-route-Descending="@(Model.Filter.SortBy == ProductSortFields.QuantityOnHand && !Model.Filter.Descending)"
+                       asp-route-Search="@Model.Filter.Search"
+                       asp-route-Status="@Model.Filter.Status"
+                       asp-route-Page="1">
+                        Quantity on Hand
+                    </a>
+                </th>
+                <th>
+                    <a asp-page="./Index"
                        asp-route-SortBy="CostPrice"
                        asp-route-Descending="@(Model.Filter.SortBy == ProductSortFields.CostPrice && !Model.Filter.Descending)"
                        asp-route-Search="@Model.Filter.Search"
@@ -142,6 +172,9 @@ else
                             @product.Name
                         </a>
                     </td>
+                    <td><a asp-page="/Categories/Details" asp-route-id="@product.CategoryId"> @product.CategoryName </a></td>
+                    <td><a asp-page="/Units/Details" asp-route-id="@product.UnitId"> @product.UnitName </a></td>
+                    <td>@product.QuantityOnHand</td>
                     <td>@product.CostPrice</td>
                     <td>@product.SellingPrice</td>
                     <td>@(product.IsActive ? "Active" : "Inactive")</td>

@@ -15,10 +15,16 @@
             <dd class="col-sm-9">@Model.Product.Name</dd>
 
             <dt class="col-sm-3">Unit</dt>
-            <dd class="col-sm-9">@Model.Product.Unit</dd>
+            <dd class="col-sm-9"><a asp-page="/Categories/Details" asp-route-id="@Model.Product.CategoryId"> @Model.Product.CategoryName </a></dd>
+
+            <dt class="col-sm-3">Unit</dt>
+            <dd class="col-sm-9"><a asp-page="/Units/Details" asp-route-id="@Model.Product.UnitId"> @Model.Product.UnitName </a></dd>
 
             <dt class="col-sm-3">Barcode</dt>
             <dd class="col-sm-9">@Model.Product.Barcode</dd>
+
+            <dt class="col-sm-3">Quantity on Hand</dt>
+            <dd class="col-sm-9">@Model.Product.QuantityOnHand</dd>
 
             <dt class="col-sm-3">Cost Price</dt>
             <dd class="col-sm-9">@Model.Product.CostPrice</dd>

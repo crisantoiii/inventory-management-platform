@@ -17,6 +17,16 @@ public sealed class ProductRepository
     {
     }
 
+    public async Task<Product?> GetWithRelationshipsAsync(
+        int id, 
+        CancellationToken cancellationToken)
+    {
+        return await DbSet
+            .Include(p => p.Category)
+            .Include(p => p.Unit)
+            .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
+    }
+
     public async Task<Product?> GetBySkuAsync(
         string sku,
         CancellationToken cancellationToken = default)
@@ -62,7 +72,9 @@ public sealed class ProductRepository
 
             query = query.Where(p =>
                 p.Sku.Contains(search) ||
-                p.Name.Contains(search));
+                p.Name.Contains(search) ||
+                p.Category.Name.Contains(search) ||
+                p.Unit.Name.Contains(search));
         }
 
         var totalCount =
@@ -71,6 +83,8 @@ public sealed class ProductRepository
         var orderedQuery = ApplySorting(query, request);
 
         var items = await orderedQuery
+            .Include(p => p.Category)
+            .Include(p => p.Unit)
             .Skip((request.Page - 1) * request.PageSize)
             .Take(request.PageSize)
             .ToListAsync(cancellationToken);
@@ -97,6 +111,18 @@ public sealed class ProductRepository
             ProductSortFields.Name => request.Descending
                 ? query.OrderByDescending(p => p.Name)
                 : query.OrderBy(p => p.Name),
+
+            ProductSortFields.Category => request.Descending
+                ? query.OrderByDescending(p => p.Category.Name)
+                : query.OrderBy(p => p.Category.Name),
+
+            ProductSortFields.Unit => request.Descending
+                ? query.OrderByDescending(p => p.Unit.Name)
+                : query.OrderBy(p => p.Unit.Name),
+
+            ProductSortFields.QuantityOnHand => request.Descending
+                ? query.OrderByDescending(p => p.QuantityOnHand)
+                : query.OrderBy(p => p.QuantityOnHand),
 
             ProductSortFields.CostPrice => request.Descending
                 ? query.OrderByDescending(p => p.CostPrice)

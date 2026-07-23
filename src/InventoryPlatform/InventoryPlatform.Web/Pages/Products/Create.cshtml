@@ -21,20 +21,39 @@
     </div>
 
     <div class="mb-3">
-        <label asp-for="Product.Unit" class="form-label"></label>
-        <input asp-for="Product.Unit" class="form-control" />
-        <span asp-validation-for="Product.Unit" class="text-danger"></span>
+        <label asp-for="Product.CategoryId" class="form-label">Category</label>
+        <select asp-for="Product.CategoryId"
+                asp-items="Model.CategoryOptions"
+                class="form-select">
+            <option value="">-- Select Category --</option>
+        </select>
+        <span asp-validation-for="Product.CategoryId" class="text-danger"></span>
     </div>
 
     <div class="mb-3">
-        <label asp-for="Product.CostPrice" class="form-label"></label>
+        <label asp-for="Product.UnitId" class="form-label">Unit</label>
+        <select asp-for="Product.UnitId"
+                asp-items="Model.UnitOptions"
+                class="form-select">
+            <option value="">-- Select Unit --</option>
+        </select>
+        <span asp-validation-for="Product.UnitId" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Product.QuantityOnHand" class="form-label">Quantity on Hand</label>
+        <input asp-for="Product.QuantityOnHand"
+               class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Product.CostPrice" class="form-label">Cost Price</label>
         <input asp-for="Product.CostPrice"
                class="form-control" />
     </div>
 
     <div class="mb-3">
-        <label asp-for="Product.SellingPrice"
-               class="form-label"></label>
+        <label asp-for="Product.SellingPrice" class="form-label">Selling Price</label>
         <input asp-for="Product.SellingPrice"
                class="form-control" />
     </div>

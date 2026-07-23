@@ -3,7 +3,9 @@
 public sealed record CreateProductRequest(
     string Sku,
     string Name,
-    string Unit,
+    int UnitId,
+    int CategoryId,
+    decimal QuantityOnHand,
     decimal CostPrice,
     decimal SellingPrice,
     string? Barcode,

@@ -17,7 +17,7 @@ public sealed class GetProductHandler
         int id,
         CancellationToken cancellationToken = default)
     {
-        var product = await _productRepository.GetByIdAsync(
+        var product = await _productRepository.GetWithRelationshipsAsync(
             id,
             cancellationToken);
 
@@ -29,7 +29,11 @@ public sealed class GetProductHandler
                                                     product.Id,
                                                     product.Sku,
                                                     product.Name,
-                                                    product.Unit,
+                                                    product.Category.Name,
+                                                    product.Unit.Name,
+                                                    product.CategoryId,
+                                                    product.UnitId,
+                                                    product.QuantityOnHand,
                                                     product.CostPrice,
                                                     product.SellingPrice,
                                                     product.Barcode,

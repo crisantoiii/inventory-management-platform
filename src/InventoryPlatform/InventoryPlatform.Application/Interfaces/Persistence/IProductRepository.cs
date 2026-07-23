@@ -5,6 +5,10 @@ namespace InventoryPlatform.Application.Interfaces.Persistence;
 
 public interface IProductRepository : IRepository<Product>
 {
+    Task<Product?> GetWithRelationshipsAsync(
+        int id,
+        CancellationToken cancellationToken = default);
+
     Task<Product?> GetBySkuAsync(
         string sku,
         CancellationToken cancellationToken = default);
