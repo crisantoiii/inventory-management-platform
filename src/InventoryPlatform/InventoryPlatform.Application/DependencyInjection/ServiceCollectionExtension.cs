@@ -28,6 +28,13 @@ using InventoryPlatform.Application.Features.Customers.GetCustomers;
 using InventoryPlatform.Application.Features.Customers.UpdateCustomer;
 using InventoryPlatform.Application.Features.Customers.ActivateCustomer;
 
+using InventoryPlatform.Application.Features.Units.CreateUnit;
+using InventoryPlatform.Application.Features.Units.DeactivateUnit;
+using InventoryPlatform.Application.Features.Units.GetUnit;
+using InventoryPlatform.Application.Features.Units.GetUnits;
+using InventoryPlatform.Application.Features.Units.UpdateUnit;
+using InventoryPlatform.Application.Features.Units.ActivateUnit;
+
 using Microsoft.Extensions.DependencyInjection;
 
 namespace InventoryPlatform.Application.DependencyInjection;
@@ -65,6 +72,13 @@ public static class ServiceCollectionExtensions
         services.AddScoped<UpdateCustomerHandler>();
         services.AddScoped<DeactivateCustomerHandler>();
         services.AddScoped<ActivateCustomerHandler>();
+
+        services.AddScoped<CreateUnitHandler>();
+        services.AddScoped<GetUnitHandler>();
+        services.AddScoped<GetUnitsHandler>();
+        services.AddScoped<UpdateUnitHandler>();
+        services.AddScoped<DeactivateUnitHandler>();
+        services.AddScoped<ActivateUnitHandler>();
 
         services.AddValidatorsFromAssembly(
             typeof(ServiceCollectionExtensions).Assembly);

@@ -21,4 +21,14 @@ public static class Guard
                 $"{parameterName} cannot be negative.");
         }
     }
+
+    public static void AgainstZeroOrNegative(decimal value, string parameterName)
+    {
+        if (value <= 0)
+        {
+            throw new ArgumentOutOfRangeException(
+                parameterName,
+                $"{parameterName} cannot be zero or negative.");
+        }
+    }
 }
