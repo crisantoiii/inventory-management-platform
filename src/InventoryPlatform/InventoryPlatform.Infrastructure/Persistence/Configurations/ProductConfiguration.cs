@@ -4,8 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace InventoryPlatform.Infrastructure.Persistence.Configurations;
 
-public sealed class ProductConfiguration
-    : IEntityTypeConfiguration<Product>
+public sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
 {
     public void Configure(EntityTypeBuilder<Product> builder)
     {
@@ -30,9 +29,18 @@ public sealed class ProductConfiguration
         builder.Property(x => x.Description)
             .HasMaxLength(1000);
 
-        builder.Property(x => x.Unit)
-            .HasMaxLength(50)
-            .IsRequired();
+        builder.HasOne(x => x.Category)
+            .WithMany()
+            .HasForeignKey(x => x.CategoryId)
+            .OnDelete(DeleteBehavior.Restrict); 
+
+        builder.HasOne(x => x.Unit)
+            .WithMany()
+            .HasForeignKey(x => x.UnitId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Property(x => x.QuantityOnHand)
+            .HasPrecision(18, 2);
 
         builder.Property(x => x.CostPrice)
             .HasPrecision(18, 2);

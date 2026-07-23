@@ -2,7 +2,7 @@
 
 **Project:** Inventory Management Platform
 
-**Current Version:** v0.4.0 (In Development)
+**Current Version:** v0.5.0 (In Development)
 
 **Last Updated:** July 2026
 
@@ -10,7 +10,7 @@
 
 # Overall Completion
 
-- **Completed Modules:** 4 / 8 (50%)
+- **Completed Modules:** 5 / 9 (50%)
 - **Architecture Status:** Stable
 - **Current Milestone:** Master Data Modules Complete
 
@@ -24,6 +24,7 @@
 | Category Management | ✅ Complete | 100% |
 | Supplier Management | ✅ Complete | 100% |
 | Customer Management | ✅ Complete | 100% |
+| Unit Management | ✅ Complete | 100% |
 | Inventory Transactions | ⬜ Not Started | 0% |
 | Dashboard | ⬜ Not Started | 0% |
 | Authentication & Authorization | ⬜ Not Started | 0% |
@@ -89,6 +90,20 @@
 - ✅ Status Filtering
 - ✅ Success Notifications
 
+## Unit Management
+
+- ✅ Unit Listing
+- ✅ Unit Details
+- ✅ Create Unit
+- ✅ Edit Unit
+- ✅ Activate Unit
+- ✅ Deactivate Unit
+- ✅ Server-side Search
+- ✅ Server-side Pagination
+- ✅ Server-side Sorting
+- ✅ Status Filtering
+- ✅ Success Notifications
+
 ---
 
 # Shared Infrastructure
@@ -139,6 +154,6 @@ Current version does not yet include:
 
 # Overall Assessment
 
-The Product, Category, Supplier, and Customer modules are feature-complete for the current release.
+The Product, Category, Supplier, Customer, and Unit modules are feature-complete for the current release.
 
 The project architecture has now been validated through four complete business modules using shared paging, filtering, sorting, repository patterns, CQRS-style application handlers, and consistent Razor Pages workflows. This establishes a strong foundation for implementing additional inventory modules with minimal duplication.

@@ -15,9 +15,16 @@ public sealed class CreateProductValidator
             .NotEmpty()
             .MaximumLength(200);
 
-        RuleFor(x => x.Unit)
-            .NotEmpty()
-            .MaximumLength(50);
+        RuleFor(x => x.UnitId)
+            .GreaterThan(0)
+            .WithMessage("A valid unit must be selected.");
+
+        RuleFor(x => x.CategoryId)
+            .GreaterThan(0)
+            .WithMessage("A valid category must be selected.");
+
+        RuleFor(x => x.QuantityOnHand)
+            .GreaterThanOrEqualTo(0);
 
         RuleFor(x => x.CostPrice)
             .GreaterThanOrEqualTo(0);

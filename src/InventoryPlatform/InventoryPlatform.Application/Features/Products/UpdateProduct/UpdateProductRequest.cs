@@ -3,7 +3,9 @@
 public sealed record UpdateProductRequest(
     int Id,
     string Name,
-    string Unit,
+    int CategoryId,
+    int UnitId,
+    decimal QuantityOnHand,
     decimal CostPrice,
     decimal SellingPrice,
     string? Barcode,

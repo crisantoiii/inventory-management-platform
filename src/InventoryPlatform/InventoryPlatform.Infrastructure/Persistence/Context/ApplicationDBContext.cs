@@ -9,6 +9,7 @@ public sealed class ApplicationDbContext : DbContext
     public DbSet<Category> Categories => Set<Category>();
     public DbSet<Supplier> Suppliers => Set<Supplier>();
     public DbSet<Customer> Customers => Set<Customer>();
+    public DbSet<Unit> Units => Set<Unit>();
 
     public ApplicationDbContext(
         DbContextOptions<ApplicationDbContext> options)

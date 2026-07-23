@@ -278,6 +278,25 @@ Accepted.
 
 ---
 
+# DD-011 — Normalize Product Relationships
+
+## Decision
+
+Replace free-text Unit with Unit entity.
+Add Product → Category relationship.
+
+## Rationale
+
+Improves consistency.
+Prepares inventory transactions.
+Avoids duplicated unit values.
+
+## Outcome
+
+Accepted.
+
+---
+
 # Future Decisions
 
 This document will continue to evolve as the project grows.
@@ -293,3 +312,6 @@ Examples:
 - Caching strategy
 - Inventory transaction workflow
 - Concurrency handling
+
+---
+

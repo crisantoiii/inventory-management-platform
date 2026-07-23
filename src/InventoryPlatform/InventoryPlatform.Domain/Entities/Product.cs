@@ -7,13 +7,21 @@ public sealed class Product : AuditableEntity
 {
     public string Sku { get; private set; } = string.Empty;
 
-    public string? Barcode { get; private set; }
+    public string? Barcode { get; private set; } 
 
     public string Name { get; private set; } = string.Empty;
 
     public string? Description { get; private set; }
 
-    public string Unit { get; private set; } = string.Empty;
+    public int CategoryId { get; private set; }
+
+    public Category Category { get; private set; } = default!;
+
+    public int UnitId { get; private set; }
+
+    public Unit Unit { get; private set; } = default!;
+
+    public decimal QuantityOnHand { get; private set; }
 
     public decimal CostPrice { get; private set; }
 
@@ -26,13 +34,17 @@ public sealed class Product : AuditableEntity
     public Product(
         string sku,
         string name,
-        string unit,
+        int categoryId,      
+        int unitId,          
+        decimal quantityOnHand,
         decimal costPrice,
         decimal sellingPrice)
     {
         SetSku(sku);
         Rename(name);
-        ChangeUnit(unit);
+        ChangeCategory(categoryId); 
+        ChangeUnit(unitId);
+        ChangeQuantityOnHand(quantityOnHand);
         ChangeCostPrice(costPrice);
         ChangeSellingPrice(sellingPrice);
 
@@ -42,55 +54,48 @@ public sealed class Product : AuditableEntity
     public void Rename(string name)
     {
         Guard.AgainstNullOrWhiteSpace(name, nameof(name));
-
         Name = name;
     }
 
-    public void ChangeBarcode(string? barcode)
+    public void ChangeCategory(int categoryId)
     {
-        Barcode = barcode;
+        Guard.AgainstZeroOrNegative(categoryId, nameof(categoryId)); 
+        CategoryId = categoryId;
     }
 
-    public void UpdateDescription(string? description)
+    public void ChangeUnit(int unitId)
     {
-        Description = description;
+        Guard.AgainstZeroOrNegative(unitId, nameof(unitId));
+        UnitId = unitId;
+    }
+
+    public void ChangeBarcode(string? barcode) => Barcode = barcode;
+    public void UpdateDescription(string? description) => Description = description;
+
+    public void ChangeQuantityOnHand(decimal quantityOnHand)
+    {
+        Guard.AgainstNegative(quantityOnHand, nameof(quantityOnHand));
+        QuantityOnHand = quantityOnHand;
     }
 
     public void ChangeCostPrice(decimal costPrice)
     {
         Guard.AgainstNegative(costPrice, nameof(costPrice));
-
         CostPrice = costPrice;
     }
 
     public void ChangeSellingPrice(decimal sellingPrice)
     {
         Guard.AgainstNegative(sellingPrice, nameof(sellingPrice));
-
         SellingPrice = sellingPrice;
     }
 
-    public void ChangeUnit(string unit)
-    {
-        Guard.AgainstNullOrWhiteSpace(unit, nameof(unit));
-
-        Unit = unit;
-    }
-
-    public void Activate()
-    {
-        IsActive = true;
-    }
-
-    public void Deactivate()
-    {
-        IsActive = false;
-    }
+    public void Activate() => IsActive = true;
+    public void Deactivate() => IsActive = false;
 
     private void SetSku(string sku)
     {
         Guard.AgainstNullOrWhiteSpace(sku, nameof(sku));
-
         Sku = sku;
     }
 }

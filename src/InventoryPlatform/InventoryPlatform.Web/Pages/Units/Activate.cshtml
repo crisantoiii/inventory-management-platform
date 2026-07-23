@@ -1,0 +1,40 @@
+﻿@page "{id:int}"
+@model InventoryPlatform.Web.Pages.Units.ActivateModel
+
+<h1>Activate Product</h1>
+
+<div class="alert alert-success">
+    <strong>Warning!</strong>
+    This category will become active and will
+    be available for new transactions.
+</div>
+
+<dl class="row">
+    <dt class="col-sm-3">Code</dt>
+    <dd class="col-sm-9">@Model.Unit.Code</dd>
+
+    <dt class="col-sm-3">Name</dt>
+    <dd class="col-sm-9">@Model.Unit.Name</dd>
+
+    <dt class="col-sm-3">Symbol</dt>
+    <dd class="col-sm-9">@Model.Unit.Symbol</dd>
+
+    <dt class="col-sm-3">Status</dt>
+    <dd class="col-sm-9">
+        @(Model.Unit.IsActive ? "Active" : "Inactive")
+    </dd>
+</dl>
+
+<form method="post">
+
+    <input asp-for="ActivateRequest.Id" type="hidden" />
+
+    <button type="submit" class="btn btn-primary">
+        Activate
+    </button>
+
+    <a asp-page="Index" class="btn btn-secondary">
+        Cancel
+    </a>
+
+</form>

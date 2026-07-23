@@ -8,7 +8,7 @@ The project is designed as a production-style portfolio application that demonst
 
 ## Project Status
 
-**Current Version:** v0.4.0
+**Current Version:** v0.5.0
 
 ✅ Product Management
 
@@ -17,6 +17,10 @@ The project is designed as a production-style portfolio application that demonst
 ✅ Supplier Management
 
 ✅ Customer Management
+
+✅ Unit Management
+
+✅ Product Foundation Improvements
 
 🚧 Next: Inventory Transactions
 
@@ -69,6 +73,10 @@ The long-term goal is to evolve this project into a complete inventory managemen
 - ✅ Edit Product
 - ✅ Activate Product
 - ✅ Deactivate Product
+- ✅ Add Barcode
+- ✅ Dropdown Category
+- ✅ Dropdown Unit
+- ✅ Add Quantity On Hand
 
 ### Product Listing
 
@@ -190,7 +198,7 @@ Reusable infrastructure has been implemented to support future modules.
 - Result
 - Result\<T>
 
-This infrastructure is currently shared across the Product, Category, Supplier, and Customer modules and provides a consistent foundation for future business modules.
+This infrastructure is currently shared across the Product, Category, Supplier, Customer, and Unit modules and provides a consistent foundation for future business modules.
 
 ---
 
@@ -234,6 +242,7 @@ Development Tools
 | Category Management | ✅ Complete |
 | Supplier Management | ✅ Complete |
 | Customer Management | ✅ Complete |
+| Unit Management | ✅ Complete |
 | Dashboard | ⬜ Planned |
 | Inventory Transactions | ⬜ Planned |
 
@@ -259,6 +268,7 @@ The following screenshots demonstrate the current implementation:
 - Category Management
 - Supplier Management
 - Customer Management
+- Unit Management
 
 ---
 

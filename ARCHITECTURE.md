@@ -138,6 +138,8 @@ The architecture has been validated through the implementation of three independ
 - Product Management
 - Category Management
 - Supplier Management
+- Customer Management
+- Unit Management
 
 Each module follows the same layered architecture, repository pattern, CQRS-style application handlers, reusable paging/filtering/sorting infrastructure, and Razor Pages presentation model.
 
@@ -158,10 +160,12 @@ Current repositories include:
 - ProductRepository
 - CategoryRepository
 - SupplierRepository
+- CustomerRepository
+- UnitRepository
 
 Planned repositories:
 
-- CustomerRepository
+- InventoryTransactionRepository
 
 ---
 
@@ -207,6 +211,8 @@ Reusable sorting currently includes:
 - ProductSortFields
 - CategorySortFields
 - SupplierSortFields
+- CustomerSortFields
+- UnitSortFields
 
 The infrastructure supports server-side sorting through strongly typed sort definitions.
 
@@ -272,7 +278,6 @@ The project follows:
 
 Planned additions include:
 
-- Customer Management
 - Inventory Transactions
 - Dashboard
 - Reporting
