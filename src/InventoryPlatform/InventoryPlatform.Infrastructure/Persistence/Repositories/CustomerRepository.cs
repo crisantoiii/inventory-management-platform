@@ -21,7 +21,9 @@ public sealed class CustomerRepository
     string name,
     CancellationToken cancellationToken = default)
     {
-        return await DbSet.AnyAsync(
+        return await DbSet
+            .AsNoTracking()
+            .AnyAsync(
             x => x.Name == name,
             cancellationToken);
     }
@@ -31,7 +33,9 @@ public sealed class CustomerRepository
         string name,
     CancellationToken cancellationToken = default)
     {
-        return await DbSet.AnyAsync(
+        return await DbSet
+            .AsNoTracking()
+            .AnyAsync(
             x => x.Name == name && x.Id != excludingCustomerId,
             cancellationToken);
     }
@@ -41,7 +45,7 @@ public sealed class CustomerRepository
     PagedQuery request,
     CancellationToken cancellationToken = default)
     {
-        IQueryable<Customer> query = DbSet;
+        IQueryable<Customer> query = DbSet.AsNoTracking();
 
         query = request.Status switch
         {

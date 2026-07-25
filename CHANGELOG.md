@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [v0.5.0] - 2026-07-23
+## [v0.6.0] - 2026-07-25
 
 ### Added
 
@@ -65,6 +65,26 @@ All notable changes to this project will be documented in this file.
 - Unit create page
 - Unit edit page
 
+#### Inventory Transactions Module
+- Inventory transaction management
+- Inventory transaction details page
+- Inventory transaction create page
+- Inventory transaction listing page
+- Stock In transactions
+- Stock Out transactions
+- Stock Adjustment transactions
+- Product selection dropdown
+- Transaction type selection
+- Transaction reference number
+- Transaction remarks
+- Transaction date tracking
+
+#### Inventory Workflow
+- Automatic Quantity On Hand updates
+- Immutable inventory transaction history
+- Inventory movement audit trail
+- Product inventory validation
+
 #### Shared Infrastructure
 - Reusable paging infrastructure
   - PagedRequest
@@ -88,6 +108,10 @@ All notable changes to this project will be documented in this file.
 - Product no longer stores Unit as string
 - Product pages updated to use dropdowns
 - Product repository updated to load Category and Unit
+- Product inventory is now maintained through inventory transactions.
+- Product stock updates are handled through domain methods (`IncreaseStock`, `DecreaseStock`, and `AdjustStock`).
+- Inventory movements are persisted as historical records instead of directly modifying product quantities.
+
 
 ### Improved
 
@@ -111,5 +135,12 @@ All notable changes to this project will be documented in this file.
 - Unit listing preserves sorting state.
 - Unit activation workflow.
 - Unit deactivation workflow.
-- Stronger inventory domain model
-- Foundation prepared for Inventory Transactions
+- Stronger inventory domain model.
+- Foundation prepared for Inventory Transactions.
+- Added server-side search for inventory transactions.
+- Added server-side sorting for inventory transactions.
+- Added server-side pagination for inventory transactions.
+- Added Bootstrap badges for transaction types.
+- Improved quantity display using positive and negative values.
+- Added success notifications after transaction creation.
+- Improved inventory transaction user experience with consistent Razor Pages UI.

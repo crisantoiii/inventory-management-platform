@@ -6,23 +6,47 @@ The project is designed as a production-style portfolio application that demonst
 
 ---
 
+## Highlights
+
+- Enterprise-style Clean Architecture
+- ASP.NET Core 10 Razor Pages
+- Entity Framework Core 10
+- CQRS-inspired Application Layer
+- Inventory transaction workflow with immutable history
+- Server-side search, sorting, and pagination
+- Reusable shared infrastructure
+
+---
+
 ## Project Status
 
-**Current Version:** v0.5.0
+**Current Version:** v0.6.0
 
-✅ Product Management
+## Completed Modules
 
-✅ Category Management
+- ✅ Product Management
 
-✅ Supplier Management
+- ✅ Category Management
 
-✅ Customer Management
+- ✅ Supplier Management
 
-✅ Unit Management
+- ✅ Customer Management
 
-✅ Product Foundation Improvements
+- ✅ Unit Management
 
-🚧 Next: Inventory Transactions
+- ✅ Inventory Transactions
+
+### Latest Release (v0.6.0)
+
+Implemented a complete inventory movement system featuring:
+
+- Stock In
+- Stock Out
+- Stock Adjustment
+- Immutable transaction history
+- Product quantity updates
+- Search, sorting, and paging
+- Transaction details
 
 ---
 
@@ -59,6 +83,10 @@ The long-term goal is to evolve this project into a complete inventory managemen
 - Server-side Filtering
 - Soft Activation / Deactivation
 - Shared Infrastructure
+- Inventory Transaction History
+- Inventory Audit Trail
+- Immutable Business Records
+- Automatic Stock Management
 
 ---
 
@@ -140,6 +168,30 @@ The long-term goal is to evolve this project into a complete inventory managemen
 - ✅ Status Filtering
 - ✅ Success Notifications
 
+## Inventory Transactions
+
+### Inventory Workflow
+
+- ✅ Create Inventory Transaction
+- ✅ View Transaction Details
+- ✅ Stock In
+- ✅ Stock Out
+- ✅ Stock Adjustment
+
+### Transaction Listing
+
+- ✅ Server-side Search
+- ✅ Server-side Pagination
+- ✅ Server-side Sorting
+- ✅ Success Notifications
+
+### Business Rules
+
+- ✅ Immutable transaction history
+- ✅ Automatic Quantity On Hand updates
+- ✅ Stock validation
+- ✅ Inventory audit trail
+
 ---
 
 # Architecture
@@ -160,6 +212,27 @@ InventoryPlatform
 └── InventoryPlatform.Shared
 ```
 
+## Inventory Transaction Workflow
+
+```text
+Create Transaction
+        │
+        ▼
+Application Handler
+        │
+        ▼
+Domain Logic
+        │
+        ▼
+Update Product Quantity
+        │
+        ▼
+Persist Inventory Transaction
+        │
+        ▼
+Return Result
+```
+
 Responsibilities:
 
 | Project | Responsibility |
@@ -169,6 +242,30 @@ Responsibilities:
 | Domain | Entities, Domain Rules |
 | Infrastructure | Entity Framework Core, Repositories |
 | Shared | Common Infrastructure (Paging, Filtering, Sorting, Result Pattern) |
+
+---
+
+## Implemented Patterns
+
+- Clean Architecture
+- Repository Pattern
+- Unit of Work
+- CQRS-style Application Layer
+- Result Pattern
+- FluentValidation
+- Dependency Injection
+- Entity Framework Core Configurations
+- Razor Pages
+
+---
+
+# Key Design Decisions
+
+- Inventory transactions are immutable.
+- Product quantity is maintained through domain methods.
+- Stock movements are recorded for every inventory change.
+- Business logic resides in the Application and Domain layers.
+- Razor Pages interact only with the Application layer.
 
 ---
 
@@ -192,13 +289,15 @@ Reusable infrastructure has been implemented to support future modules.
 - CategorySortFields
 - SupplierSortFields
 - CustomerSortFields
+- UnitSortFields
+- InventoryTransactionSortFields
 
 ## Result Pattern
 
 - Result
 - Result\<T>
 
-This infrastructure is currently shared across the Product, Category, Supplier, Customer, and Unit modules and provides a consistent foundation for future business modules.
+This infrastructure is currently shared across the Product, Category, Supplier, Customer, Unit, and Inventory Transaction modules.
 
 ---
 
@@ -243,19 +342,32 @@ Development Tools
 | Supplier Management | ✅ Complete |
 | Customer Management | ✅ Complete |
 | Unit Management | ✅ Complete |
+| Inventory Transactions | ✅ Complete |
 | Dashboard | ⬜ Planned |
-| Inventory Transactions | ⬜ Planned |
+| Purchase Orders | ⬜ Planned |
+| Authentication & Authorization | ⬜ Planned |
+| Reporting | ⬜ Planned |
 
 ---
 
 # Roadmap
 
-Upcoming development includes:
+## Completed
 
+- Product Management
+- Category Management
+- Supplier Management
+- Customer Management
+- Unit Management
 - Inventory Transactions
+
+## Planned
+
 - Dashboard
-- Authentication & Authorization
+- Purchase Orders
+- Sales Orders
 - Reporting
+- Authentication & Authorization
 - Audit Logging
 
 ---
@@ -269,6 +381,7 @@ The following screenshots demonstrate the current implementation:
 - Supplier Management
 - Customer Management
 - Unit Management
+- Inventory Transactions
 
 ---
 

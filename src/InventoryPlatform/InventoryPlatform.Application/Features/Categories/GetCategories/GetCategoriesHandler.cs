@@ -27,13 +27,13 @@ public sealed class GetCategoriesHandler
             Status = request.Status
         };
 
-        var categorys = await _categoryRepository.GetPagedAsync(
+        var categories = await _categoryRepository.GetPagedAsync(
             query,
             cancellationToken);
 
         var response = new PagedResult<GetCategoriesResponse>
         {
-            Items = categorys.Items
+            Items = categories.Items
                 .Select(category => new GetCategoriesResponse
                 {
                     Id = category.Id,
@@ -44,9 +44,9 @@ public sealed class GetCategoriesHandler
                     )
                 .ToList(),
 
-            Page = categorys.Page,
-            PageSize = categorys.PageSize,
-            TotalCount = categorys.TotalCount
+            Page = categories.Page,
+            PageSize = categories.PageSize,
+            TotalCount = categories.TotalCount
         };
 
         return Result<PagedResult<GetCategoriesResponse>>.Success(response);

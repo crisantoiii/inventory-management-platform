@@ -10,7 +10,7 @@ The project is developed incrementally, with each completed module validating th
 
 # Current Release
 
-## Version 0.6
+## Version 0.6.0 – Inventory Transactions
 
 ### Completed
 
@@ -85,29 +85,18 @@ The project is developed incrementally, with each completed module validating th
 - ✅ Shared Filtering
 - ✅ Shared Sorting
 
----
+### Inventory Transactions
 
-# Phase 1 — Inventory Operations
-
-## Inventory Management
-
-Planned:
-
-- Stock In
-- Stock Out
-- Stock Adjustment
-- Inventory History
-- Stock Movement
-
----
-
-## Stock Monitoring
-
-Planned:
-
-- Low Stock Alerts
-- Out of Stock Items
-- Reorder Level Monitoring
+- ✅ Create Inventory Transaction
+- ✅ Transaction Details
+- ✅ Stock In
+- ✅ Stock Out
+- ✅ Stock Adjustment
+- ✅ Inventory History
+- ✅ Product Quantity Updates
+- ✅ Server-side Search
+- ✅ Server-side Pagination
+- ✅ Server-side Sorting
 
 ---
 
@@ -120,10 +109,14 @@ Planned Widgets:
 - Total Products
 - Active Products
 - Inactive Products
-- Categories
-- Suppliers
-- Low Stock
+- Low Stock Items
+- Out of Stock Items
+- Reorder Level Monitoring
 - Inventory Value
+- Recent Inventory Transactions
+- Stock In Today
+- Stock Out Today
+
 
 ---
 
@@ -169,6 +162,8 @@ Planned:
 - Barcode Support
 - QR Code Support
 - Email Notifications
+- Bulk Import
+- Bulk Export
 
 ---
 
@@ -180,7 +175,10 @@ Future enhancements may include:
 
 - Purchase Orders
 - Sales Orders
-- Multi-Warehouse Support
+- Warehouse Management
+- Inventory Transfers
+- Stock Counts
+- Stock Adjustments Approval
 
 ## Integrations
 

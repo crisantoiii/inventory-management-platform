@@ -11,6 +11,8 @@ public sealed class Category : BaseEntity
 
     public bool IsActive { get; private set; }
 
+    public ICollection<Product> Products { get; } = new List<Product>();
+
     private Category() { }
 
     public Category(

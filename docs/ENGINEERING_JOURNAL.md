@@ -302,17 +302,60 @@ Establish a complete domain model before implementing transactional workflows. A
 
 ---
 
+# Milestone 13 — Inventory Transactions
+
+## Summary
+
+Implemented the first transactional business module responsible for recording inventory movements and maintaining product stock levels.
+
+Completed:
+
+- Inventory Transaction entity
+- Inventory Transaction repository
+- Stock In workflow
+- Stock Out workflow
+- Stock Adjustment workflow
+- Transaction Details
+- Transaction Listing
+- Server-side Search
+- Server-side Pagination
+- Server-side Sorting
+
+### Outcome
+
+Successfully extended the existing architecture from master data management to transactional workflows without requiring structural changes.
+
+The Product entity now serves as the aggregate root for inventory operations while InventoryTransaction provides an immutable history of all inventory movements.
+
+### Lessons Learned
+
+- Domain behavior should remain inside domain entities.
+- Historical business events should be immutable.
+- Existing shared infrastructure significantly reduced development effort.
+- Reusing proven architectural patterns made implementing a new business module straightforward.
+
+---
+
+## Reflection
+
+The Inventory Transactions module confirmed that the shared architecture was flexible enough to support transactional business logic without introducing new architectural patterns.
+
+The reusable infrastructure for paging, filtering, sorting, repositories, and application handlers reduced implementation complexity and allowed development to focus on business rules rather than framework concerns.
+
+---
+
 # Architecture Validation
 
-After completing four independent business modules (Product, Category, Supplier, and Customer), the shared architecture has demonstrated:
+After implementing six business modules (Product, Category, Supplier, Customer, Unit, and Inventory Transactions), the architecture has demonstrated:
 
 - Consistent implementation patterns
-- Reusable application layer components
+- Reusable application handlers
 - Reusable repository infrastructure
 - Shared paging, sorting, and filtering
 - Stable Clean Architecture boundaries
+- Seamless transition from master data to transactional workflows
 
-This milestone marked the completion of the core master data foundation, providing a stable base for future transactional modules.
+This milestone demonstrates that the architecture supports both master data and transaction-based modules without structural changes.
 
 ---
 
@@ -329,6 +372,8 @@ Throughout development the following principles have consistently guided impleme
 - Push processing to the database whenever practical
 - Maintain consistent module architecture
 - Favor proven patterns over premature abstraction
+- Keep domain behavior inside entities.
+- Prefer immutable business history for transactional data.
 
 ---
 
@@ -336,8 +381,9 @@ Throughout development the following principles have consistently guided impleme
 
 Future milestones are expected to include:
 
-- Inventory Transactions
 - Dashboard
+- Purchase Orders
+- Purchase Receiving
 - Authentication
 - Authorization
 - Reporting

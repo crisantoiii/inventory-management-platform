@@ -35,6 +35,10 @@ using InventoryPlatform.Application.Features.Units.GetUnits;
 using InventoryPlatform.Application.Features.Units.UpdateUnit;
 using InventoryPlatform.Application.Features.Units.ActivateUnit;
 
+using InventoryPlatform.Application.Features.InventoryTransactions.CreateInventoryTransaction;
+using InventoryPlatform.Application.Features.InventoryTransactions.GetInventoryTransactions;
+using InventoryPlatform.Application.Features.InventoryTransactions.GetInventoryTransaction;
+
 using Microsoft.Extensions.DependencyInjection;
 
 namespace InventoryPlatform.Application.DependencyInjection;
@@ -79,6 +83,10 @@ public static class ServiceCollectionExtensions
         services.AddScoped<UpdateUnitHandler>();
         services.AddScoped<DeactivateUnitHandler>();
         services.AddScoped<ActivateUnitHandler>();
+
+        services.AddScoped<CreateInventoryTransactionHandler>();
+        services.AddScoped<GetInventoryTransactionHandler>();
+        services.AddScoped<GetInventoryTransactionsHandler>();
 
         services.AddValidatorsFromAssembly(
             typeof(ServiceCollectionExtensions).Assembly);

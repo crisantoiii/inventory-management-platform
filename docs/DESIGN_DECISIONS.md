@@ -89,10 +89,9 @@ Current implementation:
 - ProductRepository
 - CategoryRepository
 - SupplierRepository
-
-Planned repositories:
-
 - CustomerRepository
+- UnitRepository
+- InventoryTransactionRepository
 
 ## Outcome
 
@@ -145,7 +144,7 @@ Benefits:
 - Consistent paging behavior
 - Reduced duplication
 - Faster implementation of new modules
-- Proven reusable across Product, Category, and Supplier modules
+- Proven reusable across Product, Category, Supplier, Customer, Unit, and Inventory Transaction modules.
 
 ## Outcome
 
@@ -165,7 +164,7 @@ Current implementation:
 
 ## Rationale
 
-The Product, Category, and Supplier modules all use the same filtering approach, providing a consistent user experience while minimizing duplicate code.
+The Product, Category, Supplier, Customer, Unit, and Inventory Transaction modules all use the same filtering approach.
 
 ## Outcome
 
@@ -192,6 +191,9 @@ Current implementation:
 - ProductSortFields
 - CategorySortFields
 - SupplierSortFields
+- CustomerSortFields
+- UnitSortFields
+- InventoryTransactionSortFields
 
 Keeping them in Shared prevents unnecessary project dependencies and improves reuse.
 
@@ -254,7 +256,8 @@ Accepted.
 
 ## Decision
 
-All business modules follow the same architectural structure.
+All business modules follow the same architectural structure. 
+The architecture has now been successfully validated across six independent business modules without requiring structural changes, demonstrating that the design scales consistently as new features are introduced.
 
 Each module implements:
 
@@ -287,9 +290,66 @@ Add Product → Category relationship.
 
 ## Rationale
 
-Improves consistency.
-Prepares inventory transactions.
-Avoids duplicated unit values.
+Improves consistency by replacing free-text values with normalized relationships, supports inventory transactions, and avoids duplicated unit values.
+Supports inventory transactions by enforcing consistent relationships between products, categories, and units while avoiding duplicated values.
+
+## Outcome
+
+Accepted.
+
+---
+
+# DD-012 — Immutable Inventory Transactions
+
+## Decision
+
+Inventory transactions are immutable and cannot be edited or deleted.
+
+Inventory corrections are performed by creating adjustment transactions.
+
+## Rationale
+
+Inventory transactions represent historical business events.
+
+Allowing edits or deletions would compromise inventory history, auditability, and stock traceability.
+
+Instead, every inventory movement is preserved as a permanent record.
+
+Benefits include:
+
+- Complete audit trail
+- Historical accuracy
+- Easier troubleshooting
+- Improved reporting
+- Better support for future audit logging
+
+## Alternatives Considered
+
+Allow editing or deleting transactions while recalculating product quantities.
+
+This approach was rejected because it increases complexity and risks inconsistent inventory history.
+
+## Outcome
+
+Accepted.
+
+---
+
+# DD-013 — Product as the Inventory Aggregate Root
+
+## Decision
+
+The Product entity is responsible for maintaining its inventory quantity through domain methods.
+
+Methods include:
+
+- IncreaseStock()
+- DecreaseStock()
+- AdjustStock()
+
+## Rationale
+
+Centralizing inventory behavior inside the Product entity keeps business rules in the Domain layer and prevents inventory logic from being duplicated across application handlers.
 
 ## Outcome
 
@@ -303,15 +363,15 @@ This document will continue to evolve as the project grows.
 
 Examples:
 
+- Dashboard architecture
+- Purchase order workflow
+- Concurrency handling
 - Authentication strategy
 - Authorization model
 - Audit logging
 - Background jobs
-- Reporting architecture
 - API design
 - Caching strategy
-- Inventory transaction workflow
-- Concurrency handling
 
 ---
 

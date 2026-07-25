@@ -25,6 +25,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ISupplierRepository, SupplierRepository>();
         services.AddScoped<ICustomerRepository, CustomerRepository>();
         services.AddScoped<IUnitRepository, UnitRepository>();
+        services.AddScoped<IInventoryTransactionRepository, InventoryTransactionRepository>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         return services;

@@ -4,8 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace InventoryPlatform.Infrastructure.Persistence.Configurations;
 
-public sealed class CategoryConfiguration
-    : IEntityTypeConfiguration<Category>
+public sealed class CategoryConfiguration : IEntityTypeConfiguration<Category>
 {
     public void Configure(
         EntityTypeBuilder<Category> builder)

@@ -36,7 +36,6 @@ public sealed class UpdateProductHandler
         product.ChangeSellingPrice(request.SellingPrice);
         product.ChangeUnit(request.UnitId);
         product.ChangeCategory(request.CategoryId);
-        product.ChangeQuantityOnHand(request.QuantityOnHand);
 
         _productRepository.Update(product);
 

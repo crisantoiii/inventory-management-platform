@@ -25,6 +25,7 @@
         <div class="mt-4">
 
             <a asp-page="Index"
+               onclick="if(history.length > 1) { history.back(); return false; }"
                class="btn btn-secondary">
                 Back
             </a>

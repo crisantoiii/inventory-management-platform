@@ -28,7 +28,7 @@ public class Repository<TEntity> : IRepository<TEntity>
     public virtual async Task<IReadOnlyList<TEntity>> GetAllAsync(
         CancellationToken cancellationToken = default)
     {
-        return await DbSet.ToListAsync(cancellationToken);
+        return await DbSet.AsNoTracking().ToListAsync(cancellationToken);
     }
 
     public virtual async Task<IReadOnlyList<TEntity>> FindAsync(
@@ -36,6 +36,7 @@ public class Repository<TEntity> : IRepository<TEntity>
         CancellationToken cancellationToken = default)
     {
         return await DbSet
+            .AsNoTracking()
             .Where(predicate)
             .ToListAsync(cancellationToken);
     }

@@ -10,6 +10,7 @@ public sealed class ApplicationDbContext : DbContext
     public DbSet<Supplier> Suppliers => Set<Supplier>();
     public DbSet<Customer> Customers => Set<Customer>();
     public DbSet<Unit> Units => Set<Unit>();
+    public DbSet<InventoryTransaction> InventoryTransactions => Set<InventoryTransaction>();
 
     public ApplicationDbContext(
         DbContextOptions<ApplicationDbContext> options)

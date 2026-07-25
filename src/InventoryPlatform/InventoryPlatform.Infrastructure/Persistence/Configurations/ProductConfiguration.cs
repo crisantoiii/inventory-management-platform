@@ -30,12 +30,12 @@ public sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
             .HasMaxLength(1000);
 
         builder.HasOne(x => x.Category)
-            .WithMany()
+            .WithMany(c => c.Products)
             .HasForeignKey(x => x.CategoryId)
             .OnDelete(DeleteBehavior.Restrict); 
 
         builder.HasOne(x => x.Unit)
-            .WithMany()
+            .WithMany(c => c.Products)
             .HasForeignKey(x => x.UnitId)
             .OnDelete(DeleteBehavior.Restrict);
 
