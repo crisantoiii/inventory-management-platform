@@ -2,7 +2,20 @@
 
 ## Overview
 
-The Inventory Management Platform is a modern ASP.NET Core Razor Pages application built using Clean Architecture principles. It currently provides reusable infrastructure for Product, Category, Supplier, and Customer management through consistent CRUD operations, server-side searching, sorting, filtering, and pagination. The architecture is designed to support additional inventory modules with minimal duplication.
+The Inventory Management Platform is a modern ASP.NET Core 10 Razor Pages application built using Clean Architecture principles. It currently provides reusable infrastructure for Product, Category, Supplier, Customer, Unit, and Inventory Transaction management through consistent business workflows, server-side searching, sorting, filtering, and pagination.
+
+The architecture is designed to support additional inventory modules with minimal duplication while maintaining a clean separation of concerns.
+
+## Module Summary
+
+| Module | Status |
+|---------|--------|
+| Product Management | ✅ Complete |
+| Category Management | ✅ Complete |
+| Supplier Management | ✅ Complete |
+| Customer Management | ✅ Complete |
+| Unit Management | ✅ Complete |
+| Inventory Transactions | ✅ Complete |
 
 ## Current Implementation
 
@@ -13,6 +26,7 @@ Completed business modules:
 - ✅ Supplier Management
 - ✅ Customer Management
 - ✅ Unit Management
+- ✅ Inventory Transactions
 
 Shared capabilities:
 
@@ -22,6 +36,7 @@ Shared capabilities:
 - Filtering
 - Pagination
 - Activate / Deactivate
+- Success Notifications
 
 ---
 
@@ -169,12 +184,49 @@ Each customer supports:
 
 ## Unit Information
 
-Each Unit supports:
+Each unit supports:
 
 - Code
 - Name
 - Symbol
 - Active Status
+
+---
+
+# Inventory Transactions
+
+## Inventory Workflow
+
+- ✅ Create Inventory Transaction
+- ✅ View Transaction Details
+- ✅ Stock In
+- ✅ Stock Out
+- ✅ Stock Adjustment
+
+## Transaction Listing
+
+- ✅ Server-side Search
+- ✅ Server-side Pagination
+- ✅ Server-side Sorting
+- ✅ Success Notifications
+
+## Transaction Information
+
+Each inventory transaction records:
+
+- Product
+- Transaction Type
+- Quantity
+- Reference Number
+- Remarks
+- Transaction Date
+
+## Business Rules
+
+- Inventory transactions are immutable.
+- Product inventory is updated automatically.
+- Stock Out validates available inventory.
+- Every inventory movement is recorded for audit purposes.
 
 ---
 
@@ -247,6 +299,13 @@ Currently implemented for:
 - Symbol
 - Status
 
+### Inventory Transactions
+
+- Product
+- Transaction Type
+- Quantity
+- Transaction Date
+
 ---
 
 ## Filtering
@@ -296,6 +355,12 @@ Server-side search is implemented for:
 - Unit Name
 - Symbol
 
+### Inventory Transactions
+
+- Product
+- Transaction Type
+- Reference Number
+
 ---
 
 ## Result Pattern
@@ -324,17 +389,14 @@ Operation results are standardized using:
 - Server-side Filtering
 - Soft Activation / Deactivation
 - Reusable Shared Infrastructure
+- Inventory Transaction History
+- Immutable Business Records
+- Automatic Inventory Updates
+- Domain-driven Inventory Management
 
 ---
 
 # Planned Features
-
-## Inventory
-
-- Stock In
-- Stock Out
-- Stock Adjustment
-- Inventory History
 
 ## Dashboard
 
@@ -356,3 +418,13 @@ Operation results are standardized using:
 - Product Reports
 - Export to Excel
 - Export to PDF
+
+## Purchasing
+
+- Purchase Orders
+- Purchase Order Receiving
+
+## Sales
+
+- Sales Orders
+- Customer Invoicing

@@ -1,18 +1,33 @@
 # Project Status
 
-**Project:** Inventory Management Platform
+**Current Version:** v0.6.0
 
-**Current Version:** v0.5.0 (In Development)
+**Project Status:** Active Development
 
 **Last Updated:** July 2026
+
+# Latest Release
+
+## v0.6.0 — Inventory Transactions
+
+Released: July 2026
+
+Completed:
+
+- Inventory Transactions
+- Stock In
+- Stock Out
+- Stock Adjustment
+- Immutable Transaction History
+- Automatic Quantity On Hand Updates
 
 ---
 
 # Overall Completion
 
-- **Completed Modules:** 5 / 9 (50%)
+- **Completed Modules:** 6
 - **Architecture Status:** Stable
-- **Current Milestone:** Master Data Modules Complete
+- **Current Milestone:** Inventory Transactions Complete
 
 ---
 
@@ -25,7 +40,7 @@
 | Supplier Management | ✅ Complete | 100% |
 | Customer Management | ✅ Complete | 100% |
 | Unit Management | ✅ Complete | 100% |
-| Inventory Transactions | ⬜ Not Started | 0% |
+| Inventory Transactions | ✅ Complete | 100% |
 | Dashboard | ⬜ Not Started | 0% |
 | Authentication & Authorization | ⬜ Not Started | 0% |
 | Reporting | ⬜ Not Started | 0% |
@@ -104,6 +119,20 @@
 - ✅ Status Filtering
 - ✅ Success Notifications
 
+## Inventory Transactions
+
+- ✅ Inventory Transaction Listing
+- ✅ Transaction Details
+- ✅ Create Inventory Transaction
+- ✅ Stock In
+- ✅ Stock Out
+- ✅ Stock Adjustment
+- ✅ Server-side Search
+- ✅ Server-side Pagination
+- ✅ Server-side Sorting
+- ✅ Product Quantity Updates
+- ✅ Immutable Transaction History
+
 ---
 
 # Shared Infrastructure
@@ -119,22 +148,27 @@
 - ✅ Entity Framework Core
 - ✅ Dependency Injection
 - ✅ Razor Pages
+- ✅ Domain-driven Inventory Updates
+- ✅ Inventory Transaction Workflow
 
 ---
 
 # Current Focus
 
-**Next Module**
+## Next Module
 
-Inventory Transactions
+Dashboard
 
 Planned Features:
 
-- Stock In
-- Stock Out
-- Inventory Adjustments
-- Transaction History
-- Quantity Validation
+- Total Products
+- Active Products
+- Inactive Products
+- Low Stock Items
+- Inventory Value
+- Recent Inventory Transactions
+- Stock In Today
+- Stock Out Today
 
 ---
 
@@ -142,18 +176,20 @@ Planned Features:
 
 Current version does not yet include:
 
+- Dashboard
 - Authentication
 - Role-based Authorization
-- Dashboard
 - Reporting
 - Audit Trail
+- Purchase Orders
 - File Uploads
-- Inventory Transactions
 
 ---
 
 # Overall Assessment
 
-The Product, Category, Supplier, Customer, and Unit modules are feature-complete for the current release.
+The Product, Category, Supplier, Customer, Unit, and Inventory Transaction modules are feature-complete for the current release.
 
-The project architecture has now been validated through four complete business modules using shared paging, filtering, sorting, repository patterns, CQRS-style application handlers, and consistent Razor Pages workflows. This establishes a strong foundation for implementing additional inventory modules with minimal duplication.
+The project architecture has now been validated through six business modules using shared paging, filtering, sorting, repository patterns, CQRS-style application handlers, domain-driven business behavior, and consistent Razor Pages workflows.
+
+The successful implementation of both master data modules and a transactional module demonstrates that the architecture scales without requiring structural changes.

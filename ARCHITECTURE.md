@@ -133,17 +133,18 @@ The Domain project has no knowledge of Infrastructure or Web.
 
 ## Architecture Validation
 
-The architecture has been validated through the implementation of three independent business modules:
+The architecture has been validated through the implementation of six independent business modules:
 
 - Product Management
 - Category Management
 - Supplier Management
 - Customer Management
 - Unit Management
+- Inventory Transactions
 
-Each module follows the same layered architecture, repository pattern, CQRS-style application handlers, reusable paging/filtering/sorting infrastructure, and Razor Pages presentation model.
+Each module follows the same layered architecture, repository pattern, CQRS-style application handlers, reusable paging, filtering, and sorting infrastructure, and Razor Pages presentation model.
 
-This consistency demonstrates that the architecture scales across multiple business domains without requiring structural changes.
+The successful implementation of multiple independent business modules demonstrates that the architecture scales without requiring structural changes.
 
 ## Clean Architecture
 
@@ -162,9 +163,6 @@ Current repositories include:
 - SupplierRepository
 - CustomerRepository
 - UnitRepository
-
-Planned repositories:
-
 - InventoryTransactionRepository
 
 ---
@@ -190,7 +188,7 @@ Reusable paging is implemented through:
 - PagedQuery
 - PagedResult\<T>
 
-This infrastructure is currently shared across the Product, Category, and Supplier modules and is designed to support future modules.
+This infrastructure is shared across the Product, Category, Supplier, Customer, Unit, and Inventory Transaction modules.
 
 ---
 
@@ -200,7 +198,7 @@ Reusable filtering currently includes:
 
 - Shared status filtering infrastructure
 
-The Product, Category, and Supplier modules all use the same filtering approach, and future modules are expected to follow the same pattern.
+The Product, Category, Supplier, Customer, Unit, and Inventory Transaction modules follow the same filtering approach where applicable.
 
 ---
 
@@ -213,6 +211,7 @@ Reusable sorting currently includes:
 - SupplierSortFields
 - CustomerSortFields
 - UnitSortFields
+- InventoryTransactionSortFields
 
 The infrastructure supports server-side sorting through strongly typed sort definitions.
 
@@ -254,9 +253,65 @@ Entity Framework Core
 SQL Server
 ```
 
-Business logic remains inside the Application layer.
+Application workflows are coordinated by the Application layer.
+
+Core business rules and domain behavior remain inside the Domain layer.
 
 Persistence remains inside Infrastructure.
+
+---
+
+# Inventory Transaction Workflow
+
+```text
+User
+
+    │
+
+    ▼
+
+Create Inventory Transaction
+
+    │
+
+    ▼
+
+Application Handler
+
+    │
+
+    ▼
+
+Validate Request
+
+    │
+
+    ▼
+
+Product Domain Methods
+
+    ├── IncreaseStock()
+    ├── DecreaseStock()
+    └── AdjustStock()
+
+    │
+
+    ▼
+
+Create InventoryTransaction
+
+    │
+
+    ▼
+
+Save Changes
+
+    │
+
+    ▼
+
+Updated Product Quantity
+```
 
 ---
 
@@ -274,12 +329,26 @@ The project follows:
 
 ---
 
+# Key Architectural Decisions
+
+## Immutable Inventory History
+
+Inventory transactions are treated as historical records and cannot be edited or deleted.
+
+Corrections are performed by creating adjustment transactions, preserving a complete audit trail.
+
+## Aggregate Root
+
+The Product entity acts as the aggregate root for inventory updates. All inventory changes are performed through Product domain methods to centralize business rules.
+
+---
+
 # Future Architecture
 
 Planned additions include:
 
-- Inventory Transactions
 - Dashboard
+- Purchase Orders
 - Reporting
 - Authentication
 - Authorization
