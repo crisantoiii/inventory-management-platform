@@ -29,6 +29,9 @@ public sealed class Product : AuditableEntity
 
     public bool IsActive { get; private set; }
 
+    public ICollection<InventoryTransaction> Transactions { get; }
+    = new List<InventoryTransaction>();
+
     private Product() { }
 
     public Product(
@@ -44,7 +47,7 @@ public sealed class Product : AuditableEntity
         Rename(name);
         ChangeCategory(categoryId); 
         ChangeUnit(unitId);
-        ChangeQuantityOnHand(quantityOnHand);
+        AdjustStock(quantityOnHand);
         ChangeCostPrice(costPrice);
         ChangeSellingPrice(sellingPrice);
 
@@ -72,10 +75,27 @@ public sealed class Product : AuditableEntity
     public void ChangeBarcode(string? barcode) => Barcode = barcode;
     public void UpdateDescription(string? description) => Description = description;
 
-    public void ChangeQuantityOnHand(decimal quantityOnHand)
+    public void AdjustStock(decimal quantity)
     {
-        Guard.AgainstNegative(quantityOnHand, nameof(quantityOnHand));
-        QuantityOnHand = quantityOnHand;
+        var newQuantity = QuantityOnHand + quantity;
+
+        Guard.AgainstNegative(newQuantity, nameof(quantity));
+
+        QuantityOnHand = newQuantity;
+    }
+
+    public void IncreaseStock(decimal quantity)
+    {
+        Guard.AgainstZeroOrNegative(quantity, nameof(quantity));
+        QuantityOnHand += quantity;
+    }
+
+    public void DecreaseStock(decimal quantity)
+    {
+        Guard.AgainstZeroOrNegative(quantity, nameof(quantity));
+        Guard.AgainstGreaterThan(quantity, QuantityOnHand, nameof(quantity));
+
+        QuantityOnHand -= quantity;
     }
 
     public void ChangeCostPrice(decimal costPrice)
@@ -97,6 +117,11 @@ public sealed class Product : AuditableEntity
     {
         Guard.AgainstNullOrWhiteSpace(sku, nameof(sku));
         Sku = sku;
+    }
+
+    public bool CanDecreaseStock(decimal quantity)
+    {
+        return quantity <= QuantityOnHand;
     }
 }
 

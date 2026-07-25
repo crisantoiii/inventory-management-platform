@@ -21,7 +21,9 @@ public sealed class CategoryRepository
     string name,
     CancellationToken cancellationToken = default)
     {
-        return await DbSet.AnyAsync(
+        return await DbSet
+            .AsNoTracking()
+            .AnyAsync(
             x => x.Name == name,
             cancellationToken);
     }
@@ -31,7 +33,8 @@ public sealed class CategoryRepository
     PagedQuery request,
     CancellationToken cancellationToken = default)
     {
-        IQueryable<Category> query = DbSet;
+        IQueryable<Category> query = DbSet
+                        .AsNoTracking();
 
         query = request.Status switch
         {

@@ -22,6 +22,7 @@ public sealed class ProductRepository
         CancellationToken cancellationToken)
     {
         return await DbSet
+            .AsNoTracking()
             .Include(p => p.Category)
             .Include(p => p.Unit)
             .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
@@ -31,7 +32,9 @@ public sealed class ProductRepository
         string sku,
         CancellationToken cancellationToken = default)
     {
-        return await DbSet.FirstOrDefaultAsync(
+        return await DbSet
+            .AsNoTracking()
+            .FirstOrDefaultAsync(
             x => x.Sku == sku,
             cancellationToken);
     }
@@ -40,7 +43,9 @@ public sealed class ProductRepository
         string sku,
         CancellationToken cancellationToken = default)
     {
-        return await DbSet.AnyAsync(
+        return await DbSet
+            .AsNoTracking()
+            .AnyAsync(
             x => x.Sku == sku,
             cancellationToken);
     }
@@ -49,7 +54,7 @@ public sealed class ProductRepository
     PagedQuery request,
     CancellationToken cancellationToken = default)
     {
-        IQueryable<Product> query = DbSet;
+        IQueryable<Product> query = DbSet.AsNoTracking();
 
         query = request.Status switch
         {

@@ -4,8 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace InventoryPlatform.Infrastructure.Persistence.Configurations;
 
-public sealed class CustomerConfiguration
-    : IEntityTypeConfiguration<Customer>
+public sealed class CustomerConfiguration : IEntityTypeConfiguration<Customer>
 {
     public void Configure(EntityTypeBuilder<Customer> builder)
     {

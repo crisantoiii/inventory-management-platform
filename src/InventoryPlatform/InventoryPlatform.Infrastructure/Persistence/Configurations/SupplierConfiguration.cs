@@ -4,8 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace InventoryPlatform.Infrastructure.Persistence.Configurations;
 
-public sealed class SupplierConfiguration
-    : IEntityTypeConfiguration<Supplier>
+public sealed class SupplierConfiguration : IEntityTypeConfiguration<Supplier>
 {
     public void Configure(EntityTypeBuilder<Supplier> builder)
     {

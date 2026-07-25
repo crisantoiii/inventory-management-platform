@@ -21,7 +21,9 @@ public sealed class UnitRepository
         string code,
         CancellationToken cancellationToken = default)
     {
-        return await DbSet.AnyAsync(
+        return await DbSet
+            .AsNoTracking()
+            .AnyAsync(
             x => x.Code == code,
             cancellationToken);
     }
@@ -30,7 +32,9 @@ public sealed class UnitRepository
     string name,
     CancellationToken cancellationToken = default)
     {
-        return await DbSet.AnyAsync(
+        return await DbSet
+            .AsNoTracking()
+            .AnyAsync(
             x => x.Name == name,
             cancellationToken);
     }
@@ -39,7 +43,9 @@ public sealed class UnitRepository
         string symbol,
         CancellationToken cancellationToken = default)
     {
-        return await DbSet.AnyAsync(
+        return await DbSet
+            .AsNoTracking()
+            .AnyAsync(
             x => x.Symbol == symbol,
             cancellationToken);
     }
@@ -50,7 +56,9 @@ public sealed class UnitRepository
         string symbol,
         CancellationToken cancellationToken = default)
     {
-        return await DbSet.AnyAsync(
+        return await DbSet
+            .AsNoTracking()
+            .AnyAsync(
             x => 
             x.Code == code || 
             x.Name == name ||
@@ -63,7 +71,7 @@ public sealed class UnitRepository
     PagedQuery request,
     CancellationToken cancellationToken = default)
     {
-        IQueryable<Unit> query = DbSet;
+        IQueryable<Unit> query = DbSet.AsNoTracking();
 
         query = request.Status switch
         {

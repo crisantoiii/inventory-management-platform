@@ -21,7 +21,9 @@ public sealed class SupplierRepository
     string name,
     CancellationToken cancellationToken = default)
     {
-        return await DbSet.AnyAsync(
+        return await DbSet
+            .AsNoTracking()
+            .AnyAsync(
             x => x.Name == name,
             cancellationToken);
     }
@@ -31,7 +33,9 @@ public sealed class SupplierRepository
         string name,
     CancellationToken cancellationToken = default)
     {
-        return await DbSet.AnyAsync(
+        return await DbSet
+            .AsNoTracking()
+            .AnyAsync(
             x => x.Name == name && x.Id != excludingSupplierId,
             cancellationToken);
     }
@@ -41,7 +45,7 @@ public sealed class SupplierRepository
     PagedQuery request,
     CancellationToken cancellationToken = default)
     {
-        IQueryable<Supplier> query = DbSet;
+        IQueryable<Supplier> query = DbSet.AsNoTracking();
 
         query = request.Status switch
         {

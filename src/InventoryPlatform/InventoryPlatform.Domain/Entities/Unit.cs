@@ -13,6 +13,8 @@ public sealed class Unit : BaseEntity
 
     public bool IsActive { get; private set; }
 
+    public ICollection<Product> Products { get; } = new List<Product>();
+
     private Unit() { }
 
     public Unit(
