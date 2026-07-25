@@ -31,4 +31,19 @@ public static class Guard
                 $"{parameterName} cannot be zero or negative.");
         }
     }
+
+    public static void AgainstGreaterThan(
+        decimal value,
+        decimal maximum,
+        string argumentName,
+        string? message = null)
+    {
+        if (value > maximum)
+        {
+            throw new ArgumentOutOfRangeException(
+                argumentName,
+                value,
+                message ?? $"{argumentName} cannot be greater than {maximum}.");
+        }
+    }
 }
