@@ -1,0 +1,68 @@
+﻿@page
+@model InventoryPlatform.Web.Pages.InventoryTransactions.DetailsModel
+
+<h1>Transaction Details</h1>
+
+<div class="card">
+    <div class="card-body">
+
+        <dl class="row">
+
+            <dt class="col-sm-3">Product</dt>
+            <dd class="col-sm-9">
+                <a asp-page="/Products/Details" 
+                asp-route-id="@Model.InventoryTransaction.ProductId"> 
+                @Model.InventoryTransaction.ProductName</a>
+            </dd>
+
+            <dt class="col-sm-3">SKU</dt>
+            <dd class="col-sm-9">@Model.InventoryTransaction.ProductSku</dd>
+
+            <dt class="col-sm-3">Transaction Type</dt>
+            <dd class="col-sm-9">
+                @switch (@Model.InventoryTransaction.TransactionType)
+                {
+                    case TransactionType.StockIn:
+                        <span class="badge bg-success">Stock In</span>
+                        break;
+
+                    case TransactionType.StockOut:
+                        <span class="badge bg-danger">Stock Out</span>
+                        break;
+
+                    case TransactionType.Adjustment:
+                        <span class="badge bg-warning text-dark">Adjustment</span>
+                        break;
+
+                    default:
+                        <span class="badge bg-secondary">Unknown</span>
+                        break;
+                }
+            </dd>
+
+            <dt class="col-sm-3">Quantity</dt>
+            <dd class="col-sm-9">@Model.InventoryTransaction.Quantity</dd>
+
+            <dt class="col-sm-3">Reference Number</dt>
+            <dd class="col-sm-9">@Model.InventoryTransaction.ReferenceNumber</dd>
+
+            <dt class="col-sm-3">Remarks</dt>
+            <dd class="col-sm-9">@Model.InventoryTransaction.Remarks</dd>
+
+            <dt class="col-sm-3">Transaction Date</dt>
+            <dd class="col-sm-9">@Model.InventoryTransaction.TransactionDateUtc.ToLocalTime().ToString("dddd, MMMM dd, yyyy h:mm tt")</dd>
+
+        </dl>
+
+        <div class="mt-4">
+
+            <a asp-page="Index"
+               onclick="if(history.length > 1) { history.back(); return false; }"
+               class="btn btn-secondary">
+                Back
+            </a>
+
+        </div>
+
+    </div>
+</div>
