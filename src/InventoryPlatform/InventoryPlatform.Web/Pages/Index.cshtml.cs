@@ -7,7 +7,7 @@ namespace InventoryPlatform.Web.Pages
     {
         public void OnGet()
         {
-            ViewData["Title"] = "Inventory Dashboard";
+            ViewData["Title"] = "Inventory Management Platform";
         }
     }
 }

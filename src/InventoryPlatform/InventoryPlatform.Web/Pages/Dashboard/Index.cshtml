@@ -5,7 +5,7 @@
 
 <!-- Dashboard Header -->
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1 class="h2 m-0 text-dark">Dashboard</h1>
+    <h1 class="h2 m-0 text-dark">@ViewData["Title"]</h1>
     <button class="btn btn-primary btn-sm"><i class="bi bi-arrow-clockwise me-1"></i> Refresh</button>
 </div>
 
@@ -16,7 +16,7 @@
         <div class="card h-100 border-0 shadow-sm text-center">
             <div class="card-body d-flex flex-column justify-content-center p-3">
                 <div class="text-muted small text-uppercase fw-semibold mb-1">Total Products</div>
-                <div class="fs-3 fw-bold text-dark">1,245</div>
+                <div class="fs-3 fw-bold text-dark">@Model.DashbordDTO.Statistics.TotalProducts</div>
             </div>
         </div>
     </div>
@@ -26,7 +26,7 @@
         <div class="card h-100 border-0 shadow-sm text-center border-start border-success border-4">
             <div class="card-body d-flex flex-column justify-content-center p-3">
                 <div class="text-muted small text-uppercase fw-semibold mb-1">Active</div>
-                <div class="fs-3 fw-bold text-success">1,180</div>
+                <div class="fs-3 fw-bold text-success">@Model.DashbordDTO.Statistics.ActiveProducts</div>
             </div>
         </div>
     </div>
@@ -36,7 +36,7 @@
         <div class="card h-100 border-0 shadow-sm text-center border-start border-secondary border-4">
             <div class="card-body d-flex flex-column justify-content-center p-3">
                 <div class="text-muted small text-uppercase fw-semibold mb-1">Inactive</div>
-                <div class="fs-3 fw-bold text-secondary">65</div>
+                <div class="fs-3 fw-bold text-secondary">@Model.DashbordDTO.Statistics.InactiveProducts</div>
             </div>
         </div>
     </div>
@@ -46,7 +46,7 @@
         <div class="card h-100 border-0 shadow-sm text-center border-start border-warning border-4">
             <div class="card-body d-flex flex-column justify-content-center p-3">
                 <div class="text-muted small text-uppercase fw-semibold mb-1">Low Stock</div>
-                <div class="fs-3 fw-bold text-warning">14</div>
+                <div class="fs-3 fw-bold text-warning">@Model.DashbordDTO.Statistics.LowStockProducts</div>
             </div>
         </div>
     </div>
@@ -56,7 +56,7 @@
         <div class="card h-100 border-0 shadow-sm text-center border-start border-danger border-4">
             <div class="card-body d-flex flex-column justify-content-center p-3">
                 <div class="text-muted small text-uppercase fw-semibold mb-1">Out of Stock</div>
-                <div class="fs-3 fw-bold text-danger">3</div>
+                <div class="fs-3 fw-bold text-danger">@Model.DashbordDTO.Statistics.OutOfStockProducts</div>
             </div>
         </div>
     </div>
@@ -66,7 +66,7 @@
         <div class="card h-100 border-0 shadow-sm text-center bg-primary text-white">
             <div class="card-body d-flex flex-column justify-content-center p-3">
                 <div class="text-white-50 small text-uppercase fw-semibold mb-1">Value</div>
-                <div class="fs-4 fw-bold">$42,350</div>
+                <div class="fs-4 fw-bold">@Model.DashbordDTO.Statistics.InventoryValue</div>
             </div>
         </div>
     </div>
