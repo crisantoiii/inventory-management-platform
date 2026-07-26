@@ -20,8 +20,6 @@ public sealed class DashboardRepository
 
     public async Task<DashboardDto> GetDashboardAsync(CancellationToken cancellationToken = default)
     {
-        var dashboard = new DashboardDto();
-
         var totalProducts =
             await _context.Products
                 .AsNoTracking()
@@ -55,12 +53,28 @@ public sealed class DashboardRepository
                 x => x.QuantityOnHand == 0,
                 cancellationToken);
 
-        var inventoryValue =
-            await _context.Products
+        var inventoryValue = await _context.Products
+            .AsNoTracking()
+            .Select(p => p.QuantityOnHand * p.CostPrice)
+            .AsAsyncEnumerable()
+            .DefaultIfEmpty(0)
+            .SumAsync(cancellationToken);
+
+        var recentTransactions =
+            await _context.InventoryTransactions
                 .AsNoTracking()
-                .SumAsync(
-                    x => x.QuantityOnHand * x.CostPrice,
-                    cancellationToken);
+                .Include(t => t.Product)
+                .OrderByDescending(t => t.TransactionDateUtc)
+                .Take(10)
+                .Select(t => new RecentTransactionDto
+                {
+                    Id = t.Id,
+                    ProductName = t.Product.Name,
+                    TransactionType = t.TransactionType.ToString(),
+                    Quantity = t.Quantity,
+                    TransactionDate = t.TransactionDateUtc
+                })
+                .ToListAsync(cancellationToken);
 
         return new DashboardDto
         {
@@ -74,7 +88,7 @@ public sealed class DashboardRepository
                 InventoryValue = inventoryValue
             },
 
-            RecentTransactions = [],
+            RecentTransactions = recentTransactions,
 
             LowStockProducts = []
         };

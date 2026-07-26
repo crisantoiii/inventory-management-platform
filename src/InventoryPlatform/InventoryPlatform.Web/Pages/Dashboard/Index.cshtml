@@ -94,27 +94,50 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td class="text-muted fw-medium">#TX-9402</td>
-                                <td class="fw-semibold">Wireless Mouse</td>
-                                <td><span class="badge bg-success-subtle text-success border border-success-subtle">Restock</span></td>
-                                <td>+50</td>
-                                <td class="text-muted small">Today, 2:15 PM</td>
-                            </tr>
-                            <tr>
-                                <td class="text-muted fw-medium">#TX-9401</td>
-                                <td class="fw-semibold">Mechanical Keyboard</td>
-                                <td><span class="badge bg-danger-subtle text-danger border border-danger-subtle">Sale</span></td>
-                                <td>-2</td>
-                                <td class="text-muted small">Today, 11:30 AM</td>
-                            </tr>
-                            <tr>
-                                <td class="text-muted fw-medium">#TX-9399</td>
-                                <td class="fw-semibold">27" 4K Monitor</td>
-                                <td><span class="badge bg-danger-subtle text-danger border border-danger-subtle">Sale</span></td>
-                                <td>-1</td>
-                                <td class="text-muted small">Yesterday</td>
-                            </tr>
+                            @foreach (var inventoryTransaction in Model.DashbordDTO.RecentTransactions)
+                            {
+                                <tr>
+                                    <td>
+                                        @inventoryTransaction.Id
+                                    </td>
+                                    <td>
+                                        @inventoryTransaction.ProductName
+                                    </td>
+                                    <td>
+                                        @switch (inventoryTransaction.TransactionType)
+                                        {
+                                            case nameof(TransactionType.StockIn):
+                                                <span class="badge bg-success">Stock In</span>
+                                                break;
+
+                                            case nameof(TransactionType.StockOut):
+                                                <span class="badge bg-danger">Stock Out</span>
+                                                break;
+
+                                            case nameof(TransactionType.Adjustment):
+                                                <span class="badge bg-warning text-dark">Adjustment</span>
+                                                break;
+
+                                            default:
+                                                <span class="badge bg-secondary">Unknown</span>
+                                                break;
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (inventoryTransaction.TransactionType == nameof(TransactionType.StockOut))
+                                        {
+                                            <span>-@inventoryTransaction.Quantity</span>
+                                        }
+                                        else
+                                        {
+                                            <span>+@inventoryTransaction.Quantity</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @inventoryTransaction.TransactionDate.ToLocalTime().ToString("dddd, MMMM dd, yyyy h:mm tt")
+                                    </td>
+                                </tr>
+                            }
                         </tbody>
                     </table>
                 </div>

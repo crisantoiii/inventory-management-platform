@@ -12,7 +12,7 @@ public sealed class RecentTransactionDto
 
     public string TransactionType { get; init; } = string.Empty;
 
-    public int Quantity { get; init; }
+    public decimal Quantity { get; init; }
 
     public DateTime TransactionDate { get; init; }
 }
