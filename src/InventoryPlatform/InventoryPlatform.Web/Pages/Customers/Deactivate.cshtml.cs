@@ -28,6 +28,8 @@ public class DeactivateModel : PageModel
 
     public async Task<IActionResult> OnGetAsync(int id)
     {
+        ViewData["Title"] = "Deactivate Customer";
+
         var result = await _getHandler.HandleAsync(id);
 
         if (result.IsFailure || result.Value is null)

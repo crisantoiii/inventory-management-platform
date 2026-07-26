@@ -48,6 +48,8 @@ public class IndexModel : PageModel
 
     public async Task OnGetAsync()
     {
+        ViewData["Title"] = "Products";
+
         var result = await _handler.HandleAsync(Filter);
 
         if (result.IsSuccess && result.Value is not null)

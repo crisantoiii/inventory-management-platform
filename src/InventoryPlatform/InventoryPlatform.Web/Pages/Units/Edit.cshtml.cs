@@ -26,6 +26,8 @@ public class EditModel : PageModel
 
     public async Task<IActionResult> OnGetAsync(int id)
     {
+        ViewData["Title"] = "Edit Unit";
+
         var result = await _getHandler.HandleAsync(id);
 
         if (result.IsFailure || result.Value is null)
