@@ -20,33 +20,33 @@ public sealed class DashboardRepository
 
     public async Task<DashboardDto> GetDashboardAsync(CancellationToken cancellationToken = default)
     {
-        var totalProducts =
+        var totalProductsCount =
             await _context.Products
                 .AsNoTracking()
                 .CountAsync(cancellationToken);
 
-        var activeProducts =
+        var activeProductsCount =
             await _context.Products
                 .AsNoTracking()
                 .CountAsync(
                 x => x.IsActive,
                 cancellationToken);
 
-        var inactiveProducts =
+        var inactiveProductsCount =
             await _context.Products
                 .AsNoTracking()
                 .CountAsync(
                 x => !x.IsActive,
                 cancellationToken);
 
-        var lowStockProducts =
+        var lowStockProductsCount =
             await _context.Products
                 .AsNoTracking()
                 .CountAsync(
                 x => x.QuantityOnHand <= 10,
                 cancellationToken);
 
-        var outOfStockProducts =
+        var outOfStockProductsCount =
             await _context.Products
                 .AsNoTracking()
                 .CountAsync(
@@ -76,21 +76,36 @@ public sealed class DashboardRepository
                 })
                 .ToListAsync(cancellationToken);
 
+        var lowStockProducts =
+            await _context.Products
+                .AsNoTracking()
+                .Where(p => p.QuantityOnHand <= 10)
+                .OrderBy(p => p.QuantityOnHand)
+                .Take(10)
+                .Select(p => new LowStockProductDto
+                {
+                    Id = p.Id,
+                    ProductName = p.Name,
+                    CategoryName = p.Category.Name,
+                    QuantityOnHand = p.QuantityOnHand
+                })
+                .ToListAsync(cancellationToken);
+
         return new DashboardDto
         {
             Statistics = new DashboardStatisticsDto
             {
-                TotalProducts = totalProducts,
-                ActiveProducts = activeProducts,
-                InactiveProducts = inactiveProducts,
-                LowStockProducts = lowStockProducts,
-                OutOfStockProducts = outOfStockProducts,
+                TotalProducts = totalProductsCount,
+                ActiveProducts = activeProductsCount,
+                InactiveProducts = inactiveProductsCount,
+                LowStockProducts = lowStockProductsCount,
+                OutOfStockProducts = outOfStockProductsCount,
                 InventoryValue = inventoryValue
             },
 
             RecentTransactions = recentTransactions,
 
-            LowStockProducts = []
+            LowStockProducts = lowStockProducts
         };
     }
 }

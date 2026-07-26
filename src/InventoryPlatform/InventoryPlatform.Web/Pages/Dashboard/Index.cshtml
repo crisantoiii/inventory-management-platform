@@ -94,17 +94,17 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (var inventoryTransaction in Model.DashbordDTO.RecentTransactions)
+                            @foreach (var recentTransaction in Model.DashbordDTO.RecentTransactions)
                             {
                                 <tr>
                                     <td>
-                                        @inventoryTransaction.Id
+                                        @recentTransaction.Id
                                     </td>
                                     <td>
-                                        @inventoryTransaction.ProductName
+                                        @recentTransaction.ProductName
                                     </td>
                                     <td>
-                                        @switch (inventoryTransaction.TransactionType)
+                                        @switch (recentTransaction.TransactionType)
                                         {
                                             case nameof(TransactionType.StockIn):
                                                 <span class="badge bg-success">Stock In</span>
@@ -124,17 +124,17 @@
                                         }
                                     </td>
                                     <td>
-                                        @if (inventoryTransaction.TransactionType == nameof(TransactionType.StockOut))
+                                        @if (recentTransaction.TransactionType == nameof(TransactionType.StockOut))
                                         {
-                                            <span>-@inventoryTransaction.Quantity</span>
+                                            <span>-@recentTransaction.Quantity</span>
                                         }
                                         else
                                         {
-                                            <span>+@inventoryTransaction.Quantity</span>
+                                            <span>+@recentTransaction.Quantity</span>
                                         }
                                     </td>
                                     <td>
-                                        @inventoryTransaction.TransactionDate.ToLocalTime().ToString("dddd, MMMM dd, yyyy h:mm tt")
+                                        @recentTransaction.TransactionDate.ToLocalTime().ToString("dddd, MMMM dd, yyyy h:mm tt")
                                     </td>
                                 </tr>
                             }
@@ -153,39 +153,39 @@
             </div>
             <div class="card-body px-4 pb-4">
                 <div class="d-flex flex-column gap-3">
-                    <!-- Low Stock Item 1 -->
-                    <div class="d-flex align-items-center justify-content-between p-3 bg-light rounded border border-warning-subtle">
-                        <div>
-                            <h6 class="mb-1 fw-semibold text-dark">USB-C Hub Adapter</h6>
-                            <small class="text-muted">SKU: TECH-8832</small>
+                     @foreach (var lowStockProduct in Model.DashbordDTO.LowStockProducts)
+                    {
+                        <div class="d-flex align-items-center justify-content-between p-3 bg-light rounded border border-warning-subtle">
+                            <div>
+                                <h6 class="mb-1 fw-semibold text-dark">@lowStockProduct.ProductName</h6>
+                                <small class="text-muted">Category: @lowStockProduct.CategoryName</small>
+                            </div>
+                            <div class="text-end">
+                                <span class="badge bg-warning text-dark mb-1">
+                                    @{
+                                        var quantity = lowStockProduct.QuantityOnHand;
+                                    }
+                                    @if (@quantity == 0)
+                                    {
+                                        <span class="badge bg-danger">@quantity Left</span>
+                                    }
+                                    else if (@quantity >= 1 && @quantity <= 5)
+                                    {
+                                        <span class="badge bg-warning">@quantity Left</span>
+                                    }
+                                    else if (@quantity >= 6 && @quantity <= 10)
+                                    {
+                                        <span class="badge bg-info">@quantity Left</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-success">@quantity Left</span>
+                                    }
+                                </span>
+                                <div class="small text-muted"></div>
+                            </div>
                         </div>
-                        <div class="text-end">
-                            <span class="badge bg-warning text-dark mb-1">5 Left</span>
-                            <div class="small text-muted">Min: 15</div>
-                        </div>
-                    </div>
-                    <!-- Low Stock Item 2 -->
-                    <div class="d-flex align-items-center justify-content-between p-3 bg-light rounded border border-warning-subtle">
-                        <div>
-                            <h6 class="mb-1 fw-semibold text-dark">Ergonomic Office Chair</h6>
-                            <small class="text-muted">SKU: FURN-1029</small>
-                        </div>
-                        <div class="text-end">
-                            <span class="badge bg-warning text-dark mb-1">2 Left</span>
-                            <div class="small text-muted">Min: 10</div>
-                        </div>
-                    </div>
-                    <!-- Out of Stock Item -->
-                    <div class="d-flex align-items-center justify-content-between p-3 bg-light rounded border border-danger-subtle">
-                        <div>
-                            <h6 class="mb-1 fw-semibold text-dark">Bluetooth Headphones</h6>
-                            <small class="text-muted">SKU: AUDIO-4421</small>
-                        </div>
-                        <div class="text-end">
-                            <span class="badge bg-danger text-white mb-1">0 Left</span>
-                            <div class="small text-muted">Min: 20</div>
-                        </div>
-                    </div>
+                    }
                 </div>
             </div>
         </div>

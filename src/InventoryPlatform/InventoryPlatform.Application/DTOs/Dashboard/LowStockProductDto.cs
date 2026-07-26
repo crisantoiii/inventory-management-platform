@@ -12,5 +12,5 @@ public sealed class LowStockProductDto
 
     public string CategoryName { get; init; } = string.Empty;
 
-    public int QuantityOnHand { get; init; }
+    public decimal QuantityOnHand { get; init; }
 }
