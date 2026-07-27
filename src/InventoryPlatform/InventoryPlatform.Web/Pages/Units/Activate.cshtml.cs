@@ -28,6 +28,8 @@ public class ActivateModel : PageModel
 
     public async Task<IActionResult> OnGetAsync(int id)
     {
+        ViewData["Title"] = "Activate Unit";
+
         var result = await _getHandler.HandleAsync(id);
 
         if (result.IsFailure || result.Value is null)

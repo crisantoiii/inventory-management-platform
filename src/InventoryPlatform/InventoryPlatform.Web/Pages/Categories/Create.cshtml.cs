@@ -22,6 +22,8 @@ public class CreateModel : PageModel
 
     public async Task<IActionResult> OnPostAsync()
     {
+        ViewData["Title"] = "Create New Category";
+
         var result = await _handler.HandleAsync(Category);
 
         if (!result.IsSuccess)

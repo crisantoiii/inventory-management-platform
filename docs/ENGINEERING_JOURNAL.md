@@ -8,6 +8,27 @@ Rather than documenting daily work, it captures important architectural decision
 
 ---
 
+# Milestone Timeline
+
+| Milestone | Focus |
+|-----------|-------|
+| 1 | Solution Setup |
+| 2 | EF Core |
+| 3 | Product |
+| 4 | Shared Paging |
+| 5 | Searching |
+| 6 | Sorting |
+| 7 | Filtering |
+| 8 | Product Completion |
+| 9 | Category |
+| 10 | Supplier |
+| 11 | Customer |
+| 12 | Product Foundation |
+| 13 | Inventory Transactions |
+| 14 | Dashboard |
+
+---
+
 # Milestone 1 — Project Initialization
 
 ## Summary
@@ -284,11 +305,15 @@ A well-designed shared infrastructure enables feature development to focus on bu
 
 # Milestone 12 — Product Foundation Improvements
 
+## Summary
+
+Expanded the Product domain model to support future inventory operations by introducing normalized relationships and inventory-specific attributes.
+
 Completed:
 
 - Unit Management
-- Product Category relationship
-- Product Unit relationship
+- Product–Category relationship
+- Product–Unit relationship
 - Barcode
 - QuantityOnHand
 
@@ -336,26 +361,67 @@ The Product entity now serves as the aggregate root for inventory operations whi
 
 ---
 
+# Milestone 14 — Dashboard
+
+## Summary
+
+Implemented the first reporting module by introducing a centralized dashboard that aggregates inventory statistics and operational insights.
+
+Completed:
+
+- Dashboard overview
+- Inventory statistics
+- Inventory value summary
+- Recent inventory transactions
+- Low stock products
+- Read-only dashboard projections
+- Responsive dashboard layout
+
+### Outcome
+
+Successfully extended the architecture to support reporting scenarios without introducing new architectural layers or modifying existing domain workflows.
+
+The Dashboard demonstrates that the same Clean Architecture can support both transactional business operations and read-only reporting through dedicated DTO projections and repository queries.
+
+### Lessons Learned
+
+- Reporting requirements differ from transactional workflows.
+- Read-only DTO projections improve performance and reduce coupling.
+- Existing application and repository patterns were reusable for reporting features.
+- Consistent architectural patterns simplify the addition of new modules.
+
+---
+
 ## Reflection
 
 The Inventory Transactions module confirmed that the shared architecture was flexible enough to support transactional business logic without introducing new architectural patterns.
 
 The reusable infrastructure for paging, filtering, sorting, repositories, and application handlers reduced implementation complexity and allowed development to focus on business rules rather than framework concerns.
 
+The Dashboard milestone demonstrated that the architecture is equally effective for reporting features. By using dedicated DTO projections and read-only repositories, reporting concerns remained isolated from transactional domain logic while still reusing the existing application and infrastructure layers. 
+
+Together, the Inventory Transactions and Dashboard milestones demonstrate that the architecture supports both write-focused business workflows and read-optimized reporting without requiring architectural changes.
+
 ---
 
 # Architecture Validation
 
-After implementing six business modules (Product, Category, Supplier, Customer, Unit, and Inventory Transactions), the architecture has demonstrated:
+After implementing seven business modules (Dashboard, Product, Category, Supplier, Customer, Unit, and Inventory Transactions), the architecture has demonstrated:
 
 - Consistent implementation patterns
 - Reusable application handlers
 - Reusable repository infrastructure
 - Shared paging, sorting, and filtering
 - Stable Clean Architecture boundaries
-- Seamless transition from master data to transactional workflows
+- Seamless evolution from master data to transactional and reporting workflows
 
-This milestone demonstrates that the architecture supports both master data and transaction-based modules without structural changes.
+This milestone demonstrates that the architecture supports:
+
+- Master data modules
+- Transactional workflows
+- Read-only reporting modules
+
+without requiring structural changes.
 
 ---
 
@@ -374,6 +440,7 @@ Throughout development the following principles have consistently guided impleme
 - Favor proven patterns over premature abstraction
 - Keep domain behavior inside entities.
 - Prefer immutable business history for transactional data.
+- Use read-only DTO projections for reporting features.
 
 ---
 
@@ -381,10 +448,9 @@ Throughout development the following principles have consistently guided impleme
 
 Future milestones are expected to include:
 
-- Dashboard
-- Purchase Orders
-- Purchase Receiving
 - Authentication
 - Authorization
+- Purchase Orders
+- Purchase Receiving
 - Reporting
 - Audit Logging

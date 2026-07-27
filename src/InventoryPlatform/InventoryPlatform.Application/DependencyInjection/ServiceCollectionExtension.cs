@@ -40,6 +40,7 @@ using InventoryPlatform.Application.Features.InventoryTransactions.GetInventoryT
 using InventoryPlatform.Application.Features.InventoryTransactions.GetInventoryTransaction;
 
 using Microsoft.Extensions.DependencyInjection;
+using InventoryPlatform.Application.Features.Dashboard.GetDashboard;
 
 namespace InventoryPlatform.Application.DependencyInjection;
 
@@ -87,6 +88,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<CreateInventoryTransactionHandler>();
         services.AddScoped<GetInventoryTransactionHandler>();
         services.AddScoped<GetInventoryTransactionsHandler>();
+
+        services.AddScoped<GetDashboardHandler>();
 
         services.AddValidatorsFromAssembly(
             typeof(ServiceCollectionExtensions).Assembly);

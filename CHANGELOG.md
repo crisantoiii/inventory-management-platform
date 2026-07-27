@@ -2,6 +2,51 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v0.7.0] - 2026-07-27
+
+### Added
+
+#### Dashboard Module
+
+- Dashboard overview page
+- Dashboard statistics cards
+- Recent inventory transactions widget
+- Low stock products widget
+- Inventory value summary
+- Dashboard refresh action
+
+#### Dashboard Statistics
+
+- Total Products
+- Active Products
+- Inactive Products
+- Low Stock Products
+- Out of Stock Products
+- Total Inventory Value
+
+#### Dashboard Reporting
+
+- Recent inventory transactions
+- Low stock product monitoring
+- Read-only dashboard projections
+- Empty state handling for dashboard widgets
+
+### Changed
+
+- Added Dashboard feature to the application navigation.
+- Extended the application layer with dashboard queries and handlers.
+- Added dashboard repository for read-only reporting.
+- Introduced dashboard DTOs for statistics and widget data.
+- Improved project documentation to reflect the completed Dashboard module.
+
+### Improved
+
+- Added responsive dashboard layout using Bootstrap cards.
+- Improved visibility of inventory metrics through KPI cards.
+- Enhanced dashboard usability with transaction badges and low stock indicators.
+- Formatted inventory value for improved readability.
+- Added user-friendly empty state messages when dashboard widgets contain no data.
+
 ## [v0.6.0] - 2026-07-25
 
 ### Added
@@ -96,6 +141,7 @@ All notable changes to this project will be documented in this file.
 - Shared supplier sort field definitions
 - Shared customer sort field definitions
 - Shared unit sort field definitions
+- Shared inventory transaction sort field definitions
 
 ### Changed
 

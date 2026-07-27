@@ -1,0 +1,218 @@
+﻿@page
+@model InventoryPlatform.Web.Pages.Dashboard.IndexModel
+@{
+}
+
+<!-- Dashboard Header -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h2 m-0 text-dark">@ViewData["Title"]</h1>
+    <a href="/Dashboard" class="btn btn-primary btn-sm"><i class="bi bi-arrow-clockwise me-1"></i> Refresh</a>
+</div>
+
+<!-- Inventory Metrics Grid -->
+<div class="row g-3 mb-5">
+    <!-- Total Products -->
+    <div class="col-12 col-sm-6 col-md-4 col-lg-2">
+        <div class="card h-100 border-0 shadow-sm text-center">
+            <div class="card-body d-flex flex-column justify-content-center p-3">
+                <div class="text-muted small text-uppercase fw-bold mb-1">Total Products</div>
+                <div class="fs-1 fw-bold text-dark">@Model.DashbordDTO.Statistics.TotalProducts</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Products -->
+    <div class="col-12 col-sm-6 col-md-4 col-lg-2">
+        <div class="card h-100 border-0 shadow-sm text-center border-start border-success border-4">
+            <div class="card-body d-flex flex-column justify-content-center p-3">
+                <div class="text-muted small text-uppercase fw-bold mb-1">Active</div>
+                <div class="fs-1 fw-bold text-success">@Model.DashbordDTO.Statistics.ActiveProducts</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Inactive Products -->
+    <div class="col-12 col-sm-6 col-md-4 col-lg-2">
+        <div class="card h-100 border-0 shadow-sm text-center border-start border-secondary border-4">
+            <div class="card-body d-flex flex-column justify-content-center p-3">
+                <div class="text-muted small text-uppercase fw-bold mb-1">Inactive</div>
+                <div class="fs-1 fw-bold text-secondary">@Model.DashbordDTO.Statistics.InactiveProducts</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Low Stock -->
+    <div class="col-12 col-sm-6 col-md-4 col-lg-2">
+        <div class="card h-100 border-0 shadow-sm text-center border-start border-warning border-4">
+            <div class="card-body d-flex flex-column justify-content-center p-3">
+                <div class="text-muted small text-uppercase fw-bold mb-1">Low Stock</div>
+                <div class="fs-1 fw-bold text-warning">@Model.DashbordDTO.Statistics.LowStockProducts</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Out of Stock -->
+    <div class="col-12 col-sm-6 col-md-4 col-lg-2">
+        <div class="card h-100 border-0 shadow-sm text-center border-start border-danger border-4">
+            <div class="card-body d-flex flex-column justify-content-center p-3">
+                <div class="text-muted small text-uppercase fw-bold mb-1">Out of Stock</div>
+                <div class="fs-1 fw-bold text-danger">@Model.DashbordDTO.Statistics.OutOfStockProducts</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Inventory Value -->
+    <div class="col-12 col-sm-6 col-md-4 col-lg-2">
+        <div class="card h-100 border-0 shadow-sm text-center bg-primary text-white">
+            <div class="card-body d-flex flex-column justify-content-center p-3">
+                <div class="text-white-50 small text-uppercase fw-bold mb-1">Value</div>
+                <div class="fs-1 fw-bold">@Model.DashbordDTO.Statistics.InventoryValue.ToString("N2")</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Lower Dashboard Sections -->
+<div class="row g-4">
+    <!-- Recent Transactions -->
+    <div class="col-12 col-lg-7">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-transparent border-0 pt-4 px-4 pb-2 d-flex justify-content-between align-items-center">
+                <h2 class="h5 m-0 fw-bold text-dark">Recent Transactions</h2>
+                @if (Model.DashbordDTO.RecentTransactions.Any())
+                {
+                    <a href="/InventoryTransactions/Index" class="btn btn-sm btn-link">
+                        View All →
+                    </a>
+                }
+
+            </div>
+            <div class="card-body px-4 pb-4">
+                @if (!Model.DashbordDTO.RecentTransactions.Any())
+                {
+                    <div class="alert alert-info">
+                        No recent transactions.
+                    </div>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light text-muted small uppercase">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Product</th>
+                                    <th>Type</th>
+                                    <th>Qty</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var recentTransaction in Model.DashbordDTO.RecentTransactions)
+                                {
+                                    <tr>
+                                        <td>
+                                            @recentTransaction.Id
+                                        </td>
+                                        <td>
+                                            @recentTransaction.ProductName
+                                        </td>
+                                        <td>
+                                            @switch (recentTransaction.TransactionType)
+                                            {
+                                                case nameof(TransactionType.StockIn):
+                                                    <span class="badge bg-success">Stock In</span>
+                                                    break;
+
+                                                case nameof(TransactionType.StockOut):
+                                                    <span class="badge bg-danger">Stock Out</span>
+                                                    break;
+
+                                                case nameof(TransactionType.Adjustment):
+                                                    <span class="badge bg-warning text-dark">Adjustment</span>
+                                                    break;
+
+                                                default:
+                                                    <span class="badge bg-secondary">Unknown</span>
+                                                    break;
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (recentTransaction.TransactionType == nameof(TransactionType.StockOut))
+                                            {
+                                                <span>-@recentTransaction.Quantity</span>
+                                            }
+                                            else
+                                            {
+                                                <span>+@recentTransaction.Quantity</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            @recentTransaction.TransactionDate.ToLocalTime().ToString("dddd, MMMM dd, yyyy h:mm tt")
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Low Stock Products -->
+    <div class="col-12 col-lg-5">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-transparent border-0 pt-4 px-4 pb-2">
+                <h2 class="h5 m-0 fw-bold text-dark">Low Stock Products</h2>
+            </div>
+            <div class="card-body px-4 pb-4">
+                <div class="d-flex flex-column gap-3">
+                    @if (!Model.DashbordDTO.LowStockProducts.Any())
+                    {
+                        <div class="alert alert-info">
+                            No low products found.
+                        </div>
+                    }
+                    else
+                    {
+                        @foreach (var lowStockProduct in Model.DashbordDTO.LowStockProducts)
+                        {
+                            <div class="d-flex align-items-center justify-content-between p-3 bg-light rounded border border-warning-subtle">
+                                <div>
+                                    <h6 class="mb-1 fw-semibold text-dark">@lowStockProduct.ProductName</h6>
+                                    <small class="text-muted">Category: @lowStockProduct.CategoryName</small>
+                                </div>
+                                <div class="text-end">
+                                    <span class="badge bg-warning text-dark mb-1">
+                                        @{
+                                            var quantity = lowStockProduct.QuantityOnHand;
+                                        }
+                                        @if (@quantity == 0)
+                                        {
+                                            <span class="badge bg-danger fs-5 fw-bold text-danger">@quantity Left</span>
+                                        }
+                                        else if (@quantity >= 1 && @quantity <= 5)
+                                        {
+                                            <span class="badge bg-warning fs-5 fw-bold  text-danger">@quantity Left</span>
+                                        }
+                                        else if (@quantity >= 6 && @quantity <= 10)
+                                        {
+                                            <span class="badge bg-info fs-5 fw-bold  text-danger">@quantity Left</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-success fs-5 fw-bold">@quantity Left</span>
+                                        }
+                                    </span>
+                                    <div class="small text-muted"></div>
+                                </div>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

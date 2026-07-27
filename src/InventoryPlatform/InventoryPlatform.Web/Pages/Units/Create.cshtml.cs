@@ -18,6 +18,7 @@ public class CreateModel : PageModel
 
     public void OnGet()
     {
+        ViewData["Title"] = "Create New Unit";
     }
 
     public async Task<IActionResult> OnPostAsync()

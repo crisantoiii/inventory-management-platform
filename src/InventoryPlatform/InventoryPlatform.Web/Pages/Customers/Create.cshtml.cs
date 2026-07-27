@@ -18,6 +18,7 @@ public class CreateModel : PageModel
 
     public void OnGet()
     {
+        ViewData["Title"] = "Create New Customer";
     }
 
     public async Task<IActionResult> OnPostAsync()

@@ -17,6 +17,8 @@ public class DetailsModel : PageModel
 
     public async Task<IActionResult> OnGetAsync(int id)
     {
+        ViewData["Title"] = "Customer Details";
+
         var result = await _handler.HandleAsync(id);
 
         if (result.IsFailure || result.Value is null)

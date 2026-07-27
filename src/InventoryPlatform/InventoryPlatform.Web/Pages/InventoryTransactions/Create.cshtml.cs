@@ -25,6 +25,8 @@ public class CreateModel : PageModel
 
     public async Task<IActionResult> OnGetAsync(CancellationToken cancellationToken)
     {
+        ViewData["Title"] = "Create New Inventory Transaction";
+
         await PopulateProductDropdownAsync(cancellationToken);
 
         return Page();

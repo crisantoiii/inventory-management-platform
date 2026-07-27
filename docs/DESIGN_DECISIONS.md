@@ -92,6 +92,7 @@ Current implementation:
 - CustomerRepository
 - UnitRepository
 - InventoryTransactionRepository
+- DashboardRepository
 
 ## Outcome
 
@@ -257,7 +258,7 @@ Accepted.
 ## Decision
 
 All business modules follow the same architectural structure. 
-The architecture has now been successfully validated across six independent business modules without requiring structural changes, demonstrating that the design scales consistently as new features are introduced.
+The architecture has now been successfully validated across seven independent business modules without requiring structural changes, demonstrating that the design scales consistently as new features are introduced.
 
 Each module implements:
 
@@ -357,13 +358,46 @@ Accepted.
 
 ---
 
+# DD-014 — Read-only Dashboard Projections
+
+Version Introduced: v0.7.0
+
+## Decision
+
+Implement the Dashboard using read-only DTO projections instead of exposing domain entities directly.
+
+## Rationale
+
+The Dashboard is a reporting feature that aggregates information from multiple sources without modifying business data.
+
+Using dedicated DTO projections:
+
+- Keeps reporting concerns separate from transactional workflows.
+- Avoids loading unnecessary entity graphs.
+- Improves query performance.
+- Reduces coupling between the UI and domain model.
+- Allows the Dashboard to evolve independently of domain entities.
+
+## Alternatives Considered
+
+Reuse existing domain entities directly for reporting.
+
+This approach was rejected because reporting requirements differ from transactional workflows and would unnecessarily expose domain models to presentation concerns.
+
+## Outcome
+
+Accepted.
+
+---
+
 # Future Decisions
 
 This document will continue to evolve as the project grows.
 
 Examples:
 
-- Dashboard architecture
+
+
 - Purchase order workflow
 - Concurrency handling
 - Authentication strategy

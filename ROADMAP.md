@@ -10,7 +10,7 @@ The project is developed incrementally, with each completed module validating th
 
 # Current Release
 
-## Version 0.6.0 – Inventory Transactions
+## Version 0.7.0 – Dashboard
 
 ### Completed
 
@@ -98,40 +98,15 @@ The project is developed incrementally, with each completed module validating th
 - ✅ Server-side Pagination
 - ✅ Server-side Sorting
 
----
+### Dashboard
 
-# Phase 2 — Dashboard & Reporting
-
-## Dashboard
-
-Planned Widgets:
-
-- Total Products
-- Active Products
-- Inactive Products
-- Low Stock Items
-- Out of Stock Items
-- Reorder Level Monitoring
-- Inventory Value
-- Recent Inventory Transactions
-- Stock In Today
-- Stock Out Today
-
-
----
-
-## Reporting
-
-Planned Reports:
-
-- Product Report
-- Inventory Report
-- Transaction Report
-
-Export Options:
-
-- Excel
-- PDF
+- ✅ Dashboard Overview
+- ✅ Inventory Statistics
+- ✅ Inventory Value Summary
+- ✅ Recent Inventory Transactions
+- ✅ Low Stock Products
+- ✅ Responsive Dashboard Layout
+- ✅ Empty State Handling
 
 ---
 
@@ -151,15 +126,30 @@ Authorization
 
 ---
 
-# Phase 4 — Advanced Features
+# Phase 4 — Reporting
+
+Planned Reports:
+
+- Product Report
+- Inventory Report
+- Transaction Report
+
+Export Options:
+
+- Excel
+- PDF
+
+---
+
+# Phase 5 — Advanced Features
 
 Planned:
 
 - Audit Trail
 - Activity Logs
 - File Uploads
+- Barcode Scanner Integration
 - Product Images
-- Barcode Support
 - QR Code Support
 - Email Notifications
 - Bulk Import
@@ -209,5 +199,6 @@ Each new module should:
 - Maintain consistent Razor Pages workflows.
 - Keep business rules inside domain entities.
 - Favor consistency over premature abstraction.
+- Prefer DTO projections for read-only reporting features.
 
 The architecture should evolve through reuse rather than introducing module-specific implementations whenever possible.

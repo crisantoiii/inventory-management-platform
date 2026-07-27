@@ -37,6 +37,8 @@ public class EditModel : PageModel
 
     public async Task<IActionResult> OnGetAsync(int id, CancellationToken cancellationToken)
     {
+        ViewData["Title"] = "Edit Product";
+
         var result = await _getHandler.HandleAsync(id);
 
         if (result.IsFailure || result.Value is null)
