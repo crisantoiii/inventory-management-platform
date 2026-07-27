@@ -406,7 +406,7 @@ The following screenshots demonstrate the current implementation:
 
 ![Product Add](docs/screenshots/products_add.png)
 
-![Product Details](docs/screenshots/products_details.png)
+![Product Details](docs/screenshots/product_details.png)
 
 ### Category Management
 
@@ -420,9 +420,9 @@ The following screenshots demonstrate the current implementation:
 
 ![Suppliers](docs/screenshots/suppliers.png)
 
-![Supplier Add](docs/screenshots/supplier_add.png)
+![Supplier Add](docs/screenshots/suppliers_add.png)
 
-![Supplier Details](docs/screenshots/supplier_details.png)
+![Supplier Details](docs/screenshots/suppliers_details.png)
 
 ### Customer Management
 
