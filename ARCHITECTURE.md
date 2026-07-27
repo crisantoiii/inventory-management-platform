@@ -133,14 +133,16 @@ The Domain project has no knowledge of Infrastructure or Web.
 
 ## Architecture Validation
 
-The architecture has been validated through the implementation of six independent business modules:
+The architecture has been validated through the implementation of seven independent business modules:
 
+- Dashboard
 - Product Management
 - Category Management
 - Supplier Management
 - Customer Management
 - Unit Management
 - Inventory Transactions
+- DashboardRepository
 
 Each module follows the same layered architecture, repository pattern, CQRS-style application handlers, reusable paging, filtering, and sorting infrastructure, and Razor Pages presentation model.
 
@@ -164,6 +166,13 @@ Current repositories include:
 - CustomerRepository
 - UnitRepository
 - InventoryTransactionRepository
+- DashboardRepository
+
+---
+
+## Read Model Pattern
+
+Read-only features such as the Dashboard use repository-based DTO projections rather than exposing domain entities. This keeps reporting queries optimized while preserving domain encapsulation.
 
 ---
 
@@ -315,6 +324,49 @@ Updated Product Quantity
 
 ---
 
+# Dashboard Request Workflow
+
+```text
+Browser
+
+    │
+
+    ▼
+
+Dashboard Razor Page
+
+    │
+
+    ▼
+
+Application Handler
+
+    │
+
+    ▼
+
+Dashboard Repository
+
+    │
+
+    ▼
+
+Read-only DTO Projections
+
+    │
+
+    ▼
+
+SQL Server
+
+    │
+
+    ▼
+
+Dashboard View
+
+---
+
 # Design Principles
 
 The project follows:
@@ -326,6 +378,7 @@ The project follows:
 - Single Responsibility Principle
 - Consistency over Premature Abstraction
 - Vertical Slice Feature Organization
+- Read-only DTO Projections
 
 ---
 
@@ -341,13 +394,16 @@ Corrections are performed by creating adjustment transactions, preserving a comp
 
 The Product entity acts as the aggregate root for inventory updates. All inventory changes are performed through Product domain methods to centralize business rules.
 
+## Read-only Dashboard Projections
+
+The Dashboard uses read-only DTO projections to aggregate reporting data without exposing domain entities. This keeps reporting concerns separate from transactional business workflows while leveraging the existing application and repository architecture.
+
 ---
 
 # Future Architecture
 
 Planned additions include:
 
-- Dashboard
 - Purchase Orders
 - Reporting
 - Authentication

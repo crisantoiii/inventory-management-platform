@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Inventory Management Platform is a modern ASP.NET Core 10 Razor Pages application built using Clean Architecture principles. It currently provides reusable infrastructure for Product, Category, Supplier, Customer, Unit, and Inventory Transaction management through consistent business workflows, server-side searching, sorting, filtering, and pagination.
+The Inventory Management Platform is a modern ASP.NET Core 10 Razor Pages application built using Clean Architecture principles. It currently provides business modules for Dashboard, Product, Category, Supplier, Customer, Unit, and Inventory Transaction management through consistent business workflows, server-side searching, sorting, filtering, and pagination.
 
 The architecture is designed to support additional inventory modules with minimal duplication while maintaining a clean separation of concerns.
 
@@ -10,6 +10,7 @@ The architecture is designed to support additional inventory modules with minima
 
 | Module | Status |
 |---------|--------|
+| Dashboard | ✅ Complete |
 | Product Management | ✅ Complete |
 | Category Management | ✅ Complete |
 | Supplier Management | ✅ Complete |
@@ -27,6 +28,7 @@ Completed business modules:
 - ✅ Customer Management
 - ✅ Unit Management
 - ✅ Inventory Transactions
+- ✅ Dashboard
 
 Shared capabilities:
 
@@ -230,6 +232,40 @@ Each inventory transaction records:
 
 ---
 
+# Dashboard
+
+## Dashboard Overview
+
+- ✅ Inventory statistics
+- ✅ Inventory value summary
+- ✅ Recent inventory transactions
+- ✅ Low stock product monitoring
+- ✅ Refresh dashboard
+
+## Dashboard Widgets
+
+- Total Products
+- Active Products
+- Inactive Products
+- Low Stock Products
+- Out of Stock Products
+- Inventory Value
+- Recent Transactions
+- Low Stock Product List
+
+## Dashboard Features
+
+- Responsive dashboard layout
+- Read-only reporting
+- Empty state handling
+- Real-time inventory summary
+
+## Dashboard Design
+
+The Dashboard aggregates inventory statistics, recent inventory activity, and low stock alerts into a single read-only view using DTO projections optimized for reporting.
+
+---
+
 # Shared Infrastructure
 
 ## Paging
@@ -393,18 +429,11 @@ Operation results are standardized using:
 - Immutable Business Records
 - Automatic Inventory Updates
 - Domain-driven Inventory Management
+- Dashboard Analytics
 
 ---
 
 # Planned Features
-
-## Dashboard
-
-- Total Products
-- Active Products
-- Inactive Products
-- Low Stock Items
-- Inventory Value
 
 ## Security
 
