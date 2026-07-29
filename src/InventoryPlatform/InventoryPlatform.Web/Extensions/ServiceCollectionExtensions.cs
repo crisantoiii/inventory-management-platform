@@ -26,6 +26,19 @@ public static class ServiceCollectionExtensions
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders();
 
+        services.ConfigureApplicationCookie(options =>
+        {
+            options.LoginPath = "/Identity/Account/Login";
+            options.LogoutPath = "/Identity/Account/Logout";
+            options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+
+            options.Cookie.Name = "InventoryPlatform.Auth";
+
+            options.SlidingExpiration = true;
+
+            options.ExpireTimeSpan = TimeSpan.FromHours(8);
+        });
+
         services.AddRazorPages();
 
         return services;

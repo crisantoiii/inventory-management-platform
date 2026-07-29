@@ -16,6 +16,8 @@ public static class WebApplicationExtensions
 
         app.UseRouting();
 
+        app.UseAuthentication();
+
         app.UseAuthorization();
 
         app.MapStaticAssets();
