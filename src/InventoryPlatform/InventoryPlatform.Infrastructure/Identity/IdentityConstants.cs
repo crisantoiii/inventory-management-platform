@@ -1,10 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿namespace InventoryPlatform.Infrastructure.Identity;
 
-namespace InventoryPlatform.Infrastructure.Identity
+public static class IdentityConstants
 {
-    internal class IdentityConstants
+    public static class Roles
     {
+        public const string Administrator = nameof(Administrator);
+        public const string InventoryManager = nameof(InventoryManager);
+        public const string Viewer = nameof(Viewer);
+    }
+
+    public static class DefaultAdmin
+    {
+        public const string UserName = "admin";
+        public const string Email = "admin@inventory.local";
+        public const string Password = "Admin@123";
     }
 }
