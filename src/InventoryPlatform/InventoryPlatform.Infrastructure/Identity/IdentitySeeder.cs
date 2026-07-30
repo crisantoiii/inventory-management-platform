@@ -18,7 +18,26 @@ public static class IdentitySeeder
 
         await SeedRolesAsync(roleManager);
 
-        await SeedAdministratorAsync(userManager);
+        await SeedUserAsync(userManager, 
+            IdentityConstants.DefaultAdmin.UserName, 
+            IdentityConstants.DefaultAdmin.Email,
+            IdentityConstants.DefaultAdmin.Password,
+            IdentityConstants.Roles.Administrator
+             );
+
+        await SeedUserAsync(userManager,
+            IdentityConstants.DefaultManager.UserName,
+            IdentityConstants.DefaultManager.Email,
+            IdentityConstants.DefaultManager.Password,
+            IdentityConstants.Roles.InventoryManager
+             );
+
+        await SeedUserAsync(userManager,
+            IdentityConstants.DefaultViewer.UserName,
+            IdentityConstants.DefaultViewer.Email,
+            IdentityConstants.DefaultViewer.Password,
+            IdentityConstants.Roles.Viewer
+             );
     }
 
     private static async Task SeedRolesAsync(
@@ -43,28 +62,31 @@ public static class IdentitySeeder
         }
     }
 
-    private static async Task SeedAdministratorAsync(
-        UserManager<ApplicationUser> userManager)
+    private static async Task SeedUserAsync(
+        UserManager<ApplicationUser> userManager, 
+        string username, 
+        string email, 
+        string password,
+        string role)
     {
-        var admin = await userManager.FindByEmailAsync(
-            IdentityConstants.DefaultAdmin.Email);
+        var user = await userManager.FindByEmailAsync(
+            email);
 
-        if (admin is not null)
+        if ( user is not null)
         {
             return;
         }
 
-
-        admin = new ApplicationUser
+        user = new ApplicationUser
         {
-            UserName = IdentityConstants.DefaultAdmin.UserName,
-            Email = IdentityConstants.DefaultAdmin.Email,
+            UserName = username,
+            Email = email,
             EmailConfirmed = true
         };
 
         var result = await userManager.CreateAsync(
-            admin,
-            IdentityConstants.DefaultAdmin.Password);
+            user,
+            password);
 
         EnsureSucceeded(result, "Creating administrator");
 
@@ -78,8 +100,8 @@ public static class IdentitySeeder
 
 
         var roleResult = await userManager.AddToRoleAsync(
-            admin,
-            IdentityConstants.Roles.Administrator);
+            user,
+            role);
 
         EnsureSucceeded(roleResult, "Assigning administrator role");
 

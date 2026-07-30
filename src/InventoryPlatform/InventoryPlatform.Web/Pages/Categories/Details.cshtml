@@ -1,5 +1,6 @@
 ﻿@page
 @model InventoryPlatform.Web.Pages.Categories.DetailsModel
+@using InventoryPlatform.Infrastructure.Identity;
 
 <h1>@ViewData["Title"]</h1>
 
@@ -30,11 +31,15 @@
                 Back
             </a>
 
-            <a asp-page="Edit"
-               asp-route-id="@Model.Category.Id"
-               class="btn btn-primary">
-                Edit
-            </a>
+            @if (User.IsInRole(IdentityConstants.Roles.Administrator) ||
+                User.IsInRole(IdentityConstants.Roles.InventoryManager))
+            {
+                <a asp-page="Edit"
+                   asp-route-id="@Model.Category.Id"
+                   class="btn btn-primary">
+                    Edit
+                </a>
+            }
 
         </div>
 

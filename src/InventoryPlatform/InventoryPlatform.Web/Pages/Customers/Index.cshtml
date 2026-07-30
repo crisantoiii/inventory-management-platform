@@ -1,6 +1,7 @@
 ﻿@page
 @model InventoryPlatform.Web.Pages.Customers.IndexModel
 @using InventoryPlatform.Shared.Sorting;
+@using InventoryPlatform.Infrastructure.Identity;
 
 @{
     var start = (Model.Customers.Page - 1) * Model.Customers.PageSize + 1;
@@ -13,10 +14,14 @@
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h1 class="mb-0">@ViewData["Title"]</h1>
 
-    <a asp-page="Create"
-       class="btn btn-primary">
-        Add customer
-    </a>
+    @if (User.IsInRole(IdentityConstants.Roles.Administrator) ||
+    User.IsInRole(IdentityConstants.Roles.InventoryManager))
+    {
+        <a asp-page="Create"
+           class="btn btn-primary">
+            Add Customer
+        </a>
+    }
 </div>
 @if (!string.IsNullOrWhiteSpace(Model.SuccessMessage))
 {
@@ -160,27 +165,35 @@ else
                                 Details
                             </a>
 
-                            <a asp-page="Edit"
-                               asp-route-id="@customer.Id"
-                               class="btn btn-sm btn-outline-primary">
-                                Edit
-                            </a>
-
-                            @if (customer.IsActive)
+                            @if (User.IsInRole(IdentityConstants.Roles.Administrator) ||
+                                User.IsInRole(IdentityConstants.Roles.InventoryManager))
                             {
-                                <a asp-page="Deactivate"
+                                <a asp-page="Edit"
                                    asp-route-id="@customer.Id"
-                                   class="btn btn-sm btn-outline-danger">
-                                    Deactivate
+                                   class="btn btn-sm btn-outline-primary">
+                                    Edit
                                 </a>
                             }
-                            else
+
+                            @if (User.IsInRole(IdentityConstants.Roles.Administrator))
                             {
-                                <a asp-page="Activate"
-                                   asp-route-id="@customer.Id"
-                                   class="btn btn-sm btn-outline-success">
-                                    Activate
-                                </a>
+
+                                @if (customer.IsActive)
+                                {
+                                    <a asp-page="Deactivate"
+                                       asp-route-id="@customer.Id"
+                                       class="btn btn-sm btn-outline-danger">
+                                        Deactivate
+                                    </a>
+                                }
+                                else
+                                {
+                                    <a asp-page="Activate"
+                                       asp-route-id="@customer.Id"
+                                       class="btn btn-sm btn-outline-success">
+                                        Activate
+                                    </a>
+                                }
                             }
 
                         </div>

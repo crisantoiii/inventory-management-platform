@@ -1,11 +1,14 @@
 using InventoryPlatform.Application.Features.InventoryTransactions.CreateInventoryTransaction;
 using InventoryPlatform.Application.Features.Products.GetProducts;
+using InventoryPlatform.Web.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace InventoryPlatform.Web.Pages.InventoryTransactions;
 
+[Authorize(Policy = AuthorizationPolicies.InventoryManagement)]
 public class CreateModel : PageModel
 {
     private readonly CreateInventoryTransactionHandler _handler;

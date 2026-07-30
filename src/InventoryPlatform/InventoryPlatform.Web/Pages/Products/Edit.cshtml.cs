@@ -2,12 +2,15 @@ using InventoryPlatform.Application.Features.Categories.GetCategories;
 using InventoryPlatform.Application.Features.Products.GetProduct;
 using InventoryPlatform.Application.Features.Products.UpdateProduct;
 using InventoryPlatform.Application.Features.Units.GetUnits;
+using InventoryPlatform.Web.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace InventoryPlatform.Web.Pages.Products;
 
+[Authorize(Policy = AuthorizationPolicies.InventoryManagement)]
 public class EditModel : PageModel
 {
     private readonly GetProductHandler _getHandler;

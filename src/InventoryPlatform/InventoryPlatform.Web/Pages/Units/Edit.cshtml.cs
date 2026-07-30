@@ -1,10 +1,13 @@
 using InventoryPlatform.Application.Features.Units.GetUnit;
 using InventoryPlatform.Application.Features.Units.UpdateUnit;
+using InventoryPlatform.Web.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace InventoryPlatform.Web.Pages.Units;
 
+[Authorize(Policy = AuthorizationPolicies.InventoryManagement)]
 public class EditModel : PageModel
 {
     private readonly GetUnitHandler _getHandler;

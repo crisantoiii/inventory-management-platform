@@ -1,9 +1,12 @@
 using InventoryPlatform.Application.Features.Suppliers.CreateSupplier;
+using InventoryPlatform.Web.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace InventoryPlatform.Web.Pages.Suppliers;
 
+[Authorize(Policy = AuthorizationPolicies.ViewInventory)]
 public class CreateModel : PageModel
 {
     private readonly CreateSupplierHandler _handler;

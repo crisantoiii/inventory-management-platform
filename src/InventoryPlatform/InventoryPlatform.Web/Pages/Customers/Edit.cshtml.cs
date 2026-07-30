@@ -1,10 +1,13 @@
 using InventoryPlatform.Application.Features.Customers.GetCustomer;
 using InventoryPlatform.Application.Features.Customers.UpdateCustomer;
+using InventoryPlatform.Web.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace InventoryPlatform.Web.Pages.Customers;
 
+[Authorize(Policy = AuthorizationPolicies.InventoryManagement)]
 public class EditModel : PageModel
 {
     private readonly GetCustomerHandler _getHandler;

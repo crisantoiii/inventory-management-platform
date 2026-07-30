@@ -1,12 +1,15 @@
 using InventoryPlatform.Application.Features.Products.GetProducts;
-using InventoryPlatform.Shared.Paging;
 using InventoryPlatform.Shared.Filtering;
+using InventoryPlatform.Shared.Paging;
+using InventoryPlatform.Web.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace InventoryPlatform.Web.Pages.Products;
 
+[Authorize(Policy = AuthorizationPolicies.ViewInventory)]
 public class IndexModel : PageModel
 {
     [FromQuery]

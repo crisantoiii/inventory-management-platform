@@ -1,7 +1,8 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using InventoryPlatform.Infrastructure.Persistence.Context;
-using LocalIdentity = InventoryPlatform.Infrastructure.Identity;
+﻿using InventoryPlatform.Infrastructure.Persistence.Context;
+using InventoryPlatform.Web.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.DependencyInjection;
+using LocalIdentity = InventoryPlatform.Infrastructure.Identity;
 
 namespace InventoryPlatform.Web.Extensions;
 
@@ -69,6 +70,29 @@ public static class ServiceCollectionExtensions
             options.Conventions.AuthorizeFolder(
                 "/Inventory",
                 $"{LocalIdentity.IdentityConstants.Roles.Administrator},{LocalIdentity.IdentityConstants.Roles.InventoryManager}");
+        });
+
+        services.AddAuthorization(options =>
+        {
+            options.AddPolicy(
+                AuthorizationPolicies.Administrator,
+                policy =>
+                    policy.RequireRole(LocalIdentity.IdentityConstants.Roles.Administrator));
+
+            options.AddPolicy(
+                AuthorizationPolicies.InventoryManagement,
+                policy =>
+                    policy.RequireRole(
+                        LocalIdentity.IdentityConstants.Roles.Administrator,
+                        LocalIdentity.IdentityConstants.Roles.InventoryManager));
+
+            options.AddPolicy(
+                AuthorizationPolicies.ViewInventory,
+                policy =>
+                    policy.RequireRole(
+                        LocalIdentity.IdentityConstants.Roles.Administrator,
+                        LocalIdentity.IdentityConstants.Roles.InventoryManager,
+                        LocalIdentity.IdentityConstants.Roles.Viewer));
         });
 
         services.AddRazorPages();

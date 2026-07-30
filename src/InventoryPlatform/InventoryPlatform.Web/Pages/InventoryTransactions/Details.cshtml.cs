@@ -1,9 +1,12 @@
 using InventoryPlatform.Application.Features.InventoryTransactions.GetInventoryTransaction;
+using InventoryPlatform.Web.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace InventoryPlatform.Web.Pages.InventoryTransactions;
 
+[Authorize(Policy = AuthorizationPolicies.ViewInventory)]
 public class DetailsModel : PageModel
 {
     private readonly GetInventoryTransactionHandler _handler;
