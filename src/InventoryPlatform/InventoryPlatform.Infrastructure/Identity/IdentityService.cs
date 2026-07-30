@@ -25,7 +25,12 @@ public sealed class IdentityService : IIdentityService
         GetUsersRequest request,
         CancellationToken cancellationToken = default)
     {
-        IQueryable<ApplicationUser> query = _context.Users.AsNoTracking();
+        IQueryable<ApplicationUser> query = _context.Users
+            .AsNoTracking();
+
+        query = ApplyFilters(query, request);
+
+        query = ApplySearch(query, request);
 
         var totalCount = await query.CountAsync(cancellationToken);
 
@@ -54,5 +59,29 @@ public sealed class IdentityService : IIdentityService
             PageSize = request.PageSize,
             TotalCount = totalCount
         };
+    }
+
+    private static IQueryable<ApplicationUser> ApplyFilters(
+    IQueryable<ApplicationUser> query,
+    GetUsersRequest request)
+    {
+        // Future:
+        // - Role filtering
+        // - Lockout filtering
+        return query;
+    }
+
+    private static IQueryable<ApplicationUser> ApplySearch(
+    IQueryable<ApplicationUser> query,
+    GetUsersRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.Search))
+            return query;
+
+        var search = request.Search.Trim();
+
+        return query.Where(user =>
+            (user.UserName != null && user.UserName.Contains(search)) ||
+            (user.Email != null && user.Email.Contains(search)));
     }
 }
