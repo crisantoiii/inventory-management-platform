@@ -8,9 +8,11 @@ public sealed record GetUsersResponse
 
     public string Email { get; init; } = string.Empty;
 
-    public string FullName { get; init; } = string.Empty;
+    public bool EmailConfirmed { get; init; }
 
-    public string Role { get; init; } = string.Empty;
+    public bool LockoutEnabled { get; init; }
 
-    public bool IsActive { get; init; }
+    public DateTimeOffset? LockoutEnd { get; init; }
+
+    public IReadOnlyList<string> Roles { get; init; } = [];
 }

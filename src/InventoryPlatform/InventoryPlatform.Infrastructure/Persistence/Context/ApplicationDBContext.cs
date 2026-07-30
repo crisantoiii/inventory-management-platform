@@ -16,6 +16,8 @@ public sealed class ApplicationDbContext
     public DbSet<Unit> Units => Set<Unit>();
     public DbSet<InventoryTransaction> InventoryTransactions => Set<InventoryTransaction>();
 
+    public DbSet<ApplicationUser> Users => Set<ApplicationUser>();
+
     public ApplicationDbContext(
         DbContextOptions<ApplicationDbContext> options)
         : base(options)
