@@ -6,7 +6,7 @@ namespace InventoryPlatform.Application.Interfaces.Identity;
 
 public interface IIdentityService
 {
-    Task<Result<PagedResult<GetUsersResponse>>> GetUsersAsync(
+    Task<PagedResult<GetUsersResponse>> GetUsersAsync(
         GetUsersRequest request,
         CancellationToken cancellationToken = default);
 }

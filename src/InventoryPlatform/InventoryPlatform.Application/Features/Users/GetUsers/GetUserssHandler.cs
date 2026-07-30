@@ -13,7 +13,7 @@ public sealed class GetUsersHandler
         _identityService = identityService;
     }
 
-    public Task<Result<PagedResult<GetUsersResponse>>> HandleAsync(
+    public Task<PagedResult<GetUsersResponse>> HandleAsync(
         GetUsersRequest request,
         CancellationToken cancellationToken = default)
     {
