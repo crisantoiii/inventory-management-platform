@@ -42,6 +42,31 @@ public sealed class IdentityService : IIdentityService
             .Take(request.PageSize)
             .ToListAsync(cancellationToken);
 
+        var userIds = users
+            .Select(u => u.Id)
+            .ToList();
+
+        var roleLookup = await (
+            from userRole in _context.UserRoles
+            join role in _context.Roles
+                on userRole.RoleId equals role.Id
+            where userIds.Contains(userRole.UserId)
+            select new
+            {
+                userRole.UserId,
+                role.Name
+            })
+            .ToListAsync(cancellationToken);
+
+        var rolesByUser = roleLookup
+            .GroupBy(x => x.UserId)
+            .ToDictionary(
+                g => g.Key,
+                g => (IReadOnlyList<string>)g
+                    .Select(x => x.Name!)
+                    .OrderBy(name => name)
+                    .ToList());
+
         var items = users
             .Select(user => new GetUsersResponse
             {
@@ -51,7 +76,7 @@ public sealed class IdentityService : IIdentityService
                 EmailConfirmed = user.EmailConfirmed,
                 LockoutEnabled = user.LockoutEnabled,
                 LockoutEnd = user.LockoutEnd,
-                Roles = []
+                Roles = rolesByUser.TryGetValue(user.Id, out var roles) ? roles : []
             })
             .ToList();
 
