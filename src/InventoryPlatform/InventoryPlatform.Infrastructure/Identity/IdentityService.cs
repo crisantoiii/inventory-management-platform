@@ -3,6 +3,7 @@ using InventoryPlatform.Application.Interfaces.Identity;
 using InventoryPlatform.Infrastructure.Persistence.Context;
 using InventoryPlatform.Shared.Paging;
 using InventoryPlatform.Shared.Results;
+using InventoryPlatform.Shared.Sorting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -34,7 +35,9 @@ public sealed class IdentityService : IIdentityService
 
         var totalCount = await query.CountAsync(cancellationToken);
 
-        var users = await query
+        var orderedQuery = ApplySorting(query, request);
+
+        var users = await orderedQuery
             .Skip((request.Page - 1) * request.PageSize)
             .Take(request.PageSize)
             .ToListAsync(cancellationToken);
@@ -69,6 +72,27 @@ public sealed class IdentityService : IIdentityService
         // - Role filtering
         // - Lockout filtering
         return query;
+    }
+
+    private static IOrderedQueryable<ApplicationUser> ApplySorting(
+        IQueryable<ApplicationUser> query,
+        PagedRequest request)
+    {
+
+        return request.SortBy?.ToLowerInvariant() switch
+        {
+            UserSortFields.Email => request.Descending
+                ? query.OrderByDescending(u => u.Email)
+                : query.OrderBy(u => u.Email),
+
+            UserSortFields.Lockout => request.Descending
+                ? query.OrderByDescending(u => u.LockoutEnd)
+                : query.OrderBy(u => u.LockoutEnd),
+
+            _ => request.Descending
+                ? query.OrderByDescending(u => u.UserName)
+                : query.OrderBy(u => u.UserName)
+        };
     }
 
     private static IQueryable<ApplicationUser> ApplySearch(
