@@ -54,6 +54,7 @@ public static class IdentitySeeder
             return;
         }
 
+
         admin = new ApplicationUser
         {
             UserName = IdentityConstants.DefaultAdmin.UserName,
@@ -65,6 +66,8 @@ public static class IdentitySeeder
             admin,
             IdentityConstants.DefaultAdmin.Password);
 
+        EnsureSucceeded(result, "Creating administrator");
+
         if (!result.Succeeded)
         {
             throw new InvalidOperationException(
@@ -73,9 +76,12 @@ public static class IdentitySeeder
                     result.Errors.Select(e => e.Description)));
         }
 
+
         var roleResult = await userManager.AddToRoleAsync(
             admin,
             IdentityConstants.Roles.Administrator);
+
+        EnsureSucceeded(roleResult, "Assigning administrator role");
 
         if (!roleResult.Succeeded)
         {
@@ -84,5 +90,21 @@ public static class IdentitySeeder
                     Environment.NewLine,
                     roleResult.Errors.Select(e => e.Description)));
         }
+    }
+
+    private static void EnsureSucceeded(
+    IdentityResult result,
+    string operation)
+    {
+        if (result.Succeeded)
+        {
+            return;
+        }
+
+        throw new InvalidOperationException(
+            $"{operation} failed.{Environment.NewLine}" +
+            string.Join(
+                Environment.NewLine,
+                result.Errors.Select(e => e.Description)));
     }
 }

@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using InventoryPlatform.Infrastructure.Identity;
 using InventoryPlatform.Infrastructure.Persistence.Context;
+using LocalIdentity = InventoryPlatform.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 
 namespace InventoryPlatform.Web.Extensions;
@@ -11,7 +11,7 @@ public static class ServiceCollectionExtensions
         this IServiceCollection services)
     {
         services
-            .AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
+            .AddIdentity<LocalIdentity.ApplicationUser, IdentityRole<Guid>>(options =>
             {
                 options.Password.RequireDigit = true;
                 options.Password.RequireLowercase = true;
@@ -37,6 +37,38 @@ public static class ServiceCollectionExtensions
             options.SlidingExpiration = true;
 
             options.ExpireTimeSpan = TimeSpan.FromHours(8);
+        });
+
+        services.AddAntiforgery(options =>
+        {
+            options.Cookie.Name = "InventoryPlatform.AntiForgery";
+            options.Cookie.HttpOnly = true;
+            options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+            options.Cookie.SameSite = SameSiteMode.Lax;
+        });
+
+        services.AddRazorPages(options =>
+        {
+            options.Conventions.AuthorizeFolder("/");
+
+            options.Conventions.AllowAnonymousToPage("/Index");
+
+            options.Conventions.AllowAnonymousToAreaPage(
+                "Identity",
+                "/Account/Login");
+        });
+
+        services.AddRazorPages(options =>
+        {
+            options.Conventions.AuthorizeFolder("/Products");
+
+            options.Conventions.AuthorizeFolder(
+                "/Administration",
+                LocalIdentity.IdentityConstants.Roles.Administrator);
+
+            options.Conventions.AuthorizeFolder(
+                "/Inventory",
+                $"{LocalIdentity.IdentityConstants.Roles.Administrator},{LocalIdentity.IdentityConstants.Roles.InventoryManager}");
         });
 
         services.AddRazorPages();
