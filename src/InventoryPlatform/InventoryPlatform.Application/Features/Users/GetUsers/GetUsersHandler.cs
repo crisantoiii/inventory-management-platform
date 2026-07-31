@@ -1,5 +1,4 @@
-﻿using InventoryPlatform.Application.Features.Products.GetProducts;
-using InventoryPlatform.Application.Interfaces.Identity;
+﻿using InventoryPlatform.Application.Interfaces.Identity;
 using InventoryPlatform.Domain.Entities;
 using InventoryPlatform.Shared.Paging;
 using InventoryPlatform.Shared.Results;

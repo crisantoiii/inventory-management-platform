@@ -1,8 +1,10 @@
-﻿using InventoryPlatform.Application.Features.Units.GetUnits;
+﻿
+using InventoryPlatform.Application.DTOs.Role;
+using InventoryPlatform.Application.Features.Users;
+using InventoryPlatform.Application.Features.Users.CreateUser;
 using InventoryPlatform.Application.Features.Users.GetUser;
 using InventoryPlatform.Application.Features.Users.GetUsers;
 using InventoryPlatform.Application.Interfaces.Identity;
-using InventoryPlatform.Domain.Entities;
 using InventoryPlatform.Infrastructure.Persistence.Context;
 using InventoryPlatform.Shared.Filtering;
 using InventoryPlatform.Shared.Paging;
@@ -17,13 +19,60 @@ public sealed class IdentityService : IIdentityService
 {
     private readonly ApplicationDbContext _context;
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly RoleManager<IdentityRole<Guid>> _roleManager;
 
     public IdentityService(
         ApplicationDbContext context,
-        UserManager<ApplicationUser> userManager)
+        UserManager<ApplicationUser> userManager,
+        RoleManager<IdentityRole<Guid>> roleManager)
     {
         _context = context;
         _userManager = userManager;
+        _roleManager = roleManager;
+    }
+
+    public async Task<IReadOnlyList<RoleOption>> GetRolesAsync(
+        CancellationToken cancellationToken = default)
+    {
+        return await _roleManager.Roles
+            .OrderBy(role => role.Name)
+            .Select(role => new RoleOption(role.Name!, false))
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<Result<Guid>> CreateUserAsync(CreateUserRequest request,
+        CancellationToken cancellationToken)
+    {
+        var user = await _userManager.FindByNameAsync(request.UserName);
+
+        if (user is not null)
+        {
+            return Result<Guid>.Failure(UserErrors.DuplicateUserName);
+        }
+
+        user = await _userManager.FindByEmailAsync(request.Email);
+
+        if (user is not null)
+        {
+            return Result<Guid>.Failure(UserErrors.DuplicateEmail);
+        }
+
+        user = new ApplicationUser
+        {
+            UserName = request.UserName,
+            Email = request.Email,
+            EmailConfirmed = request.EmailConfirmed,
+        };
+
+        var result = await _userManager.CreateAsync(
+            user,
+            request.Password);
+
+        var roleResult = await _userManager.AddToRolesAsync(
+            user,
+            request.Roles);
+
+        return Result<Guid>.Success(user.Id);
     }
 
     public async Task<Result<GetUserResponse>> GetUserAsync(Guid id,

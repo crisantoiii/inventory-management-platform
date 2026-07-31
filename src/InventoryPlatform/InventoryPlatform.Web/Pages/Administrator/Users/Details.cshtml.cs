@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace InventoryPlatform.Web.Pages.Administrator.Users;
 
-[Authorize(Policy = AuthorizationPolicies.ViewInventory)]
+[Authorize(Policy = AuthorizationPolicies.Administrator)]
 public class DetailsModel : PageModel
 {
     private readonly GetUserHandler _handler;

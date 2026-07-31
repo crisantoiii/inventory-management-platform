@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿@using InventoryPlatform.Infrastructure.Identity;
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -59,6 +61,17 @@
                                 Inventory Transactions
                             </a>
                         </li>
+
+                        @if (User.IsInRole(IdentityConstants.Roles.Administrator))
+                            {
+                            <li class="nav-item">
+                                <a class="nav-link"
+                                   asp-page="/Administrator/Users/Index">
+                                    Users
+                                </a>
+                            </li>
+                            }
+
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-page="/Privacy">Privacy</a>
                         </li>
