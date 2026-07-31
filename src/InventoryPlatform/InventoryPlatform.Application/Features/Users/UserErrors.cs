@@ -4,6 +4,11 @@ namespace InventoryPlatform.Application.Features.Users;
 
 public static class UserErrors
 {
+    public static Error NotFound(Guid guid) =>
+        new(
+            "User.NotFound",
+            $"User {guid} not found.");
+
     public static readonly Error DuplicateUserName =
         new(
             "User.DuplicateUserName",

@@ -2,6 +2,7 @@
 using InventoryPlatform.Application.Features.Users.CreateUser;
 using InventoryPlatform.Application.Features.Users.GetUser;
 using InventoryPlatform.Application.Features.Users.GetUsers;
+using InventoryPlatform.Application.Features.Users.UpdateUser;
 using InventoryPlatform.Shared.Paging;
 using InventoryPlatform.Shared.Results;
 
@@ -22,5 +23,9 @@ public interface IIdentityService
 
     Task<Result<Guid>> CreateUserAsync(
         CreateUserRequest request, 
-        CancellationToken cancellationToken);
+        CancellationToken cancellationToken = default);
+
+    Task<Result> UpdateUserAsync(
+        UpdateUserRequest request,
+        CancellationToken cancellationToken = default);
 }

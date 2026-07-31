@@ -4,6 +4,7 @@ using InventoryPlatform.Application.Features.Users;
 using InventoryPlatform.Application.Features.Users.CreateUser;
 using InventoryPlatform.Application.Features.Users.GetUser;
 using InventoryPlatform.Application.Features.Users.GetUsers;
+using InventoryPlatform.Application.Features.Users.UpdateUser;
 using InventoryPlatform.Application.Interfaces.Identity;
 using InventoryPlatform.Infrastructure.Persistence.Context;
 using InventoryPlatform.Shared.Filtering;
@@ -40,8 +41,39 @@ public sealed class IdentityService : IIdentityService
             .ToListAsync(cancellationToken);
     }
 
+    public async Task<Result> UpdateUserAsync(
+        UpdateUserRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var user = await _userManager.FindByIdAsync(request.Id.ToString());
+
+        if (user is null)
+        {
+            return Result.Failure(
+                UserErrors.NotFound(request.Id));
+        }
+
+        user.UserName = request.UserName;
+        user.Email = request.Email;
+        user.PhoneNumber = request.PhoneNumber;
+        user.EmailConfirmed = request.EmailConfirmed;
+
+        var result = await _userManager.UpdateAsync(user);
+
+        if (!result.Succeeded)
+        {
+            return Result.Failure(
+                Error.Validation2(
+                    string.Join(
+                        Environment.NewLine,
+                        result.Errors.Select(e => e.Description))));
+        }
+
+        return Result.Success();
+    }
+
     public async Task<Result<Guid>> CreateUserAsync(CreateUserRequest request,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
         var user = await _userManager.FindByNameAsync(request.UserName);
 
