@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Microsoft.Extensions.DependencyInjection;
 
 using InventoryPlatform.Application.Features.Products.CreateProduct;
 using InventoryPlatform.Application.Features.Products.DeactivateProduct;
@@ -39,8 +40,9 @@ using InventoryPlatform.Application.Features.InventoryTransactions.CreateInvento
 using InventoryPlatform.Application.Features.InventoryTransactions.GetInventoryTransactions;
 using InventoryPlatform.Application.Features.InventoryTransactions.GetInventoryTransaction;
 
-using Microsoft.Extensions.DependencyInjection;
+
 using InventoryPlatform.Application.Features.Dashboard.GetDashboard;
+using InventoryPlatform.Application.Features.Users.GetUsers;
 
 namespace InventoryPlatform.Application.DependencyInjection;
 
@@ -90,6 +92,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<GetInventoryTransactionsHandler>();
 
         services.AddScoped<GetDashboardHandler>();
+
+        services.AddScoped<GetUsersHandler>();
 
         services.AddValidatorsFromAssembly(
             typeof(ServiceCollectionExtensions).Assembly);

@@ -1,6 +1,9 @@
-﻿using InventoryPlatform.Application.Features.Users.GetUsers;
+﻿using InventoryPlatform.Application.Features.Units.GetUnits;
+using InventoryPlatform.Application.Features.Users.GetUsers;
 using InventoryPlatform.Application.Interfaces.Identity;
+using InventoryPlatform.Domain.Entities;
 using InventoryPlatform.Infrastructure.Persistence.Context;
+using InventoryPlatform.Shared.Filtering;
 using InventoryPlatform.Shared.Paging;
 using InventoryPlatform.Shared.Results;
 using InventoryPlatform.Shared.Sorting;
@@ -23,7 +26,7 @@ public sealed class IdentityService : IIdentityService
     }
 
     public async Task<PagedResult<GetUsersResponse>> GetUsersAsync(
-        GetUsersRequest request,
+        PagedQuery request,
         CancellationToken cancellationToken = default)
     {
         IQueryable<ApplicationUser> query = _context.Users
@@ -91,21 +94,43 @@ public sealed class IdentityService : IIdentityService
 
     private static IQueryable<ApplicationUser> ApplyFilters(
     IQueryable<ApplicationUser> query,
-    GetUsersRequest request)
+    PagedQuery request)
     {
         // Future:
         // - Role filtering
         // - Lockout filtering
+
+
+        query = request.Status switch
+        {
+            ProductStatusFilter.Active =>
+                query.Where(p => p.LockoutEnabled),
+
+            ProductStatusFilter.Inactive =>
+                query.Where(p => !p.LockoutEnabled),
+
+            ProductStatusFilter.All =>
+                query,
+
+            _ =>
+                query.Where(p => p.LockoutEnabled)
+        };
+
+
         return query;
     }
 
     private static IOrderedQueryable<ApplicationUser> ApplySorting(
         IQueryable<ApplicationUser> query,
-        PagedRequest request)
+        PagedQuery request)
     {
 
-        return request.SortBy?.ToLowerInvariant() switch
+        return request.SortBy switch
         {
+            UserSortFields.UserName => request.Descending
+                ? query.OrderByDescending(u => u.UserName)
+                : query.OrderBy(u => u.UserName),
+
             UserSortFields.Email => request.Descending
                 ? query.OrderByDescending(u => u.Email)
                 : query.OrderBy(u => u.Email),
@@ -114,15 +139,13 @@ public sealed class IdentityService : IIdentityService
                 ? query.OrderByDescending(u => u.LockoutEnd)
                 : query.OrderBy(u => u.LockoutEnd),
 
-            _ => request.Descending
-                ? query.OrderByDescending(u => u.UserName)
-                : query.OrderBy(u => u.UserName)
+            _ => query.OrderBy(u => u.UserName)
         };
     }
 
     private static IQueryable<ApplicationUser> ApplySearch(
     IQueryable<ApplicationUser> query,
-    GetUsersRequest request)
+    PagedQuery request)
     {
         if (string.IsNullOrWhiteSpace(request.Search))
             return query;

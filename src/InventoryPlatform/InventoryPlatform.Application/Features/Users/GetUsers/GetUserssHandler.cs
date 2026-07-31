@@ -1,4 +1,6 @@
-﻿using InventoryPlatform.Application.Interfaces.Identity;
+﻿using InventoryPlatform.Application.Features.Products.GetProducts;
+using InventoryPlatform.Application.Interfaces.Identity;
+using InventoryPlatform.Domain.Entities;
 using InventoryPlatform.Shared.Paging;
 using InventoryPlatform.Shared.Results;
 
@@ -13,12 +15,32 @@ public sealed class GetUsersHandler
         _identityService = identityService;
     }
 
-    public Task<PagedResult<GetUsersResponse>> HandleAsync(
+    public async Task<Result<PagedResult<GetUsersResponse>>> HandleAsync(
         GetUsersRequest request,
         CancellationToken cancellationToken = default)
     {
-        return _identityService.GetUsersAsync(
-            request,
+        var query = new PagedQuery
+        {
+            Search = request.Search,
+            Page = request.Page,
+            PageSize = request.PageSize,
+            SortBy = request.SortBy,
+            Descending = request.Descending,
+            Status = request.Status
+        };
+
+        var users = _identityService.GetUsersAsync(
+            query,
             cancellationToken);
+
+        var response = new PagedResult<GetUsersResponse>
+        {
+            Items = users.Result.Items,
+            Page = users.Result.Page,
+            PageSize = users.Result.PageSize,
+            TotalCount = users.Result.TotalCount
+        };
+
+        return Result<PagedResult<GetUsersResponse>>.Success(response);
     }
 }

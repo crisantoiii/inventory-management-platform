@@ -15,10 +15,6 @@ public class IndexModel : PageModel
     [FromQuery]
     public GetCustomersRequest Filter { get; set; } = new();
 
-    [FromQuery]
-    public ProductStatusFilter Status { get; set; }
-    = ProductStatusFilter.Active;
-
     [TempData]
     public string? SuccessMessage { get; set; }
 
