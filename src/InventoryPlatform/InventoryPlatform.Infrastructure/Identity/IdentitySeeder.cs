@@ -67,7 +67,8 @@ public static class IdentitySeeder
         string username, 
         string email, 
         string password,
-        string role)
+        string role,
+        bool isActive = true)
     {
         var user = await userManager.FindByEmailAsync(
             email);

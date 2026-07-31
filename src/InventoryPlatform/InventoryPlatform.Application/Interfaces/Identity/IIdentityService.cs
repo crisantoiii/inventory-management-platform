@@ -1,4 +1,5 @@
-﻿using InventoryPlatform.Application.Features.Users.GetUsers;
+﻿using InventoryPlatform.Application.Features.Users.GetUser;
+using InventoryPlatform.Application.Features.Users.GetUsers;
 using InventoryPlatform.Shared.Paging;
 using InventoryPlatform.Shared.Results;
 
@@ -8,5 +9,9 @@ public interface IIdentityService
 {
     Task<PagedResult<GetUsersResponse>> GetUsersAsync(
         PagedQuery request,
+        CancellationToken cancellationToken = default);
+
+    Task<Result<GetUserResponse>> GetUserAsync(
+        Guid id,
         CancellationToken cancellationToken = default);
 }

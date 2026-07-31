@@ -1,4 +1,5 @@
 ﻿using InventoryPlatform.Application.Features.Units.GetUnits;
+using InventoryPlatform.Application.Features.Users.GetUser;
 using InventoryPlatform.Application.Features.Users.GetUsers;
 using InventoryPlatform.Application.Interfaces.Identity;
 using InventoryPlatform.Domain.Entities;
@@ -23,6 +24,28 @@ public sealed class IdentityService : IIdentityService
     {
         _context = context;
         _userManager = userManager;
+    }
+
+    public async Task<Result<GetUserResponse>> GetUserAsync(Guid id,
+        CancellationToken cancellationToken = default)
+    {
+        var user = await _userManager.FindByIdAsync(id.ToString());
+        var roles = await _userManager.GetRolesAsync(user);
+
+        return Result<GetUserResponse>.Success(new GetUserResponse
+        { 
+            Id = user.Id,
+            Username = user.UserName,
+            Email = user.Email,
+            Roles = roles.ToList(),
+            EmailConfirmed = user.EmailConfirmed,
+            PhoneNumber = user.PhoneNumber,
+            PhoneNumberConfirmed = user.PhoneNumberConfirmed,
+            LockoutEnabled = user.LockoutEnabled,
+            LockoutEnd = user.LockoutEnd,
+            AccessFailedCount = user.AccessFailedCount,
+            IsActive = user.IsActive,
+        });
     }
 
     public async Task<PagedResult<GetUsersResponse>> GetUsersAsync(
