@@ -14,8 +14,8 @@ public sealed class UpdateUserHandler
     }
 
     public Task<Shared.Results.Result> HandleAsync(
-    UpdateUserRequest request,
-    CancellationToken cancellationToken)
+        UpdateUserRequest request,
+        CancellationToken cancellationToken)
     {
         return _identityService.UpdateUserAsync(request, cancellationToken);
     }

@@ -12,4 +12,11 @@ public sealed class UpdateUserRolesHandler
         _identityService = identityService;
     }
 
+    public Task<Shared.Results.Result> HandleAsync(
+        UpdateUserRolesRequest request,
+        CancellationToken cancellationToken)
+    {
+        return _identityService.UpdateUserRolesAsync(request, cancellationToken);
+    }
+
 }

@@ -5,6 +5,7 @@ using InventoryPlatform.Application.Features.Users.CreateUser;
 using InventoryPlatform.Application.Features.Users.GetUser;
 using InventoryPlatform.Application.Features.Users.GetUsers;
 using InventoryPlatform.Application.Features.Users.UpdateUser;
+using InventoryPlatform.Application.Features.Users.UpdateUserRoles;
 using InventoryPlatform.Application.Interfaces.Identity;
 using InventoryPlatform.Infrastructure.Persistence.Context;
 using InventoryPlatform.Shared.Filtering;
@@ -39,6 +40,41 @@ public sealed class IdentityService : IIdentityService
             .OrderBy(role => role.Name)
             .Select(role => new RoleOption(role.Name!, false))
             .ToListAsync(cancellationToken);
+    }
+
+    public async Task<Result> UpdateUserRolesAsync(
+        UpdateUserRolesRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var user = await _userManager.FindByIdAsync(request.Id.ToString());
+
+        if (user is null)
+        {
+            return Result.Failure(
+                UserErrors.NotFound(request.Id));
+        }
+
+        var currentRoles = await _userManager.GetRolesAsync(user);
+
+        var rolesToAdd = request.Roles.Except(currentRoles).ToList();
+        var rolesToRemove = currentRoles.Except(request.Roles).ToList();
+
+        if (rolesToRemove.Any())
+        {
+            var removeResult = await _userManager.RemoveFromRolesAsync(user, rolesToRemove);
+            if (!removeResult.Succeeded)
+                return Result.Failure(Error.None);
+        }
+
+        if (rolesToAdd.Any())
+        {
+            var addResult = await _userManager.AddToRolesAsync(user, rolesToAdd);
+            if (!addResult.Succeeded)
+                return Result.Failure(Error.None);
+        }
+
+        return Result.Success();
+
     }
 
     public async Task<Result> UpdateUserAsync(
