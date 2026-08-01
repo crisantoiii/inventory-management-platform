@@ -149,6 +149,9 @@ public sealed class IdentityService : IIdentityService
         var user = await _userManager.FindByIdAsync(id.ToString());
         var roles = await _userManager.GetRolesAsync(user);
 
+        var isActive = (user.LockoutEnd is { } lockoutEnd &&
+            lockoutEnd > DateTimeOffset.UtcNow) ? false : true;
+
         return Result<GetUserResponse>.Success(new GetUserResponse
         { 
             Id = user.Id,
@@ -161,7 +164,7 @@ public sealed class IdentityService : IIdentityService
             LockoutEnabled = user.LockoutEnabled,
             LockoutEnd = user.LockoutEnd,
             AccessFailedCount = user.AccessFailedCount,
-            IsActive = user.IsActive,
+            IsActive = isActive,
         });
     }
 
