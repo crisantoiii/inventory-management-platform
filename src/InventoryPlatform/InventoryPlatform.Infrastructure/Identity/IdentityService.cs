@@ -270,14 +270,14 @@ public sealed class IdentityService : IIdentityService
         // - Role filtering
         // - Lockout filtering
 
-
+        var now = DateTimeOffset.UtcNow;
         query = request.Status switch
         {
             ProductStatusFilter.Active =>
-                query.Where(p => p.LockoutEnabled),
+                query.Where(p => p.LockoutEnabled && (p.LockoutEnd == null || p.LockoutEnd <= now)),
 
             ProductStatusFilter.Inactive =>
-                query.Where(p => !p.LockoutEnabled),
+                query.Where(p => p.LockoutEnabled && (p.LockoutEnd != null && p.LockoutEnd > now)),
 
             ProductStatusFilter.All =>
                 query,

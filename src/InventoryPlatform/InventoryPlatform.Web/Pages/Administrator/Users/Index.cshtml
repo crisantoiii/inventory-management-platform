@@ -121,6 +121,8 @@ else
 
             @foreach (var user in Model.Users.Items)
             {
+                var isCurrentlyLocked = user.LockoutEnd is { } lockoutEnd &&
+                            lockoutEnd > DateTimeOffset.UtcNow;
                 <tr>
                     <td>
                         <a asp-page="Details"
@@ -131,8 +133,7 @@ else
                     <td>@user.Email</td>
                     <td>@string.Join(", ",user.Roles)</td>
                     <td>
-                        @if (user.LockoutEnd is { } lockoutEnd &&
-                             lockoutEnd > DateTimeOffset.UtcNow)
+                        @if (isCurrentlyLocked)
                         {
                             <span class="badge bg-danger">Inactive</span>
                         }
@@ -177,9 +178,9 @@ else
                             @if (User.IsInRole(IdentityConstants.Roles.Administrator))
                             {
 
-                                @if (user.LockoutEnabled)
+                                @if (!isCurrentlyLocked)
                                 {
-                                    <a asp-page="Deactivate"
+                                    <a asp-page="EditStatus"
                                        asp-route-id="@user.Id"
                                        class="btn btn-sm btn-outline-danger">
                                         Deactivate
@@ -187,7 +188,7 @@ else
                                 }
                                 else
                                 {
-                                    <a asp-page="Activate"
+                                    <a asp-page="EditStatus"
                                        asp-route-id="@user.Id"
                                        class="btn btn-sm btn-outline-success">
                                         Activate

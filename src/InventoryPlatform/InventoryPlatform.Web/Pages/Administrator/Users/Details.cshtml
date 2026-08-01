@@ -53,6 +53,9 @@
 
             @if (User.IsInRole(IdentityConstants.Roles.Administrator))
             {
+                var isCurrentlyLocked = @Model.User.LockoutEnd is { } lockoutEnd &&
+                             lockoutEnd > DateTimeOffset.UtcNow;
+
                 <a asp-page="Edit"
                    asp-route-id="@Model.User.Id"
                    class="btn btn-primary">
@@ -61,9 +64,26 @@
 
                 <a asp-page="EditRoles"
                    asp-route-id="@Model.User.Id"
-                   class="btn btn-info">
+                   class="btn btn-outline-info">
                     Assign Roles
                 </a>
+
+                @if (!isCurrentlyLocked)
+                {
+                    <a asp-page="EditStatus"
+                        asp-route-id="@Model.User.Id"
+                        class="btn btn-danger">
+                        Deactivate
+                    </a>
+                }
+                else
+                {
+                    <a asp-page="EditStatus"
+                        asp-route-id="@Model.User.Id"
+                        class="btn btn-success">
+                        Activate
+                    </a>
+                }
             }
 
         </div>
