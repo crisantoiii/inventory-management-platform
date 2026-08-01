@@ -4,6 +4,7 @@ using InventoryPlatform.Application.Features.Users.GetUser;
 using InventoryPlatform.Application.Features.Users.GetUsers;
 using InventoryPlatform.Application.Features.Users.UpdateUser;
 using InventoryPlatform.Application.Features.Users.UpdateUserRoles;
+using InventoryPlatform.Application.Features.Users.UpdateUserStatus;
 using InventoryPlatform.Shared.Paging;
 using InventoryPlatform.Shared.Results;
 
@@ -32,5 +33,9 @@ public interface IIdentityService
 
     Task<Result> UpdateUserRolesAsync(
         UpdateUserRolesRequest request,
+        CancellationToken cancellationToken = default);
+
+    Task<Result> UpdateUserStatusAsync(
+        UpdateUserStatusRequest request,
         CancellationToken cancellationToken = default);
 }

@@ -6,6 +6,7 @@ using InventoryPlatform.Application.Features.Users.GetUser;
 using InventoryPlatform.Application.Features.Users.GetUsers;
 using InventoryPlatform.Application.Features.Users.UpdateUser;
 using InventoryPlatform.Application.Features.Users.UpdateUserRoles;
+using InventoryPlatform.Application.Features.Users.UpdateUserStatus;
 using InventoryPlatform.Application.Interfaces.Identity;
 using InventoryPlatform.Infrastructure.Persistence.Context;
 using InventoryPlatform.Shared.Filtering;
@@ -40,6 +41,32 @@ public sealed class IdentityService : IIdentityService
             .OrderBy(role => role.Name)
             .Select(role => new RoleOption(role.Name!, false))
             .ToListAsync(cancellationToken);
+    }
+
+    public async Task<Result> UpdateUserStatusAsync(
+        UpdateUserStatusRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var user = await _userManager.FindByIdAsync(request.Id.ToString());
+
+        if (user is null)
+        {
+            return Result.Failure(
+                UserErrors.NotFound(request.Id));
+        }
+
+        if(request.IsActive)
+        {
+            user.LockoutEnd = null;
+        }
+        else
+        {
+            user.LockoutEnd = DateTimeOffset.MaxValue;
+        }
+
+        await _userManager.UpdateAsync(user);
+
+        return Result.Success();
     }
 
     public async Task<Result> UpdateUserRolesAsync(
