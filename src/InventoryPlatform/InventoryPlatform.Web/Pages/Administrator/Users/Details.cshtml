@@ -25,7 +25,7 @@
             <dd class="col-sm-9"></dd>
 
             <dt class="col-sm-3">Email Confirmed</dt>
-            <dd class="col-sm-9">@Model.User.AccessFailedCount</dd>
+            <dd class="col-sm-9">@Model.User.EmailConfirmed</dd>
 
             <dt class="col-sm-3">Phone</dt>
             <dd class="col-sm-9">@Model.User.PhoneNumber</dd>
@@ -49,11 +49,7 @@
 
         <div class="mt-4">
 
-            <a asp-page="Index"
-               onclick="if(history.length > 1) { history.back(); return false; }"
-               class="btn btn-secondary">
-                Back
-            </a>
+            <a asp-page="Index" id="backButton" class="btn btn-secondary">Back</a>
 
             @if (User.IsInRole(IdentityConstants.Roles.Administrator))
             {

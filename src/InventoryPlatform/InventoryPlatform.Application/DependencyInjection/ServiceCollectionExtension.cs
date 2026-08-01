@@ -46,6 +46,7 @@ using InventoryPlatform.Application.Features.Users.GetUsers;
 using InventoryPlatform.Application.Features.Users.GetUser;
 using InventoryPlatform.Application.Features.Users.CreateUser;
 using InventoryPlatform.Application.Features.Users.GetRoles;
+using InventoryPlatform.Application.Features.Users.UpdateUser;
 
 namespace InventoryPlatform.Application.DependencyInjection;
 
@@ -100,6 +101,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<GetUserHandler>();
         services.AddScoped<CreateUserHandler>();
         services.AddScoped<GetRolesHandler>();
+        services.AddScoped<UpdateUserHandler>();
 
         services.AddValidatorsFromAssembly(
             typeof(ServiceCollectionExtensions).Assembly);

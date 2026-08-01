@@ -1,0 +1,53 @@
+﻿@page "{id:Guid}"
+@model InventoryPlatform.Web.Pages.Administrator.Users.EditModel
+
+<h1>@ViewData["Title"]</h1>
+
+<form method="post">
+
+    <div asp-validation-summary="ModelOnly"
+         class="text-danger"></div>
+
+    <input asp-for="User.Id" type="hidden" />
+
+    <div class="mb-3">
+        <label asp-for="User.UserName" class="form-label"></label>
+        <input asp-for="User.UserName" class="form-control" />
+        <span asp-validation-for="User.UserName" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="User.Email" class="form-label"></label>
+        <input asp-for="User.Email" class="form-control" type="email"/>
+        <span asp-validation-for="User.Email" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="User.PhoneNumber" class="form-label"></label>
+        <input asp-for="User.PhoneNumber" class="form-control" />
+        <span asp-validation-for="User.PhoneNumber" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <div class="form-check">
+            <input class="form-check-input"
+                   type="checkbox"
+                   asp-for="User.EmailConfirmed"
+                   name="User.EmailConfirmed"
+                    />
+            <label class="form-check-label">
+                Email Confirmed
+            </label>
+        </div>
+    </div>
+
+    <button class="btn btn-primary">
+        Update
+    </button>
+
+    <a asp-page="Index"
+       class="btn btn-secondary">
+        Cancel
+    </a>
+
+</form>

@@ -237,3 +237,34 @@ else
 
     </nav>
 }
+
+@section Scripts {
+    <script>
+        const backButton = document.getElementById("backButton");
+
+        if (backButton) {
+            backButton.addEventListener("click", function (e) {
+                const referrer = document.referrer;
+                const currentHost = window.location.host;
+
+                // 1. Check if referrer exists and belongs to our website
+                if (referrer && referrer.includes(currentHost)) {
+                    
+                    // Convert referrer to lowercase to make checks case-insensitive
+                    const lowerReferrer = referrer.toLowerCase();
+
+                    // 2. EXCEPTION: If we came from a Create or Edit page, do NOT use history.back()
+                    if (lowerReferrer.includes("/create") || lowerReferrer.includes("/edit")) {
+                        // Let the default HTML behavior run (it will follow asp-page="Index")
+                        return; 
+                    }
+
+                    // 3. STANDARD BEHAVIOR: Safe to go back to previous details/pages
+                    e.preventDefault();
+                    window.history.back();
+                }
+                // 4. FALLBACK: If no referrer, it naturally follows asp-page="Index"
+            });
+        }
+    </script>
+}
