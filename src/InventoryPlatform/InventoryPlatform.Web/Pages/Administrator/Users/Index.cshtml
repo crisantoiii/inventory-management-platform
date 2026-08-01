@@ -177,6 +177,15 @@ else
 
                             @if (User.IsInRole(IdentityConstants.Roles.Administrator))
                             {
+                                <a asp-page="ResetPassword"
+                                   asp-route-id="@user.Id"
+                                   class="btn btn-sm btn-outline-success">
+                                    Reset Password
+                                </a>
+                            }
+
+                            @if (User.IsInRole(IdentityConstants.Roles.Administrator))
+                            {
 
                                 @if (!isCurrentlyLocked)
                                 {

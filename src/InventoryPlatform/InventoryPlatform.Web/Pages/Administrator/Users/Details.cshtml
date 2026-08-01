@@ -68,6 +68,12 @@
                     Assign Roles
                 </a>
 
+                <a asp-page="ResetPassword"
+                   asp-route-id="@Model.User.Id"
+                   class="btn btn-outline-success">
+                    Reset Password
+                </a>
+
                 @if (!isCurrentlyLocked)
                 {
                     <a asp-page="EditStatus"

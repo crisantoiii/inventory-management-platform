@@ -34,7 +34,7 @@ public class EditStatusModel : PageModel
 
     public async Task<IActionResult> OnGetAsync(Guid id, CancellationToken cancellationToken)
     {
-        ViewData["Title"] = "Update User Roles";
+        ViewData["Title"] = "Update User Status";
 
         var user = await _getUserHandler.HandleAsync(id);
 
