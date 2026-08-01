@@ -4,6 +4,7 @@ using InventoryPlatform.Application.Features.Users;
 using InventoryPlatform.Application.Features.Users.CreateUser;
 using InventoryPlatform.Application.Features.Users.GetUser;
 using InventoryPlatform.Application.Features.Users.GetUsers;
+using InventoryPlatform.Application.Features.Users.ResetPassowrd;
 using InventoryPlatform.Application.Features.Users.UpdateUser;
 using InventoryPlatform.Application.Features.Users.UpdateUserRoles;
 using InventoryPlatform.Application.Features.Users.UpdateUserStatus;
@@ -41,6 +42,38 @@ public sealed class IdentityService : IIdentityService
             .OrderBy(role => role.Name)
             .Select(role => new RoleOption(role.Name!, false))
             .ToListAsync(cancellationToken);
+    }
+
+    public async Task<Result> ResetPasswordAsync(
+        ResetPasswordRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var user = await _userManager.FindByIdAsync(request.Id.ToString());
+
+        if (user is null)
+        {
+            return Result.Failure(
+                UserErrors.NotFound(request.Id));
+        }
+
+        var token = await _userManager
+            .GeneratePasswordResetTokenAsync(user);
+
+        var result = await _userManager.ResetPasswordAsync(
+            user,
+            token,
+            request.Password);
+
+        if (!result.Succeeded)
+        {
+            return Result.Failure(
+                Error.Validation2(
+                    string.Join(
+                        Environment.NewLine,
+                        result.Errors.Select(e => e.Description))));
+        }
+
+        return ToResult(result);
     }
 
     public async Task<Result> UpdateUserStatusAsync(
@@ -325,5 +358,20 @@ public sealed class IdentityService : IIdentityService
         return query.Where(user =>
             (user.UserName != null && user.UserName.Contains(search)) ||
             (user.Email != null && user.Email.Contains(search)));
+    }
+
+    private static Result ToResult(
+        IdentityResult identityResult)
+    {
+        if (identityResult.Succeeded)
+        {
+            return Result.Success();
+        }
+
+        return Result.Failure(
+            Error.Validation2(
+                string.Join(
+                    Environment.NewLine,
+                    identityResult.Errors.Select(e => e.Description))));
     }
 }
