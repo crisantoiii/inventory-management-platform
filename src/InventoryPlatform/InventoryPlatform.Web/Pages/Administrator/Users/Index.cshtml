@@ -167,6 +167,15 @@ else
 
                             @if (User.IsInRole(IdentityConstants.Roles.Administrator))
                             {
+                                <a asp-page="EditRoles"
+                                   asp-route-id="@user.Id"
+                                   class="btn btn-sm btn-outline-info">
+                                    Assign Roles
+                                </a>
+                            }
+
+                            @if (User.IsInRole(IdentityConstants.Roles.Administrator))
+                            {
 
                                 @if (user.LockoutEnabled)
                                 {
