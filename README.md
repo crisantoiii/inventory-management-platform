@@ -1,6 +1,6 @@
 # Inventory Management Platform
 
-A modern **Inventory Management Platform** built with **ASP.NET Core 10 Razor Pages**, **Entity Framework Core**, and **Clean Architecture**.
+**Inventory Management Platform** is a production-style **ASP.NET Core** application built using **Clean Architecture**, **CQRS-inspired application services**, **ASP.NET Core Identity**, and **Entity Framework Core**. The project demonstrates enterprise software design principles through modular business features, role-based security, reusable infrastructure, and maintainable application architecture.
 
 The project is designed as a production-style portfolio application that demonstrates enterprise software development practices including layered architecture, reusable infrastructure, server-side data processing, and maintainable code organization.
 
@@ -16,12 +16,14 @@ The project is designed as a production-style portfolio application that demonst
 - Server-side search, sorting, and pagination
 - Reusable shared infrastructure
 - Business analytics dashboard
+- ASP.NET Core Identity Authentication
+- Enterprise User Management
 
 ---
 
 ## Project Status
 
-**Current Version:** v0.7.0
+**Current Version:** v0.8.0
 
 ## Completed Modules
 
@@ -39,16 +41,16 @@ The project is designed as a production-style portfolio application that demonst
 
 - ✅ Dashboard
 
-### Latest Release (v0.7.0)
+### Latest Release (v0.8.0)
 
-Implemented a business dashboard featuring:
+Implemented Authentication and complete User Management featuring:
 
-- Inventory statistics
-- Recent inventory transactions
-- Low stock product monitoring
-- Inventory value summary
-- Responsive dashboard layout
-- Empty state handling
+- ASP.NET Core Identity
+- Login / Logout
+- Role-based Authorization
+- User Administration
+- Password Reset
+- Account Activation / Deactivation
 
 ---
 
@@ -90,6 +92,11 @@ The long-term goal is to evolve this project into a complete inventory managemen
 - Immutable Business Records
 - Automatic Stock Management
 - Business Dashboard
+- ASP.NET Core Identity
+- Cookie Authentication
+- Role-based Authorization
+- User Management
+- Password Management
 
 ---
 
@@ -213,6 +220,37 @@ The long-term goal is to evolve this project into a complete inventory managemen
 - ✅ Low stock monitoring
 - ✅ Empty state handling
 
+## User Management
+
+### Authentication
+
+- ✅ Login
+- ✅ Logout
+- ✅ Cookie Authentication
+- ✅ Role-based Authorization
+- ✅ ASP.NET Core Identity
+- ✅ Identity Cookie Authentication
+
+### User Lifecycle
+
+- ✅ Create User
+- ✅ View User Details
+- ✅ Edit User
+- ✅ Activate User
+- ✅ Deactivate User
+- ✅ Reset Password
+
+### Role Management
+
+- ✅ Assign Roles
+
+### User Listing
+
+- ✅ Server-side Search
+- ✅ Server-side Pagination
+- ✅ Server-side Sorting
+- ✅ Status Filtering
+
 ---
 
 # Architecture
@@ -258,13 +296,60 @@ The Dashboard demonstrates how multiple read models can be composed through the 
 
 Responsibilities:
 
-| Project | Responsibility |
-|----------|----------------|
-| Web | UI, Razor Pages, Dependency Injection |
-| Application | Business Logic, Use Cases, DTOs |
-| Domain | Entities, Domain Rules |
-| Infrastructure | Entity Framework Core, Repositories |
-| Shared | Common Infrastructure (Paging, Filtering, Sorting, Result Pattern) |
+InventoryPlatform
+│
+├── Web
+│     Razor Pages
+│
+├── Application
+│     Features
+│     Handlers
+│
+├── Domain
+│     Entities
+│
+├── Infrastructure
+│     EF Core
+│     Identity
+│
+└── Shared
+      Paging
+      Filtering
+      Sorting
+
+## Solution Architecture
+
+Request
+
+↓
+
+Razor Page
+
+↓
+
+Application Handler
+
+↓
+
+Repository / IdentityService
+
+↓
+
+Entity Framework Core
+
+↓
+
+SQL Server
+
+## Architectural Principles
+
+- Feature-first organization
+- Clean Architecture
+- Thin Razor PageModels
+- Thin Application Handlers
+- Business logic isolated from the Presentation layer
+- ASP.NET Core Identity encapsulated behind IIdentityService
+- Incremental refactoring guided by the Rule of Three
 
 ---
 
@@ -279,6 +364,12 @@ Responsibilities:
 - Dependency Injection
 - Entity Framework Core Configurations
 - Razor Pages
+- Feature-based Architecture
+- ASP.NET Core Identity
+- Role-based Authorization
+- Dependency Injection Extensions
+- Thin PageModels
+- Thin Handlers
 
 ---
 
@@ -290,6 +381,10 @@ Responsibilities:
 - Business logic resides in the Application and Domain layers.
 - Razor Pages interact only with the Application layer.
 - Dashboard data is composed using read-only DTO projections optimized for reporting.
+- Identity operations are encapsulated behind IIdentityService.
+- Authentication uses ASP.NET Core Identity.
+- Administrative user management is separated from self-service account management.
+- Business logic remains outside the Razor Pages.
 
 ---
 
@@ -315,6 +410,8 @@ Reusable infrastructure has been implemented to support future modules.
 - CustomerSortFields
 - UnitSortFields
 - InventoryTransactionSortFields
+- UserSortFields
+- RoleOption
 
 ## Result Pattern
 
@@ -334,6 +431,7 @@ Backend
 - Entity Framework Core 10
 - SQL Server
 - LINQ
+- Microsoft ASP.NET Core Identity
 
 Architecture
 
@@ -368,8 +466,9 @@ Development Tools
 | Unit Management | ✅ Complete |
 | Inventory Transactions | ✅ Complete |
 | Dashboard | ✅ Complete |
+| Authentication & Authorization | ✅ Complete |
+| User Management | ✅ Complete |
 | Purchase Orders | ⬜ Planned |
-| Authentication & Authorization | ⬜ Planned |
 | Reporting | ⬜ Planned |
 
 ---
@@ -385,14 +484,19 @@ Development Tools
 - Unit Management
 - Inventory Transactions
 - Dashboard
+- Authentication & Authorization
+- User Management
 
 ## Planned
 
 - Purchase Orders
 - Sales Orders
 - Reporting
-- Authentication & Authorization
 - Audit Logging
+- Account Management
+- Change Password
+- Forgot Password
+- Two-Factor Authentication
 
 ---
 
@@ -454,6 +558,16 @@ The following screenshots demonstrate the current implementation:
 
 ![Dashboard-2](docs/screenshots/dashboard-2.png)
 
+### Authentication & Authorization
+![Login](docs/screenshots/user_login.png)
+
+### User Management
+![Users](docs/screenshots/users_list.png)
+![User Details](docs/screenshots/user_details.png)
+![User Edit](docs/screenshots/users_edit.png)
+![User Roles](docs/screenshots/users_roles.png)
+![Reset Password](docs/screenshots/user_reset.png)
+![Deact/Activate User](docs/screenshots/user_deact.png)
 ---
 
 # Learning Objectives
@@ -465,8 +579,15 @@ This project is focused on applying modern enterprise development practices incl
 - Clean Architecture
 - Maintainable Code
 - Reusable Components
-- Enterprise CRUD Design
+- Enterprise Business Application Design
 - Scalable Repository Design
+- Enterprise Authentication
+- Identity Management
+- Authorization
+- Feature-based Architecture
+- CQRS-inspired Design
+- Result Pattern
+- Rule of Three Refactoring
 
 ---
 

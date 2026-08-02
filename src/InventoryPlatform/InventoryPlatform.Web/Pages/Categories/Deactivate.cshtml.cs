@@ -1,10 +1,13 @@
-using InventoryPlatform.Application.Features.Categories.GetCategory;
 using InventoryPlatform.Application.Features.Categories.DeactivateCategory;
+using InventoryPlatform.Application.Features.Categories.GetCategory;
+using InventoryPlatform.Web.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace InventoryPlatform.Web.Pages.Categories;
 
+[Authorize(Policy = AuthorizationPolicies.Administrator)]
 public class DeactivateModel : PageModel
 {
     private readonly GetCategoryHandler _getHandler;

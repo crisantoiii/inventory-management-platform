@@ -1,6 +1,7 @@
 ﻿@page
 @model InventoryPlatform.Web.Pages.InventoryTransactions.IndexModel
 @using InventoryPlatform.Shared.Sorting;
+@using InventoryPlatform.Infrastructure.Identity;
 
 @{
     var start = (Model.InventoryTransactions.Page - 1) * Model.InventoryTransactions.PageSize + 1;
@@ -13,10 +14,14 @@
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h1 class="mb-0">@ViewData["Title"]</h1>
 
-    <a asp-page="Create"
-       class="btn btn-primary">
-        Add Transaction
-    </a>
+    @if (User.IsInRole(IdentityConstants.Roles.Administrator) ||
+    User.IsInRole(IdentityConstants.Roles.InventoryManager))
+    {
+        <a asp-page="Create"
+           class="btn btn-primary">
+            Add Transaction
+        </a>
+    }
 </div>
 @if (!string.IsNullOrWhiteSpace(Model.SuccessMessage))
 {

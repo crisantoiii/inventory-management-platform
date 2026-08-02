@@ -1,9 +1,12 @@
 using InventoryPlatform.Application.Features.Customers.CreateCustomer;
+using InventoryPlatform.Web.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace InventoryPlatform.Web.Pages.Customers;
 
+[Authorize(Policy = AuthorizationPolicies.InventoryManagement)]
 public class CreateModel : PageModel
 {
     private readonly CreateCustomerHandler _handler;

@@ -6,6 +6,28 @@ This roadmap outlines the planned evolution of the Inventory Management Platform
 
 The project is developed incrementally, with each completed module validating the architecture before expanding into additional business domains.
 
+v0.1  Products                 ✅
+
+v0.2  Categories               ✅
+
+v0.3  Suppliers                ✅
+
+v0.4  Customers / Units        ✅
+
+v0.5  Shared Infrastructure    ✅
+
+v0.6  Inventory Transactions   ✅
+
+v0.7  Dashboard                ✅
+
+v0.8  Identity & Users         ✅
+
+v0.9  Architecture Sprint      🔄
+
+v1.0  Purchasing               ⏳
+
+v1.1  Reporting                ⏳
+
 ---
 
 # Current Release
@@ -108,40 +130,84 @@ The project is developed incrementally, with each completed module validating th
 - ✅ Responsive Dashboard Layout
 - ✅ Empty State Handling
 
+### Authentication
+
+- ✅ ASP.NET Core Identity
+- ✅ Cookie Authentication
+- ✅ Login
+- ✅ Logout
+- ✅ Role-based Authorization
+- ✅ Policy-based Authorization
+
+### User Management
+
+- ✅ User Listing
+- ✅ User Details
+- ✅ Create User
+- ✅ Edit User
+- ✅ Assign Roles
+- ✅ Activate / Deactivate User
+- ✅ Reset Password
+- ✅ Server-side Search
+- ✅ Server-side Pagination
+- ✅ Server-side Sorting
+
 ---
 
-# Phase 3 — Security
-
-Authentication
-
-- Login
-- Logout
-- Password Reset
-
-Authorization
-
-- Administrator
-- Inventory Manager
-- Viewer
+# Phase 1 — Foundation ✅
 
 ---
 
-# Phase 4 — Reporting
+# Phase 2 — Inventory Core ✅
+
+---
+
+# Phase 3 — Identity & User Management ✅
+
+---
+
+# Phase 4 – Architecture Sprint 1
+
+Objectives
+
+- Review overall solution architecture
+- Apply Rule of Three refactoring where justified
+- Improve shared UI components
+- Standardize Razor Page patterns
+- Review dependency registration
+- Update project documentation
+- Prepare foundation for Purchasing
+
+---
+
+# Phase 5 – Account Management
+
+Planned
+
+- Change Password
+- Forgot Password
+- Force Password Change
+- Email Verification
+- Two-Factor Authentication
+- User Profile
+
+# Phase 6 — Reporting
 
 Planned Reports:
 
 - Product Report
 - Inventory Report
 - Transaction Report
+- Inventory Valuation Report
+- Low Stock Report
+- Inventory Movement Report
 
 Export Options:
 
 - Excel
 - PDF
 
----
-
-# Phase 5 — Advanced Features
+# Phase 7 — Advanced Features
 
 Planned:
 
@@ -200,5 +266,7 @@ Each new module should:
 - Keep business rules inside domain entities.
 - Favor consistency over premature abstraction.
 - Prefer DTO projections for read-only reporting features.
+- Encapsulate framework-specific implementations behind application abstractions.
+- Apply the Rule of Three before introducing shared abstractions.
 
 The architecture should evolve through reuse rather than introducing module-specific implementations whenever possible.

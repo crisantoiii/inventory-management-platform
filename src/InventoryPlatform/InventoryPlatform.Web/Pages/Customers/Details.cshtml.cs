@@ -1,9 +1,12 @@
 using InventoryPlatform.Application.Features.Customers.GetCustomer;
+using InventoryPlatform.Web.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace InventoryPlatform.Web.Pages.Customers;
 
+[Authorize(Policy = AuthorizationPolicies.ViewInventory)]
 public class DetailsModel : PageModel
 {
     private readonly GetCustomerHandler _handler;

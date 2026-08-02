@@ -1,0 +1,40 @@
+﻿@page "{id:Guid}"
+@model InventoryPlatform.Web.Pages.Administrator.Users.EditStatusModel
+
+<h1>@ViewData["Title"]</h1>
+
+<form method="post">
+
+    <div asp-validation-summary="ModelOnly"
+         class="text-danger"></div>
+
+    <input asp-for="Input.Id" type="hidden" />
+
+    <div class="mb-3">
+
+        <div class="alert alert-@(Model.Input.IsActive ? "success" : "danger") d-flex align-items-center" role="alert">
+        
+
+            <span class="me-2 fs-4">@(Model.Input.IsActive ? "🔓" : "🔒")</span>
+
+            <div>
+                Are you sure you want to 
+                <strong class="text-uppercase text-decoration-underline">
+                    @(Model.Input.IsActive ? "Activate" : "Deactivate")
+                </strong> 
+                the user account?
+            </div>
+
+        </div>
+    </div>
+
+    <button class="btn btn-primary">
+        Proceed
+    </button>
+
+    <a asp-page="Index"
+       class="btn btn-secondary">
+        Cancel
+    </a>
+
+</form>

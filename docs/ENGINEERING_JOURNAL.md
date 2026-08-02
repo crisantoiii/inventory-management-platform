@@ -26,6 +26,9 @@ Rather than documenting daily work, it captures important architectural decision
 | 12 | Product Foundation |
 | 13 | Inventory Transactions |
 | 14 | Dashboard |
+| 15 | Authentication & Authorization|
+| 16 | User Management |
+| 17 | Architecture Sprint 1 |
 
 ---
 
@@ -392,21 +395,102 @@ The Dashboard demonstrates that the same Clean Architecture can support both tra
 
 ---
 
+# Milestone 15 — Authentication & Authorization
+
+## Summary
+
+Integrated ASP.NET Core Identity into the existing Clean Architecture without introducing dependencies from the Application or Web layers to Identity framework types.
+
+Completed:
+
+- ASP.NET Core Identity
+- Cookie Authentication
+- Login
+- Logout
+- Role-based Authorization
+- Policy-based Authorization
+- Identity Service abstraction
+
+## Outcome
+
+Successfully incorporated authentication and authorization into the existing architecture while preserving separation of concerns.
+
+Identity framework components remain encapsulated within the Infrastructure layer behind `IIdentityService`.
+
+## Lessons Learned
+
+- Framework-specific APIs should remain behind application abstractions.
+- Authentication is an infrastructure concern rather than business logic.
+- Encapsulation allows Identity to evolve independently from the rest of the application.
+
+---
+
+# Milestone 16 — User Management
+
+## Summary
+
+Implemented a complete administrative user management module using the existing application architecture and Identity service abstraction.
+
+Completed:
+
+- User Listing
+- User Details
+- Create User
+- Edit User
+- Assign Roles
+- Activate User
+- Deactivate User
+- Reset Password
+- Search
+- Pagination
+- Sorting
+- Status Filtering
+
+## Outcome
+
+Validated that the same architectural patterns used for business modules could also support security and identity management without structural changes.
+
+The Identity module became another feature within the application rather than a special-case implementation.
+
+## Lessons Learned
+
+- Identity operations belong behind an application service rather than inside Razor Pages.
+- Administrative workflows should remain independent from end-user account management.
+- Existing paging, sorting, filtering, Result, and handler patterns were reusable without modification.
+
+---
+
 ## Reflection
 
-The Inventory Transactions module confirmed that the shared architecture was flexible enough to support transactional business logic without introducing new architectural patterns.
+The Inventory Transactions milestone confirmed that the shared architecture was flexible enough to support transactional business logic without introducing new architectural patterns.
 
-The reusable infrastructure for paging, filtering, sorting, repositories, and application handlers reduced implementation complexity and allowed development to focus on business rules rather than framework concerns.
+The Dashboard milestone further demonstrated that the same architecture could support read-optimized reporting through dedicated DTO projections and repository queries while maintaining a clear separation between reporting and transactional workflows.
 
-The Dashboard milestone demonstrated that the architecture is equally effective for reporting features. By using dedicated DTO projections and read-only repositories, reporting concerns remained isolated from transactional domain logic while still reusing the existing application and infrastructure layers. 
+The Authentication and User Management milestones extended this validation into the security domain. By encapsulating ASP.NET Core Identity behind `IIdentityService`, authentication, authorization, and administrative user management were integrated without exposing framework-specific APIs to the Application or Presentation layers.
 
-Together, the Inventory Transactions and Dashboard milestones demonstrate that the architecture supports both write-focused business workflows and read-optimized reporting without requiring architectural changes.
+Across master data management, transactional workflows, reporting, and identity management, the same architectural principles remained consistent. Existing application handlers, shared paging, filtering, sorting infrastructure, and the Result pattern were reused without structural changes, allowing development to focus on business requirements rather than framework concerns.
+
+Perhaps the most significant lesson throughout the project has been the value of incremental architecture. Reusable infrastructure was introduced only after proving its usefulness through multiple independent implementations, following the Rule of Three. This approach kept the codebase simple during early development while allowing shared abstractions to emerge naturally as the application evolved.
+
+Together, these milestones demonstrate that the architecture supports both business functionality and platform capabilities while preserving clean separation of concerns, maintainability, and long-term scalability.
 
 ---
 
 # Architecture Validation
 
-After implementing seven business modules (Dashboard, Product, Category, Supplier, Customer, Unit, and Inventory Transactions), the architecture has demonstrated:
+After implementing:
+
+- Product Management
+- Category Management
+- Supplier Management
+- Customer Management
+- Unit Management
+- Inventory Transactions
+- Dashboard Reporting
+- Authentication
+- User Management
+
+the architecture has demonstrated:
 
 - Consistent implementation patterns
 - Reusable application handlers
@@ -441,6 +525,20 @@ Throughout development the following principles have consistently guided impleme
 - Keep domain behavior inside entities.
 - Prefer immutable business history for transactional data.
 - Use read-only DTO projections for reporting features.
+- Encapsulate framework-specific implementations behind application abstractions.
+- Apply the Rule of Three before introducing shared abstractions.
+
+---
+
+# Engineering Philosophy
+
+Throughout development the project has intentionally favored incremental evolution over speculative design.
+
+Common infrastructure is introduced only after proving its value across multiple independent implementations.
+
+This approach has helped keep the solution simple while allowing reusable components to emerge naturally as the application has grown.
+
+The project deliberately applies the Rule of Three to balance maintainability against premature abstraction.
 
 ---
 
@@ -448,8 +546,8 @@ Throughout development the following principles have consistently guided impleme
 
 Future milestones are expected to include:
 
-- Authentication
-- Authorization
+- Architecture Sprint 1
+- Account Management
 - Purchase Orders
 - Purchase Receiving
 - Reporting

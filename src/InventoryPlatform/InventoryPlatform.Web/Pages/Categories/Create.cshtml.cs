@@ -1,8 +1,12 @@
 using InventoryPlatform.Application.Features.Categories.CreateCategory;
+using InventoryPlatform.Web.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace InventoryPlatform.Web.Pages.Categories;
+
+[Authorize(Policy = AuthorizationPolicies.InventoryManagement)]
 
 public class CreateModel : PageModel
 {

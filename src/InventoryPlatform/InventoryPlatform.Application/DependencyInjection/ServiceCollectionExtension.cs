@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Microsoft.Extensions.DependencyInjection;
 
 using InventoryPlatform.Application.Features.Products.CreateProduct;
 using InventoryPlatform.Application.Features.Products.DeactivateProduct;
@@ -39,8 +40,16 @@ using InventoryPlatform.Application.Features.InventoryTransactions.CreateInvento
 using InventoryPlatform.Application.Features.InventoryTransactions.GetInventoryTransactions;
 using InventoryPlatform.Application.Features.InventoryTransactions.GetInventoryTransaction;
 
-using Microsoft.Extensions.DependencyInjection;
 using InventoryPlatform.Application.Features.Dashboard.GetDashboard;
+
+using InventoryPlatform.Application.Features.Users.GetUsers;
+using InventoryPlatform.Application.Features.Users.GetUser;
+using InventoryPlatform.Application.Features.Users.CreateUser;
+using InventoryPlatform.Application.Features.Users.GetRoles;
+using InventoryPlatform.Application.Features.Users.UpdateUser;
+using InventoryPlatform.Application.Features.Users.UpdateUserRoles;
+using InventoryPlatform.Application.Features.Users.UpdateUserStatus;
+using InventoryPlatform.Application.Features.Users.ResetPassowrd;
 
 namespace InventoryPlatform.Application.DependencyInjection;
 
@@ -90,6 +99,15 @@ public static class ServiceCollectionExtensions
         services.AddScoped<GetInventoryTransactionsHandler>();
 
         services.AddScoped<GetDashboardHandler>();
+
+        services.AddScoped<GetUsersHandler>();
+        services.AddScoped<GetUserHandler>();
+        services.AddScoped<CreateUserHandler>();
+        services.AddScoped<GetRolesHandler>();
+        services.AddScoped<UpdateUserHandler>();
+        services.AddScoped<UpdateUserRolesHandler>();
+        services.AddScoped<UpdateUserStatusHandler>();
+        services.AddScoped<ResetPasswordHandler>();
 
         services.AddValidatorsFromAssembly(
             typeof(ServiceCollectionExtensions).Assembly);

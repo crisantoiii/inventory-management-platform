@@ -1,10 +1,13 @@
-using InventoryPlatform.Application.Features.Products.GetProduct;
 using InventoryPlatform.Application.Features.Products.DeactivateProduct;
+using InventoryPlatform.Application.Features.Products.GetProduct;
+using InventoryPlatform.Web.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace InventoryPlatform.Web.Pages.Products;
 
+[Authorize(Policy = AuthorizationPolicies.Administrator)]
 public class DeactivateModel : PageModel
 {
     private readonly GetProductHandler _getHandler;

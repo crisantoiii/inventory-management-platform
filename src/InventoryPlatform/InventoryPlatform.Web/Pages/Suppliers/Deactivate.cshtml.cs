@@ -1,10 +1,13 @@
-using InventoryPlatform.Application.Features.Suppliers.GetSupplier;
 using InventoryPlatform.Application.Features.Suppliers.DeactivateSupplier;
+using InventoryPlatform.Application.Features.Suppliers.GetSupplier;
+using InventoryPlatform.Web.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace InventoryPlatform.Web.Pages.Suppliers;
 
+[Authorize(Policy = AuthorizationPolicies.Administrator)]
 public class DeactivateModel : PageModel
 {
     private readonly GetSupplierHandler _getHandler;

@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿@using InventoryPlatform.Infrastructure.Identity;
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -59,9 +61,48 @@
                                 Inventory Transactions
                             </a>
                         </li>
+
+                        @if (User.IsInRole(IdentityConstants.Roles.Administrator))
+                            {
+                            <li class="nav-item">
+                                <a class="nav-link"
+                                   asp-page="/Administrator/Users/Index">
+                                    Users
+                                </a>
+                            </li>
+                            }
+
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-page="/Privacy">Privacy</a>
                         </li>
+                    </ul>
+                    <ul class="navbar-nav ms-auto">
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            <span class="navbar-text me-3">
+                                Hello, @User.Identity.Name
+                            </span>
+
+                            <form asp-area="Identity"
+                                  asp-page="/Account/Logout"
+                                  method="post"
+                                  class="d-inline">
+
+                                @Html.AntiForgeryToken()
+
+                                <button class="btn btn-outline-danger btn-sm">
+                                    Logout
+                                </button>
+                            </form>
+                        }
+                        else
+                        {
+                            <a asp-area="Identity"
+                               asp-page="/Account/Login"
+                               class="btn btn-outline-primary">
+                                Login
+                            </a>
+                        }
                     </ul>
                 </div>
             </div>

@@ -1,9 +1,13 @@
 ﻿using InventoryPlatform.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using InventoryPlatform.Infrastructure.Identity;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace InventoryPlatform.Infrastructure.Persistence.Context;
 
-public sealed class ApplicationDbContext : DbContext
+public sealed class ApplicationDbContext
+    : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>
 {
     public DbSet<Product> Products => Set<Product>();
     public DbSet<Category> Categories => Set<Category>();
@@ -11,6 +15,8 @@ public sealed class ApplicationDbContext : DbContext
     public DbSet<Customer> Customers => Set<Customer>();
     public DbSet<Unit> Units => Set<Unit>();
     public DbSet<InventoryTransaction> InventoryTransactions => Set<InventoryTransaction>();
+
+    public DbSet<ApplicationUser> Users => Set<ApplicationUser>();
 
     public ApplicationDbContext(
         DbContextOptions<ApplicationDbContext> options)

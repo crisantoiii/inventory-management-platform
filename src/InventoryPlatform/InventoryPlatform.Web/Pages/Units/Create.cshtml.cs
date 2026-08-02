@@ -1,9 +1,12 @@
 using InventoryPlatform.Application.Features.Units.CreateUnit;
+using InventoryPlatform.Web.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace InventoryPlatform.Web.Pages.Units;
 
+[Authorize(Policy = AuthorizationPolicies.Administrator)]
 public class CreateModel : PageModel
 {
     private readonly CreateUnitHandler _handler;

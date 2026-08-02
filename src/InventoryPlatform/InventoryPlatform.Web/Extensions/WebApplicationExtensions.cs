@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using InventoryPlatform.Infrastructure.Identity;
+using Microsoft.AspNetCore.Builder;
 
 namespace InventoryPlatform.Web.Extensions;
 
@@ -16,7 +17,11 @@ public static class WebApplicationExtensions
 
         app.UseRouting();
 
+        app.UseAuthentication();
+
         app.UseAuthorization();
+
+        IdentitySeeder.SeedAsync(app.Services).GetAwaiter().GetResult();
 
         app.MapStaticAssets();
 

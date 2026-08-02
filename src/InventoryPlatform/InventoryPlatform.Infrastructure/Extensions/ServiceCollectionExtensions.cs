@@ -1,4 +1,6 @@
-﻿using InventoryPlatform.Application.Interfaces.Persistence;
+﻿using InventoryPlatform.Application.Interfaces.Identity;
+using InventoryPlatform.Application.Interfaces.Persistence;
+using InventoryPlatform.Infrastructure.Identity;
 using InventoryPlatform.Infrastructure.Persistence;
 using InventoryPlatform.Infrastructure.Persistence.Context;
 using InventoryPlatform.Infrastructure.Persistence.Repositories;
@@ -27,6 +29,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IUnitRepository, UnitRepository>();
         services.AddScoped<IInventoryTransactionRepository, InventoryTransactionRepository>();
         services.AddScoped<IDashboardRepository, DashboardRepository>();
+        services.AddScoped<IIdentityService, IdentityService>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         return services;
