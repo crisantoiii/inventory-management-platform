@@ -30,12 +30,12 @@ The presentation layer.
 
 Responsibilities:
 
+- Authentication
+- Authorization
 - Razor Pages
-- User Interface
 - Model Binding
-- Dependency Injection Configuration
+- Dependency Injection
 - Middleware
-- Authentication (future)
 - Static Assets
 
 The Web project is the only layer directly accessed by users.
@@ -79,6 +79,8 @@ The infrastructure layer implements external dependencies.
 Responsibilities:
 
 - Entity Framework Core
+- ASP.NET Core Identity
+- Identity Services
 - Repository Implementations
 - Database Context
 - Configurations
@@ -129,20 +131,36 @@ The Domain project has no knowledge of Infrastructure or Web.
 
 ---
 
+# Dependency Injection Strategy
+
+The solution registers services through extension methods owned by each layer.
+
+```csharp
+builder.Services
+    .AddApplication()
+    .AddInfrastructure(builder.Configuration)
+    .AddWeb();
+```
+
+---
+
 # Current Architectural Patterns
 
 ## Architecture Validation
 
-The architecture has been validated through the implementation of seven independent business modules:
+The architecture has been validated through business modules, transactional workflows, dashboard reporting, authentication, and comprehensive user management.
 
-- Dashboard
+The architecture has been validated through the implementation of:
+
 - Product Management
 - Category Management
 - Supplier Management
 - Customer Management
 - Unit Management
 - Inventory Transactions
-- DashboardRepository
+- Dashboard Reporting
+- Authentication
+- User Management
 
 Each module follows the same layered architecture, repository pattern, CQRS-style application handlers, reusable paging, filtering, and sorting infrastructure, and Razor Pages presentation model.
 
@@ -167,6 +185,39 @@ Current repositories include:
 - UnitRepository
 - InventoryTransactionRepository
 - DashboardRepository
+
+---
+
+## Identity Service Pattern
+
+ASP.NET Core Identity is encapsulated behind `IIdentityService`.
+
+The Application layer depends only on the abstraction, while Infrastructure provides the implementation using:
+
+- UserManager
+- RoleManager
+- SignInManager
+
+This approach isolates framework-specific APIs from the rest of the application and keeps the Web and Application layers independent of ASP.NET Core Identity.
+
+---
+
+## Feature-based Organization
+
+Application logic is organized by feature rather than technical type.
+
+Example:
+
+```text
+Features
+└── Users
+    ├── CreateUser
+    ├── GetUsers
+    ├── GetUser
+    ├── UpdateUser
+    ├── UpdateUserRoles
+    └── ResetPassword
+```
 
 ---
 
@@ -256,6 +307,40 @@ Repository Implementation
 ↓
 
 Entity Framework Core
+
+↓
+
+SQL Server
+```
+
+# Identity Request
+
+```text
+Browser
+
+↓
+
+Razor Page
+
+↓
+
+Application Handler
+
+↓
+
+IIdentityService
+
+↓
+
+IdentityService
+
+↓
+
+UserManager / RoleManager
+
+↓
+
+ASP.NET Core Identity
 
 ↓
 
@@ -371,14 +456,35 @@ Dashboard View
 
 The project follows:
 
-- SOLID Principles
+Architectural Principles
+
+- Clean Architecture
+- SOLID
 - Separation of Concerns
 - Dependency Inversion
-- DRY (Don't Repeat Yourself)
-- Single Responsibility Principle
+
+Application Design
+
+- Feature-first Organization
+- Thin Razor PageModels
+- Thin Application Handlers
+
+Engineering Practices
+
+- Rule of Three Refactoring
+- Framework Encapsulation
 - Consistency over Premature Abstraction
-- Vertical Slice Feature Organization
-- Read-only DTO Projections
+- DRY
+
+---
+
+## Incremental Refactoring
+
+The solution follows the Rule of Three when introducing reusable abstractions.
+
+Patterns are extracted only after demonstrating reuse across multiple independent features.
+
+This avoids premature abstraction while maintaining long-term maintainability.
 
 ---
 
@@ -402,14 +508,22 @@ The Dashboard uses read-only DTO projections to aggregate reporting data without
 
 # Future Architecture
 
-Planned additions include:
+## Business Modules
 
 - Purchase Orders
+- Sales Orders
 - Reporting
-- Authentication
-- Authorization
+
+## Identity Enhancements
+
+- Change Password
+- Forgot Password
+- Two-Factor Authentication
+
+## Platform Features
+
 - Audit Logging
+- REST API
 - Background Jobs
-- API Endpoints
 
 The existing architecture is intended to support these features without major restructuring.
