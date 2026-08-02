@@ -2,6 +2,64 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v0.8.0] - 2026-08-01
+
+### Release Summary
+
+This release introduces a complete Identity and User Management subsystem built on ASP.NET Core Identity. Authentication, authorization, and administrative user management are now fully integrated into the existing Clean Architecture while preserving separation of concerns through the `IIdentityService` abstraction.
+
+### Added
+
+#### Authentication
+
+- ASP.NET Core Identity integration
+- Cookie authentication
+- Login page
+- Logout functionality
+- Role-based authorization
+- Policy-based authorization
+- Identity service abstraction
+
+#### User Management
+
+- User listing page
+- User details page
+- Create user page
+- Edit user page
+- User role management
+- User activation
+- User deactivation
+- Password reset
+- User search
+- Server-side pagination
+- Server-side sorting
+- Status filtering
+
+#### Identity Infrastructure
+
+- ApplicationUser entity
+- Identity database integration
+- Identity service implementation
+- Role initialization
+- Authorization policies
+- Identity dependency registration
+
+### Changed
+
+- Extended the Clean Architecture to support ASP.NET Core Identity.
+- Added `IIdentityService` abstraction to isolate Identity framework APIs.
+- Updated the Infrastructure layer to encapsulate user and role management.
+- Added administrator-only Razor Pages for user administration.
+- Improved project documentation to include authentication, identity, and user management architecture.
+
+### Improved
+
+- Standardized user management workflows with existing application patterns.
+- Reused shared paging, filtering, sorting, and Result pattern infrastructure.
+- Improved security by encapsulating framework-specific functionality behind application abstractions.
+- Maintained consistent feature-first organization across Identity and business modules.
+- Preserved Clean Architecture boundaries while integrating authentication and authorization.
+
 ## [v0.7.0] - 2026-07-27
 
 ### Added
