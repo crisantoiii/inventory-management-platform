@@ -1,3 +1,5 @@
+Each decision is recorded only after implementation has validated the approach in practice, ensuring that architectural guidance reflects proven patterns rather than speculative design.
+
 # Design Decisions
 
 ## Overview
@@ -258,7 +260,18 @@ Accepted.
 ## Decision
 
 All business modules follow the same architectural structure. 
-The architecture has now been successfully validated across seven independent business modules without requiring structural changes, demonstrating that the design scales consistently as new features are introduced.
+
+The architecture has now been validated across:
+
+- Product Management
+- Category Management
+- Supplier Management
+- Customer Management
+- Unit Management
+- Inventory Transactions
+- Dashboard Reporting
+- Authentication
+- User Management
 
 Each module implements:
 
@@ -390,22 +403,176 @@ Accepted.
 
 ---
 
+# DD-015 — Identity Service Abstraction
+
+Version Introduced: v0.8.0
+
+## Decision
+
+Encapsulate ASP.NET Core Identity behind `IIdentityService` rather than exposing `UserManager`, `RoleManager`, or `SignInManager` to the Application or Web layers.
+
+## Rationale
+
+ASP.NET Core Identity is a framework concern and should remain isolated within the Infrastructure layer.
+
+The Application layer coordinates user management workflows through an abstraction without depending on framework-specific APIs.
+
+Benefits include:
+
+- Preserves Clean Architecture boundaries.
+- Reduces coupling to ASP.NET Core Identity.
+- Simplifies testing.
+- Allows Identity implementation details to evolve independently of business workflows.
+
+## Alternatives Considered
+
+Inject `UserManager` and `RoleManager` directly into Razor Pages or application handlers.
+
+This approach was rejected because it tightly couples business workflows to the Identity framework.
+
+## Outcome
+
+Accepted.
+
+---
+
+# DD-016 — Administrative User Management
+
+Version Introduced: v0.8.0
+
+## Decision
+
+Separate administrative user management from self-service account management.
+
+Administrative operations include:
+
+- Create User
+- Edit User
+- Assign Roles
+- Activate / Deactivate
+- Reset Password
+
+Self-service account operations will be implemented separately.
+
+## Rationale
+
+Administrative workflows differ significantly from end-user account management.
+
+Separating these concerns results in:
+
+- Clearer authorization boundaries.
+- Simpler page organization.
+- Easier future expansion.
+
+## Alternatives Considered
+
+Implement all identity-related functionality inside a single Account area.
+
+This approach was rejected because administrator features and end-user features have different responsibilities and security requirements.
+
+## Outcome
+
+Accepted.
+
+---
+
+# DD-017 — Feature-first Organization
+
+Version Introduced: v0.8.0
+
+## Decision
+
+Organize the Application layer by feature rather than by technical type.
+
+Example:
+
+Features
+└── Users
+    ├── CreateUser
+    ├── GetUser
+    ├── GetUsers
+    ├── UpdateUser
+    ├── UpdateUserRoles
+    └── ResetPassword
+
+## Rationale
+
+Feature-first organization keeps all components of a use case together.
+
+Benefits include:
+
+- Improved discoverability.
+- Better maintainability.
+- Reduced navigation across folders.
+- Easier onboarding for new developers.
+
+## Alternatives Considered
+
+Organize handlers, DTOs, and validators into separate technical folders.
+
+This approach was rejected because related code becomes fragmented as the application grows.
+
+## Outcome
+
+Accepted.
+
+---
+
+# DD-018 — Rule of Three Refactoring
+
+Version Introduced: v0.8.0
+
+## Decision
+
+Reusable abstractions are introduced only after demonstrating value across multiple independent implementations.
+
+## Rationale
+
+The project intentionally avoids premature abstraction.
+
+Infrastructure and shared components are extracted only after proving their usefulness through repeated implementation.
+
+Examples include:
+
+- Shared Paging
+- Shared Filtering
+- Shared Sorting
+- IdentityResult mapping
+- Shared UI components (future)
+
+Benefits include:
+
+- Simpler initial implementations.
+- Reduced speculative design.
+- Better long-term maintainability.
+- Abstractions driven by real requirements rather than assumptions.
+
+## Alternatives Considered
+
+Create generic infrastructure before multiple implementations exist.
+
+This approach was rejected because it often increases complexity without providing immediate value.
+
+## Outcome
+
+Accepted.
+
+---
+
 # Future Decisions
 
 This document will continue to evolve as the project grows.
 
 Examples:
 
-
-
-- Purchase order workflow
-- Concurrency handling
-- Authentication strategy
-- Authorization model
-- Audit logging
-- Background jobs
-- API design
-- Caching strategy
+- Account Management
+- Change Password workflow
+- Purchase Order workflow
+- Sales Order workflow
+- Audit Logging
+- Background Jobs
+- REST API
+- Caching Strategy
 
 ---
 
