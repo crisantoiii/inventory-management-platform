@@ -2,15 +2,19 @@
 
 ## Overview
 
-The Inventory Management Platform is a modern ASP.NET Core 10 Razor Pages application built using Clean Architecture principles. It currently provides business modules for Dashboard, Product, Category, Supplier, Customer, Unit, and Inventory Transaction management through consistent business workflows, server-side searching, sorting, filtering, and pagination.
+The Inventory Management Platform is a modern ASP.NET Core 10 Razor Pages application built using Clean Architecture principles.
 
-The architecture is designed to support additional inventory modules with minimal duplication while maintaining a clean separation of concerns.
+The platform currently provides business modules for Product, Category, Supplier, Customer, Unit, Inventory Transactions, Dashboard Reporting, Authentication, and User Management.
+
+Shared infrastructure such as paging, filtering, sorting, the Result pattern, and Identity service abstractions are reused consistently across modules while maintaining a clear separation of concerns.
 
 ## Module Summary
 
 | Module | Status |
 |---------|--------|
 | Dashboard | ✅ Complete |
+| Authentication | ✅ Complete |
+| User Management | ✅ Complete |
 | Product Management | ✅ Complete |
 | Category Management | ✅ Complete |
 | Supplier Management | ✅ Complete |
@@ -29,6 +33,8 @@ Completed business modules:
 - ✅ Unit Management
 - ✅ Inventory Transactions
 - ✅ Dashboard
+- ✅ Authentication
+- ✅ User Management
 
 Shared capabilities:
 
@@ -266,7 +272,71 @@ The Dashboard aggregates inventory statistics, recent inventory activity, and lo
 
 ---
 
+# Authentication
+
+## Authentication Features
+
+- ✅ Login
+- ✅ Logout
+- ✅ Cookie Authentication
+- ✅ ASP.NET Core Identity
+- ✅ Role-based Authorization
+- ✅ Policy-based Authorization
+
+## Security
+
+- Protected Razor Pages
+- Authorization Policies
+- Identity Cookie Authentication
+- Secure Password Management
+
+---
+
+# User Management
+
+## User Lifecycle
+
+- ✅ Create User
+- ✅ View User Details
+- ✅ Edit User
+- ✅ Assign Roles
+- ✅ Activate User
+- ✅ Deactivate User
+- ✅ Reset Password
+
+## User Listing
+
+- ✅ Server-side Search
+- ✅ Server-side Pagination
+- ✅ Server-side Sorting
+- ✅ Status Filtering
+
+## User Information
+
+Each user supports:
+
+- Username
+- Email
+- Assigned Roles
+- Active Status
+- Lockout Status
+
+---
+
 # Shared Infrastructure
+
+## Identity Infrastructure
+
+Implemented through ASP.NET Core Identity.
+
+Features:
+
+- User Authentication
+- Role Management
+- Password Reset
+- Cookie Authentication
+- Authorization Policies
+- Identity Service Abstraction
 
 ## Paging
 
@@ -430,20 +500,56 @@ Operation results are standardized using:
 - Automatic Inventory Updates
 - Domain-driven Inventory Management
 - Dashboard Analytics
+- ASP.NET Core Identity
+- Identity Service Pattern
+- Feature-first Organization
+- Thin Razor PageModels
+- Thin Application Handlers
+- Rule of Three Refactoring
+
+---
+
+# Platform Features
+
+## Identity
+
+- ASP.NET Core Identity
+- Cookie Authentication
+- Role-based Authorization
+- Policy-based Authorization
+- Administrative User Management
+
+## User Administration
+
+- Create User
+- Assign Roles
+- Activate / Deactivate
+- Reset Password
+
+## Shared UI
+
+- Server-side Paging
+- Server-side Search
+- Server-side Sorting
+- Status Filtering
+- Success Notifications
 
 ---
 
 # Planned Features
 
-## Security
+## Account Management
 
-- Authentication
-- Authorization
-- Role Management
+- Change Password
+- Forgot Password
+- Two-Factor Authentication
+- User Profile
 
 ## Reporting
 
 - Inventory Reports
+- Inventory Valuation
+- Low Stock Report
 - Product Reports
 - Export to Excel
 - Export to PDF
