@@ -20,7 +20,9 @@ public sealed class ActivateCategoryHandler
         ActivateCategoryRequest request,
         CancellationToken cancellationToken = default)
     {
-        var category = await _categoryRepository.GetByIdAsync(request.Id,cancellationToken);
+        var category = await _categoryRepository.GetByIdAsync(
+            request.Id,
+            cancellationToken);
 
         if (category is null)
         {
@@ -30,7 +32,8 @@ public sealed class ActivateCategoryHandler
 
         category.Activate();
 
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        await _unitOfWork.SaveChangesAsync(
+            cancellationToken);
 
         return Result<ActivateCategoryResponse>.Success(
             new ActivateCategoryResponse(

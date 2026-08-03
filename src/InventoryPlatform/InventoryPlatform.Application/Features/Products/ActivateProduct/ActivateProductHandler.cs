@@ -20,7 +20,9 @@ public sealed class ActivateProductHandler
         ActivateProductRequest request,
         CancellationToken cancellationToken = default)
     {
-        var product = await _productRepository.GetByIdAsync(request.Id, cancellationToken);
+        var product = await _productRepository.GetByIdAsync(
+            request.Id, 
+            cancellationToken);
 
         if (product is null)
         {
@@ -30,7 +32,8 @@ public sealed class ActivateProductHandler
 
         product.Activate();
 
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        await _unitOfWork.SaveChangesAsync(
+            cancellationToken);
 
         return Result<ActivateProductResponse>.Success(
             new ActivateProductResponse(

@@ -19,7 +19,9 @@ public sealed class DeactivateUnitHandler
         DeactivateUnitRequest request,
         CancellationToken cancellationToken = default)
     {
-        var category = await _categoryRepository.GetByIdAsync(request.Id,cancellationToken);
+        var category = await _categoryRepository.GetByIdAsync(
+            request.Id,
+            cancellationToken);
 
         if (category is null)
         {
@@ -29,7 +31,8 @@ public sealed class DeactivateUnitHandler
 
         category.Deactivate();
 
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        await _unitOfWork.SaveChangesAsync(
+            cancellationToken);
 
         return Result<DeactivateUnitResponse>.Success(
             new DeactivateUnitResponse(

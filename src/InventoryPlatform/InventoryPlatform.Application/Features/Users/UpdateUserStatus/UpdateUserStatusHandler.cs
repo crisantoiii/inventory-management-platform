@@ -15,7 +15,9 @@ public sealed class UpdateUserStatusHandler
         UpdateUserStatusRequest request,
         CancellationToken cancellationToken)
     {
-        return _identityService.UpdateUserStatusAsync(request, cancellationToken);
+        return _identityService.UpdateUserStatusAsync(
+            request, 
+            cancellationToken);
     }
 
 }
