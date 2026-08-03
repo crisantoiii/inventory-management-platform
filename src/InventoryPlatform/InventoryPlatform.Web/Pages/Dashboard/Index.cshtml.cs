@@ -15,7 +15,7 @@ namespace InventoryPlatform.Web.Pages.Dashboard;
 public class IndexModel : PageModel
 {
     [FromQuery]
-    public GetDashboardQuery Query { get; set; } = new();
+    public GetDashboardRequest Query { get; set; } = new();
 
     [TempData]
     public string? SuccessMessage { get; set; }
