@@ -28,16 +28,16 @@ public sealed class GetUsersHandler
             Status = request.Status
         };
 
-        var users = _identityService.GetUsersAsync(
+        var users = await _identityService.GetUsersAsync(
             query,
             cancellationToken);
 
         var response = new PagedResult<GetUsersResponse>
         {
-            Items = users.Result.Items,
-            Page = users.Result.Page,
-            PageSize = users.Result.PageSize,
-            TotalCount = users.Result.TotalCount
+            Items = users.Items,
+            Page = users.Page,
+            PageSize = users.PageSize,
+            TotalCount = users.TotalCount
         };
 
         return Result<PagedResult<GetUsersResponse>>.Success(response);
