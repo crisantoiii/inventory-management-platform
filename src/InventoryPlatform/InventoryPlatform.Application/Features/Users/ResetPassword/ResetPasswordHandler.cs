@@ -1,8 +1,7 @@
-﻿using InventoryPlatform.Application.Features.Users.ResetPassowrd;
-using InventoryPlatform.Application.Interfaces.Identity;
+﻿using InventoryPlatform.Application.Interfaces.Identity;
 using InventoryPlatform.Shared.Results;
 
-namespace InventoryPlatform.Application.Features.Users.ResetPassowrd;
+namespace InventoryPlatform.Application.Features.Users.ResetPassword;
 
 public sealed class ResetPasswordHandler
 {

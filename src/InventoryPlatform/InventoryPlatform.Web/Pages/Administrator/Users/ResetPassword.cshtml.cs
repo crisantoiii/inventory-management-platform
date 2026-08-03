@@ -1,5 +1,5 @@
 using InventoryPlatform.Application.Features.Users.GetUser;
-using InventoryPlatform.Application.Features.Users.ResetPassowrd;
+using InventoryPlatform.Application.Features.Users.ResetPassword;
 using InventoryPlatform.Web.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;

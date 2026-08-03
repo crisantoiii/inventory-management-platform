@@ -49,7 +49,7 @@ using InventoryPlatform.Application.Features.Users.GetRoles;
 using InventoryPlatform.Application.Features.Users.UpdateUser;
 using InventoryPlatform.Application.Features.Users.UpdateUserRoles;
 using InventoryPlatform.Application.Features.Users.UpdateUserStatus;
-using InventoryPlatform.Application.Features.Users.ResetPassowrd;
+using InventoryPlatform.Application.Features.Users.ResetPassword;
 
 namespace InventoryPlatform.Application.DependencyInjection;
 
