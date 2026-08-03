@@ -295,7 +295,7 @@ Return Result
 The Dashboard demonstrates how multiple read models can be composed through the Application layer while preserving the separation between presentation, business logic, and persistence.
 
 Responsibilities:
-
+```text
 InventoryPlatform
 │
 ├── Web
@@ -316,9 +316,10 @@ InventoryPlatform
       Paging
       Filtering
       Sorting
+```
 
 ## Solution Architecture
-
+```text
 Request
 
 ↓
@@ -338,7 +339,7 @@ Repository / IdentityService
 Entity Framework Core
 
 ↓
-
+```
 SQL Server
 
 ## Architectural Principles
