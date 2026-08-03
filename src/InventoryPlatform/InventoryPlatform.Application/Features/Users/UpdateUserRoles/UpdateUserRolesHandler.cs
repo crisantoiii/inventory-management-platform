@@ -1,4 +1,5 @@
 ﻿using InventoryPlatform.Application.Interfaces.Identity;
+using InventoryPlatform.Shared.Results;
 
 namespace InventoryPlatform.Application.Features.Users.UpdateUserRoles;
 
@@ -12,7 +13,7 @@ public sealed class UpdateUserRolesHandler
         _identityService = identityService;
     }
 
-    public Task<Shared.Results.Result> HandleAsync(
+    public Task<Result> HandleAsync(
         UpdateUserRolesRequest request,
         CancellationToken cancellationToken)
     {

@@ -1,4 +1,5 @@
 ﻿using InventoryPlatform.Application.Interfaces.Identity;
+using InventoryPlatform.Shared.Results;
 
 namespace InventoryPlatform.Application.Features.Users.UpdateUserStatus;
 
@@ -11,7 +12,7 @@ public sealed class UpdateUserStatusHandler
         _identityService = identityService;
     }
 
-    public Task<Shared.Results.Result> HandleAsync(
+    public Task<Result> HandleAsync(
         UpdateUserStatusRequest request,
         CancellationToken cancellationToken)
     {
