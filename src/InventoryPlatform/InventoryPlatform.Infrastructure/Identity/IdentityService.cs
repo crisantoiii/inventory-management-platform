@@ -97,9 +97,9 @@ public sealed class IdentityService : IIdentityService
             user.LockoutEnd = DateTimeOffset.MaxValue;
         }
 
-        await _userManager.UpdateAsync(user);
+        var result = await _userManager.UpdateAsync(user);
 
-        return Result.Success();
+        return ToResult(result);
     }
 
     public async Task<Result> UpdateUserRolesAsync(
@@ -123,14 +123,14 @@ public sealed class IdentityService : IIdentityService
         {
             var removeResult = await _userManager.RemoveFromRolesAsync(user, rolesToRemove);
             if (!removeResult.Succeeded)
-                return Result.Failure(Error.None);
+                return ToResult(removeResult);
         }
 
         if (rolesToAdd.Any())
         {
             var addResult = await _userManager.AddToRolesAsync(user, rolesToAdd);
             if (!addResult.Succeeded)
-                return Result.Failure(Error.None);
+                return ToResult(addResult);
         }
 
         return Result.Success();
@@ -192,13 +192,25 @@ public sealed class IdentityService : IIdentityService
             EmailConfirmed = request.EmailConfirmed,
         };
 
-        var result = await _userManager.CreateAsync(
-            user,
-            request.Password);
+        var createResult = await _userManager.CreateAsync(user, request.Password);
 
-        var roleResult = await _userManager.AddToRolesAsync(
-            user,
-            request.Roles);
+        if (!createResult.Succeeded)
+        {
+            return Result<Guid>.Failure(
+                Error.Validation2(string.Join(
+                    Environment.NewLine,
+                    createResult.Errors.Select(e => e.Description))));
+        }
+
+        var roleResult = await _userManager.AddToRolesAsync(user, request.Roles);
+
+        if (!roleResult.Succeeded)
+        {
+            return Result<Guid>.Failure(
+                Error.Validation2(string.Join(
+                    Environment.NewLine,
+                    roleResult.Errors.Select(e => e.Description))));
+        }
 
         return Result<Guid>.Success(user.Id);
     }
@@ -207,6 +219,13 @@ public sealed class IdentityService : IIdentityService
         CancellationToken cancellationToken = default)
     {
         var user = await _userManager.FindByIdAsync(id.ToString());
+
+        if (user is null)
+        {
+            return Result<GetUserResponse>.Failure(
+                UserErrors.NotFound(id));
+        }
+
         var roles = await _userManager.GetRolesAsync(user);
 
         var isActive = (user.LockoutEnd is { } lockoutEnd &&
