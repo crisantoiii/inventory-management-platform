@@ -8,6 +8,26 @@ The platform currently provides business modules for Product, Category, Supplier
 
 Shared infrastructure such as paging, filtering, sorting, the Result pattern, and Identity service abstractions are reused consistently across modules while maintaining a clear separation of concerns.
 
+# Architecture Validation
+
+The project completed **Architecture Sprint 1** after implementing the foundational modules.
+
+The review validated:
+
+- Application Layer
+- Infrastructure Layer
+- Web Layer
+- Shared Infrastructure
+- Engineering Documentation
+
+Outcome:
+
+- ✅ Architecture validated
+- ✅ No structural redesign required
+- ✅ Ready for workflow-driven business modules
+
+The next milestone is **v1.0.0 – Purchasing Module**.
+
 ## Module Summary
 
 | Module | Status |
@@ -21,10 +41,11 @@ Shared infrastructure such as paging, filtering, sorting, the Result pattern, an
 | Customer Management | ✅ Complete |
 | Unit Management | ✅ Complete |
 | Inventory Transactions | ✅ Complete |
+| Architecture Sprint | ✅ Complete |
 
 ## Current Implementation
 
-Completed business modules:
+Completed modules:
 
 - ✅ Product Management
 - ✅ Category Management
@@ -269,6 +290,7 @@ Each inventory transaction records:
 ## Dashboard Design
 
 The Dashboard aggregates inventory statistics, recent inventory activity, and low stock alerts into a single read-only view using DTO projections optimized for reporting.
+- Read-only repository architecture
 
 ---
 
@@ -325,7 +347,7 @@ Each user supports:
 
 # Shared Infrastructure
 
-## Identity Infrastructure
+## Shared Identity Infrastructure
 
 Implemented through ASP.NET Core Identity.
 
@@ -506,6 +528,7 @@ Operation results are standardized using:
 - Thin Razor PageModels
 - Thin Application Handlers
 - Rule of Three Refactoring
+- Architecture Sprint Review
 
 ---
 
@@ -536,6 +559,22 @@ Operation results are standardized using:
 
 ---
 
+# Engineering Features
+
+The project emphasizes maintainability in addition to business functionality.
+
+Engineering practices include:
+
+- Architecture Review Process
+- Feature-first Organization
+- Pull Request Workflow
+- Versioned Milestones
+- Engineering Journal
+- Design Decision Records
+- Comprehensive Documentation
+
+---
+
 # Planned Features
 
 ## Account Management
@@ -557,9 +596,14 @@ Operation results are standardized using:
 ## Purchasing
 
 - Purchase Orders
-- Purchase Order Receiving
+- Purchase Approval
+- Goods Receiving
+- Partial Receiving
+- Purchase History
 
 ## Sales
 
 - Sales Orders
 - Customer Invoicing
+- Stock Reservation
+- Sales History
