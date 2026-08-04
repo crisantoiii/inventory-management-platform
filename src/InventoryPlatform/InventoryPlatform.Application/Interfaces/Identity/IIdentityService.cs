@@ -2,7 +2,7 @@
 using InventoryPlatform.Application.Features.Users.CreateUser;
 using InventoryPlatform.Application.Features.Users.GetUser;
 using InventoryPlatform.Application.Features.Users.GetUsers;
-using InventoryPlatform.Application.Features.Users.ResetPassowrd;
+using InventoryPlatform.Application.Features.Users.ResetPassword;
 using InventoryPlatform.Application.Features.Users.UpdateUser;
 using InventoryPlatform.Application.Features.Users.UpdateUserRoles;
 using InventoryPlatform.Application.Features.Users.UpdateUserStatus;

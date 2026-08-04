@@ -19,7 +19,9 @@ public sealed class ActivateCustomerHandler
         ActivateCustomerRequest request,
         CancellationToken cancellationToken = default)
     {
-        var customer = await _customerRepository.GetByIdAsync(request.Id, cancellationToken);
+        var customer = await _customerRepository.GetByIdAsync(
+            request.Id, 
+            cancellationToken);
 
         if (customer is null)
         {
@@ -29,7 +31,8 @@ public sealed class ActivateCustomerHandler
 
         customer.Activate();
 
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        await _unitOfWork.SaveChangesAsync(
+            cancellationToken);
 
         return Result<ActivateCustomerResponse>.Success(
             new ActivateCustomerResponse(

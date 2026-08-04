@@ -1,5 +1,6 @@
 ﻿using InventoryPlatform.Application.Features.Users.CreateUser;
 using InventoryPlatform.Application.Interfaces.Identity;
+using InventoryPlatform.Shared.Results;
 
 namespace InventoryPlatform.Application.Features.Users.UpdateUser;
 
@@ -13,7 +14,7 @@ public sealed class UpdateUserHandler
         _identityService = identityService;
     }
 
-    public Task<Shared.Results.Result> HandleAsync(
+    public Task<Result> HandleAsync(
         UpdateUserRequest request,
         CancellationToken cancellationToken)
     {

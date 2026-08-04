@@ -17,7 +17,7 @@ public sealed class GetDashboardHandler
     }
 
     public async Task<Result<DashboardDto>> HandleAsync(
-        GetDashboardQuery query,
+        GetDashboardRequest query,
         CancellationToken cancellationToken = default)
     {
         var dashboard = await _repository.GetDashboardAsync(cancellationToken);

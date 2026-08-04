@@ -1,4 +1,5 @@
 ﻿using InventoryPlatform.Application.Interfaces.Persistence;
+using InventoryPlatform.Domain.Entities;
 using InventoryPlatform.Shared.Paging;
 using InventoryPlatform.Shared.Results;
 namespace InventoryPlatform.Application.Features.Customers.GetCustomers;
@@ -34,15 +35,15 @@ public sealed class GetCustomersHandler
         var response = new PagedResult<GetCustomersResponse>
         {
             Items = customers.Items
-                .Select(c => new GetCustomersResponse
+                .Select(customer => new GetCustomersResponse
                 {
-                    Id = c.Id,
-                    Name = c.Name,
-                    ContactPerson = c.ContactPerson,
-                    Email = c.Email,
-                    Phone = c.Phone,
-                    Address = c.Address,
-                    IsActive = c.IsActive
+                    Id = customer.Id,
+                    Name = customer.Name,
+                    ContactPerson = customer.ContactPerson,
+                    Email = customer.Email,
+                    Phone = customer.Phone,
+                    Address = customer.Address,
+                    IsActive = customer.IsActive
                 }
                     )
                 .ToList(),

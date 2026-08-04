@@ -5,14 +5,14 @@ namespace InventoryPlatform.Application.Features.Units.ActivateUnit;
 
 public sealed class ActivateUnitHandler
 {
-    private readonly IUnitRepository _categoryRepository;
+    private readonly IUnitRepository _unitRepository;
     private readonly IUnitOfWork _unitOfWork;
 
     public ActivateUnitHandler(
-        IUnitRepository categoryRepository,
+        IUnitRepository unitRepository,
         IUnitOfWork unitOfWork)
     {
-        _categoryRepository = categoryRepository;
+        _unitRepository = unitRepository;
         _unitOfWork = unitOfWork;
     }
 
@@ -20,22 +20,25 @@ public sealed class ActivateUnitHandler
         ActivateUnitRequest request,
         CancellationToken cancellationToken = default)
     {
-        var category = await _categoryRepository.GetByIdAsync(request.Id,cancellationToken);
+        var unit = await _unitRepository.GetByIdAsync(
+            request.Id,
+            cancellationToken);
 
-        if (category is null)
+        if (unit is null)
         {
             return Result<ActivateUnitResponse>.Failure(
                 UnitErrors.NotFound);
         }
 
-        category.Activate();
+        unit.Activate();
 
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        await _unitOfWork.SaveChangesAsync(
+            cancellationToken);
 
         return Result<ActivateUnitResponse>.Success(
             new ActivateUnitResponse(
-                category.Id,
-                category.Name,
-                category.IsActive));
+                unit.Id,
+                unit.Name,
+                unit.IsActive));
     }
 }

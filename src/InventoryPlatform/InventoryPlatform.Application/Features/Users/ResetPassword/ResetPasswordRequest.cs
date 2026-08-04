@@ -1,4 +1,4 @@
-﻿namespace InventoryPlatform.Application.Features.Users.ResetPassowrd;
+﻿namespace InventoryPlatform.Application.Features.Users.ResetPassword;
 
 public sealed record ResetPasswordRequest
 {

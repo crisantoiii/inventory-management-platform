@@ -4,14 +4,14 @@ namespace InventoryPlatform.Application.Features.Units.UpdateUnit;
 
 public sealed class UpdateUnitHandler
 {
-    private readonly IUnitRepository _categoryRepository;
+    private readonly IUnitRepository _unitRepository;
     private readonly IUnitOfWork _unitOfWork;
 
     public UpdateUnitHandler(
-        IUnitRepository categoryRepository,
+        IUnitRepository unitRepository,
         IUnitOfWork unitOfWork)
     {
-        _categoryRepository = categoryRepository;
+        _unitRepository = unitRepository;
         _unitOfWork = unitOfWork;
     }
 
@@ -19,28 +19,28 @@ public sealed class UpdateUnitHandler
         UpdateUnitRequest request,
         CancellationToken cancellationToken = default)
     {
-        var category = await _categoryRepository.GetByIdAsync(
+        var unit = await _unitRepository.GetByIdAsync(
             request.Id,
             cancellationToken);
 
-        if (category is null)
+        if (unit is null)
         {
             return Result<UpdateUnitResponse>.Failure(
                         UnitErrors.NotFound);
         }
 
-        category.Update(
+        unit.Update(
             request.Code,
             request.Name, 
             request.Symbol);
 
-        _categoryRepository.Update(category);
+        _unitRepository.Update(unit);
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Result<UpdateUnitResponse>.Success(
             new UpdateUnitResponse(
-                category.Id,
-                category.Name));
+                unit.Id,
+                unit.Name));
     }
 }

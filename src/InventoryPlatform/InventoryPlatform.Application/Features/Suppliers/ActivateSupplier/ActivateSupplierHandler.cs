@@ -19,7 +19,9 @@ public sealed class ActivateSupplierHandler
         ActivateSupplierRequest request,
         CancellationToken cancellationToken = default)
     {
-        var supplier = await _supplierRepository.GetByIdAsync(request.Id);
+        var supplier = await _supplierRepository.GetByIdAsync(
+            request.Id,
+            cancellationToken);
 
         if (supplier is null)
         {
@@ -29,7 +31,8 @@ public sealed class ActivateSupplierHandler
 
         supplier.Activate();
 
-        await _unitOfWork.SaveChangesAsync();
+        await _unitOfWork.SaveChangesAsync(
+            cancellationToken);
 
         return Result<ActivateSupplierResponse>.Success(
             new ActivateSupplierResponse(

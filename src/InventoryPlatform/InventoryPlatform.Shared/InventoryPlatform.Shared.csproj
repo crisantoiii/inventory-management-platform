@@ -7,11 +7,21 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Common\" />
-    <Folder Include="Extensions\" />
-    <Folder Include="Exceptions\" />
-    <Folder Include="Constants\" />
-    <Folder Include="Helpers\" />
+    <Compile Remove="Common\**" />
+    <Compile Remove="Constants\**" />
+    <Compile Remove="Exceptions\**" />
+    <Compile Remove="Extensions\**" />
+    <Compile Remove="Helpers\**" />
+    <EmbeddedResource Remove="Common\**" />
+    <EmbeddedResource Remove="Constants\**" />
+    <EmbeddedResource Remove="Exceptions\**" />
+    <EmbeddedResource Remove="Extensions\**" />
+    <EmbeddedResource Remove="Helpers\**" />
+    <None Remove="Common\**" />
+    <None Remove="Constants\**" />
+    <None Remove="Exceptions\**" />
+    <None Remove="Extensions\**" />
+    <None Remove="Helpers\**" />
   </ItemGroup>
 
 </Project>
