@@ -1,5 +1,88 @@
 # Changelog
 
+## [v0.9.0] - 2026-08-04
+
+### Release Summary
+
+This release completes **Architecture Sprint 1**, a comprehensive review of the Inventory Management Platform architecture across the Application, Infrastructure, and Web layers.
+
+The objective of this milestone was to validate the existing Clean Architecture implementation before introducing larger business workflows. The review confirmed that the architecture scales successfully and does not require structural redesign prior to implementing the Purchasing module.
+
+---
+
+### Reviewed
+
+#### Application Layer
+
+- Reviewed feature-first organization
+- Reviewed request and response models
+- Reviewed validators
+- Reviewed Create, Get, Update, Activate, and Deactivate handlers
+- Reviewed Identity handlers
+- Validated handler consistency and application boundaries
+
+#### Infrastructure Layer
+
+- Reviewed dependency injection
+- Reviewed ApplicationDbContext
+- Reviewed generic repository
+- Reviewed feature repositories
+- Reviewed IdentityService
+- Reviewed Unit of Work
+- Reviewed Entity Framework Core configurations
+
+#### Web Layer
+
+- Reviewed shared layout
+- Reviewed navigation
+- Reviewed Users module
+- Reviewed Products module
+- Reviewed Categories module
+- Reviewed shared Razor Pages patterns
+
+---
+
+### Changed
+
+- Improved naming consistency across the solution
+- Improved IdentityService result handling
+- Improved handler consistency
+- Standardized architecture documentation
+- Updated project documentation for Architecture Sprint 1
+
+---
+
+### Validated
+
+- Clean Architecture
+- Feature-first organization
+- Repository Pattern
+- Unit of Work
+- Result Pattern
+- ASP.NET Core Identity isolation
+- Razor Pages architecture
+- Shared paging, filtering, and sorting infrastructure
+
+---
+
+### Documentation
+
+- Updated README
+- Updated PROJECT_STATUS
+- Updated ROADMAP
+- Updated ARCHITECTURE
+- Updated ENGINEERING_JOURNAL
+- Updated DESIGN_DECISIONS
+- Updated FEATURES
+
+---
+
+### Outcome
+
+Architecture Sprint 1 concluded that the existing architecture remains stable, maintainable, and suitable for future expansion.
+
+The project is now ready to begin implementation of the **Purchasing Module (v1.0.0)**.
+
 All notable changes to this project will be documented in this file.
 
 ## [v0.8.0] - 2026-08-01
