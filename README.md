@@ -21,36 +21,57 @@ The project is designed as a production-style portfolio application that demonst
 
 ---
 
+# Why This Project?
+
+Many portfolio projects demonstrate CRUD functionality. This project goes beyond CRUD by emphasizing maintainable architecture, enterprise development practices, and scalable software design.
+
+The focus is not only on implementing business features but also on applying professional engineering practices such as architectural reviews, feature-based organization, incremental refactoring, and comprehensive documentation.
+
+---
+
 ## Project Status
 
-**Current Version:** v0.8.0
+**Current Version:** v0.9.0 – Architecture Validated
 
 ## Completed Modules
 
 - ✅ Product Management
-
 - ✅ Category Management
-
 - ✅ Supplier Management
-
 - ✅ Customer Management
-
 - ✅ Unit Management
-
 - ✅ Inventory Transactions
-
 - ✅ Dashboard
+- ✅ Authentication & Authorization
+- ✅ User Management
 
-### Latest Release (v0.8.0)
+## Latest Release (v0.9.0)
 
-Implemented Authentication and complete User Management featuring:
+Architecture Sprint 1 completed.
 
-- ASP.NET Core Identity
-- Login / Logout
-- Role-based Authorization
-- User Administration
-- Password Reset
-- Account Activation / Deactivation
+Highlights:
+
+- Validated Clean Architecture across all layers
+- Reviewed Application, Infrastructure, and Web architecture
+- Improved IdentityService error handling
+- Standardized naming consistency
+- Confirmed architecture scalability for future business modules
+
+
+---
+
+## Architecture Validation
+
+The project completed **Architecture Sprint 1**, a comprehensive architectural review covering the Application, Infrastructure, and Web layers.
+
+### Review Outcome
+
+- ✅ Application layer validated
+- ✅ Infrastructure layer validated
+- ✅ Web layer validated
+- ✅ Architecture approved for future module expansion
+
+The review concluded that the existing architecture scales successfully without requiring structural redesign.
 
 ---
 
@@ -97,6 +118,10 @@ The long-term goal is to evolve this project into a complete inventory managemen
 - Role-based Authorization
 - User Management
 - Password Management
+- Architecture Review Process
+- Feature-first Organization
+- ASP.NET Core Identity Isolation
+- Engineering Documentation
 
 ---
 
@@ -354,6 +379,22 @@ SQL Server
 
 ---
 
+## Architecture Validation
+
+Architecture Sprint 1 confirmed:
+
+- Thin Application Handlers
+- Rich Domain Model
+- Repository Pattern
+- Unit of Work
+- Identity Isolation
+- Feature-first organization
+- Razor Pages architecture
+
+No major architectural redesign was required.
+
+---
+
 ## Implemented Patterns
 
 - Clean Architecture
@@ -371,6 +412,9 @@ SQL Server
 - Dependency Injection Extensions
 - Thin PageModels
 - Thin Handlers
+- Feature-first Architecture
+- Architecture Review Process
+- Rule of Three Refactoring
 
 ---
 
@@ -487,16 +531,18 @@ Development Tools
 - Dashboard
 - Authentication & Authorization
 - User Management
+- Architecture Sprint 1
 
-## Planned
+## Next
 
-- Purchase Orders
-- Sales Orders
+- Purchasing Module (v1.0.0)
+
+## Future
+
+- Sales
 - Reporting
 - Audit Logging
-- Account Management
-- Change Password
-- Forgot Password
+- Self-Service Account Management
 - Two-Factor Authentication
 
 ---
@@ -589,6 +635,8 @@ This project is focused on applying modern enterprise development practices incl
 - CQRS-inspired Design
 - Result Pattern
 - Rule of Three Refactoring
+- Enterprise Code Review
+- Architecture Validation
 
 ---
 
