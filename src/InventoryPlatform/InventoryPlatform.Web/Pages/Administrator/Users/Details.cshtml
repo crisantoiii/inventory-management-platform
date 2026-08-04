@@ -25,13 +25,40 @@
             <dd class="col-sm-9"></dd>
 
             <dt class="col-sm-3">Email Confirmed</dt>
-            <dd class="col-sm-9">@Model.User.EmailConfirmed</dd>
+            <dd class="col-sm-9">
+            
+                @if(Model.User.EmailConfirmed)
+                {
+                    <span class="badge bg-success">
+                        Yes
+                    </span>
+                }
+                else
+                {
+                    <span class="badge bg-danger">
+                        No
+                    </span>
+                }
+            </dd>
 
             <dt class="col-sm-3">Phone</dt>
             <dd class="col-sm-9">@Model.User.PhoneNumber</dd>
 
             <dt class="col-sm-3">Phone Confirmed</dt>
-            <dd class="col-sm-9">@Model.User.PhoneNumberConfirmed</dd>
+            <dd class="col-sm-9">
+                @if(Model.User.PhoneNumberConfirmed)
+                {
+                    <span class="badge bg-success">
+                        Yes
+                    </span>
+                }
+                else
+                {
+                    <span class="badge bg-danger">
+                        No
+                    </span>
+                }
+            </dd>
 
             <dt class="col-sm-3"></dt>
             <dd class="col-sm-9"></dd>
