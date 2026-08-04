@@ -7,34 +7,52 @@ This roadmap outlines the planned evolution of the Inventory Management Platform
 The project is developed incrementally, with each completed module validating the architecture before expanding into additional business domains.
 
 v0.1  Products                 ✅
-
 v0.2  Categories               ✅
-
 v0.3  Suppliers                ✅
-
 v0.4  Customers / Units        ✅
-
 v0.5  Shared Infrastructure    ✅
-
 v0.6  Inventory Transactions   ✅
-
 v0.7  Dashboard                ✅
-
 v0.8  Identity & Users         ✅
-
-v0.9  Architecture Sprint      🔄
-
-v1.0  Purchasing               ⏳
-
+v0.9  Architecture Sprint      ✅
+v1.0  Purchasing Module        🔄
 v1.1  Reporting                ⏳
+v1.2  Account Management       ⏳
+
+---
+
+# Current Development Strategy
+
+The project has completed its architectural foundation.
+
+Future development will prioritize expanding business capabilities while preserving the validated architecture.
+
+Focus Areas
+
+- Business workflows
+- Domain modeling
+- Enterprise features
+- Reporting
+- APIs
 
 ---
 
 # Current Release
 
-## Version 0.7.0 – Dashboard
+## Version 0.9.0 – Architecture Sprint 1
 
 ### Completed
+
+- Architecture Sprint 1
+- Application Layer Review
+- Infrastructure Layer Review
+- Web Layer Review
+- Architecture Validation
+- Documentation Updates
+
+### Result
+
+The application architecture has been validated and is ready for business expansion.
 
 ### Product Management
 
@@ -180,7 +198,41 @@ Objectives
 
 ---
 
-# Phase 5 – Account Management
+# Phase 5 — Purchasing Module
+
+Objectives
+
+- Purchase Orders
+- Purchase Order Items
+- Purchase Approval Workflow
+- Goods Receiving
+- Partial Receiving
+- Inventory Integration
+- Purchase History
+- Supplier Purchase History
+
+---
+
+# Phase 6 — Reporting
+
+Planned Reports:
+
+- Inventory Valuation
+- Purchase History
+- Supplier Purchase Analysis
+- Stock Movement
+- Inventory Valuation Report
+- Low Stock Report
+- Inventory Movement Report
+
+Export Options:
+
+- Excel
+- PDF
+
+---
+
+# Phase 7 – Account Management
 
 Planned
 
@@ -191,23 +243,9 @@ Planned
 - Two-Factor Authentication
 - User Profile
 
-# Phase 6 — Reporting
+---
 
-Planned Reports:
-
-- Product Report
-- Inventory Report
-- Transaction Report
-- Inventory Valuation Report
-- Low Stock Report
-- Inventory Movement Report
-
-Export Options:
-
-- Excel
-- PDF
-
-# Phase 7 — Advanced Features
+# Phase 8 — Advanced Features
 
 Planned:
 
@@ -229,11 +267,12 @@ Future enhancements may include:
 
 ## Business Modules
 
-- Purchase Orders
-- Sales Orders
-- Warehouse Management
+- Purchasing
+- Sales
+- Warehouse
 - Inventory Transfers
-- Stock Counts
+- Cycle Counts
+- Returns
 - Stock Adjustments Approval
 
 ## Integrations
@@ -248,6 +287,19 @@ Future enhancements may include:
 ## Intelligence
 
 - Inventory Forecasting
+
+---
+
+# Planned Releases
+
+| Version | Milestone |
+|---------|-----------|
+| v0.9.0 | Architecture Sprint 1 ✅ |
+| v1.0.0 | Purchasing Module |
+| v1.1.0 | Reporting |
+| v1.2.0 | Account Management |
+| v1.3.0 | Sales Module |
+| v2.0.0 | REST API & Blazor |
 
 ---
 
