@@ -7,13 +7,34 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
-    <Folder Include="Middleware\" />
-    <Folder Include="Configurations\" />
-    <Folder Include="Filters\" />
-    <Folder Include="Models\" />
-    <Folder Include="ViewModels\" />
-    <Folder Include="Services\" />
+    <Compile Remove="Configurations\**" />
+    <Compile Remove="Controllers\**" />
+    <Compile Remove="Filters\**" />
+    <Compile Remove="Middleware\**" />
+    <Compile Remove="Models\**" />
+    <Compile Remove="Services\**" />
+    <Compile Remove="ViewModels\**" />
+    <Content Remove="Configurations\**" />
+    <Content Remove="Controllers\**" />
+    <Content Remove="Filters\**" />
+    <Content Remove="Middleware\**" />
+    <Content Remove="Models\**" />
+    <Content Remove="Services\**" />
+    <Content Remove="ViewModels\**" />
+    <EmbeddedResource Remove="Configurations\**" />
+    <EmbeddedResource Remove="Controllers\**" />
+    <EmbeddedResource Remove="Filters\**" />
+    <EmbeddedResource Remove="Middleware\**" />
+    <EmbeddedResource Remove="Models\**" />
+    <EmbeddedResource Remove="Services\**" />
+    <EmbeddedResource Remove="ViewModels\**" />
+    <None Remove="Configurations\**" />
+    <None Remove="Controllers\**" />
+    <None Remove="Filters\**" />
+    <None Remove="Middleware\**" />
+    <None Remove="Models\**" />
+    <None Remove="Services\**" />
+    <None Remove="ViewModels\**" />
   </ItemGroup>
 
   <ItemGroup>

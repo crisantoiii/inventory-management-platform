@@ -7,10 +7,18 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Extensions\" />
-    <Folder Include="Mapping\" />
-    <Folder Include="Validators\" />
-    <Folder Include="Services\" />
+    <Compile Remove="Extensions\**" />
+    <Compile Remove="Mapping\**" />
+    <Compile Remove="Services\**" />
+    <Compile Remove="Validators\**" />
+    <EmbeddedResource Remove="Extensions\**" />
+    <EmbeddedResource Remove="Mapping\**" />
+    <EmbeddedResource Remove="Services\**" />
+    <EmbeddedResource Remove="Validators\**" />
+    <None Remove="Extensions\**" />
+    <None Remove="Mapping\**" />
+    <None Remove="Services\**" />
+    <None Remove="Validators\**" />
   </ItemGroup>
 
   <ItemGroup>
