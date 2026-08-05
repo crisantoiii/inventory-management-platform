@@ -8,11 +8,11 @@ public sealed class PurchaseOrderItem : BaseEntity
     {
     }
 
-    public Guid PurchaseOrderId { get; private set; }
+    public int PurchaseOrderId { get; private set; }
 
     public PurchaseOrder PurchaseOrder { get; private set; } = null!;
 
-    public Guid ProductId { get; private set; }
+    public int ProductId { get; private set; }
 
     public Product Product { get; private set; } = null!;
 
@@ -38,8 +38,8 @@ public sealed class PurchaseOrderItem : BaseEntity
     public bool IsFullyReceived => RemainingQuantity == 0;
 
     public static PurchaseOrderItem Create(
-        Guid purchaseOrderId,
-        Guid productId,
+        int purchaseOrderId,
+        int productId,
         decimal quantity,
         decimal unitCost)
     {
