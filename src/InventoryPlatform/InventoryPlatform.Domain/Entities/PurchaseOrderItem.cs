@@ -21,4 +21,61 @@ public sealed class PurchaseOrderItem : BaseEntity
     public decimal UnitCost { get; private set; }
 
     public decimal ReceivedQuantity { get; private set; }
+
+    /// <summary>
+    /// Gets the total amount for this purchase order line.
+    /// </summary>
+    public decimal LineTotal => Quantity * UnitCost;
+
+    /// <summary>
+    /// Gets the remaining quantity to be received.
+    /// </summary>
+    public decimal RemainingQuantity => Quantity - ReceivedQuantity;
+
+    /// <summary>
+    /// Gets a value indicating whether this line has been fully received.
+    /// </summary>
+    public bool IsFullyReceived => RemainingQuantity == 0;
+
+    public static PurchaseOrderItem Create(
+        Guid purchaseOrderId,
+        Guid productId,
+        decimal quantity,
+        decimal unitCost)
+    {
+        return new PurchaseOrderItem
+        {
+            PurchaseOrderId = purchaseOrderId,
+            ProductId = productId,
+            Quantity = quantity,
+            UnitCost = unitCost,
+            ReceivedQuantity = 0
+        };
+    }
+
+    /// <summary>
+    /// Receives inventory for this purchase order line.
+    /// </summary>
+    /// <param name="quantity">
+    /// Quantity received from the supplier.
+    /// </param>
+    /// <exception cref="InvalidOperationException">
+    /// Thrown when the received quantity is invalid.
+    /// </exception>
+    public void Receive(decimal quantity)
+    {
+        if (quantity <= 0)
+        {
+            throw new InvalidOperationException(
+                "Received quantity must be greater than zero.");
+        }
+
+        if (ReceivedQuantity + quantity > Quantity)
+        {
+            throw new InvalidOperationException(
+                "Received quantity cannot exceed ordered quantity.");
+        }
+
+        ReceivedQuantity += quantity;
+    }
 }
