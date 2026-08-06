@@ -111,6 +111,19 @@ public sealed class PurchaseOrder : BaseEntity
         _items.Remove(item);
     }
 
+    public void Submit()
+    {
+        EnsureDraft();
+
+        if (_items.Count == 0)
+        {
+            throw new InvalidOperationException(
+                "A purchase order must contain at least one item.");
+        }
+
+        Status = PurchaseOrderStatus.Submitted;
+    }
+
     private void EnsureDraft()
     {
         if (Status != PurchaseOrderStatus.Draft)
@@ -119,4 +132,6 @@ public sealed class PurchaseOrder : BaseEntity
                 "Only draft purchase orders can be modified.");
         }
     }
+
+
 }
