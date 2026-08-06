@@ -124,6 +124,22 @@ public sealed class PurchaseOrder : BaseEntity
         Status = PurchaseOrderStatus.Submitted;
     }
 
+    public void Approve()
+    {
+        EnsureSubmitted();
+
+        Status = PurchaseOrderStatus.Approved;
+    }
+
+    private void EnsureSubmitted()
+    {
+        if (Status != PurchaseOrderStatus.Submitted)
+        {
+            throw new InvalidOperationException(
+                "Only submitted purchase orders can be approved.");
+        }
+    }
+
     private void EnsureDraft()
     {
         if (Status != PurchaseOrderStatus.Draft)
