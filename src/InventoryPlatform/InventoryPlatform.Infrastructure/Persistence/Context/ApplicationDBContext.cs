@@ -15,8 +15,11 @@ public sealed class ApplicationDbContext
     public DbSet<Customer> Customers => Set<Customer>();
     public DbSet<Unit> Units => Set<Unit>();
     public DbSet<InventoryTransaction> InventoryTransactions => Set<InventoryTransaction>();
-
     public DbSet<ApplicationUser> Users => Set<ApplicationUser>();
+
+    public DbSet<PurchaseOrder> PurchaseOrders => Set<PurchaseOrder>();
+
+    public DbSet<PurchaseOrderItem> PurchaseOrderItems => Set<PurchaseOrderItem>();
 
     public ApplicationDbContext(
         DbContextOptions<ApplicationDbContext> options)
