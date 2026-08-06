@@ -131,12 +131,43 @@ public sealed class PurchaseOrder : BaseEntity
         Status = PurchaseOrderStatus.Approved;
     }
 
+    public void Receive(
+    int productId,
+    decimal quantity)
+    {
+        EnsureApproved();
+
+        var item = _items.SingleOrDefault(x => x.ProductId == productId);
+
+        if (item is null)
+        {
+            throw new InvalidOperationException(
+                "Purchase order item was not found.");
+        }
+
+        item.Receive(quantity);
+
+        Status = Items.All(x => x.IsFullyReceived)
+            ? PurchaseOrderStatus.Completed
+            : PurchaseOrderStatus.Receiving;
+    }
+
     private void EnsureSubmitted()
     {
         if (Status != PurchaseOrderStatus.Submitted)
         {
             throw new InvalidOperationException(
                 "Only submitted purchase orders can be approved.");
+        }
+    }
+
+    private void EnsureApproved()
+    {
+        if (Status != PurchaseOrderStatus.Approved &&
+            Status != PurchaseOrderStatus.Receiving)
+        {
+            throw new InvalidOperationException(
+                "Only approved purchase orders can receive inventory.");
         }
     }
 
