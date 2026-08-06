@@ -9,18 +9,19 @@
   <ItemGroup>
     <Compile Remove="Email\**" />
     <Compile Remove="Logging\**" />
+    <Compile Remove="Persistence\Interceptors\**" />
+    <Compile Remove="Persistence\Seeding\**" />
     <Compile Remove="Services\**" />
     <EmbeddedResource Remove="Email\**" />
     <EmbeddedResource Remove="Logging\**" />
+    <EmbeddedResource Remove="Persistence\Interceptors\**" />
+    <EmbeddedResource Remove="Persistence\Seeding\**" />
     <EmbeddedResource Remove="Services\**" />
     <None Remove="Email\**" />
     <None Remove="Logging\**" />
+    <None Remove="Persistence\Interceptors\**" />
+    <None Remove="Persistence\Seeding\**" />
     <None Remove="Services\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Persistence\Interceptors\" />
-    <Folder Include="Persistence\Seeding\" />
   </ItemGroup>
 
   <ItemGroup>
