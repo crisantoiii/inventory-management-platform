@@ -1,4 +1,5 @@
 ﻿using InventoryPlatform.Domain.Common;
+using InventoryPlatform.Domain.Exceptions;
 
 namespace InventoryPlatform.Domain.Entities;
 
@@ -59,20 +60,20 @@ public sealed class PurchaseOrderItem : BaseEntity
     /// <param name="quantity">
     /// Quantity received from the supplier.
     /// </param>
-    /// <exception cref="InvalidOperationException">
+    /// <exception cref="DomainException">
     /// Thrown when the received quantity is invalid.
     /// </exception>
     public void Receive(decimal quantity)
     {
         if (quantity <= 0)
         {
-            throw new InvalidOperationException(
+            throw new DomainException(
                 "Received quantity must be greater than zero.");
         }
 
         if (ReceivedQuantity + quantity > Quantity)
         {
-            throw new InvalidOperationException(
+            throw new DomainException(
                 "Received quantity cannot exceed ordered quantity.");
         }
 
@@ -88,13 +89,13 @@ public sealed class PurchaseOrderItem : BaseEntity
     {
         if (quantity <= 0)
         {
-            throw new InvalidOperationException(
+            throw new DomainException(
                 "Quantity must be greater than zero.");
         }
 
         if (unitCost < 0)
         {
-            throw new InvalidOperationException(
+            throw new DomainException(
                 "Unit cost cannot be negative.");
         }
 

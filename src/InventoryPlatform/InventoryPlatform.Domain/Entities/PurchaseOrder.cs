@@ -1,5 +1,6 @@
 ﻿using InventoryPlatform.Domain.Common;
 using InventoryPlatform.Domain.Enums;
+using InventoryPlatform.Domain.Exceptions;
 
 namespace InventoryPlatform.Domain.Entities;
 
@@ -52,19 +53,19 @@ public sealed class PurchaseOrder : BaseEntity
 
         if (_items.Any(x => x.ProductId == productId))
         {
-            throw new InvalidOperationException(
+            throw new DomainException(
                 "The product already exists in this purchase order.");
         }
 
         if (quantity <= 0)
         {
-            throw new InvalidOperationException(
+            throw new DomainException(
                 "Quantity must be greater than zero.");
         }
 
         if (unitCost < 0)
         {
-            throw new InvalidOperationException(
+            throw new DomainException(
                 "Unit cost cannot be negative.");
         }
 
@@ -87,7 +88,7 @@ public sealed class PurchaseOrder : BaseEntity
 
         if (item is null)
         {
-            throw new InvalidOperationException(
+            throw new DomainException(
                 "Purchase order item was not found.");
         }
 
@@ -104,7 +105,7 @@ public sealed class PurchaseOrder : BaseEntity
 
         if (item is null)
         {
-            throw new InvalidOperationException(
+            throw new DomainException(
                 "Purchase order item was not found.");
         }
 
@@ -117,7 +118,7 @@ public sealed class PurchaseOrder : BaseEntity
 
         if (_items.Count == 0)
         {
-            throw new InvalidOperationException(
+            throw new DomainException(
                 "A purchase order must contain at least one item.");
         }
 
@@ -141,7 +142,7 @@ public sealed class PurchaseOrder : BaseEntity
 
         if (item is null)
         {
-            throw new InvalidOperationException(
+            throw new DomainException(
                 "Purchase order item was not found.");
         }
 
@@ -156,7 +157,7 @@ public sealed class PurchaseOrder : BaseEntity
     {
         if (Status != PurchaseOrderStatus.Submitted)
         {
-            throw new InvalidOperationException(
+            throw new DomainException(
                 "Only submitted purchase orders can be approved.");
         }
     }
@@ -166,7 +167,7 @@ public sealed class PurchaseOrder : BaseEntity
         if (Status != PurchaseOrderStatus.Approved &&
             Status != PurchaseOrderStatus.Receiving)
         {
-            throw new InvalidOperationException(
+            throw new DomainException(
                 "Only approved purchase orders can receive inventory.");
         }
     }
@@ -175,7 +176,7 @@ public sealed class PurchaseOrder : BaseEntity
     {
         if (Status != PurchaseOrderStatus.Draft)
         {
-            throw new InvalidOperationException(
+            throw new DomainException(
                 "Only draft purchase orders can be modified.");
         }
     }
