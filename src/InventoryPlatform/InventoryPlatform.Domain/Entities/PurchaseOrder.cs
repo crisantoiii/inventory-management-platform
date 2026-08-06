@@ -76,6 +76,26 @@ public sealed class PurchaseOrder : BaseEntity
                 unitCost));
     }
 
+    public void UpdateItem(
+    int productId,
+    decimal quantity,
+    decimal unitCost)
+    {
+        EnsureDraft();
+
+        var item = _items.SingleOrDefault(x => x.ProductId == productId);
+
+        if (item is null)
+        {
+            throw new InvalidOperationException(
+                "Purchase order item was not found.");
+        }
+
+        item.Update(
+            quantity,
+            unitCost);
+    }
+
     private void EnsureDraft()
     {
         if (Status != PurchaseOrderStatus.Draft)

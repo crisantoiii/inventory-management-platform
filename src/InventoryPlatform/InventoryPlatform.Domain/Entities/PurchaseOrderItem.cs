@@ -78,4 +78,27 @@ public sealed class PurchaseOrderItem : BaseEntity
 
         ReceivedQuantity += quantity;
     }
+
+    /// <summary>
+    /// Updates the purchase order line.
+    /// </summary>
+    public void Update(
+        decimal quantity,
+        decimal unitCost)
+    {
+        if (quantity <= 0)
+        {
+            throw new InvalidOperationException(
+                "Quantity must be greater than zero.");
+        }
+
+        if (unitCost < 0)
+        {
+            throw new InvalidOperationException(
+                "Unit cost cannot be negative.");
+        }
+
+        Quantity = quantity;
+        UnitCost = unitCost;
+    }
 }
