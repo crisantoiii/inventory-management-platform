@@ -27,4 +27,13 @@ public sealed class PurchaseOrderRepository
                 x => x.Id == id,
                 cancellationToken);
     }
+
+    public async Task<IReadOnlyList<PurchaseOrder>> GetPurchaseOrdersAsync(
+    CancellationToken cancellationToken = default)
+    {
+        return await Context.PurchaseOrders
+            .Include(x => x.Supplier)
+            .OrderByDescending(x => x.OrderDate)
+            .ToListAsync(cancellationToken);
+    }
 }
