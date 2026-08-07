@@ -579,6 +579,79 @@ This milestone marks the transition from building the platform foundation to exp
 
 ---
 
+# Milestone 18 — Purchasing Application Layer
+
+## Summary
+
+Implemented the Application layer for the Purchasing module by exposing the PurchaseOrder aggregate through business-oriented use cases while preserving the Rich Domain Model established during previous sprints.
+
+Completed:
+
+### Commands
+
+- Create Purchase Order
+- Submit Purchase Order
+- Approve Purchase Order
+- Receive Purchase Order
+
+### Queries
+
+- Get Purchase Order
+- Get Purchase Orders
+
+### Supporting Components
+
+- Request / Response models
+- Application handlers
+- Repository integration
+- Purchasing error definitions
+
+---
+
+## Outcome
+
+The Purchasing module became the first workflow-driven business module within the Inventory Management Platform.
+
+Unlike previous CRUD-oriented modules, Purchasing introduced explicit business workflows while preserving the existing Clean Architecture.
+
+Application handlers remained intentionally small by delegating business behavior to the PurchaseOrder aggregate.
+
+The successful implementation confirmed that the architecture scales naturally from CRUD operations to workflow-oriented business processes without requiring structural redesign.
+
+---
+
+## Lessons Learned
+
+- Rich Domain Models simplify Application layer implementation.
+- Workflow-oriented modules benefit from business-focused commands rather than generic CRUD operations.
+- Separate read models improve clarity and reduce coupling between presentation and domain models.
+- Feature-first organization scales effectively as business workflows become more complex.
+- Architecture reviews before implementation reduce technical debt and improve consistency.
+
+---
+
+## Reflection
+
+Sprint 3 demonstrated that the architectural foundation established during previous milestones was sufficient to support significantly more complex business behavior.
+
+The Purchasing module introduced state transitions, aggregate coordination, and workflow-driven business logic while preserving existing architectural boundaries.
+
+Rather than expanding the responsibilities of the Application layer, business behavior was intentionally concentrated within the Domain Model.
+
+This milestone validated several architectural principles adopted throughout the project:
+
+- Rich Domain Model
+- Thin Application Handlers
+- Vertical Slice Architecture
+- Command / Query Separation
+- Business-oriented Repository Design
+
+The result is an Application layer that remains focused on orchestration while the Domain Model owns business rules and workflow transitions.
+
+This milestone represents the project's transition from CRUD-oriented business modules toward workflow-driven enterprise functionality.
+
+---
+
 # Architecture Validation
 
 After implementing:
@@ -616,6 +689,22 @@ Architecture Sprint 1 formally validated these conclusions through a comprehensi
 
 ---
 
+# Workflow Architecture Validation
+
+Sprint 3 extended the architectural validation beyond master data, reporting, and identity management into workflow-driven business processes.
+
+The Purchasing module confirmed that:
+
+- Rich Domain Models scale effectively for business workflows.
+- Existing repository infrastructure supports aggregate-based operations.
+- Feature-first organization remains effective as workflow complexity increases.
+- Request / Response / Handler organization provides a consistent implementation pattern.
+- The existing architecture required no structural redesign to support workflow-based business capabilities.
+
+This milestone validates the architecture's ability to evolve from CRUD-oriented modules into enterprise workflow modules while preserving Clean Architecture principles.
+
+---
+
 # Engineering Principles Reinforced
 
 Throughout development the following principles have consistently guided implementation:
@@ -634,6 +723,10 @@ Throughout development the following principles have consistently guided impleme
 - Use read-only DTO projections for reporting features.
 - Encapsulate framework-specific implementations behind application abstractions.
 - Apply the Rule of Three before introducing shared abstractions.
+- Keep Application handlers focused on orchestration.
+- Model business workflows as explicit commands.
+- Return dedicated read models for query operations.
+- Prefer workflow-oriented business behavior over generic CRUD operations.
 
 ---
 
@@ -653,10 +746,9 @@ The project deliberately applies the Rule of Three to balance maintainability ag
 
 Future milestones are expected to include:
 
-- Account Management
-- Purchasing Module
-- Purchase Receiving
-- Reporting
-- Audit Logging
+- Purchasing Presentation Layer
 - Sales Module
+- Reporting Enhancements
+- Audit Logging
 - REST API
+- Integration Testing

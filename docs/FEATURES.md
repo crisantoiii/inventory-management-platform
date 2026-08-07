@@ -4,7 +4,18 @@
 
 The Inventory Management Platform is a modern ASP.NET Core 10 Razor Pages application built using Clean Architecture principles.
 
-The platform currently provides business modules for Product, Category, Supplier, Customer, Unit, Inventory Transactions, Dashboard Reporting, Authentication, and User Management.
+The platform currently provides business modules for:
+
+- Product
+- Category
+- Supplier
+- Customer
+- Unit
+- Inventory Transactions
+- Purchasing
+- Dashboard Reporting
+- Authentication
+- User Management
 
 Shared infrastructure such as paging, filtering, sorting, the Result pattern, and Identity service abstractions are reused consistently across modules while maintaining a clear separation of concerns.
 
@@ -26,7 +37,7 @@ Outcome:
 - ✅ No structural redesign required
 - ✅ Ready for workflow-driven business modules
 
-The next milestone is **v1.0.0 – Purchasing Module**.
+The next milestone is **v1.1.0 Purchasing Presentation Layer**.
 
 ## Module Summary
 
@@ -42,6 +53,7 @@ The next milestone is **v1.0.0 – Purchasing Module**.
 | Unit Management | ✅ Complete |
 | Inventory Transactions | ✅ Complete |
 | Architecture Sprint | ✅ Complete |
+| Purchasing | 🟨 Application Complete |
 
 ## Current Implementation
 
@@ -56,6 +68,7 @@ Completed modules:
 - ✅ Dashboard
 - ✅ Authentication
 - ✅ User Management
+- ✅ Purchasing Application Layer
 
 Shared capabilities:
 
@@ -259,6 +272,50 @@ Each inventory transaction records:
 
 ---
 
+# Purchasing
+
+## Purchase Order Workflow
+
+- ✅ Create Purchase Order
+- ✅ Get Purchase Order
+- ✅ Get Purchase Orders
+- ✅ Submit Purchase Order
+- ✅ Approve Purchase Order
+- ✅ Receive Purchase Order
+
+## Purchase Order States
+
+```text
+Draft
+
+↓
+
+Submitted
+
+↓
+
+Approved
+
+↓
+
+Receiving
+
+↓
+
+Completed
+```
+
+## Business Rules
+
+- Purchase Orders begin in Draft status.
+- Only Draft Purchase Orders can be modified.
+- Purchase Orders cannot be submitted without items.
+- Only Submitted Purchase Orders can be approved.
+- Only Approved Purchase Orders can receive inventory.
+- Purchase Order completion is determined automatically by the Domain Model.
+
+---
+
 # Dashboard
 
 ## Dashboard Overview
@@ -359,6 +416,9 @@ Features:
 - Cookie Authentication
 - Authorization Policies
 - Identity Service Abstraction
+- Workflow-oriented Application Handlers
+- Rich Domain Model
+- Vertical Slice Architecture
 
 ## Paging
 
@@ -529,6 +589,9 @@ Operation results are standardized using:
 - Thin Application Handlers
 - Rule of Three Refactoring
 - Architecture Sprint Review
+- Workflow-oriented Application Handlers
+- Rich Domain Model
+- Vertical Slice Architecture
 
 ---
 
@@ -572,10 +635,24 @@ Engineering practices include:
 - Engineering Journal
 - Design Decision Records
 - Comprehensive Documentation
+- Sprint Review Process
+- Architecture Validation Reviews
+- Technical Debt Tracking
+- Sprint Retrospectives
 
 ---
 
 # Planned Features
+
+## Purchasing
+
+Remaining work:
+
+- Purchase Order Razor Pages
+- Purchase Order Listing UI
+- Purchase Order Details UI
+- Purchase History
+- User Experience Improvements
 
 ## Account Management
 

@@ -609,6 +609,12 @@ Accepted.
 
 Architecture Sprint 1 concluded that the existing architecture remains stable and is ready for expansion into workflow-driven business domains beginning with the Purchasing Module.
 
+### Validation
+
+Sprint 3 successfully validated this decision through the implementation of the complete Purchasing Application layer.
+
+No architectural redesign was required, confirming that the existing architecture scales effectively from CRUD-oriented modules to workflow-driven business processes.
+
 ---
 
 # Architecture Review Outcome
@@ -623,6 +629,165 @@ The review confirmed that:
 - Future development should prioritize business capabilities rather than architectural restructuring.
 
 This document will continue to evolve only when new architectural decisions become necessary.
+
+---
+
+# DD-020 — Rich Domain Model
+
+Version Introduced: v1.0.0
+
+## Decision
+
+Business behavior is encapsulated within Domain aggregates rather than implemented inside Application handlers.
+
+Examples include:
+
+- PurchaseOrder.Create()
+- PurchaseOrder.AddItem()
+- PurchaseOrder.UpdateItem()
+- PurchaseOrder.RemoveItem()
+- PurchaseOrder.Submit()
+- PurchaseOrder.Approve()
+- PurchaseOrder.Receive()
+
+## Rationale
+
+Application handlers should coordinate workflows rather than implement business rules.
+
+Keeping business behavior inside aggregates:
+
+- Preserves aggregate invariants.
+- Prevents business rule duplication.
+- Simplifies application handlers.
+- Improves maintainability as workflows grow.
+
+## Alternatives Considered
+
+Implement business rules directly inside application handlers.
+
+This approach was rejected because it scatters business logic across multiple use cases and weakens aggregate consistency.
+
+## Outcome
+
+Accepted.
+
+---
+
+# DD-021 — Thin Application Handlers
+
+Version Introduced: v1.0.0
+
+## Decision
+
+Application handlers are responsible only for orchestrating workflows.
+
+Handlers:
+
+- Load aggregates.
+- Invoke domain behavior.
+- Persist changes.
+- Return Result<T>.
+
+Handlers do not contain business rules.
+
+## Rationale
+
+Keeping handlers small improves:
+
+- Readability.
+- Testability.
+- Separation of concerns.
+
+Business decisions remain inside the Domain Model.
+
+## Alternatives Considered
+
+Allow handlers to perform workflow validation and state transitions.
+
+This approach was rejected because it duplicates business rules and leads to an Anemic Domain Model.
+
+## Outcome
+
+Accepted.
+
+---
+
+# DD-022 — Workflow-Oriented Commands
+
+Version Introduced: v1.0.0
+
+## Decision
+
+Commands represent business actions rather than generic CRUD operations.
+
+Examples include:
+
+- SubmitPurchaseOrder
+- ApprovePurchaseOrder
+- ReceivePurchaseOrder
+
+instead of:
+
+- UpdatePurchaseOrderStatus
+
+## Rationale
+
+Business-oriented commands make application behavior explicit and align the codebase with domain terminology.
+
+Benefits include:
+
+- Improved readability.
+- Better alignment with business processes.
+- Easier future extension.
+- Reduced ambiguity.
+
+## Alternatives Considered
+
+Implement a generic status update command.
+
+This approach was rejected because it hides business intent behind technical operations.
+
+## Outcome
+
+Accepted.
+
+---
+
+# DD-023 — Dedicated Read Models
+
+Version Introduced: v1.0.0
+
+## Decision
+
+Queries return dedicated read models rather than exposing Domain entities.
+
+Examples include:
+
+- GetPurchaseOrderResponse
+- GetPurchaseOrderSummaryResponse
+
+Separate read models are used for detail and list views.
+
+## Rationale
+
+Read models should be optimized for presentation rather than persistence.
+
+Benefits include:
+
+- Reduced coupling.
+- Better query performance.
+- Clear separation between commands and queries.
+- Freedom to evolve the Domain independently from the UI.
+
+## Alternatives Considered
+
+Return Domain entities directly to the Presentation layer.
+
+This approach was rejected because it exposes business internals and tightly couples the UI to the Domain Model.
+
+## Outcome
+
+Accepted.
 
 ---
 

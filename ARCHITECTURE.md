@@ -161,6 +161,7 @@ The architecture has been validated through the implementation of:
 - Dashboard Reporting
 - Authentication
 - User Management
+- Purchasing
 
 Each module follows the same layered architecture, repository pattern, CQRS-style application handlers, reusable paging, filtering, and sorting infrastructure, and Razor Pages presentation model.
 
@@ -211,22 +212,51 @@ Example:
 
 ```text
 Features
-└── Users
-    ├── CreateUser
-    ├── GetUsers
-    ├── GetUser
-    ├── UpdateUser
-    ├── UpdateUserRoles
-    └── ResetPassword
+└── Purchasing
+    ├── CreatePurchaseOrder
+    ├── GetPurchaseOrder
+    ├── GetPurchaseOrders
+    ├── SubmitPurchaseOrder
+    ├── ApprovePurchaseOrder
+    └── ReceivePurchaseOrder
 ```
+
+---
+
+# Vertical Slice Architecture
+
+Business capabilities are organized by feature rather than technical type.
+
+Each feature owns its own:
+
+- Request
+- Response
+- Handler
+- Validator (when required)
+
+Examples include:
+
+- CreatePurchaseOrder
+- GetPurchaseOrder
+- SubmitPurchaseOrder
+- ApprovePurchaseOrder
+- ReceivePurchaseOrder
+
+This organization minimizes coupling while improving discoverability and maintainability.
 
 ---
 
 ## Read Model Pattern
 
-The Dashboard demonstrates that reporting concerns can coexist within the same architecture while remaining isolated from transactional domain logic.
+The platform uses dedicated read models for presentation concerns.
 
-Read-only DTO projections avoid unnecessary entity tracking and reduce coupling between reporting and business workflows.
+Examples include:
+
+- Dashboard reporting DTOs
+- GetPurchaseOrderResponse
+- GetPurchaseOrderSummaryResponse
+
+Read models are optimized for presentation while remaining independent from Domain entities.
 
 ---
 
@@ -315,6 +345,26 @@ Entity Framework Core
 
 SQL Server
 ```
+
+# Command and Query Separation
+
+The Application layer distinguishes between commands that modify business state and queries that return optimized read models.
+
+Commands
+
+- Create Purchase Order
+- Submit Purchase Order
+- Approve Purchase Order
+- Receive Purchase Order
+
+Queries
+
+- Get Purchase Order
+- Get Purchase Orders
+
+Commands delegate business behavior to Domain aggregates.
+
+Queries return dedicated DTO projections optimized for presentation.
 
 # Identity Request
 
@@ -456,31 +506,79 @@ Dashboard View
 
 ---
 
-# Future Workflow
+# Purchasing Workflow
 
 ```text
-Purchase Order
+Create Purchase Order
 
 ↓
 
-Application Handler
+Draft
 
 ↓
 
-PurchaseOrder Aggregate
+Submit
 
 ↓
 
-Inventory Transaction
+Submitted
 
 ↓
 
-Product
+Approve
 
 ↓
 
-Save Changes
+Approved
+
+↓
+
+Receive
+
+↓
+
+Receiving
+
+↓
+
+Completed
 ```
+
+The Purchasing workflow is implemented through business-oriented Application handlers that delegate workflow transitions to the PurchaseOrder aggregate.
+
+The Application layer coordinates the workflow while the Domain Model owns all business rules and state transitions.
+
+---
+
+# Workflow-driven Business Modules
+
+The Purchasing module represents the platform's first workflow-driven business capability.
+
+Unlike CRUD-oriented modules, Purchasing models explicit business state transitions:
+
+```text
+Draft
+
+↓
+
+Submitted
+
+↓
+
+Approved
+
+↓
+
+Receiving
+
+↓
+
+Completed
+```
+
+Workflow transitions are implemented through Domain behavior rather than generic data updates.
+
+This demonstrates the architecture's ability to support aggregate-driven enterprise workflows while preserving Clean Architecture principles.
 
 ---
 
@@ -500,6 +598,10 @@ Application Design
 - Feature-first Organization
 - Thin Razor PageModels
 - Thin Application Handlers
+- Vertical Slice Architecture
+- Request / Response / Handler Pattern
+- Dedicated Read Models
+- Workflow-oriented Commands
 
 Engineering Practices
 
@@ -529,9 +631,19 @@ Inventory transactions are treated as historical records and cannot be edited or
 
 Corrections are performed by creating adjustment transactions, preserving a complete audit trail.
 
-## Aggregate Root
+## Aggregate Roots
 
-The Product entity acts as the aggregate root for inventory updates. All inventory changes are performed through Product domain methods to centralize business rules.
+Current aggregate roots include:
+
+### Product
+
+Responsible for inventory operations through domain behavior.
+
+### PurchaseOrder
+
+Responsible for the complete purchasing workflow and owns PurchaseOrderItems.
+
+Business rules and workflow transitions are encapsulated within the aggregate.
 
 ## Read-only Dashboard Projections
 
@@ -544,6 +656,12 @@ The project deliberately introduced an Architecture Sprint before implementing w
 Rather than continuously adding new features, the architecture was reviewed to confirm that existing abstractions remained appropriate.
 
 This milestone established a stable foundation for future business modules without requiring structural redesign.
+
+### Validation
+
+Sprint 3 successfully validated this architectural decision through the implementation of the complete Purchasing Application layer.
+
+The existing architecture supported workflow-driven business processes without requiring structural redesign, confirming that the platform scales naturally from CRUD-oriented modules to aggregate-driven workflows.
 
 ---
 
@@ -578,9 +696,7 @@ The review confirmed that:
 - ASP.NET Core Identity integration preserves architectural separation.
 - Razor Pages maintain consistent UI patterns.
 
-No major architectural redesign was required.
-
-The architecture is considered stable and ready for expansion into Purchasing, Reporting, and future enterprise modules.
+Sprint 3 subsequently validated these findings through the implementation of the Purchasing Application layer, demonstrating that the existing architecture scales successfully into workflow-driven business modules without requiring structural redesign.
 
 ---
 
@@ -588,7 +704,6 @@ The architecture is considered stable and ready for expansion into Purchasing, R
 
 ## Business Modules
 
-- Purchasing
 - Sales
 - Warehouse
 - Reporting

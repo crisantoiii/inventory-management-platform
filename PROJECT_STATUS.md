@@ -1,6 +1,6 @@
 # Overall Progress
 
-████████████████░░░ 80%
+████████████████░░░ 85%
 
 Foundation
 ████████████████████ 100%
@@ -18,11 +18,11 @@ Reporting
 ░░░░░░░░░░░░░░░░░░░░ 0%
 
 Purchase Orders
-░░░░░░░░░░░░░░░░░░░░ 0%
+███████████░░░░░░░░░ 50%
 
 # Project Status
 
-**Current Version:** v0.9.0
+**Current Version:** v1.0.0
 
 **Project Status:** Active Development
 
@@ -30,19 +30,20 @@ Purchase Orders
 
 # Latest Release
 
-## v0.9.0 — Architecture Sprint 1
+## v1.0.0 — Purchasing Application Layer
 
 Released: August 2026
 
 Completed:
 
-- Architecture Sprint 1
-- Application layer review
-- Infrastructure layer review
-- Web layer review
-- Architecture validation
-- IdentityService improvements
-- Documentation updates
+- Purchasing Application Layer
+- Create Purchase Order
+- Get Purchase Order
+- Get Purchase Orders
+- Submit Purchase Order
+- Approve Purchase Order
+- Receive Purchase Order
+- Workflow Architecture Validation
 
 ---
 
@@ -57,6 +58,8 @@ Completed:
 - ✅ v0.7.0 - Dashboard
 - ✅ v0.8.0 - Authentication & User Management
 - ✅ v0.9.0 - Architecture Sprint 1
+- ✅ v1.0.0 - Purchasing Application Layer
+- 🔄 v1.1.0 - Purchasing Presentation Layer
 
 ---
 
@@ -64,8 +67,8 @@ Completed:
 
 - **Completed Modules:** 9
 - **Architecture Status:** Validated
-- **Current Milestone:** Architecture Sprint 1 Complete
-- **Next Milestone:** v1.0.0 Purchasing Module
+- **Current Milestone:** Purchasing Application Layer Complete
+- **Next Milestone:** Purchasing Presentation Layer
 
 ---
 
@@ -106,6 +109,7 @@ The architecture has been validated and is considered stable for future business
 | Dashboard | ✅ Complete | 100% |
 | Authentication & Authorization |  ✅ Complete | 100% |
 | User Management | ✅ Complete | 100% |
+| Purchasing | 🟨 Application Complete | 50% |
 | Reporting | ⬜ Not Started | 0% |
 | Account Management | ⬜ Not Started | 0% |
 
@@ -232,6 +236,17 @@ The architecture has been validated and is considered stable for future business
 - ✅ Server-side Sorting
 - ✅ Status Filtering
 
+## Purchasing
+
+- ✅ Create Purchase Order
+- ✅ Get Purchase Order
+- ✅ Get Purchase Orders
+- ✅ Submit Purchase Order
+- ✅ Approve Purchase Order
+- ✅ Receive Purchase Order
+- ✅ Rich Domain Workflow
+- ✅ CQRS-style Application Layer
+
 ---
 
 # Shared Infrastructure
@@ -253,26 +268,29 @@ The architecture has been validated and is considered stable for future business
 - ✅ Identity Service Abstraction
 - ✅ Shared Result Pattern
 - ✅ Shared User Sorting Infrastructure
+- ✅ Vertical Slice Architecture
+- ✅ Workflow-oriented Application Handlers
+- ✅ Rich Domain Model
 
 ---
 
 # Current Focus
 
-v1.0.0 – Purchasing Module
+v1.0.0 – Purchasing Presentation Layer
 
 Objectives
 
-- Design Purchase Order aggregate
-- Implement purchasing workflow
-- Integrate inventory receiving
-- Record automatic inventory transactions
-- Expand business capabilities without architectural changes
+- Razor Pages
+- Purchase Order UI
+- Workflow Actions
+- Validation
+- End-to-end Integration
 
 ---
 
 # Next Milestone
 
-## v1.0.0 – Purchasing Module
+## v1.1.0 – Purchasing Presentation Layer
 
 Planned Activities
 
@@ -292,9 +310,13 @@ Current version does not yet include:
 
 Business Modules
 
-- Purchase Orders
 - Sales Orders
 - Reporting
+
+Purchasing
+
+- Purchase Order UI
+- Purchase History
 
 Account Features
 
@@ -319,3 +341,9 @@ The architecture has now been validated through master data modules, transaction
 Architecture Sprint 1 validated the solution across the Application, Infrastructure, and Web layers.
 
 The review concluded that no architectural redesign was required, confirming that the project is ready for continued expansion beginning with the Purchasing module.
+
+Sprint 3 successfully extended this validation into workflow-driven business processes through the Purchasing module.
+
+The Application layer now supports complete Purchase Order workflows while preserving the Rich Domain Model, Vertical Slice Architecture, and Clean Architecture boundaries established during earlier milestones.
+
+This confirms that the existing architecture scales effectively from CRUD-oriented modules to aggregate-driven enterprise workflows without structural redesign.

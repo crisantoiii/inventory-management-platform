@@ -1,5 +1,73 @@
 # Changelog
 
+## [v1.0.0] - 2026-08-07
+
+### Release Summary
+
+This release introduces the Application layer for the Purchasing module, extending the platform beyond CRUD-oriented business modules into workflow-driven business processes.
+
+The Purchasing module demonstrates the successful application of the Rich Domain Model, Vertical Slice Architecture, and business-oriented application handlers without requiring changes to the existing Clean Architecture.
+
+---
+
+### Added
+
+#### Purchasing Module
+
+- Create Purchase Order
+- Get Purchase Order
+- Get Purchase Orders
+- Submit Purchase Order
+- Approve Purchase Order
+- Receive Purchase Order
+
+#### Application Layer
+
+- Purchase Order command handlers
+- Purchase Order query handlers
+- Request / Response models
+- Purchasing error definitions
+- Repository integration for Purchasing workflows
+
+---
+
+### Changed
+
+- Extended the Application layer with workflow-oriented business capabilities.
+- Introduced dedicated read models for Purchasing queries.
+- Standardized Purchasing handlers using the established Request / Response / Handler pattern.
+- Expanded the Domain-driven workflow through the Application layer without modifying architectural boundaries.
+
+---
+
+### Improved
+
+- Preserved thin Application handlers by delegating business behavior to the PurchaseOrder aggregate.
+- Maintained consistent Vertical Slice Architecture across all Purchasing features.
+- Reused existing Repository, Unit of Work, and Result pattern infrastructure.
+- Validated the architecture's ability to support workflow-driven business modules.
+
+---
+
+### Documentation
+
+- Added SPRINT_03_APPLICATION.md
+- Updated ARCHITECTURE
+- Updated DESIGN_DECISIONS
+- Updated ENGINEERING_JOURNAL
+- Updated FEATURES
+- Updated PROJECT_STATUS
+
+---
+
+### Outcome
+
+The Purchasing module became the first workflow-oriented business module within the platform.
+
+This release validates that the existing architecture successfully scales from CRUD-based modules to aggregate-driven business workflows while preserving Clean Architecture principles.
+
+---
+
 ## [v0.9.0] - 2026-08-04
 
 ### Release Summary
@@ -85,6 +153,8 @@ The project is now ready to begin implementation of the **Purchasing Module (v1.
 
 All notable changes to this project will be documented in this file.
 
+---
+
 ## [v0.8.0] - 2026-08-01
 
 ### Release Summary
@@ -143,6 +213,8 @@ This release introduces a complete Identity and User Management subsystem built 
 - Maintained consistent feature-first organization across Identity and business modules.
 - Preserved Clean Architecture boundaries while integrating authentication and authorization.
 
+---
+
 ## [v0.7.0] - 2026-07-27
 
 ### Added
@@ -187,6 +259,8 @@ This release introduces a complete Identity and User Management subsystem built 
 - Enhanced dashboard usability with transaction badges and low stock indicators.
 - Formatted inventory value for improved readability.
 - Added user-friendly empty state messages when dashboard widgets contain no data.
+
+---
 
 ## [v0.6.0] - 2026-07-25
 

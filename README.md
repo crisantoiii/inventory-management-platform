@@ -1,6 +1,5 @@
 # Inventory Management Platform
-
-**Inventory Management Platform** is a production-style **ASP.NET Core** application built using **Clean Architecture**, **CQRS-inspired application services**, **ASP.NET Core Identity**, and **Entity Framework Core**. The project demonstrates enterprise software design principles through modular business features, role-based security, reusable infrastructure, and maintainable application architecture.
+> A production-style Inventory Management Platform built with **ASP.NET Core 10**, **Clean Architecture**, **Rich Domain Modeling**, **CQRS-inspired Application Layer**, and **Entity Framework Core**. The project demonstrates enterprise software development practices through modular business capabilities, workflow-driven domain models, and maintainable architecture.
 
 The project is designed as a production-style portfolio application that demonstrates enterprise software development practices including layered architecture, reusable infrastructure, server-side data processing, and maintainable code organization.
 
@@ -18,6 +17,10 @@ The project is designed as a production-style portfolio application that demonst
 - Business analytics dashboard
 - ASP.NET Core Identity Authentication
 - Enterprise User Management
+- Workflow-driven Purchasing module
+- Rich Domain Model
+- Vertical Slice Architecture
+
 
 ---
 
@@ -31,7 +34,7 @@ The focus is not only on implementing business features but also on applying pro
 
 ## Project Status
 
-**Current Version:** v0.9.0 – Architecture Validated
+**Current Version:** v1.0.0 – Purchasing Application Layer
 
 ## Completed Modules
 
@@ -44,18 +47,19 @@ The focus is not only on implementing business features but also on applying pro
 - ✅ Dashboard
 - ✅ Authentication & Authorization
 - ✅ User Management
+- 🟨 Purchasing (Application Layer Complete)
 
-## Latest Release (v0.9.0)
+## Latest Release 
 
-Architecture Sprint 1 completed.
+### v1.0.0 — Purchasing Application Layer
 
-Highlights:
+Highlights
 
-- Validated Clean Architecture across all layers
-- Reviewed Application, Infrastructure, and Web architecture
-- Improved IdentityService error handling
-- Standardized naming consistency
-- Confirmed architecture scalability for future business modules
+- Implemented Purchase Order workflows
+- Introduced workflow-driven business processes
+- Added CQRS-style command and query handlers
+- Validated Rich Domain Model architecture
+- Extended architecture without structural redesign
 
 
 ---
@@ -63,6 +67,10 @@ Highlights:
 ## Architecture Validation
 
 The project completed **Architecture Sprint 1**, a comprehensive architectural review covering the Application, Infrastructure, and Web layers.
+
+Sprint 3 successfully validated the architecture by implementing the first workflow-driven business module (Purchasing) without requiring architectural redesign.
+
+This confirmed that the existing architecture scales from CRUD-oriented modules to workflow-driven business processes without requiring structural redesign.
 
 ### Review Outcome
 
@@ -122,6 +130,11 @@ The long-term goal is to evolve this project into a complete inventory managemen
 - Feature-first Organization
 - ASP.NET Core Identity Isolation
 - Engineering Documentation
+- Rich Domain Model
+- Vertical Slice Architecture
+- Workflow-driven Business Processes
+- Dedicated Read Models
+- Business-oriented Application Handlers
 
 ---
 
@@ -227,6 +240,53 @@ The long-term goal is to evolve this project into a complete inventory managemen
 - ✅ Stock validation
 - ✅ Inventory audit trail
 
+## Purchasing
+
+### Implemented Features
+
+- ✅ Create Purchase Order
+- ✅ Get Purchase Order
+- ✅ Get Purchase Orders
+- ✅ Submit Purchase Order
+- ✅ Approve Purchase Order
+- ✅ Receive Purchase Order
+
+### Workflow
+```text
+Draft
+
+↓
+
+Submitted
+
+↓
+
+Approved
+
+↓
+
+Receiving
+
+↓
+
+Completed
+```
+
+### Architectural Highlights
+
+- Rich Domain Model
+- Vertical Slice Architecture
+- Workflow-driven Business Processes
+- Dedicated Read Models
+- Business-oriented Application Handlers
+
+### Domain Design
+
+- Rich Domain Model
+- Workflow-driven state transitions
+- Aggregate-based business behavior
+- Thin Application handlers
+
 ## Dashboard
 
 ### Dashboard Overview
@@ -317,6 +377,32 @@ Persist Inventory Transaction
 Return Result
 ```
 
+## Purchasing Workflow
+
+```text
+Create Purchase Order
+
+↓
+
+Application Handler
+
+↓
+
+PurchaseOrder Aggregate
+
+↓
+
+Repository
+
+↓
+
+Save Changes
+
+↓
+
+Result
+```
+
 The Dashboard demonstrates how multiple read models can be composed through the Application layer while preserving the separation between presentation, business logic, and persistence.
 
 Responsibilities:
@@ -357,6 +443,10 @@ Application Handler
 
 ↓
 
+Domain Aggregate
+
+↓
+
 Repository / IdentityService
 
 ↓
@@ -364,8 +454,9 @@ Repository / IdentityService
 Entity Framework Core
 
 ↓
-```
+
 SQL Server
+```
 
 ## Architectural Principles
 
@@ -376,6 +467,11 @@ SQL Server
 - Business logic isolated from the Presentation layer
 - ASP.NET Core Identity encapsulated behind IIdentityService
 - Incremental refactoring guided by the Rule of Three
+- Vertical Slice Architecture
+- Request / Response / Handler pattern
+- Rich Domain Model
+- Workflow-oriented business commands
+- Dedicated Read Models
 
 ---
 
@@ -415,6 +511,10 @@ No major architectural redesign was required.
 - Feature-first Architecture
 - Architecture Review Process
 - Rule of Three Refactoring
+- Vertical Slice Architecture
+- Rich Domain Model
+- Workflow-driven Business Processes
+- Dedicated Read Models
 
 ---
 
@@ -430,6 +530,9 @@ No major architectural redesign was required.
 - Authentication uses ASP.NET Core Identity.
 - Administrative user management is separated from self-service account management.
 - Business logic remains outside the Razor Pages.
+- Purchase Orders are implemented as workflow-driven aggregates.
+- Business behavior resides inside Domain entities.
+- Application handlers orchestrate workflows rather than implement business rules.
 
 ---
 
@@ -463,7 +566,7 @@ Reusable infrastructure has been implemented to support future modules.
 - Result
 - Result\<T>
 
-This infrastructure is currently shared across the Product, Category, Supplier, Customer, Unit, and Inventory Transaction modules.
+This infrastructure is currently shared across the Product, Category, Supplier, Customer, Unit, Inventory Transaction, and Purchasing modules.
 
 ---
 
@@ -513,7 +616,7 @@ Development Tools
 | Dashboard | ✅ Complete |
 | Authentication & Authorization | ✅ Complete |
 | User Management | ✅ Complete |
-| Purchase Orders | ⬜ Planned |
+| Purchasing | 🟨 Application Layer Complete (UI Pending) |
 | Reporting | ⬜ Planned |
 
 ---
@@ -535,7 +638,7 @@ Development Tools
 
 ## Next
 
-- Purchasing Module (v1.0.0)
+- v1.1.0 — Purchasing Presentation Layer
 
 ## Future
 
@@ -615,6 +718,11 @@ The following screenshots demonstrate the current implementation:
 ![User Roles](docs/screenshots/users_roles.png)
 ![Reset Password](docs/screenshots/user_reset.png)
 ![Deact/Activate User](docs/screenshots/user_deact.png)
+
+### Purchasing
+
+> Screenshots will be added after the Purchasing Presentation Layer is completed.
+
 ---
 
 # Learning Objectives
@@ -637,6 +745,10 @@ This project is focused on applying modern enterprise development practices incl
 - Rule of Three Refactoring
 - Enterprise Code Review
 - Architecture Validation
+- Rich Domain Modeling
+- Workflow-driven Enterprise Applications
+- Vertical Slice Architecture
+- Aggregate Design
 
 ---
 
