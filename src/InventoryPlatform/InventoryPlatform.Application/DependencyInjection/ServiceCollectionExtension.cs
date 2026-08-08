@@ -51,6 +51,13 @@ using InventoryPlatform.Application.Features.Users.UpdateUserRoles;
 using InventoryPlatform.Application.Features.Users.UpdateUserStatus;
 using InventoryPlatform.Application.Features.Users.ResetPassword;
 
+using InventoryPlatform.Application.Features.Purchasing.GetPurchaseOrders;
+using InventoryPlatform.Application.Features.Purchasing.GetPurchaseOrder;
+using InventoryPlatform.Application.Features.Purchasing.CreatePurchaseOrder;
+using InventoryPlatform.Application.Features.Purchasing.SubmitPurchaseOrder;
+using InventoryPlatform.Application.Features.Purchasing.ApprovePurchaseOrder;
+using InventoryPlatform.Application.Features.Purchasing.ReceivePurchaseOrder;
+
 namespace InventoryPlatform.Application.DependencyInjection;
 
 public static class ServiceCollectionExtensions
@@ -108,6 +115,13 @@ public static class ServiceCollectionExtensions
         services.AddScoped<UpdateUserRolesHandler>();
         services.AddScoped<UpdateUserStatusHandler>();
         services.AddScoped<ResetPasswordHandler>();
+
+        services.AddScoped<GetPurchaseOrdersHandler>();
+        services.AddScoped<GetPurchaseOrderHandler>();
+        services.AddScoped<CreatePurchaseOrderHandler>();
+        services.AddScoped<SubmitPurchaseOrderHandler>();
+        services.AddScoped<ApprovePurchaseOrderHandler>();
+        services.AddScoped<ReceivePurchaseOrderHandler>();
 
         services.AddValidatorsFromAssembly(
             typeof(ServiceCollectionExtensions).Assembly);
