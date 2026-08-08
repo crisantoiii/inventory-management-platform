@@ -1,0 +1,96 @@
+﻿@page
+@model InventoryPlatform.Web.Pages.Purchasing.PurchaseOrders.IndexModel
+
+@{
+    ViewData["Title"] = "Purchase Orders";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-1">Purchase Orders</h1>
+            <p class="text-muted mb-0">
+                View and manage purchase orders.
+            </p>
+        </div>
+
+        <a asp-page="./Create" class="btn btn-primary">
+            Create Purchase Order
+        </a>
+    </div>
+
+    @if (TempData["SuccessMessage"] is string successMessage)
+    {
+        <div class="alert alert-success" role="alert">
+            @successMessage
+        </div>
+    }
+
+    <div asp-validation-summary="ModelOnly"
+         class="text-danger mb-3"></div>
+
+    @if (Model.PurchaseOrders.Count == 0)
+    {
+        <div class="alert alert-info">
+            No purchase orders found.
+        </div>
+    }
+    else
+    {
+        <div class="card">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Supplier</th>
+                                <th>Order Date</th>
+                                <th>Status</th>
+                                <th class="text-end">Total</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @foreach (var purchaseOrder in Model.PurchaseOrders)
+                            {
+                                <tr>
+                                    <td>
+                                        @purchaseOrder.Id
+                                    </td>
+
+                                    <td>
+                                        @purchaseOrder.SupplierName
+                                    </td>
+
+                                    <td>
+                                        @purchaseOrder.OrderDate.ToString("MMM dd, yyyy")
+                                    </td>
+
+                                    <td>
+                                        <span class="badge bg-secondary">
+                                            @purchaseOrder.Status
+                                        </span>
+                                    </td>
+
+                                    <td class="text-end">
+                                        @purchaseOrder.TotalAmount.ToString("N2")
+                                    </td>
+
+                                    <td class="text-end">
+                                        <a asp-page="./Details"
+                                           asp-route-id="@purchaseOrder.Id"
+                                           class="btn btn-sm btn-outline-primary">
+                                            Details
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+</div>

@@ -1,0 +1,3 @@
+﻿namespace InventoryPlatform.Application.Features.Purchasing.GetPurchaseOrders;
+
+public sealed record GetPurchaseOrdersRequest;

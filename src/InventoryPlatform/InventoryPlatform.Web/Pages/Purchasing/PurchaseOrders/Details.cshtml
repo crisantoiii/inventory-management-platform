@@ -1,0 +1,246 @@
+﻿@page "{id:int}"
+@model InventoryPlatform.Web.Pages.Purchasing.PurchaseOrders.DetailsModel
+@using InventoryPlatform.Domain.Enums
+
+@{
+    ViewData["Title"] = "Purchase Order Details";
+}
+
+<div class="container-fluid">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-1">Purchase Order Details</h1>
+            <p class="text-muted mb-0">
+                View purchase order information and items.
+            </p>
+        </div>
+
+        <a asp-page="./Index" class="btn btn-outline-secondary">
+            Back to Purchase Orders
+        </a>
+    </div>
+
+    @if (Model.PurchaseOrder is not null)
+    {
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+
+                <h5 class="mb-0">Purchase Order Information</h5>
+
+                @if (Model.PurchaseOrder.Status == PurchaseOrderStatus.Draft)
+                {
+                    <form method="post" asp-page-handler="Submit">
+                        <input type="hidden" name="id" value="@Model.PurchaseOrder.Id" />
+                        <button type="submit" class="btn btn-primary">
+                            Submit Purchase Order
+                        </button>
+                    </form>
+                }
+
+                @if (Model.PurchaseOrder.Status == PurchaseOrderStatus.Submitted)
+                {
+                    <form method="post" asp-page-handler="Approve">
+                        <input type="hidden" name="id" value="@Model.PurchaseOrder.Id" />
+                        <button type="submit" class="btn btn-primary">
+                            Approve Purchase Order
+                        </button>
+                    </form>
+                }
+
+            </div>
+
+            <div class="card-body">
+                <div class="row g-3">
+
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">ID</label>
+                        <div class="fw-semibold">
+                            @Model.PurchaseOrder.Id
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Supplier</label>
+                        <div class="fw-semibold">
+                            @Model.PurchaseOrder.SupplierName
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Order Date</label>
+                        <div>
+                            @Model.PurchaseOrder.OrderDate.ToString("MMM dd, yyyy")
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Expected Delivery</label>
+                        <div>
+                            @Model.PurchaseOrder.ExpectedDeliveryDate?.ToString("MMM dd, yyyy")
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Status</label>
+                        <div>
+                            <span class="badge bg-secondary">
+                                @Model.PurchaseOrder.Status
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Total Amount</label>
+                        <div class="fw-semibold">
+                            @Model.PurchaseOrder.TotalAmount.ToString("N2")
+                        </div>
+                    </div>
+
+                    @if (!string.IsNullOrWhiteSpace(Model.PurchaseOrder.Remarks))
+                    {
+                        <div class="col-12">
+                            <label class="form-label text-muted">Remarks</label>
+                            <div>
+                                @Model.PurchaseOrder.Remarks
+                            </div>
+                        </div>
+                    }
+
+                </div>
+            </div>
+        </div>
+
+        @if (TempData["SuccessMessage"] is string successMessage)
+        {
+            <div class="alert alert-success" role="alert">
+                @successMessage
+            </div>
+        }
+
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Purchase Order Items</h5>
+            </div>
+
+            <div class="card-body p-0">
+                @if (Model.PurchaseOrder.Items.Count == 0)
+                {
+                    <div class="p-3">
+                        <div class="alert alert-info mb-0">
+                            This purchase order has no items.
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>SKU</th>
+                                    <th>Product</th>
+                                    <th class="text-end">Quantity</th>
+                                    <th class="text-end">Unit Cost</th>
+                                    <th class="text-end">Line Total</th>
+                                    <th class="text-end">Received</th>
+                                    <th class="text-end">Remaining</th>
+                                    <th class="text-end">Receiving</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                @foreach (var item in Model.PurchaseOrder.Items)
+                                {
+                                    <tr>
+                                        <td>
+                                            @item.ProductSku
+                                        </td>
+
+                                        <td>
+                                            @item.ProductName
+                                        </td>
+
+                                        <td class="text-end">
+                                            @item.Quantity.ToString("N2")
+                                        </td>
+
+                                        <td class="text-end">
+                                            @item.UnitCost.ToString("N2")
+                                        </td>
+
+                                        <td class="text-end">
+                                            @item.LineTotal.ToString("N2")
+                                        </td>
+
+                                        <td class="text-end">
+                                            @item.ReceivedQuantity.ToString("N2")
+                                        </td>
+
+                                        <td class="text-end">
+                                            @item.RemainingQuantity.ToString("N2")
+                                        </td>
+
+                                        <td class="text-end">
+                                            @if (item.IsFullyReceived)
+                                            {
+                                                <span class="badge bg-success">
+                                                    Fully Received
+                                                </span>
+                                            }
+                                            else if (Model.PurchaseOrder.Status == PurchaseOrderStatus.Approved ||
+                                                     Model.PurchaseOrder.Status == PurchaseOrderStatus.Receiving)
+                                            {
+                                                <form method="post"
+                                                      asp-page-handler="Receive"
+                                                      class="d-flex justify-content-end align-items-center gap-2">
+
+                                                    <input type="hidden"
+                                                           name="purchaseOrderId"
+                                                           value="@Model.PurchaseOrder.Id" />
+
+                                                    <input type="hidden"
+                                                           name="productId"
+                                                           value="@item.ProductId" />
+
+                                                    <input type="number"
+                                                           name="quantity"
+                                                           value="@item.RemainingQuantity"
+                                                           min="0.01"
+                                                           max="@item.RemainingQuantity"
+                                                           step="0.01"
+                                                           class="form-control form-control-sm"
+                                                           style="width: 110px;" />
+
+                                                    <button type="submit"
+                                                            class="btn btn-sm btn-primary">
+                                                        Receive
+                                                    </button>
+                                                </form>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+
+                            <tfoot>
+                                <tr>
+                                    <th colspan="4" class="text-end">
+                                        Total
+                                    </th>
+
+                                    <th class="text-end">
+                                        @Model.PurchaseOrder.TotalAmount.ToString("N2")
+                                    </th>
+
+                                    <th colspan="2"></th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+    
+    }
+</div>

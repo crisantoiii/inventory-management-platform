@@ -1,6 +1,6 @@
-# Overall Progress
+## Overall Progress
 
-████████████████░░░ 80%
+████████████████░░░ 85%
 
 Foundation
 ████████████████████ 100%
@@ -14,15 +14,16 @@ Master Data
 Inventory
 ████████████████████ 100%
 
+Purchase Orders
+████████████████████ 100%
+
 Reporting
 ░░░░░░░░░░░░░░░░░░░░ 0%
 
-Purchase Orders
-░░░░░░░░░░░░░░░░░░░░ 0%
 
 # Project Status
 
-**Current Version:** v0.9.0
+**Current Version:** v1.1.0
 
 **Project Status:** Active Development
 
@@ -30,19 +31,25 @@ Purchase Orders
 
 # Latest Release
 
-## v0.9.0 — Architecture Sprint 1
+## v1.1.0 — Purchasing Presentation Layer
 
 Released: August 2026
 
 Completed:
 
-- Architecture Sprint 1
-- Application layer review
-- Infrastructure layer review
-- Web layer review
-- Architecture validation
-- IdentityService improvements
-- Documentation updates
+- Purchasing Presentation Layer
+- Purchase Order Index
+- Create Purchase Order
+- Purchase Order Details
+- Submit Purchase Order
+- Approve Purchase Order
+- Partial Purchase Order Receiving
+- Final Purchase Order Receiving
+- Purchase Order Completed State
+- Presentation Validation
+- Success and Failure Feedback
+- End-to-end Purchasing Workflow Validation
+- Workflow Architecture Validation
 
 ---
 
@@ -57,6 +64,8 @@ Completed:
 - ✅ v0.7.0 - Dashboard
 - ✅ v0.8.0 - Authentication & User Management
 - ✅ v0.9.0 - Architecture Sprint 1
+- ✅ v1.0.0 - Purchasing Application Layer
+- ✅ v1.1.0 - Purchasing Presentation Layer
 
 ---
 
@@ -64,8 +73,8 @@ Completed:
 
 - **Completed Modules:** 9
 - **Architecture Status:** Validated
-- **Current Milestone:** Architecture Sprint 1 Complete
-- **Next Milestone:** v1.0.0 Purchasing Module
+- **Current Milestone:** Purchasing Presentation Layer Complete
+- **Next Milestone:** Future Purchasing Enhancements / Next Business Module
 
 ---
 
@@ -106,6 +115,7 @@ The architecture has been validated and is considered stable for future business
 | Dashboard | ✅ Complete | 100% |
 | Authentication & Authorization |  ✅ Complete | 100% |
 | User Management | ✅ Complete | 100% |
+| Purchasing | 🟨 Presentation Complete | 100% |
 | Reporting | ⬜ Not Started | 0% |
 | Account Management | ⬜ Not Started | 0% |
 
@@ -197,7 +207,7 @@ The architecture has been validated and is considered stable for future business
 - ✅ Product Quantity Updates
 - ✅ Immutable Transaction History
 
-# Dashboard
+## Dashboard
 
 - ✅ Dashboard Overview
 - ✅ Inventory Statistics
@@ -232,6 +242,40 @@ The architecture has been validated and is considered stable for future business
 - ✅ Server-side Sorting
 - ✅ Status Filtering
 
+## Purchasing
+
+### Application Layer
+
+- ✅ Create Purchase Order
+- ✅ Get Purchase Order
+- ✅ Get Purchase Orders
+- ✅ Submit Purchase Order
+- ✅ Approve Purchase Order
+- ✅ Receive Purchase Order
+- ✅ Rich Domain Workflow
+- ✅ CQRS-style Application Layer
+
+### Presentation Layer
+
+- ✅ Purchase Order Listing
+- ✅ Create Purchase Order
+- ✅ Purchase Order Details
+- ✅ Submit Purchase Order
+- ✅ Approve Purchase Order
+- ✅ Partial Purchase Order Receiving
+- ✅ Final Purchase Order Receiving
+- ✅ Completed Purchase Order State
+- ✅ Supplier Selection
+- ✅ Product Selection
+- ✅ Ordered Quantity Display
+- ✅ Received Quantity Display
+- ✅ Remaining Quantity Display
+- ✅ Calculated Purchase Order Total
+- ✅ Client-side Validation
+- ✅ Domain Validation
+- ✅ Success Messages
+- ✅ Query Failure Feedback
+
 ---
 
 # Shared Infrastructure
@@ -253,36 +297,42 @@ The architecture has been validated and is considered stable for future business
 - ✅ Identity Service Abstraction
 - ✅ Shared Result Pattern
 - ✅ Shared User Sorting Infrastructure
+- ✅ Vertical Slice Architecture
+- ✅ Workflow-oriented Application Handlers
+- ✅ Rich Domain Model
 
 ---
 
 # Current Focus
 
-v1.0.0 – Purchasing Module
+v1.1.0 – Purchasing Presentation Layer Complete
 
-Objectives
+The Purchasing vertical slice has been completed through the Presentation layer and verified end-to-end using persisted database records.
 
-- Design Purchase Order aggregate
-- Implement purchasing workflow
-- Integrate inventory receiving
-- Record automatic inventory transactions
-- Expand business capabilities without architectural changes
+Completed:
+
+- Razor Pages
+- Purchase Order UI
+- Workflow Actions
+- Validation
+- Success and failure feedback
+- End-to-end Integration
 
 ---
 
 # Next Milestone
 
-## v1.0.0 – Purchasing Module
+The next milestone has not yet been formally defined.
 
-Planned Activities
+Potential future work includes:
 
-- Purchase Orders
-- Purchase Order Items
-- Purchase Order Workflow
-- Approval Process
-- Receiving Process
-- Inventory Integration
-- Purchase History
+- Purchasing enhancements
+- Inventory integration for Purchase Order receiving
+- Cross-cutting DomainException handling
+- Multiple Purchase Order item management
+- Purchase Order search, filtering, sorting, and pagination
+- Additional reporting capabilities
+- Sales module
 
 ---
 
@@ -292,9 +342,15 @@ Current version does not yet include:
 
 Business Modules
 
-- Purchase Orders
 - Sales Orders
 - Reporting
+
+Purchasing
+
+- Purchase History
+- Multiple Purchase Order item management in the Create UI
+- Purchase Order search, filtering, sorting, and pagination
+- Inventory synchronization during Purchase Order receiving
 
 Account Features
 
@@ -312,10 +368,52 @@ Platform
 
 # Overall Assessment
 
-The Dashboard, Product, Category, Supplier, Customer, Unit, and Inventory Transaction modules are feature-complete for the current release.
+The Dashboard, Product, Category, Supplier, Customer, Unit, and Inventory Transaction modules are feature-complete for their current planned scope.
 
-The architecture has now been validated through master data modules, transactional workflows, dashboard reporting, authentication, and comprehensive user management. The successful implementation of ASP.NET Core Identity alongside the existing application architecture demonstrates that the solution scales across both business and security domains while maintaining clean separation of concerns.
+The architecture has been validated through master data modules, transactional workflows, dashboard reporting, authentication, comprehensive user management, and the Purchasing workflow.
 
-Architecture Sprint 1 validated the solution across the Application, Infrastructure, and Web layers.
+Architecture Sprint 1 validated the solution across the Application, Infrastructure, and Web layers and concluded that no architectural redesign was required.
 
-The review concluded that no architectural redesign was required, confirming that the project is ready for continued expansion beginning with the Purchasing module.
+Sprint 3 extended this validation into workflow-driven business processes through the Purchasing Application layer.
+
+Sprint 4 extended the Purchasing workflow into the Presentation layer, providing a usable Razor Pages interface for:
+
+- Purchase Order listing
+- Purchase Order creation
+- Purchase Order details
+- Submission
+- Approval
+- Partial receiving
+- Final receiving
+
+The complete Purchase Order lifecycle was verified through actual browser interactions and persisted database records:
+
+```text
+Draft
+  ↓ Submit
+Submitted
+  ↓ Approve
+Approved
+  ↓ Receive partial quantity
+Receiving
+  ↓ Receive remaining quantity
+Completed
+```
+
+The successful implementation confirms that the existing architecture supports a complete workflow-driven vertical slice across:
+
+```text
+Presentation
+     ↓
+Application
+     ↓
+Domain
+     ↓
+Infrastructure
+     ↓
+Database
+```
+
+without structural redesign.
+
+The Purchasing module is now ready for future enhancements while the platform remains in active development.

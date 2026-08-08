@@ -40,9 +40,11 @@ Rather than documenting daily work, it captures important architectural decision
 | 12 | Product Foundation |
 | 13 | Inventory Transactions |
 | 14 | Dashboard |
-| 15 | Authentication & Authorization|
+| 15 | Authentication & Authorization |
 | 16 | User Management |
 | 17 | Architecture Sprint 1 |
+| 18 | Purchasing Application Layer |
+| 19 | Purchasing Presentation Layer |
 
 ---
 
@@ -116,9 +118,9 @@ After validating the implementation, paging was extracted into reusable infrastr
 
 Introduced:
 
-- PagedRequest
-- PagedQuery
-- PagedResult<T>
+- `PagedRequest`
+- `PagedQuery`
+- `PagedResult<T>`
 
 ### Lesson Learned
 
@@ -156,7 +158,7 @@ Initially, sort definitions were implemented for the Product module before being
 
 Later refactored to:
 
-InventoryPlatform.Shared.Sorting
+`InventoryPlatform.Shared.Sorting`
 
 ### Reason
 
@@ -189,6 +191,7 @@ Added:
 
 Repository pipeline became:
 
+```text
 Status
 
 ↓
@@ -206,7 +209,7 @@ Sort
 ↓
 
 Paging
-
+```
 ### Lesson Learned
 
 Applying filters before sorting and paging results in a cleaner and more efficient query pipeline.
@@ -579,6 +582,347 @@ This milestone marks the transition from building the platform foundation to exp
 
 ---
 
+# Milestone 18 — Purchasing Application Layer
+
+## Summary
+
+Implemented the Application layer for the Purchasing module by exposing the PurchaseOrder aggregate through business-oriented use cases while preserving the Rich Domain Model established during previous sprints.
+
+Completed:
+
+### Commands
+
+- Create Purchase Order
+- Submit Purchase Order
+- Approve Purchase Order
+- Receive Purchase Order
+
+### Queries
+
+- Get Purchase Order
+- Get Purchase Orders
+
+### Supporting Components
+
+- Request / Response models
+- Application handlers
+- Repository integration
+- Purchasing error definitions
+
+---
+
+## Outcome
+
+The Purchasing module became the first workflow-driven business module within the Inventory Management Platform.
+
+Unlike previous CRUD-oriented modules, Purchasing introduced explicit business workflows while preserving the existing Clean Architecture.
+
+Application handlers remained intentionally small by delegating business behavior to the PurchaseOrder aggregate.
+
+The successful implementation confirmed that the architecture scales naturally from CRUD operations to workflow-oriented business processes without requiring structural redesign.
+
+---
+
+## Lessons Learned
+
+- Rich Domain Models simplify Application layer implementation.
+- Workflow-oriented modules benefit from business-focused commands rather than generic CRUD operations.
+- Separate read models improve clarity and reduce coupling between presentation and domain models.
+- Feature-first organization scales effectively as business workflows become more complex.
+- Architecture reviews before implementation reduce technical debt and improve consistency.
+
+---
+
+## Reflection
+
+Sprint 3 demonstrated that the architectural foundation established during previous milestones was sufficient to support significantly more complex business behavior.
+
+The Purchasing module introduced state transitions, aggregate coordination, and workflow-driven business logic while preserving existing architectural boundaries.
+
+Rather than expanding the responsibilities of the Application layer, business behavior was intentionally concentrated within the Domain Model.
+
+This milestone validated several architectural principles adopted throughout the project:
+
+- Rich Domain Model
+- Thin Application Handlers
+- Vertical Slice Architecture
+- Command / Query Separation
+- Business-oriented Repository Design
+
+The result is an Application layer that remains focused on orchestration while the Domain Model owns business rules and workflow transitions.
+
+This milestone represents the project's transition from CRUD-oriented business modules toward workflow-driven enterprise functionality.
+
+---
+
+# Milestone 19 — Purchasing Presentation Layer
+
+## Summary
+
+Implemented the Presentation layer for the Purchasing module and connected the existing Purchasing Application use cases to a usable Razor Pages workflow.
+
+The milestone focused on turning the Purchasing Application layer implemented in Sprint 3 into a complete browser-accessible vertical slice.
+
+Completed:
+
+### Presentation Pages
+
+- Purchase Order Index
+- Create Purchase Order
+- Purchase Order Details
+
+### Workflow Actions
+
+- Submit Purchase Order
+- Approve Purchase Order
+- Receive Purchase Order
+
+### Presentation Features
+
+- Supplier selection
+- Product selection
+- Purchase Order item input
+- Expected delivery date
+- Remarks
+- Purchase Order status display
+- Ordered quantity display
+- Received quantity display
+- Remaining quantity display
+- Calculated total display
+- Success messages
+- Validation summaries
+- Receive quantity validation
+- Fully received indication
+
+## End-to-End Workflow
+
+The complete Purchase Order workflow was implemented and verified through the browser using persisted database records.
+
+```text
+Draft
+  ↓ Submit
+Submitted
+  ↓ Approve
+Approved
+  ↓ Receive partial quantity
+Receiving
+  ↓ Receive remaining quantity
+Completed
+```
+
+The workflow was tested using actual Purchase Orders rather than seeded test data.
+
+This allowed the Presentation layer, Application layer, Domain model, persistence infrastructure, and database to be validated together.
+
+---
+
+## Integration with the Application Layer
+
+The Presentation layer consumes the existing Purchasing Application handlers through dependency injection.
+
+The Purchasing Details page coordinates:
+
+- `GetPurchaseOrderHandler`
+- `SubmitPurchaseOrderHandler`
+- `ApprovePurchaseOrderHandler`
+- `ReceivePurchaseOrderHandler`
+
+The Index page uses:
+
+GetPurchaseOrdersHandler
+
+The Create page uses:
+
+- `CreatePurchaseOrderHandler`
+- `GetSuppliersHandler`
+- `GetProductsHandler`
+
+The resulting flow remains:
+
+```text
+Razor Page
+    ↓
+Application Handler
+    ↓
+Domain Aggregate
+    ↓
+Repository / Unit of Work
+    ↓
+Database
+```
+
+No direct DbContext or repository access was introduced into the Presentation layer.
+
+---
+
+## Repository Integration Issue
+
+During end-to-end testing, the Purchase Order Index initially displayed a Total Amount of 0.00 even though the Details page displayed the correct calculated total.
+
+Investigation showed that the Purchase Order list query did not load the Purchase Order items required by the aggregate to calculate TotalAmount.
+
+The repository query was updated to load the required Purchase Order items.
+
+The solution preserved the existing Domain calculation rather than introducing a duplicated persisted total.
+
+### Lesson Learned
+
+A calculated Domain property still depends on the persistence query loading the data required by the aggregate.
+
+Successful compilation does not guarantee that the complete object graph required by a read model has been loaded.
+
+---
+
+## Receiving Workflow
+
+Receiving was implemented at the Purchase Order Item level.
+
+The workflow supports partial receiving:
+
+```text
+Ordered:   10
+Received:   0
+Remaining: 10
+
+Receive 5
+    ↓
+
+Ordered:   10
+Received:   5
+Remaining:  5
+Status: Receiving
+
+Receive 5
+    ↓
+
+Ordered:   10
+Received:  10
+Remaining:  0
+Status: Completed
+```
+The Details page displays Fully Received when an item reaches its ordered quantity.
+
+### Lesson Learned
+
+Item-level workflow actions provide the flexibility required to represent partial business events while keeping the aggregate responsible for enforcing the resulting state.
+
+---
+
+## Validation Testing
+
+The Receive workflow was tested through both client-side and Domain validation.
+
+### Client-Side Validation
+
+The Receive input prevents invalid values such as zero through the HTML minimum constraint.
+
+### Domain Validation
+
+Client-side validation was intentionally bypassed during testing to verify that the Domain remained authoritative.
+
+Submitting a zero quantity reached the Domain and resulted in:
+
+```text
+DomainException
+Received quantity must be greater than zero.
+```
+
+This confirmed that business invariants remain protected even when Presentation-layer validation is bypassed.
+
+### Lesson Learned
+
+Client-side validation should improve user experience, but it should never be treated as the business-rule boundary.
+
+---
+
+## Presentation Feedback Improvements
+
+During the final review, several Presentation-layer improvements were implemented.
+
+### Success Messages
+
+Existing `TempData["SuccessMessage"]` values are now displayed by the relevant Razor Pages.
+
+This provides visible confirmation after operations such as:
+
+- Create
+- Submit
+- Approve
+- Receive
+
+### Query Failure Feedback
+
+The Index page now surfaces Application query failures through the validation summary rather than silently presenting an empty Purchase Order list.
+
+### Dropdown Failure Feedback
+
+The Create page now checks Supplier and Product query results and reports failures through `ModelState`.
+
+This prevents a failed lookup from being silently interpreted as an empty selection list.
+
+---
+
+## Architecture Validation
+
+Sprint 4 confirmed that the existing architecture could support a complete workflow-driven Presentation layer without structural redesign.
+
+The review confirmed:
+
+- Razor Pages depend on Application handlers.
+- Application handlers coordinate use cases.
+- Domain entities enforce business rules.
+- Repositories remain behind Application abstractions.
+- The Presentation layer does not directly access persistence.
+- Workflow actions are expressed as business-oriented commands.
+- Existing Result-based response handling remains the Application contract.
+
+The implementation therefore extended the existing architecture rather than introducing a new Presentation-specific pattern.
+
+---
+
+## Technical Findings
+
+Two issues were identified during the Sprint 4 review but intentionally deferred.
+
+### DomainException Boundary Handling
+
+When client-side validation is bypassed, Domain exceptions can propagate from Application handlers.
+
+This is a cross-cutting concern rather than a Purchasing-specific problem.
+
+No Purchasing-specific workaround was introduced.
+
+A consistent project-wide strategy for converting Domain exceptions into the application's Result/error-handling mechanism should be evaluated separately.
+
+### Inventory Update During Receiving
+
+The current Receive workflow updates:
+
+- Purchase Order Item received quantity
+- Purchase Order status
+
+It does not currently update Product inventory.
+
+No inventory synchronization behavior was added during Sprint 4 because the required business rule and architectural boundary have not yet been formally established.
+
+These findings are therefore treated as technical debt/future design work rather than incomplete Sprint 4 implementation.
+
+---
+
+## Lessons Learned
+
+- A complete vertical slice is more valuable than implementing isolated Presentation pages without validating the workflow.
+- Existing Application handlers can be exposed through Razor Pages without moving business logic into the Web layer.
+- Repository queries must load the data required by calculated aggregate properties.
+- Client-side validation improves usability, while Domain validation protects business invariants.
+- Partial receiving is naturally represented at the Purchase Order Item level.
+- End-to-end testing can reveal integration issues that compilation and unit-level inspection do not expose.
+- Presentation-layer error handling should distinguish between an empty result and an actual Application or persistence failure.
+- Cross-cutting concerns should be solved consistently rather than through feature-specific workarounds.
+- Implementation and documentation commits should remain separate so that Git history clearly distinguishes software changes from documentation changes.
+
+---
+
 # Architecture Validation
 
 After implementing:
@@ -592,6 +936,8 @@ After implementing:
 - Dashboard Reporting
 - Authentication
 - User Management
+- Purchasing Application Layer
+- Purchasing Presentation Layer
 
 the architecture has demonstrated:
 
@@ -600,7 +946,9 @@ the architecture has demonstrated:
 - Reusable repository infrastructure
 - Shared paging, sorting, and filtering
 - Stable Clean Architecture boundaries
-- Seamless evolution from master data to transactional and reporting workflows
+- Seamless evolution from master data to transactional workflows
+- Separation between workflow orchestration and Presentation concerns
+- End-to-end integration between Presentation, Application, Domain, Infrastructure, and database layers
 
 This milestone demonstrates that the architecture supports:
 
@@ -609,10 +957,31 @@ This milestone demonstrates that the architecture supports:
 - Read-only reporting modules
 - Authentication and authorization
 - Administrative user management
+- Workflow-driven business modules
+- Browser-accessible end-to-end workflows
 
-without requiring structural changes.
+without requiring structural redesign.
 
 Architecture Sprint 1 formally validated these conclusions through a comprehensive review of the solution before the introduction of larger business workflow modules.
+
+---
+
+# Workflow Architecture Validation
+
+Sprint 3 validated the Application-layer architecture for workflow-driven business processes through the implementation of the Purchasing Application layer.
+
+Sprint 4 extended that validation into the Presentation layer by connecting the existing Purchasing Application use cases to Razor Pages and verifying the complete workflow through the browser.
+
+The Purchasing module confirmed that:
+
+- Rich Domain Models scale effectively for business workflows.
+- Existing repository infrastructure supports aggregate-based operations.
+- Feature-first organization remains effective as workflow complexity increases.
+- Request / Response / Handler organization provides a consistent implementation pattern.
+- Razor Pages can consume Application handlers without bypassing architectural boundaries.
+- The existing architecture required no structural redesign to support an end-to-end workflow-driven business capability.
+
+This milestone validates the architecture's ability to evolve from CRUD-oriented modules into enterprise workflow modules while preserving Clean Architecture principles.
 
 ---
 
@@ -629,11 +998,15 @@ Throughout development the following principles have consistently guided impleme
 - Push processing to the database whenever practical
 - Maintain consistent module architecture
 - Favor proven patterns over premature abstraction
-- Keep domain behavior inside entities.
-- Prefer immutable business history for transactional data.
-- Use read-only DTO projections for reporting features.
-- Encapsulate framework-specific implementations behind application abstractions.
-- Apply the Rule of Three before introducing shared abstractions.
+- Keep domain behavior inside entities
+- Prefer immutable business history for transactional data
+- Use read-only DTO projections for reporting features
+- Encapsulate framework-specific implementations behind application abstractions
+- Apply the Rule of Three before introducing shared abstractions
+- Keep Application handlers focused on orchestration
+- Model business workflows as explicit commands
+- Return dedicated read models for query operations
+- Prefer workflow-oriented business behavior over generic CRUD operations
 
 ---
 
@@ -653,10 +1026,8 @@ The project deliberately applies the Rule of Three to balance maintainability ag
 
 Future milestones are expected to include:
 
-- Account Management
-- Purchasing Module
-- Purchase Receiving
-- Reporting
-- Audit Logging
 - Sales Module
+- Reporting Enhancements
+- Audit Logging
 - REST API
+- Integration Testing

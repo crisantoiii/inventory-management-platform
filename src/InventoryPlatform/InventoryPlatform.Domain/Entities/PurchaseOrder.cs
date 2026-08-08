@@ -1,0 +1,185 @@
+﻿using InventoryPlatform.Domain.Common;
+using InventoryPlatform.Domain.Enums;
+using InventoryPlatform.Domain.Exceptions;
+
+namespace InventoryPlatform.Domain.Entities;
+
+public sealed class PurchaseOrder : BaseEntity
+{
+    private readonly List<PurchaseOrderItem> _items = new();
+
+    private PurchaseOrder()
+    {
+    }
+
+    public int SupplierId { get; private set; }
+
+    public Supplier Supplier { get; private set; } = null!;
+
+    public DateOnly OrderDate { get; private set; }
+
+    public DateOnly? ExpectedDeliveryDate { get; private set; }
+
+    public PurchaseOrderStatus Status { get; private set; }
+
+    public string? Remarks { get; private set; }
+
+    public IReadOnlyCollection<PurchaseOrderItem> Items => _items.AsReadOnly();
+
+    public decimal TotalAmount => _items.Sum(x => x.LineTotal);
+
+    public static PurchaseOrder Create(
+        int supplierId,
+        DateOnly orderDate,
+        DateOnly? expectedDeliveryDate,
+        string? remarks)
+    {
+        return new PurchaseOrder
+        {
+            SupplierId = supplierId,
+            OrderDate = orderDate,
+            ExpectedDeliveryDate = expectedDeliveryDate,
+            Remarks = remarks,
+            Status = PurchaseOrderStatus.Draft
+        };
+    }
+
+    public void AddItem(
+        int productId,
+        decimal quantity,
+        decimal unitCost)
+    {
+        EnsureDraft();
+
+        if (_items.Any(x => x.ProductId == productId))
+        {
+            throw new DomainException(
+                "The product already exists in this purchase order.");
+        }
+
+        if (quantity <= 0)
+        {
+            throw new DomainException(
+                "Quantity must be greater than zero.");
+        }
+
+        if (unitCost < 0)
+        {
+            throw new DomainException(
+                "Unit cost cannot be negative.");
+        }
+
+        _items.Add(
+            PurchaseOrderItem.Create(
+                Id,
+                productId,
+                quantity,
+                unitCost));
+    }
+
+    public void UpdateItem(
+    int productId,
+    decimal quantity,
+    decimal unitCost)
+    {
+        EnsureDraft();
+
+        var item = _items.SingleOrDefault(x => x.ProductId == productId);
+
+        if (item is null)
+        {
+            throw new DomainException(
+                "Purchase order item was not found.");
+        }
+
+        item.Update(
+            quantity,
+            unitCost);
+    }
+
+    public void RemoveItem(int productId)
+    {
+        EnsureDraft();
+
+        var item = _items.SingleOrDefault(x => x.ProductId == productId);
+
+        if (item is null)
+        {
+            throw new DomainException(
+                "Purchase order item was not found.");
+        }
+
+        _items.Remove(item);
+    }
+
+    public void Submit()
+    {
+        EnsureDraft();
+
+        if (_items.Count == 0)
+        {
+            throw new DomainException(
+                "A purchase order must contain at least one item.");
+        }
+
+        Status = PurchaseOrderStatus.Submitted;
+    }
+
+    public void Approve()
+    {
+        EnsureSubmitted();
+
+        Status = PurchaseOrderStatus.Approved;
+    }
+
+    public void Receive(
+    int productId,
+    decimal quantity)
+    {
+        EnsureApproved();
+
+        var item = _items.SingleOrDefault(x => x.ProductId == productId);
+
+        if (item is null)
+        {
+            throw new DomainException(
+                "Purchase order item was not found.");
+        }
+
+        item.Receive(quantity);
+
+        Status = Items.All(x => x.IsFullyReceived)
+            ? PurchaseOrderStatus.Completed
+            : PurchaseOrderStatus.Receiving;
+    }
+
+    private void EnsureSubmitted()
+    {
+        if (Status != PurchaseOrderStatus.Submitted)
+        {
+            throw new DomainException(
+                "Only submitted purchase orders can be approved.");
+        }
+    }
+
+    private void EnsureApproved()
+    {
+        if (Status != PurchaseOrderStatus.Approved &&
+            Status != PurchaseOrderStatus.Receiving)
+        {
+            throw new DomainException(
+                "Only approved purchase orders can receive inventory.");
+        }
+    }
+
+    private void EnsureDraft()
+    {
+        if (Status != PurchaseOrderStatus.Draft)
+        {
+            throw new DomainException(
+                "Only draft purchase orders can be modified.");
+        }
+    }
+
+
+}

@@ -95,6 +95,7 @@ Current implementation:
 - UnitRepository
 - InventoryTransactionRepository
 - DashboardRepository
+- PurchaseOrderRepository
 
 ## Outcome
 
@@ -609,11 +610,19 @@ Accepted.
 
 Architecture Sprint 1 concluded that the existing architecture remains stable and is ready for expansion into workflow-driven business domains beginning with the Purchasing Module.
 
+### Validation
+
+Sprint 3 successfully validated this decision through the implementation of the complete Purchasing Application layer.
+
+No architectural redesign was required, confirming that the existing architecture scales effectively from CRUD-oriented modules to workflow-driven business processes.
+
 ---
 
 # Architecture Review Outcome
 
 Architecture Sprint 1 validated the decisions recorded in this document.
+
+Sprint 3 and Sprint 4 subsequently extended that validation through the implementation of the Purchasing Application and Presentation layers.
 
 The review confirmed that:
 
@@ -623,6 +632,347 @@ The review confirmed that:
 - Future development should prioritize business capabilities rather than architectural restructuring.
 
 This document will continue to evolve only when new architectural decisions become necessary.
+
+---
+
+# DD-020 — Rich Domain Model
+
+Version Introduced: v1.0.0
+
+## Decision
+
+Business behavior is encapsulated within Domain aggregates rather than implemented inside Application handlers.
+
+Examples include:
+
+- PurchaseOrder.Create()
+- PurchaseOrder.AddItem()
+- PurchaseOrder.UpdateItem()
+- PurchaseOrder.RemoveItem()
+- PurchaseOrder.Submit()
+- PurchaseOrder.Approve()
+- PurchaseOrder.Receive()
+
+## Rationale
+
+Application handlers should coordinate workflows rather than implement business rules.
+
+Keeping business behavior inside aggregates:
+
+- Preserves aggregate invariants.
+- Prevents business rule duplication.
+- Simplifies application handlers.
+- Improves maintainability as workflows grow.
+
+## Alternatives Considered
+
+Implement business rules directly inside application handlers.
+
+This approach was rejected because it scatters business logic across multiple use cases and weakens aggregate consistency.
+
+## Outcome
+
+Accepted.
+
+---
+
+# DD-021 — Thin Application Handlers
+
+Version Introduced: v1.0.0
+
+## Decision
+
+Application handlers are responsible only for orchestrating workflows.
+
+Handlers:
+
+- Load aggregates.
+- Invoke domain behavior.
+- Persist changes.
+- Return Result<T>.
+
+Handlers do not contain business rules.
+
+## Rationale
+
+Keeping handlers small improves:
+
+- Readability.
+- Testability.
+- Separation of concerns.
+
+Business decisions remain inside the Domain Model.
+
+## Alternatives Considered
+
+Allow handlers to perform workflow validation and state transitions.
+
+This approach was rejected because it duplicates business rules and leads to an Anemic Domain Model.
+
+## Outcome
+
+Accepted.
+
+---
+
+# DD-022 — Workflow-Oriented Commands
+
+Version Introduced: v1.0.0
+
+## Decision
+
+Commands represent business actions rather than generic CRUD operations.
+
+Examples include:
+
+- SubmitPurchaseOrder
+- ApprovePurchaseOrder
+- ReceivePurchaseOrder
+
+instead of:
+
+- UpdatePurchaseOrderStatus
+
+## Rationale
+
+Business-oriented commands make application behavior explicit and align the codebase with domain terminology.
+
+Benefits include:
+
+- Improved readability.
+- Better alignment with business processes.
+- Easier future extension.
+- Reduced ambiguity.
+
+## Alternatives Considered
+
+Implement a generic status update command.
+
+This approach was rejected because it hides business intent behind technical operations.
+
+## Outcome
+
+Accepted.
+
+---
+
+# DD-023 — Dedicated Read Models
+
+Version Introduced: v1.0.0
+
+## Decision
+
+Queries return dedicated read models rather than exposing Domain entities.
+
+Examples include:
+
+- GetPurchaseOrderResponse
+- GetPurchaseOrderSummaryResponse
+
+Separate read models are used for detail and list views.
+
+## Rationale
+
+Read models should be optimized for presentation rather than persistence.
+
+Benefits include:
+
+- Reduced coupling.
+- Better query performance.
+- Clear separation between commands and queries.
+- Freedom to evolve the Domain independently from the UI.
+
+## Alternatives Considered
+
+Return Domain entities directly to the Presentation layer.
+
+This approach was rejected because it exposes business internals and tightly couples the UI to the Domain Model.
+
+## Outcome
+
+Accepted.
+
+---
+
+# DD-024 — Presentation Layer Uses Application Handlers
+
+Version Introduced: v1.1.0
+
+## Decision
+
+Razor PageModels interact with business capabilities through Application handlers rather than accessing repositories, `DbContext`, or other persistence infrastructure directly.
+
+The Purchasing Presentation layer uses handlers such as:
+
+- GetPurchaseOrdersHandler
+- CreatePurchaseOrderHandler
+- GetPurchaseOrderHandler
+- SubmitPurchaseOrderHandler
+- ApprovePurchaseOrderHandler
+- ReceivePurchaseOrderHandler
+
+## Rationale
+
+The Presentation layer should focus on HTTP request handling, model binding, validation, and user interaction.
+
+Application handlers remain responsible for coordinating business workflows.
+
+This preserves the established architecture:
+
+```text
+Presentation
+     ↓
+Application
+     ↓
+Domain
+     ↓
+Infrastructure
+```
+
+Benefits include:
+
+- Preserves Clean Architecture boundaries.
+- Keeps persistence concerns out of Razor Pages.
+- Keeps business workflows out of the Presentation layer.
+- Improves testability.
+- Provides a consistent integration pattern for future modules.
+
+## Alternatives Considered
+
+Inject repositories or DbContext directly into Razor PageModels.
+
+This approach was rejected because it would bypass the Application layer and couple the Presentation layer to persistence infrastructure.
+
+## Outcome
+
+Accepted.
+
+---
+
+# DD-026 — Item-Level Purchase Order Receiving
+
+Version Introduced: v1.1.0
+
+## Decision
+
+Purchase Order receiving is implemented at the Purchase Order Item level.
+
+Receiving requires:
+
+- Purchase Order ID
+- Product ID
+- Quantity
+
+The workflow supports partial receiving before the Purchase Order becomes fully completed.
+
+## Rationale
+
+A Purchase Order may contain multiple items and each item may be received independently.
+
+Item-level receiving allows the system to track:
+
+- Ordered quantity
+- Received quantity
+- Remaining quantity
+- Fully received state
+
+This supports real-world partial delivery scenarios.
+
+The Domain remains responsible for enforcing receiving rules.
+
+## Alternatives Considered
+
+Implement a single Purchase Order-level Receive action that marks the entire Purchase Order as received.
+
+This approach was rejected because it cannot represent partial deliveries or item-specific receiving quantities.
+
+## Outcome
+
+Accepted.
+
+---
+
+# DD-027 — Calculated Purchase Order Totals
+
+Version Introduced: v1.1.0
+
+## Decision
+
+Purchase Order TotalAmount remains a calculated Domain property based on Purchase Order items rather than being persisted as duplicated state.
+
+The persistence query loads the Purchase Order items required to calculate the total when generating the Purchase Order summary.
+
+## Rationale
+
+The Purchase Order total is derived from its line items.
+
+Keeping the total calculated:
+
+- Avoids duplicated state.
+- Prevents synchronization problems.
+- Keeps the total consistent with the underlying items.
+- Preserves the Rich Domain Model.
+
+During Sprint 4 integration testing, the Index initially displayed 0.00 while Details displayed the correct total because the list query did not load the Purchase Order items.
+
+The repository query was updated to load the required items rather than introducing a separate persisted total column.
+
+## Alternatives Considered
+
+Add a TotalAmount database column and update it whenever Purchase Order items change.
+
+This approach was rejected because it introduces duplicated state and creates synchronization responsibilities between the item collection and stored total.
+
+## Outcome
+
+Accepted.
+
+---
+
+# DD-028 — Client-Side Validation as UX Layer
+
+Version Introduced: v1.1.0
+
+## Decision
+
+Client-side validation is used to provide immediate user feedback, while Domain validation remains the authoritative enforcement of business rules.
+
+For example, the Receive quantity input prevents zero or negative values through HTML validation, while the Domain independently validates the receiving quantity.
+
+## Rationale
+
+Client-side validation improves usability by preventing obviously invalid submissions before they reach the server.
+
+However, client-side validation cannot be considered a security or business-rule boundary because it can be bypassed.
+
+Therefore:
+```text
+Client Validation
+       ↓
+User Experience
+       ↓
+Application
+       ↓
+Domain Validation
+       ↓
+Business Rule Authority
+```
+
+This provides both a responsive user experience and reliable business-rule enforcement.
+
+## Alternatives Considered
+
+Rely only on client-side validation.
+
+This approach was rejected because client-side validation can be bypassed.
+
+Rely only on Domain validation.
+
+This approach was rejected because it provides poorer immediate user feedback.
+
+## Outcome
+
+Accepted.
 
 ---
 

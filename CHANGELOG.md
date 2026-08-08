@@ -1,5 +1,224 @@
 # Changelog
 
+## [v1.1.0] - 2026-08-08
+
+### Release Summary
+
+This release completes the Presentation layer for the Purchasing module, connecting the existing Purchasing Application use cases to a usable Razor Pages workflow.
+
+The release delivers a complete Purchase Order vertical slice from creation through submission, approval, partial receiving, and final completion using actual persisted database records.
+
+The implementation preserves the existing Clean Architecture, Rich Domain Model, Vertical Slice Architecture, and business-oriented Application handler patterns established in previous sprints.
+
+---
+
+### Added
+
+#### Purchasing Presentation Layer
+
+- Purchase Order Index page
+- Create Purchase Order page
+- Purchase Order Details page
+- Supplier selection
+- Product selection
+- Purchase Order item input
+- Expected delivery date
+- Purchase Order remarks
+- Purchase Order status display
+- Ordered quantity display
+- Received quantity display
+- Remaining quantity display
+- Calculated Purchase Order total display
+
+#### Purchase Order Workflow
+
+- Submit Purchase Order action
+- Approve Purchase Order action
+- Receive Purchase Order action
+- Partial Purchase Order receiving
+- Final receiving and Completed state
+- Fully Received item indication
+
+#### Presentation Validation and Feedback
+
+- Client-side Receive quantity validation
+- Validation summaries
+- Success messages using `TempData`
+- Index query failure feedback
+- Supplier query failure feedback
+- Product query failure feedback
+
+---
+
+### Changed
+
+- Registered Purchasing Application handlers required by the Presentation layer.
+- Connected Razor PageModels to the existing Purchasing Application use cases through dependency injection.
+- Updated Purchase Order repository queries to load Purchase Order items required for calculated totals.
+- Improved Purchase Order Index total calculation.
+- Added Presentation-layer handling for Application query failures.
+- Added Supplier and Product lookup failure handling during Purchase Order creation.
+- Added success feedback after successful Purchase Order operations.
+
+---
+
+### Improved
+
+- Completed the Purchasing workflow as a browser-accessible vertical slice.
+- Preserved the separation between Presentation, Application, Domain, and Infrastructure layers.
+- Kept business workflow rules inside the `PurchaseOrder` aggregate.
+- Improved Purchase Order receiving usability through item-level quantity and remaining-quantity display.
+- Improved user feedback for successful and failed operations.
+- Validated client-side and Domain-level receiving rules.
+- Reused existing Application handlers, Repository, Unit of Work, and Result pattern infrastructure.
+
+---
+
+### Validated
+
+#### Purchase Order Lifecycle
+
+```text
+Draft
+  ↓ Submit
+Submitted
+  ↓ Approve
+Approved
+  ↓ Receive partial quantity
+Receiving
+  ↓ Receive remaining quantity
+Completed
+```
+
+### End-to-End Verification
+
+- Purchase Order creation
+- Purchase Order listing
+- Purchase Order details
+- Purchase Order submission
+- Purchase Order approval
+- Partial receiving
+- Final receiving
+- Completed status
+- Remaining quantity calculation
+- Fully Received state
+- Calculated Purchase Order total
+- Client-side validation
+- Domain validation
+- Success feedback
+- Query failure feedback
+
+The workflow was verified using actual database records rather than seed data.
+
+### Technical Findings
+
+The following items were identified during Sprint 4 but intentionally deferred:
+
+- Cross-cutting DomainException-to-Result/error handling strategy
+- Inventory synchronization during Purchase Order receiving
+- Multiple Purchase Order item management in the Create UI
+- Purchase Order search, filtering, sorting, and pagination
+- Additional Product identification information such as SKU in selection controls
+
+These are documented as technical debt or future enhancements and are not considered completed features of this release.
+
+### Documentation
+- Added SPRINT_04_APPLICATION.md
+- Updated ARCHITECTURE.md
+- Updated DESIGN_DECISIONS.md
+- Updated ENGINEERING_JOURNAL.md
+- Updated FEATURES.md
+- Updated PROJECT_STATUS.md
+- Updated README.md
+
+### Outcome
+
+The Purchasing module is now a complete browser-accessible vertical slice spanning:
+
+```text
+Presentation
+     ↓
+Application
+     ↓
+Domain
+     ↓
+Infrastructure
+     ↓
+Database
+```
+
+The release demonstrates that the architecture can support a workflow-driven business module from Domain and Application implementation through a usable Presentation layer without requiring structural redesign.
+
+The Purchasing module has progressed from an Application-layer capability in v1.0.0 to an end-to-end browser-accessible workflow in v1.1.0.
+
+## [v1.0.0] - 2026-08-07
+
+### Release Summary
+
+This release introduces the Application layer for the Purchasing module, extending the platform beyond CRUD-oriented business modules into workflow-driven business processes.
+
+The Purchasing module demonstrates the successful application of the Rich Domain Model, Vertical Slice Architecture, and business-oriented application handlers without requiring changes to the existing Clean Architecture.
+
+---
+
+### Added
+
+#### Purchasing Module
+
+- Create Purchase Order
+- Get Purchase Order
+- Get Purchase Orders
+- Submit Purchase Order
+- Approve Purchase Order
+- Receive Purchase Order
+
+#### Application Layer
+
+- Purchase Order command handlers
+- Purchase Order query handlers
+- Request / Response models
+- Purchasing error definitions
+- Repository integration for Purchasing workflows
+
+---
+
+### Changed
+
+- Extended the Application layer with workflow-oriented business capabilities.
+- Introduced dedicated read models for Purchasing queries.
+- Standardized Purchasing handlers using the established Request / Response / Handler pattern.
+- Expanded the Domain-driven workflow through the Application layer without modifying architectural boundaries.
+
+---
+
+### Improved
+
+- Preserved thin Application handlers by delegating business behavior to the PurchaseOrder aggregate.
+- Maintained consistent Vertical Slice Architecture across all Purchasing features.
+- Reused existing Repository, Unit of Work, and Result pattern infrastructure.
+- Validated the architecture's ability to support workflow-driven business modules.
+
+---
+
+### Documentation
+
+- Added SPRINT_03_APPLICATION.md
+- Updated ARCHITECTURE
+- Updated DESIGN_DECISIONS
+- Updated ENGINEERING_JOURNAL
+- Updated FEATURES
+- Updated PROJECT_STATUS
+
+---
+
+### Outcome
+
+The Purchasing module became the first workflow-oriented business module within the platform.
+
+This release validates that the existing architecture successfully scales from CRUD-based modules to aggregate-driven business workflows while preserving Clean Architecture principles.
+
+---
+
 ## [v0.9.0] - 2026-08-04
 
 ### Release Summary
@@ -85,6 +304,8 @@ The project is now ready to begin implementation of the **Purchasing Module (v1.
 
 All notable changes to this project will be documented in this file.
 
+---
+
 ## [v0.8.0] - 2026-08-01
 
 ### Release Summary
@@ -143,6 +364,8 @@ This release introduces a complete Identity and User Management subsystem built 
 - Maintained consistent feature-first organization across Identity and business modules.
 - Preserved Clean Architecture boundaries while integrating authentication and authorization.
 
+---
+
 ## [v0.7.0] - 2026-07-27
 
 ### Added
@@ -187,6 +410,8 @@ This release introduces a complete Identity and User Management subsystem built 
 - Enhanced dashboard usability with transaction badges and low stock indicators.
 - Formatted inventory value for improved readability.
 - Added user-friendly empty state messages when dashboard widgets contain no data.
+
+---
 
 ## [v0.6.0] - 2026-07-25
 
