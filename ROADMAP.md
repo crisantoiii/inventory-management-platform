@@ -15,44 +15,71 @@ v0.6  Inventory Transactions   ✅
 v0.7  Dashboard                ✅
 v0.8  Identity & Users         ✅
 v0.9  Architecture Sprint      ✅
-v1.0  Purchasing Module        🔄
-v1.1  Reporting                ⏳
-v1.2  Account Management       ⏳
+v1.0  Purchasing Application   ✅
+v1.1  Purchasing Presentation  ✅
+v1.2  Reporting                ⏳
+v1.3  Account Management       ⏳
 
 ---
 
 # Current Development Strategy
 
-The project has completed its architectural foundation.
+The project has completed its architectural foundation and the first end-to-end Purchasing vertical slice.
 
 Future development will prioritize expanding business capabilities while preserving the validated architecture.
 
-Focus Areas
+Focus Areas:
 
 - Business workflows
 - Domain modeling
 - Enterprise features
 - Reporting
 - APIs
+- Incremental vertical slices
+
+Each major business capability should be implemented from Domain and Application logic through a usable Presentation workflow before being considered complete.
 
 ---
 
 # Current Release
 
-## Version 0.9.0 – Architecture Sprint 1
+## Version 1.1.0 – Purchasing Presentation Layer
 
 ### Completed
 
-- Architecture Sprint 1
-- Application Layer Review
-- Infrastructure Layer Review
-- Web Layer Review
-- Architecture Validation
-- Documentation Updates
+- Purchasing Application Layer
+- Purchasing Presentation Layer
+- Purchase Order Listing
+- Purchase Order Creation
+- Purchase Order Details
+- Purchase Order Submission
+- Purchase Order Approval
+- Partial Purchase Order Receiving
+- Final Purchase Order Receiving
+- Purchase Order Completion
+- Presentation Validation
+- Success and Failure Feedback
+- End-to-End Purchasing Workflow Validation
 
 ### Result
 
-The application architecture has been validated and is ready for business expansion.
+The Purchasing module now provides a complete browser-accessible vertical slice from Purchase Order creation through final receiving.
+
+The workflow has been verified using persisted database records:
+
+```text
+Draft
+  ↓ Submit
+Submitted
+  ↓ Approve
+Approved
+  ↓ Receive partial quantity
+Receiving
+  ↓ Receive remaining quantity
+Completed
+```
+
+The implementation preserves the existing Clean Architecture, Rich Domain Model, Vertical Slice Architecture, and Application handler patterns.
 
 ### Product Management
 
@@ -200,20 +227,35 @@ Objectives
 
 # Phase 5 — Purchasing Module
 
-Objectives
+Status: 🟨 Core Workflow Complete
+
+Completed:
 
 - Purchase Orders
 - Purchase Order Items
 - Purchase Approval Workflow
 - Goods Receiving
 - Partial Receiving
+- Purchase Order Completion
+- Purchasing Presentation Layer
+- End-to-End Workflow Validation
+
+Remaining:
+
 - Inventory Integration
 - Purchase History
 - Supplier Purchase History
+- Multiple Purchase Order Item Management
+- Purchase Order Search
+- Purchase Order Filtering
+- Purchase Order Sorting
+- Purchase Order Pagination
 
 ---
 
 # Phase 6 — Reporting
+
+Status: ⏳ Planned
 
 Planned Reports:
 
@@ -221,7 +263,6 @@ Planned Reports:
 - Purchase History
 - Supplier Purchase Analysis
 - Stock Movement
-- Inventory Valuation Report
 - Low Stock Report
 - Inventory Movement Report
 
@@ -232,7 +273,9 @@ Export Options:
 
 ---
 
-# Phase 7 – Account Management
+# Phase 7 — Account Management
+
+Status: ⏳ Planned
 
 Planned
 
@@ -246,6 +289,8 @@ Planned
 ---
 
 # Phase 8 — Advanced Features
+
+Status: ⏳ Planned
 
 Planned:
 
@@ -267,7 +312,7 @@ Future enhancements may include:
 
 ## Business Modules
 
-- Purchasing
+- Purchasing Enhancements
 - Sales
 - Warehouse
 - Inventory Transfers
@@ -295,11 +340,12 @@ Future enhancements may include:
 | Version | Milestone |
 |---------|-----------|
 | v0.9.0 | Architecture Sprint 1 ✅ |
-| v1.0.0 | Purchasing Module |
-| v1.1.0 | Reporting |
-| v1.2.0 | Account Management |
-| v1.3.0 | Sales Module |
-| v2.0.0 | REST API & Blazor |
+| v1.0.0 | Purchasing Application Layer ✅ |
+| v1.1.0 | Purchasing Presentation Layer ✅ |
+| v1.2.0 | Reporting  ⏳ |
+| v1.3.0 | Account Management  ⏳ |
+| v1.4.0 | Sales Module  ⏳ |
+| v2.0.0 | REST API & Blazor  ⏳ |
 
 ---
 
@@ -320,5 +366,7 @@ Each new module should:
 - Prefer DTO projections for read-only reporting features.
 - Encapsulate framework-specific implementations behind application abstractions.
 - Apply the Rule of Three before introducing shared abstractions.
+- Prefer complete vertical slices over isolated technical implementations.
+- Validate new workflows through real application usage before considering the feature complete.
 
 The architecture should evolve through reuse rather than introducing module-specific implementations whenever possible.

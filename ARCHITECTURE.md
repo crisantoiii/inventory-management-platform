@@ -109,25 +109,29 @@ Shared components contain no business logic and are designed to be reused throug
 # Dependency Direction
 
 ```text
-          Web
-           │
-           ▼
-    Application
-           │
-           ▼
-        Domain
+Web
+ │
+ ▼
+Application
+ │
+ ▼
+Domain
 
-Infrastructure ───────┘
+Infrastructure
+ │
+ ├── implements Application abstractions
+ └── depends on Domain
 
 Shared
-▲
-│
-Referenced by all projects
+ │
+ └── referenced where required
 ```
 
-Dependencies always point inward toward the Domain.
+Dependencies point inward toward the Domain.
 
-The Domain project has no knowledge of Infrastructure or Web.
+The Domain project has no knowledge of Web or Infrastructure.
+
+Infrastructure implements persistence and external-service abstractions defined by the inner layers.
 
 ---
 
@@ -148,7 +152,7 @@ builder.Services
 
 ## Proven Architecture
 
-The architecture has been validated through business modules, transactional workflows, dashboard reporting, authentication, and comprehensive user management.
+The architecture has been validated through business modules, transactional workflows, dashboard reporting, authentication, comprehensive user management, and the Purchasing vertical slice.
 
 The architecture has been validated through the implementation of:
 
@@ -161,11 +165,12 @@ The architecture has been validated through the implementation of:
 - Dashboard Reporting
 - Authentication
 - User Management
-- Purchasing
+- Purchasing Application Layer
+- Purchasing Presentation Layer
 
-Each module follows the same layered architecture, repository pattern, CQRS-style application handlers, reusable paging, filtering, and sorting infrastructure, and Razor Pages presentation model.
+Each module follows the established layered architecture, repository pattern, CQRS-style application handlers, reusable paging, filtering, and sorting infrastructure, and Razor Pages presentation model where applicable.
 
-The successful implementation of multiple independent business modules demonstrates that the architecture scales without requiring structural changes.
+The successful implementation of multiple independent business modules demonstrates that the architecture scales from CRUD-oriented modules to workflow-driven business capabilities without requiring structural redesign.
 
 ## Clean Architecture
 
@@ -179,14 +184,16 @@ Repositories abstract persistence from application logic.
 
 Current repositories include:
 
-- ProductRepository
-- CategoryRepository
-- SupplierRepository
-- CustomerRepository
-- UnitRepository
-- InventoryTransactionRepository
-- DashboardRepository
-DashboardRepository is intentionally implemented as a read-only repository using DTO projections rather than aggregate entities.
+- `ProductRepository`
+- `CategoryRepository`
+- `SupplierRepository`
+- `CustomerRepository`
+- `UnitRepository`
+- `InventoryTransactionRepository`
+- `PurchaseOrderRepository`
+- `DashboardRepository`
+
+`DashboardRepository` is intentionally implemented as a read-only repository using DTO projections rather than aggregate entities.
 
 ---
 
@@ -196,9 +203,10 @@ ASP.NET Core Identity is encapsulated behind `IIdentityService`.
 
 The Application layer depends only on the abstraction, while Infrastructure provides the implementation using:
 
-- UserManager
-- RoleManager
-- SignInManager
+- `UserManager`
+- `RoleManager`
+- `SignInManager`
+- `IIdentityService`
 
 This approach isolates framework-specific APIs from the rest of the application and keeps the Web and Application layers independent of ASP.NET Core Identity.
 
@@ -233,14 +241,18 @@ Each feature owns its own:
 - Response
 - Handler
 - Validator (when required)
+- Presentation entry point (when applicable)
 
 Examples include:
 
-- CreatePurchaseOrder
-- GetPurchaseOrder
-- SubmitPurchaseOrder
-- ApprovePurchaseOrder
-- ReceivePurchaseOrder
+- `CreatePurchaseOrder`
+- `GetPurchaseOrder`
+- `GetPurchaseOrders`
+- `SubmitPurchaseOrder`
+- `ApprovePurchaseOrder`
+- `ReceivePurchaseOrder`
+
+The Presentation layer consumes these Application capabilities through Razor PageModels and does not access persistence infrastructure directly.
 
 This organization minimizes coupling while improving discoverability and maintainability.
 
@@ -266,8 +278,8 @@ Application operations return standardized results.
 
 Examples:
 
-- Result
-- Result\<T>
+- `Result`
+- `Result<T>`
 
 This provides consistent success and error handling.
 
@@ -277,9 +289,9 @@ This provides consistent success and error handling.
 
 Reusable paging is implemented through:
 
-- PagedRequest
-- PagedQuery
-- PagedResult\<T>
+- `PagedRequest`
+- `PagedQuery`
+- `PagedResult<T>`
 
 This infrastructure is shared across the Product, Category, Supplier, Customer, Unit, and Inventory Transaction modules.
 
@@ -299,12 +311,12 @@ The Product, Category, Supplier, Customer, Unit, and Inventory Transaction modul
 
 Reusable sorting currently includes:
 
-- ProductSortFields
-- CategorySortFields
-- SupplierSortFields
-- CustomerSortFields
-- UnitSortFields
-- InventoryTransactionSortFields
+- `ProductSortFields`
+- `CategorySortFields`
+- `SupplierSortFields`
+- `CustomerSortFields`
+- `UnitSortFields`
+- `InventoryTransactionSortFields`
 
 The infrastructure supports server-side sorting through strongly typed sort definitions.
 
@@ -316,33 +328,19 @@ Typical request lifecycle:
 
 ```text
 Browser
-
-↓
-
+   ↓
 Razor Page
-
-↓
-
+   ↓
 Application Handler
-
-↓
-
-Domain Entity
-
-↓
-
+   ↓
+Domain Entity / Aggregate
+   ↓
 Repository Interface
-
-↓
-
+   ↓
 Repository Implementation
-
-↓
-
+   ↓
 Entity Framework Core
-
-↓
-
+   ↓
 SQL Server
 ```
 
@@ -365,6 +363,35 @@ Queries
 Commands delegate business behavior to Domain aggregates.
 
 Queries return dedicated DTO projections optimized for presentation.
+
+# Presentation Validation
+
+The Presentation layer performs user-facing validation to provide immediate feedback.
+
+Examples include:
+
+- Required field validation
+- Receive quantity constraints
+- Validation summaries
+
+Presentation validation improves user experience but does not replace Domain validation.
+
+Business rules remain enforced by the Domain Model.
+
+```text
+User Input
+    ↓
+Presentation Validation
+    ↓
+Application Handler
+    ↓
+Domain Validation
+    ↓
+Persistence
+```
+
+Client-side validation can be bypassed, so business invariants must remain protected by the Domain layer.
+
 
 # Identity Request
 
@@ -510,41 +537,27 @@ Dashboard View
 
 ```text
 Create Purchase Order
-
-↓
-
+        ↓
 Draft
-
-↓
-
-Submit
-
-↓
-
+        ↓ Submit
 Submitted
-
-↓
-
-Approve
-
-↓
-
+        ↓ Approve
 Approved
-
-↓
-
-Receive
-
-↓
-
+        ↓ Receive
 Receiving
-
-↓
-
+        ↓ Receive remaining quantity
 Completed
 ```
 
-The Purchasing workflow is implemented through business-oriented Application handlers that delegate workflow transitions to the PurchaseOrder aggregate.
+The Presentation layer exposes the workflow through Razor Pages.
+
+The Application layer coordinates the use cases through business-oriented handlers.
+
+The `PurchaseOrder` aggregate owns workflow state transitions and business rules.
+
+Infrastructure persists the resulting state through the repository and Unit of Work.
+
+The Purchasing workflow is implemented through business-oriented Application handlers that delegate workflow transitions to the `PurchaseOrder` aggregate.
 
 The Application layer coordinates the workflow while the Domain Model owns all business rules and state transitions.
 
@@ -558,25 +571,26 @@ Unlike CRUD-oriented modules, Purchasing models explicit business state transiti
 
 ```text
 Draft
-
-↓
-
+   ↓
 Submitted
-
-↓
-
+   ↓
 Approved
-
-↓
-
+   ↓
 Receiving
-
-↓
-
+   ↓
 Completed
 ```
 
-Workflow transitions are implemented through Domain behavior rather than generic data updates.
+The workflow is exposed through the Presentation layer while transitions are implemented through Domain behavior.
+
+Workflow transitions are implemented through business-oriented Application handlers that delegate state changes to the PurchaseOrder aggregate.
+
+This separation ensures:
+
+- Presentation handles user interaction.
+- Application coordinates use cases.
+- Domain enforces business rules and state transitions.
+- Infrastructure handles persistence.
 
 This demonstrates the architecture's ability to support aggregate-driven enterprise workflows while preserving Clean Architecture principles.
 
@@ -586,30 +600,32 @@ This demonstrates the architecture's ability to support aggregate-driven enterpr
 
 The project follows:
 
-Architectural Principles
+### Architectural Principles
 
 - Clean Architecture
 - SOLID
 - Separation of Concerns
 - Dependency Inversion
 
-Application Design
+### Application Design
 
 - Feature-first Organization
 - Thin Razor PageModels
+- Application Handler-driven Presentation
+- Workflow-oriented Razor Pages
 - Thin Application Handlers
 - Vertical Slice Architecture
 - Request / Response / Handler Pattern
 - Dedicated Read Models
 - Workflow-oriented Commands
 
-Engineering Practices
+### Engineering Practices
 
 - Rule of Three Refactoring
 - Framework Encapsulation
 - Consistency over Premature Abstraction
 - DRY
-- Validate architecture before expanding business domains.
+- Validate architecture before expanding business domains
 
 ---
 
@@ -659,9 +675,11 @@ This milestone established a stable foundation for future business modules witho
 
 ### Validation
 
-Sprint 3 successfully validated this architectural decision through the implementation of the complete Purchasing Application layer.
+Sprint 3 validated this architectural decision through the implementation of the Purchasing Application layer.
 
-The existing architecture supported workflow-driven business processes without requiring structural redesign, confirming that the platform scales naturally from CRUD-oriented modules to aggregate-driven workflows.
+Sprint 4 extended that validation into the Presentation layer by connecting the existing Purchasing Application handlers to Razor Pages and verifying the complete Purchase Order lifecycle through actual browser interactions and persisted database records.
+
+The combined implementation demonstrated that the architecture supports workflow-driven vertical slices from Presentation through Application, Domain, Infrastructure, and database persistence without requiring structural redesign.
 
 ---
 
@@ -698,6 +716,8 @@ The review confirmed that:
 
 Sprint 3 subsequently validated these findings through the implementation of the Purchasing Application layer, demonstrating that the existing architecture scales successfully into workflow-driven business modules without requiring structural redesign.
 
+Sprint 4 extended the Purchasing implementation into the Presentation layer and verified the complete workflow through the browser without requiring architectural changes.
+
 ---
 
 # Future Architecture
@@ -707,9 +727,7 @@ Sprint 3 subsequently validated these findings through the implementation of the
 - Sales
 - Warehouse
 - Reporting
-- REST API
 - Blazor Administration
-- Background Jobs
 
 ## Identity Enhancements
 
@@ -719,8 +737,8 @@ Sprint 3 subsequently validated these findings through the implementation of the
 
 ## Platform Features
 
-- Audit Logging
 - REST API
+- Audit Logging
 - Background Jobs
 
 The existing architecture is intended to support these features without major restructuring.

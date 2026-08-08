@@ -34,7 +34,7 @@ The focus is not only on implementing business features but also on applying pro
 
 ## Project Status
 
-**Current Version:** v1.0.0 – Purchasing Application Layer
+**Current Version:** v1.1.0 – Purchasing Presentation Layer
 
 ## Completed Modules
 
@@ -47,20 +47,26 @@ The focus is not only on implementing business features but also on applying pro
 - ✅ Dashboard
 - ✅ Authentication & Authorization
 - ✅ User Management
-- 🟨 Purchasing (Application Layer Complete)
+- 🟨 Purchasing (Core Workflow Complete)
 
 ## Latest Release 
 
-### v1.0.0 — Purchasing Application Layer
+## v1.1.0 — Purchasing Presentation Layer
 
-Highlights
+### Highlights
 
-- Implemented Purchase Order workflows
-- Introduced workflow-driven business processes
-- Added CQRS-style command and query handlers
-- Validated Rich Domain Model architecture
-- Extended architecture without structural redesign
-
+- Completed Purchasing Presentation Layer
+- Added Purchase Order Listing
+- Added Purchase Order Creation
+- Added Purchase Order Details
+- Added Submit Purchase Order workflow
+- Added Approve Purchase Order workflow
+- Added partial Purchase Order receiving
+- Added final Purchase Order receiving
+- Added Purchase Order Completed state
+- Added Presentation validation and feedback
+- Added end-to-end Purchasing workflow validation
+- Extended the validated architecture without structural redesign
 
 ---
 
@@ -68,9 +74,9 @@ Highlights
 
 The project completed **Architecture Sprint 1**, a comprehensive architectural review covering the Application, Infrastructure, and Web layers.
 
-Sprint 3 successfully validated the architecture by implementing the first workflow-driven business module (Purchasing) without requiring architectural redesign.
+Sprint 3 validated the architecture through the Purchasing Application layer, while Sprint 4 extended that validation into the Presentation layer by delivering a complete browser-accessible Purchasing workflow.
 
-This confirmed that the existing architecture scales from CRUD-oriented modules to workflow-driven business processes without requiring structural redesign.
+This confirmed that the existing architecture scales from CRUD-oriented modules to workflow-driven business processes and complete end-to-end vertical slices without requiring structural redesign.
 
 ### Review Outcome
 
@@ -242,7 +248,7 @@ The long-term goal is to evolve this project into a complete inventory managemen
 
 ## Purchasing
 
-### Implemented Features
+### Purchase Order Workflow
 
 - ✅ Create Purchase Order
 - ✅ Get Purchase Order
@@ -250,25 +256,45 @@ The long-term goal is to evolve this project into a complete inventory managemen
 - ✅ Submit Purchase Order
 - ✅ Approve Purchase Order
 - ✅ Receive Purchase Order
+- ✅ Partial Purchase Order Receiving
+- ✅ Final Purchase Order Receiving
+- ✅ Completed Purchase Order State
+
+### Purchase Order Presentation
+
+- ✅ Purchase Order Listing
+- ✅ Purchase Order Creation
+- ✅ Purchase Order Details
+- ✅ Supplier Selection
+- ✅ Product Selection
+- ✅ Expected Delivery Date
+- ✅ Remarks
+- ✅ Ordered Quantity Display
+- ✅ Received Quantity Display
+- ✅ Remaining Quantity Display
+- ✅ Calculated Purchase Order Total
+
+### Validation and Feedback
+
+- ✅ Client-side Receive Quantity Validation
+- ✅ Domain Receive Quantity Validation
+- ✅ Validation Summaries
+- ✅ Success Messages
+- ✅ Index Query Failure Feedback
+- ✅ Supplier Query Failure Feedback
+- ✅ Product Query Failure Feedback
 
 ### Workflow
+
 ```text
 Draft
-
-↓
-
+  ↓ Submit
 Submitted
-
-↓
-
+  ↓ Approve
 Approved
-
-↓
-
+  ↓ Receive partial quantity
 Receiving
-
-↓
-
+  ↓ Receive remaining quantity
 Completed
 ```
 
@@ -279,6 +305,8 @@ Completed
 - Workflow-driven Business Processes
 - Dedicated Read Models
 - Business-oriented Application Handlers
+- Thin Razor PageModels
+- Application Handler-driven Presentation
 
 ### Domain Design
 
@@ -380,30 +408,20 @@ Return Result
 ## Purchasing Workflow
 
 ```text
-Create Purchase Order
-
-↓
-
+Razor Page
+     ↓
 Application Handler
-
-↓
-
+     ↓
 PurchaseOrder Aggregate
-
-↓
-
-Repository
-
-↓
-
-Save Changes
-
-↓
-
+     ↓
+Repository / Unit of Work
+     ↓
+Database
+     ↓
 Result
 ```
 
-The Dashboard demonstrates how multiple read models can be composed through the Application layer while preserving the separation between presentation, business logic, and persistence.
+The Purchase Order Details page exposes workflow actions such as Submit, Approve, and Receive while the Domain aggregate remains responsible for enforcing business rules and state transitions.
 
 Responsibilities:
 ```text
@@ -463,6 +481,8 @@ SQL Server
 - Feature-first organization
 - Clean Architecture
 - Thin Razor PageModels
+- Application Handler-driven Presentation
+- Workflow-oriented Razor Pages
 - Thin Application Handlers
 - Business logic isolated from the Presentation layer
 - ASP.NET Core Identity encapsulated behind IIdentityService
@@ -530,9 +550,13 @@ No major architectural redesign was required.
 - Authentication uses ASP.NET Core Identity.
 - Administrative user management is separated from self-service account management.
 - Business logic remains outside the Razor Pages.
-- Purchase Orders are implemented as workflow-driven aggregates.
 - Business behavior resides inside Domain entities.
 - Application handlers orchestrate workflows rather than implement business rules.
+- Purchase Orders are implemented as workflow-driven aggregates.
+- Purchase Order workflow actions are exposed through the Details page.
+- Purchase Order receiving is performed at the Purchase Order Item level.
+- Purchase Order totals remain calculated from Purchase Order items.
+- Client-side validation improves user experience while Domain validation remains authoritative.
 
 ---
 
@@ -566,7 +590,7 @@ Reusable infrastructure has been implemented to support future modules.
 - Result
 - Result\<T>
 
-This infrastructure is currently shared across the Product, Category, Supplier, Customer, Unit, Inventory Transaction, and Purchasing modules.
+This infrastructure is shared across the Product, Category, Supplier, Customer, Unit, Inventory Transaction, and Purchasing modules where applicable.
 
 ---
 
@@ -616,7 +640,7 @@ Development Tools
 | Dashboard | ✅ Complete |
 | Authentication & Authorization | ✅ Complete |
 | User Management | ✅ Complete |
-| Purchasing | 🟨 Application Layer Complete (UI Pending) |
+| Purchasing | 🟨 Core Workflow Complete |
 | Reporting | ⬜ Planned |
 
 ---
@@ -638,10 +662,11 @@ Development Tools
 
 ## Next
 
-- v1.1.0 — Purchasing Presentation Layer
+- v1.2.0 — Reporting
 
 ## Future
 
+- Purchasing Enhancements
 - Sales
 - Reporting
 - Audit Logging
@@ -721,7 +746,17 @@ The following screenshots demonstrate the current implementation:
 
 ### Purchasing
 
-> Screenshots will be added after the Purchasing Presentation Layer is completed.
+![Purchase Order List](docs/screenshots/Purchasing_list.png)
+
+![Purchase Order List](docs/screenshots/Purchasing_list2.png)
+
+![Create Purchase Order](docs/screenshots/Purchasing_create.png)
+
+![Purchase Order Details](docs/screenshots/Purchasing_details.png)
+
+![Purchase Order Details - Receiving](docs/screenshots/Purchasing_details2.png)
+
+![Purchase Order Details - Completed](docs/screenshots/Purchasing_details3.png)
 
 ---
 
@@ -749,6 +784,10 @@ This project is focused on applying modern enterprise development practices incl
 - Workflow-driven Enterprise Applications
 - Vertical Slice Architecture
 - Aggregate Design
+- End-to-End Vertical Slice Implementation
+- Workflow-driven Presentation Design
+- Presentation-to-Application Integration
+- Business Workflow Validation
 
 ---
 

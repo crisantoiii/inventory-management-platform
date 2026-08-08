@@ -37,7 +37,7 @@ Outcome:
 - ✅ No structural redesign required
 - ✅ Ready for workflow-driven business modules
 
-The next milestone is **v1.1.0 Purchasing Presentation Layer**.
+The Purchasing Presentation Layer is now complete and has been verified through an end-to-end browser workflow using persisted database records.
 
 ## Module Summary
 
@@ -53,7 +53,7 @@ The next milestone is **v1.1.0 Purchasing Presentation Layer**.
 | Unit Management | ✅ Complete |
 | Inventory Transactions | ✅ Complete |
 | Architecture Sprint | ✅ Complete |
-| Purchasing | 🟨 Application Complete |
+| Purchasing | 🟨 Core Workflow Complete |
 
 ## Current Implementation
 
@@ -69,6 +69,7 @@ Completed modules:
 - ✅ Authentication
 - ✅ User Management
 - ✅ Purchasing Application Layer
+- ✅ Purchasing Presentation Layer
 
 Shared capabilities:
 
@@ -282,37 +283,63 @@ Each inventory transaction records:
 - ✅ Submit Purchase Order
 - ✅ Approve Purchase Order
 - ✅ Receive Purchase Order
+- ✅ Partial Purchase Order Receiving
+- ✅ Final Purchase Order Receiving
+- ✅ Completed Purchase Order State
+- ✅ Rich Domain Workflow
+- ✅ CQRS-style Application Layer
+
+## Purchase Order Presentation
+
+- ✅ Purchase Order Listing
+- ✅ Create Purchase Order
+- ✅ Purchase Order Details
+- ✅ Supplier Selection
+- ✅ Product Selection
+- ✅ Expected Delivery Date
+- ✅ Remarks
+- ✅ Ordered Quantity Display
+- ✅ Received Quantity Display
+- ✅ Remaining Quantity Display
+- ✅ Calculated Purchase Order Total
+- ✅ Submit Action
+- ✅ Approve Action
+- ✅ Receive Action
+
+## Validation and Feedback
+
+- ✅ Client-side Receive Quantity Validation
+- ✅ Domain Receive Quantity Validation
+- ✅ Validation Summaries
+- ✅ Success Messages
+- ✅ Index Query Failure Feedback
+- ✅ Supplier Query Failure Feedback
+- ✅ Product Query Failure Feedback
 
 ## Purchase Order States
 
 ```text
 Draft
-
-↓
-
+  ↓ Submit
 Submitted
-
-↓
-
+  ↓ Approve
 Approved
-
-↓
-
+  ↓ Receive partial quantity
 Receiving
-
-↓
-
+  ↓ Receive remaining quantity
 Completed
 ```
 
 ## Business Rules
 
 - Purchase Orders begin in Draft status.
-- Only Draft Purchase Orders can be modified.
-- Purchase Orders cannot be submitted without items.
+- Only Draft Purchase Orders can be submitted.
 - Only Submitted Purchase Orders can be approved.
-- Only Approved Purchase Orders can receive inventory.
+- Only Approved or Receiving Purchase Orders can receive quantities.
+- Receiving supports partial quantities.
 - Purchase Order completion is determined automatically by the Domain Model.
+- Received quantity cannot exceed the remaining quantity.
+- Received quantity must be greater than zero.
 
 ---
 
@@ -416,9 +443,6 @@ Features:
 - Cookie Authentication
 - Authorization Policies
 - Identity Service Abstraction
-- Workflow-oriented Application Handlers
-- Rich Domain Model
-- Vertical Slice Architecture
 
 ## Paging
 
@@ -586,6 +610,8 @@ Operation results are standardized using:
 - Identity Service Pattern
 - Feature-first Organization
 - Thin Razor PageModels
+- Application Handler-driven Presentation
+- Workflow-oriented Razor Pages
 - Thin Application Handlers
 - Rule of Three Refactoring
 - Architecture Sprint Review
@@ -648,11 +674,14 @@ Engineering practices include:
 
 Remaining work:
 
-- Purchase Order Razor Pages
-- Purchase Order Listing UI
-- Purchase Order Details UI
 - Purchase History
-- User Experience Improvements
+- Multiple Purchase Order Item Management
+- Purchase Order Search
+- Purchase Order Filtering
+- Purchase Order Sorting
+- Purchase Order Pagination
+- Inventory Integration During Receiving
+- Additional User Experience Improvements
 
 ## Account Management
 
@@ -669,14 +698,6 @@ Remaining work:
 - Product Reports
 - Export to Excel
 - Export to PDF
-
-## Purchasing
-
-- Purchase Orders
-- Purchase Approval
-- Goods Receiving
-- Partial Receiving
-- Purchase History
 
 ## Sales
 
