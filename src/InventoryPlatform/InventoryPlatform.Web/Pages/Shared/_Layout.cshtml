@@ -22,86 +22,85 @@
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
+                        <!-- Main Dashboard -->
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-page="/Dashboard/Index">Dashboard</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link"
-                               asp-page="/Products/Index">
-                                Products
+
+                        <!-- Core Management Dropdown -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="coreDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Management
                             </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link"
-                               asp-page="/Suppliers/Index">
-                                Suppliers
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link"
-                               asp-page="/Customers/Index">
-                                Customers
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link"
-                               asp-page="/Categories/Index">
-                                Categories
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link"
-                               asp-page="/Units/Index">
-                                Units
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link"
-                               asp-page="/InventoryTransactions/Index">
-                                Inventory Transactions
-                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="coreDropdown">
+                                <li><a class="dropdown-item" asp-page="/Products/Index">Products</a></li>
+                                <li><a class="dropdown-item" asp-page="/Categories/Index">Categories</a></li>
+                                <li><a class="dropdown-item" asp-page="/Units/Index">Units</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" asp-page="/Suppliers/Index">Suppliers</a></li>
+                                <li><a class="dropdown-item" asp-page="/Customers/Index">Customers</a></li>
+                            </ul>
                         </li>
 
+                        <!-- Inventory & Purchasing Dropdown -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="inventoryDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Operations
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="inventoryDropdown">
+                                <li><a class="dropdown-item" asp-page="/Purchasing/PurchaseOrder/Index">Purchase Orders</a></li>
+                                <li><a class="dropdown-item" asp-page="/InventoryTransactions/Index">Inventory Transactions</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" asp-page="/Reports/InventoryValuation/Index">Inventory Valuation</a></li>
+                            </ul>
+                        </li>
+
+                        <!-- Admin Controls -->
                         @if (User.IsInRole(IdentityConstants.Roles.Administrator))
-                            {
+                        {
                             <li class="nav-item">
-                                <a class="nav-link"
-                                   asp-page="/Administrator/Users/Index">
-                                    Users
-                                </a>
+                                <a class="nav-link text-danger" asp-page="/Administrator/Users/Index">Users</a>
                             </li>
-                            }
+                        }
 
+                        <!-- Global Policy -->
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-page="/Privacy">Privacy</a>
                         </li>
                     </ul>
-                    <ul class="navbar-nav ms-auto">
+
+                    <!-- Authentication Status Section -->
+                    <ul class="navbar-nav ms-auto align-items-center">
                         @if (User.Identity?.IsAuthenticated == true)
                         {
-                            <span class="navbar-text me-3">
-                                Hello, @User.Identity.Name
-                            </span>
+                            <li class="nav-item me-3">
+                                <span class="navbar-text">
+                                    Hello, <strong>@User.Identity.Name</strong>
+                                </span>
+                            </li>
+                            <li class="nav-item">
+                                <form asp-area="Identity"
+                                      asp-page="/Account/Logout"
+                                      method="post"
+                                      class="d-inline">
 
-                            <form asp-area="Identity"
-                                  asp-page="/Account/Logout"
-                                  method="post"
-                                  class="d-inline">
+                                    @Html.AntiForgeryToken()
 
-                                @Html.AntiForgeryToken()
-
-                                <button class="btn btn-outline-danger btn-sm">
-                                    Logout
-                                </button>
-                            </form>
+                                    <button class="btn btn-outline-danger btn-sm">
+                                        Logout
+                                    </button>
+                                </form>
+                            </li>
                         }
                         else
                         {
-                            <a asp-area="Identity"
-                               asp-page="/Account/Login"
-                               class="btn btn-outline-primary">
-                                Login
-                            </a>
+                            <li class="nav-item">
+                                <a asp-area="Identity"
+                                   asp-page="/Account/Login"
+                                   class="btn btn-outline-primary">
+                                    Login
+                                </a>
+                            </li>
                         }
                     </ul>
                 </div>

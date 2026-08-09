@@ -31,6 +31,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IDashboardRepository, DashboardRepository>();
         services.AddScoped<IIdentityService, IdentityService>();
         services.AddScoped<IPurchaseOrderRepository, PurchaseOrderRepository>();
+        services.AddScoped<IInventoryValuationRepository, InventoryValuationRepository>();
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 

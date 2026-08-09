@@ -58,6 +58,8 @@ using InventoryPlatform.Application.Features.Purchasing.SubmitPurchaseOrder;
 using InventoryPlatform.Application.Features.Purchasing.ApprovePurchaseOrder;
 using InventoryPlatform.Application.Features.Purchasing.ReceivePurchaseOrder;
 
+using InventoryPlatform.Application.Features.Reporting.GetInventoryValuation;
+
 namespace InventoryPlatform.Application.DependencyInjection;
 
 public static class ServiceCollectionExtensions
@@ -122,6 +124,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<SubmitPurchaseOrderHandler>();
         services.AddScoped<ApprovePurchaseOrderHandler>();
         services.AddScoped<ReceivePurchaseOrderHandler>();
+
+        services.AddScoped<GetInventoryValuationHandler>();
 
         services.AddValidatorsFromAssembly(
             typeof(ServiceCollectionExtensions).Assembly);
