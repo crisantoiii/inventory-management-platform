@@ -192,8 +192,9 @@ Current repositories include:
 - `InventoryTransactionRepository`
 - `PurchaseOrderRepository`
 - `DashboardRepository`
+- `InventoryValuationRepository`
 
-`DashboardRepository` is intentionally implemented as a read-only repository using DTO projections rather than aggregate entities.
+`DashboardRepository` and `InventoryValuationRepository` are intentionally implemented as read-only repositories using DTO projections rather than aggregate entities.
 
 ---
 
@@ -265,10 +266,13 @@ The platform uses dedicated read models for presentation concerns.
 Examples include:
 
 - Dashboard reporting DTOs
+- Inventory Valuation DTOs
 - GetPurchaseOrderResponse
 - GetPurchaseOrderSummaryResponse
 
 Read models are optimized for presentation while remaining independent from Domain entities.
+
+Read-oriented reporting features use DTO projections to retrieve only the data required by the presentation layer.
 
 ---
 
@@ -530,6 +534,102 @@ SQL Server
 
 Dashboard View
 ```
+---
+
+# Inventory Valuation Request Workflow
+
+```text
+Browser
+
+    │
+
+    ▼
+
+Inventory Valuation Razor Page
+
+    │
+
+    ▼
+
+GetInventoryValuationHandler
+
+    │
+
+    ▼
+
+IInventoryValuationRepository
+
+    │
+
+    ▼
+
+InventoryValuationRepository
+
+    │
+
+    ▼
+
+Read-only EF Core Projection
+
+    │
+
+    ▼
+
+SQL Server
+
+    │
+
+    ▼
+
+InventoryValuationDto
+
+    │
+
+    ▼
+
+Inventory Valuation View
+```
+
+The Inventory Valuation report is implemented as a read-only vertical slice.
+
+The query projects only the fields required by the report and calculates:
+
+```text
+Inventory Value
+= QuantityOnHand × CostPrice
+```
+
+The query does not modify Domain entities or inventory records.
+
+---
+
+# Reporting Architecture
+
+Reporting features use a read-oriented application flow separate from transactional Domain workflows.
+
+```text
+Presentation
+     ↓
+Application Handler
+     ↓
+Read Model
+     ↓
+Repository Abstraction
+     ↓
+Infrastructure Repository
+     ↓
+EF Core Projection
+     ↓
+Database
+```
+
+The Reporting layer does not require Domain aggregate mutation when the feature is read-only.
+
+This allows reporting queries to use dedicated DTO projections while preserving the existing Clean Architecture boundaries.
+
+Inventory Valuation is the first dedicated Reporting vertical slice implemented using this approach.
+
+The implementation did not require structural architectural redesign.
 
 ---
 
@@ -665,6 +765,28 @@ Business rules and workflow transitions are encapsulated within the aggregate.
 
 The Dashboard uses read-only DTO projections to aggregate reporting data without exposing domain entities. This keeps reporting concerns separate from transactional business workflows while leveraging the existing application and repository architecture.
 
+## Read-only Reporting Projections
+
+Read-only Reporting features should prefer database-side DTO projections rather than loading Domain entities into memory.
+
+Inventory Valuation uses an EF Core projection:
+
+```text
+Product
+   ↓
+OrderBy(Product.Name)
+   ↓
+DTO Projection
+   ↓
+InventoryValuationDto
+```
+
+The initial implementation attempted to order the projected DTO directly. EF Core could not translate the DTO constructor expression used by the ordering operation.
+
+The query was therefore changed to order the underlying entity property before performing the DTO projection.
+
+This keeps filtering, ordering, calculation, and projection database-side and avoids unnecessary client-side evaluation.
+
 ## Architecture Validation Before Expansion
 
 The project deliberately introduced an Architecture Sprint before implementing workflow-driven modules.
@@ -726,7 +848,6 @@ Sprint 4 extended the Purchasing implementation into the Presentation layer and 
 
 - Sales
 - Warehouse
-- Reporting
 - Blazor Administration
 
 ## Identity Enhancements
@@ -740,5 +861,13 @@ Sprint 4 extended the Purchasing implementation into the Presentation layer and 
 - REST API
 - Audit Logging
 - Background Jobs
+
+### Reporting Enhancements
+
+- Additional reporting modules
+- Excel Export
+- PDF Export
+- Advanced report filtering
+- Advanced report sorting
 
 The existing architecture is intended to support these features without major restructuring.

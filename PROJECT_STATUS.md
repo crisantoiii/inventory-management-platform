@@ -18,12 +18,12 @@ Purchase Orders
 ████████████████████ 100%
 
 Reporting
-░░░░░░░░░░░░░░░░░░░░ 0%
+████████████████░░░░ 80%
 
 
 # Project Status
 
-**Current Version:** v1.1.0
+**Current Version:** v1.2.0
 
 **Project Status:** Active Development
 
@@ -31,25 +31,27 @@ Reporting
 
 # Latest Release
 
-## v1.1.0 — Purchasing Presentation Layer
+## v1.2.0 — Reporting: Inventory Valuation
 
 Released: August 2026
 
 Completed:
 
-- Purchasing Presentation Layer
-- Purchase Order Index
-- Create Purchase Order
-- Purchase Order Details
-- Submit Purchase Order
-- Approve Purchase Order
-- Partial Purchase Order Receiving
-- Final Purchase Order Receiving
-- Purchase Order Completed State
-- Presentation Validation
-- Success and Failure Feedback
-- End-to-end Purchasing Workflow Validation
-- Workflow Architecture Validation
+- Inventory Valuation Report
+- Inventory Valuation Read Model
+- Inventory Valuation Application Handler
+- Inventory Valuation Persistence Abstraction
+- Inventory Valuation Repository
+- Read-only EF Core Projection
+- Product-level Inventory Valuation
+- Category Projection
+- Quantity On Hand Display
+- Cost Price Display
+- Inventory Value Display
+- Total Inventory Value
+- Inventory Valuation Navigation
+- Dashboard/Report Value Consistency
+- Browser Verification
 
 ---
 
@@ -66,6 +68,7 @@ Completed:
 - ✅ v0.9.0 - Architecture Sprint 1
 - ✅ v1.0.0 - Purchasing Application Layer
 - ✅ v1.1.0 - Purchasing Presentation Layer
+- 🟨 v1.2.0 - Reporting: Inventory Valuation
 
 ---
 
@@ -73,8 +76,8 @@ Completed:
 
 - **Completed Modules:** 9
 - **Architecture Status:** Validated
-- **Current Milestone:** Purchasing Presentation Layer Complete
-- **Next Milestone:** Future Purchasing Enhancements / Next Business Module
+- **Current Milestone:** Reporting — Inventory Valuation
+- **Next Milestone:** Additional Reporting Capabilities
 
 ---
 
@@ -115,8 +118,8 @@ The architecture has been validated and is considered stable for future business
 | Dashboard | ✅ Complete | 100% |
 | Authentication & Authorization |  ✅ Complete | 100% |
 | User Management | ✅ Complete | 100% |
-| Purchasing | 🟨 Presentation Complete | 100% |
-| Reporting | ⬜ Not Started | 0% |
+| Purchasing | ✅ Presentation Complete | 100% |
+| Reporting | 🟨 Inventory Valuation Complete | Partial |
 | Account Management | ⬜ Not Started | 0% |
 
 ---
@@ -276,6 +279,38 @@ The architecture has been validated and is considered stable for future business
 - ✅ Success Messages
 - ✅ Query Failure Feedback
 
+## Reporting
+
+### Inventory Valuation
+
+- ✅ Inventory Valuation Report
+- ✅ Inventory Valuation Read Model
+- ✅ Inventory Valuation Application Handler
+- ✅ Inventory Valuation Persistence Abstraction
+- ✅ Inventory Valuation Repository
+- ✅ Read-only EF Core Projection
+- ✅ Product-level Inventory Valuation
+- ✅ Category Projection
+- ✅ Quantity On Hand Display
+- ✅ Cost Price Display
+- ✅ Inventory Value Display
+- ✅ Total Inventory Value
+- ✅ Inventory Valuation Navigation
+- ✅ Dashboard/Report Value Consistency
+- ✅ Browser Verification
+
+### Reporting — Remaining Work
+
+- ⬜ Empty database behavior verification
+- ⬜ Explicit query-failure testing
+- ⬜ Excel export
+- ⬜ PDF export
+- ⬜ Purchase History
+- ⬜ Supplier Purchase Analysis
+- ⬜ Stock Movement
+- ⬜ Low Stock Report
+- ⬜ Inventory Movement Report
+
 ---
 
 # Shared Infrastructure
@@ -305,34 +340,25 @@ The architecture has been validated and is considered stable for future business
 
 # Current Focus
 
-v1.1.0 – Purchasing Presentation Layer Complete
+v1.2.0 – Reporting: Inventory Valuation
 
-The Purchasing vertical slice has been completed through the Presentation layer and verified end-to-end using persisted database records.
-
-Completed:
-
-- Razor Pages
-- Purchase Order UI
-- Workflow Actions
-- Validation
-- Success and failure feedback
-- End-to-end Integration
+The first Reporting vertical slice has been implemented and verified as a browser-accessible read-only report backed by actual persisted database data.
 
 ---
 
 # Next Milestone
 
-The next milestone has not yet been formally defined.
+Additional Reporting Capabilities
 
 Potential future work includes:
 
-- Purchasing enhancements
-- Inventory integration for Purchase Order receiving
-- Cross-cutting DomainException handling
-- Multiple Purchase Order item management
-- Purchase Order search, filtering, sorting, and pagination
-- Additional reporting capabilities
-- Sales module
+- Excel export
+- PDF export
+- Purchase History
+- Supplier Purchase Analysis
+- Stock Movement
+- Low Stock Report
+- Inventory Movement Report
 
 ---
 
@@ -343,7 +369,6 @@ Current version does not yet include:
 Business Modules
 
 - Sales Orders
-- Reporting
 
 Purchasing
 
@@ -417,3 +442,33 @@ Database
 without structural redesign.
 
 The Purchasing module is now ready for future enhancements while the platform remains in active development.
+
+Sprint 5 introduced the first Reporting vertical slice through Inventory Valuation.
+
+The Inventory Valuation report provides a read-only browser-accessible view backed by actual persisted database data.
+
+Inventory valuation is calculated using:
+
+```text
+QuantityOnHand × CostPrice
+```
+
+The report total was verified against the existing Dashboard Inventory Value.
+
+The Reporting implementation follows a read-oriented architecture:
+
+```text
+Presentation
+     ↓
+Application
+     ↓
+Read Model
+     ↓
+Infrastructure
+     ↓
+Database
+```
+
+The implementation demonstrates that the existing architecture supports read-oriented Reporting capabilities alongside transactional business workflows without requiring structural redesign.
+
+The Reporting module remains partially complete, with additional reports and export capabilities planned for future work.

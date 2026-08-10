@@ -14,6 +14,7 @@ The platform currently provides business modules for:
 - Inventory Transactions
 - Purchasing
 - Dashboard Reporting
+- Reporting
 - Authentication
 - User Management
 
@@ -39,6 +40,8 @@ Outcome:
 
 The Purchasing Presentation Layer is now complete and has been verified through an end-to-end browser workflow using persisted database records.
 
+The first Reporting vertical slice has also been implemented through Inventory Valuation and verified using actual persisted database records.
+
 ## Module Summary
 
 | Module | Status |
@@ -54,6 +57,7 @@ The Purchasing Presentation Layer is now complete and has been verified through 
 | Inventory Transactions | ✅ Complete |
 | Architecture Sprint | ✅ Complete |
 | Purchasing | 🟨 Core Workflow Complete |
+| Reporting | 🟨 Inventory Valuation Complete |
 
 ## Current Implementation
 
@@ -70,6 +74,8 @@ Completed modules:
 - ✅ User Management
 - ✅ Purchasing Application Layer
 - ✅ Purchasing Presentation Layer
+- 🟨 Reporting
+- ✅ Inventory Valuation
 
 Shared capabilities:
 
@@ -340,6 +346,67 @@ Completed
 - Purchase Order completion is determined automatically by the Domain Model.
 - Received quantity cannot exceed the remaining quantity.
 - Received quantity must be greater than zero.
+
+---
+
+# Reporting
+
+## Inventory Valuation
+
+- ✅ Inventory Valuation Report
+- ✅ Inventory Valuation Read Model
+- ✅ Inventory Valuation Application Handler
+- ✅ Inventory Valuation Persistence Abstraction
+- ✅ Inventory Valuation Repository
+- ✅ Read-only EF Core Projection
+- ✅ Product-level Inventory Valuation
+- ✅ Category Projection
+- ✅ Quantity On Hand Display
+- ✅ Cost Price Display
+- ✅ Inventory Value Display
+- ✅ Total Inventory Value
+- ✅ Inventory Valuation Navigation
+- ✅ Dashboard/Report Value Consistency
+- ✅ Browser Verification
+
+## Inventory Valuation Calculation
+
+```text
+Inventory Value
+= QuantityOnHand × CostPrice
+```
+
+The report uses a read-only EF Core projection and does not modify Domain entities or inventory records.
+
+## Reporting Architecture
+
+```text
+Presentation
+     ↓
+Application
+     ↓
+Read Model
+     ↓
+IInventoryValuationRepository
+     ↓
+InventoryValuationRepository
+     ↓
+EF Core
+     ↓
+Database
+```
+
+## Remaining Reporting Work
+
+- ⬜ Empty database behavior verification
+- ⬜ Explicit query-failure testing
+- ⬜ Purchase History
+- ⬜ Supplier Purchase Analysis
+- ⬜ Stock Movement
+- ⬜ Low Stock Report
+- ⬜ Inventory Movement Report
+- ⬜ Excel Export
+- ⬜ PDF Export
 
 ---
 
@@ -692,9 +759,17 @@ Remaining work:
 
 ## Reporting
 
-- Inventory Reports
+Completed:
+
 - Inventory Valuation
+
+Remaining:
+
+- Purchase History
+- Supplier Purchase Analysis
+- Stock Movement
 - Low Stock Report
+- Inventory Movement Report
 - Product Reports
 - Export to Excel
 - Export to PDF

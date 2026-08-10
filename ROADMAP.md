@@ -17,7 +17,7 @@ v0.8  Identity & Users         ✅
 v0.9  Architecture Sprint      ✅
 v1.0  Purchasing Application   ✅
 v1.1  Purchasing Presentation  ✅
-v1.2  Reporting                ⏳
+v1.2  Reporting                🟨
 v1.3  Account Management       ⏳
 
 ---
@@ -43,43 +43,65 @@ Each major business capability should be implemented from Domain and Application
 
 # Current Release
 
-## Version 1.1.0 – Purchasing Presentation Layer
+## Version 1.2.0 – Reporting: Inventory Valuation
 
 ### Completed
 
-- Purchasing Application Layer
-- Purchasing Presentation Layer
-- Purchase Order Listing
-- Purchase Order Creation
-- Purchase Order Details
-- Purchase Order Submission
-- Purchase Order Approval
-- Partial Purchase Order Receiving
-- Final Purchase Order Receiving
-- Purchase Order Completion
-- Presentation Validation
-- Success and Failure Feedback
-- End-to-End Purchasing Workflow Validation
+- Inventory Valuation Report
+- Inventory Valuation Read Model
+- Inventory Valuation Application Handler
+- Inventory Valuation Persistence Abstraction
+- Inventory Valuation Repository
+- Read-only EF Core Projection
+- Product-level Inventory Valuation
+- Category Projection
+- Quantity On Hand Display
+- Cost Price Display
+- Inventory Value Display
+- Total Inventory Value
+- Inventory Valuation Navigation
+- Dashboard/Report Value Consistency
+- Browser Verification
 
 ### Result
 
-The Purchasing module now provides a complete browser-accessible vertical slice from Purchase Order creation through final receiving.
+The first Reporting vertical slice is now available as a browser-accessible read-only report backed by actual persisted database data.
 
-The workflow has been verified using persisted database records:
+Inventory valuation is calculated using:
 
 ```text
-Draft
-  ↓ Submit
-Submitted
-  ↓ Approve
-Approved
-  ↓ Receive partial quantity
-Receiving
-  ↓ Receive remaining quantity
-Completed
+QuantityOnHand × CostPrice
 ```
 
-The implementation preserves the existing Clean Architecture, Rich Domain Model, Vertical Slice Architecture, and Application handler patterns.
+The report total was verified against the existing Dashboard Inventory Value.
+
+The implementation preserves the existing Clean Architecture, Vertical Slice Architecture, Application handler patterns, and repository abstractions.
+
+The Reporting read path is:
+
+```text
+Presentation
+     ↓
+Application
+     ↓
+Read Model
+     ↓
+Infrastructure
+     ↓
+Database
+```
+
+### Remaining Reporting Work
+
+- Inventory Valuation empty-state verification
+- Explicit query-failure testing
+- Purchase History
+- Supplier Purchase Analysis
+- Stock Movement
+- Low Stock Report
+- Inventory Movement Report
+- Excel Export
+- PDF Export
 
 ### Product Management
 
@@ -255,21 +277,29 @@ Remaining:
 
 # Phase 6 — Reporting
 
-Status: ⏳ Planned
+Status: 🟨 In Progress
 
-Planned Reports:
+### Completed
 
 - Inventory Valuation
+
+### Remaining Reports
+
 - Purchase History
 - Supplier Purchase Analysis
 - Stock Movement
 - Low Stock Report
 - Inventory Movement Report
 
-Export Options:
+### Export Options
 
 - Excel
 - PDF
+
+### Remaining Validation
+
+- Inventory Valuation empty-state verification
+- Explicit query-failure testing
 
 ---
 
@@ -342,10 +372,10 @@ Future enhancements may include:
 | v0.9.0 | Architecture Sprint 1 ✅ |
 | v1.0.0 | Purchasing Application Layer ✅ |
 | v1.1.0 | Purchasing Presentation Layer ✅ |
-| v1.2.0 | Reporting  ⏳ |
-| v1.3.0 | Account Management  ⏳ |
-| v1.4.0 | Sales Module  ⏳ |
-| v2.0.0 | REST API & Blazor  ⏳ |
+| v1.2.0 | Reporting — Inventory Valuation 🟨 |
+| v1.3.0 | Account Management ⏳ |
+| v1.4.0 | Sales Module ⏳ |
+| v2.0.0 | REST API & Blazor ⏳ |
 
 ---
 
@@ -368,5 +398,6 @@ Each new module should:
 - Apply the Rule of Three before introducing shared abstractions.
 - Prefer complete vertical slices over isolated technical implementations.
 - Validate new workflows through real application usage before considering the feature complete.
+- Validate read-oriented queries against actual EF Core translation before introducing client-side evaluation.
 
 The architecture should evolve through reuse rather than introducing module-specific implementations whenever possible.

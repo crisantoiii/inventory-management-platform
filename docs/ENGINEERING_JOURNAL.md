@@ -45,6 +45,7 @@ Rather than documenting daily work, it captures important architectural decision
 | 17 | Architecture Sprint 1 |
 | 18 | Purchasing Application Layer |
 | 19 | Purchasing Presentation Layer |
+| 20 | Reporting: Inventory Valuation |
 
 ---
 
@@ -923,6 +924,211 @@ These findings are therefore treated as technical debt/future design work rather
 
 ---
 
+# Milestone 20 — Reporting: Inventory Valuation
+
+## Summary
+
+Implemented the first dedicated Reporting vertical slice through the Inventory Valuation report.
+
+The milestone extended the existing read-oriented architecture used by Dashboard Reporting into a dedicated Reporting feature without introducing structural architectural changes.
+
+Completed:
+
+### Application
+
+- Inventory Valuation read model
+- `InventoryValuationDto`
+- `GetInventoryValuationRequest`
+- `GetInventoryValuationHandler`
+- `IInventoryValuationRepository`
+
+### Infrastructure
+
+- `InventoryValuationRepository`
+- Read-only EF Core projection
+- Category relationship projection
+- Database-side inventory valuation calculation
+
+### Presentation
+
+- Inventory Valuation Razor Page
+- Inventory Valuation navigation entry
+- Product-level valuation display
+- Total Inventory Value display
+
+## Inventory Valuation
+
+The report calculates inventory value using:
+
+```text
+Inventory Value
+= QuantityOnHand × CostPrice
+```
+
+The report total is calculated as:
+
+```text
+Total Inventory Value
+= Σ (QuantityOnHand × CostPrice)
+```
+
+The implementation uses actual persisted Product and Category data.
+
+## Reporting Workflow
+
+The completed read-oriented workflow is:
+
+```text
+Inventory Valuation Razor Page
+        ↓
+GetInventoryValuationHandler
+        ↓
+IInventoryValuationRepository
+        ↓
+InventoryValuationRepository
+        ↓
+EF Core Projection
+        ↓
+SQL Server
+        ↓
+InventoryValuationDto
+        ↓
+Inventory Valuation View
+```
+
+The report does not modify Product or Inventory Transaction entities.
+
+## EF Core Query Translation Issue
+
+During implementation, the initial query attempted to order the projected DTO:
+
+```text
+Projection
+     ↓
+OrderBy(DTO.ProductName)
+```
+
+EF Core could not translate the resulting expression.
+
+The query was changed to order the underlying entity property before performing the DTO projection:
+
+```text
+Product
+     ↓
+OrderBy(Product.Name)
+     ↓
+DTO Projection
+     ↓
+InventoryValuationDto
+```
+
+This kept ordering, calculation, and projection database-side without introducing client-side evaluation.
+
+## Lesson Learned
+
+When using EF Core read projections, ordering and filtering should preferably be applied to translatable entity properties before the final DTO projection when the projected DTO expression cannot be translated.
+
+## Validation
+
+The Inventory Valuation report was verified through the browser using actual persisted database records.
+
+Validated:
+
+- Inventory Valuation navigation
+- Report page loading
+- Product data retrieval
+- Category projection
+- Quantity On Hand display
+- Cost Price display
+- Individual Inventory Value calculation
+- Total Inventory Value calculation
+- Dashboard/report total consistency
+- Existing application functionality
+- Solution build
+
+The report total was compared against the existing Dashboard Inventory Value and matched.
+
+## Architecture Validation
+
+Sprint 5 demonstrated that the existing architecture supports dedicated read-oriented Reporting features without requiring structural redesign.
+
+The Reporting path follows:
+
+```text
+Presentation
+     ↓
+Application
+     ↓
+Read Model
+     ↓
+Repository Abstraction
+     ↓
+Infrastructure
+     ↓
+Database
+```
+
+This differs from transactional workflows where Domain aggregates participate in business state changes.
+
+The implementation confirms that read-only Reporting can coexist with transactional business workflows while preserving the existing Clean Architecture boundaries.
+
+## Lessons Learned
+
+- Dedicated DTO projections are appropriate for read-only Reporting features.
+- Reporting queries should retrieve only the data required by the presentation layer.
+- EF Core translation should be validated before introducing client-side evaluation.
+- Database-side ordering, calculation, and projection help keep read queries efficient.
+- Existing Dashboard reporting patterns provided a proven foundation for the first dedicated Reporting slice.
+- A complete browser-verified vertical slice provides stronger validation than implementation alone.
+- Reporting can be introduced without creating a separate architectural layer.
+- Documentation should distinguish implemented Reporting capabilities from future reports and exports.
+
+## Reflection
+
+Sprint 5 extended the platform from its existing Dashboard reporting capability into a dedicated Reporting module.
+
+Inventory Valuation became the first Reporting vertical slice and demonstrated that the existing architecture can support read-oriented business capabilities alongside workflow-driven transactional modules.
+
+The implementation reused established patterns rather than introducing speculative abstractions.
+
+The resulting architecture remains:
+
+```text
+Transactional Workflows
+
+Presentation
+     ↓
+Application
+     ↓
+Domain
+     ↓
+Infrastructure
+     ↓
+Database
+```
+
+and
+
+```text
+Read-Oriented Reporting
+
+Presentation
+     ↓
+Application
+     ↓
+Read Model
+     ↓
+Infrastructure
+     ↓
+Database
+```
+
+No structural architectural redesign was required.
+
+The remaining Reporting roadmap includes additional reports, Excel/PDF export, and further validation of empty-state and query-failure behavior.
+
+---
+
 # Architecture Validation
 
 After implementing:
@@ -938,6 +1144,7 @@ After implementing:
 - User Management
 - Purchasing Application Layer
 - Purchasing Presentation Layer
+- Reporting: Inventory Valuation
 
 the architecture has demonstrated:
 
@@ -950,7 +1157,7 @@ the architecture has demonstrated:
 - Separation between workflow orchestration and Presentation concerns
 - End-to-end integration between Presentation, Application, Domain, Infrastructure, and database layers
 
-This milestone demonstrates that the architecture supports:
+The combined milestones demonstrate that the architecture supports:
 
 - Master data modules
 - Transactional workflows
@@ -1028,6 +1235,7 @@ Future milestones are expected to include:
 
 - Sales Module
 - Reporting Enhancements
+- Additional Reporting Modules
 - Audit Logging
 - REST API
 - Integration Testing

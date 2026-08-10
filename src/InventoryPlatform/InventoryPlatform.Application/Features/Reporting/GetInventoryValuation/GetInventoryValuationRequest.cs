@@ -1,0 +1,3 @@
+﻿namespace InventoryPlatform.Application.Features.Reporting.GetInventoryValuation;
+
+public sealed record GetInventoryValuationRequest;

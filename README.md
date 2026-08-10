@@ -34,7 +34,7 @@ The focus is not only on implementing business features but also on applying pro
 
 ## Project Status
 
-**Current Version:** v1.1.0 – Purchasing Presentation Layer
+**Current Version:** v1.2.0 – Reporting: Inventory Valuation
 
 ## Completed Modules
 
@@ -48,25 +48,28 @@ The focus is not only on implementing business features but also on applying pro
 - ✅ Authentication & Authorization
 - ✅ User Management
 - 🟨 Purchasing (Core Workflow Complete)
+- 🟨 Reporting (Inventory Valuation Complete)
 
-## Latest Release 
+## Latest Release
 
-## v1.1.0 — Purchasing Presentation Layer
+## v1.2.0 — Reporting: Inventory Valuation
 
 ### Highlights
 
-- Completed Purchasing Presentation Layer
-- Added Purchase Order Listing
-- Added Purchase Order Creation
-- Added Purchase Order Details
-- Added Submit Purchase Order workflow
-- Added Approve Purchase Order workflow
-- Added partial Purchase Order receiving
-- Added final Purchase Order receiving
-- Added Purchase Order Completed state
-- Added Presentation validation and feedback
-- Added end-to-end Purchasing workflow validation
-- Extended the validated architecture without structural redesign
+- Added Inventory Valuation report
+- Added Inventory Valuation read model
+- Added `InventoryValuationDto`
+- Added Inventory Valuation Application handler
+- Added Inventory Valuation repository abstraction
+- Added Inventory Valuation repository
+- Added read-only EF Core projection
+- Added category projection
+- Added product-level inventory valuation
+- Added total inventory valuation
+- Added Inventory Valuation navigation
+- Verified Dashboard/report valuation consistency
+- Verified the report through the browser using persisted database records
+- Preserved the existing architecture without structural redesign
 
 ---
 
@@ -75,6 +78,30 @@ The focus is not only on implementing business features but also on applying pro
 The project completed **Architecture Sprint 1**, a comprehensive architectural review covering the Application, Infrastructure, and Web layers.
 
 Sprint 3 validated the architecture through the Purchasing Application layer, while Sprint 4 extended that validation into the Presentation layer by delivering a complete browser-accessible Purchasing workflow.
+
+Sprint 5 extended the architecture into dedicated read-oriented Reporting through Inventory Valuation.
+
+The Reporting path is:
+
+```text
+Presentation
+     ↓
+Application Handler
+     ↓
+Read Model
+     ↓
+Repository Abstraction
+     ↓
+Infrastructure Repository
+     ↓
+EF Core Projection
+     ↓
+Database
+```
+
+The implementation uses a dedicated DTO projection and does not modify Domain entities.
+
+The first Reporting vertical slice was implemented without requiring structural architectural redesign.
 
 This confirmed that the existing architecture scales from CRUD-oriented modules to workflow-driven business processes and complete end-to-end vertical slices without requiring structural redesign.
 
@@ -127,6 +154,9 @@ The long-term goal is to evolve this project into a complete inventory managemen
 - Immutable Business Records
 - Automatic Stock Management
 - Business Dashboard
+- Dedicated Reporting Read Models
+- Read-only EF Core Projections
+- Inventory Valuation Reporting
 - ASP.NET Core Identity
 - Cookie Authentication
 - Role-based Authorization
@@ -314,6 +344,62 @@ Completed
 - Workflow-driven state transitions
 - Aggregate-based business behavior
 - Thin Application handlers
+
+## Reporting
+
+### Inventory Valuation
+
+- ✅ Inventory Valuation Report
+- ✅ Inventory Valuation Read Model
+- ✅ Inventory Valuation Application Handler
+- ✅ Inventory Valuation Persistence Abstraction
+- ✅ Inventory Valuation Repository
+- ✅ Read-only EF Core Projection
+- ✅ Product-level Inventory Valuation
+- ✅ Category Projection
+- ✅ Quantity On Hand Display
+- ✅ Cost Price Display
+- ✅ Inventory Value Display
+- ✅ Total Inventory Value
+- ✅ Inventory Valuation Navigation
+- ✅ Dashboard/Report Value Consistency
+- ✅ Browser Verification
+
+### Inventory Valuation Calculation
+
+```text
+Inventory Value
+= QuantityOnHand × CostPrice
+```
+
+The report uses actual persisted Product and Category data.
+
+### Reporting Architecture
+
+```text
+Presentation
+     ↓
+Application
+     ↓
+Read Model
+     ↓
+Infrastructure
+     ↓
+Database
+```
+
+### Remaining Reporting Work
+
+- ⬜ Empty database behavior verification
+- ⬜ Explicit query-failure testing
+- ⬜ Purchase History
+- ⬜ Supplier Purchase Analysis
+- ⬜ Stock Movement
+- ⬜ Low Stock Report
+- ⬜ Inventory Movement Report
+- ⬜ Excel Export
+- ⬜ PDF Export
+
 
 ## Dashboard
 
@@ -641,7 +727,7 @@ Development Tools
 | Authentication & Authorization | ✅ Complete |
 | User Management | ✅ Complete |
 | Purchasing | 🟨 Core Workflow Complete |
-| Reporting | ⬜ Planned |
+| Reporting | 🟨 Inventory Valuation Complete |
 
 ---
 
@@ -659,16 +745,25 @@ Development Tools
 - Authentication & Authorization
 - User Management
 - Architecture Sprint 1
+- Purchasing Application Layer
+- Purchasing Presentation Layer
+- Inventory Valuation Reporting
+
+## Current
+
+- v1.2.0 — Reporting: Inventory Valuation
 
 ## Next
 
-- v1.2.0 — Reporting
+- Additional Reporting Capabilities
 
 ## Future
 
 - Purchasing Enhancements
 - Sales
-- Reporting
+- Additional Reporting Modules
+- Excel Export
+- PDF Export
 - Audit Logging
 - Self-Service Account Management
 - Two-Factor Authentication
@@ -758,6 +853,12 @@ The following screenshots demonstrate the current implementation:
 
 ![Purchase Order Details - Completed](docs/screenshots/Purchasing_details3.png)
 
+### Reporting
+
+#### Inventory Valuation
+
+![Inventory Valuation](docs/screenshots/inventory_valuation.png)
+
 ---
 
 # Learning Objectives
@@ -788,6 +889,11 @@ This project is focused on applying modern enterprise development practices incl
 - Workflow-driven Presentation Design
 - Presentation-to-Application Integration
 - Business Workflow Validation
+- Read-oriented Reporting Architecture
+- DTO Projection
+- Database-side Reporting Queries
+- EF Core Query Translation
+- Reporting Vertical Slices
 
 ---
 
