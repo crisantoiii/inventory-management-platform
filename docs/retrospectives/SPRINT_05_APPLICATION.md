@@ -84,7 +84,9 @@ Application Handler
      ↓
 Read Model
      ↓
-Reporting Persistence Abstraction
+IInventoryValuationRepository
+     ↓
+InventoryValuationRepository
      ↓
 EF Core Projection
      ↓
@@ -294,24 +296,89 @@ These may be considered after the first reporting pattern has been validated.
 
 Sprint 5 Inventory Valuation is considered complete when:
 
-- [ ] Inventory Valuation read model is implemented.
-- [ ] Application request and handler are implemented.
-- [ ] Persistence abstraction is implemented.
-- [ ] EF Core read projection is implemented.
-- [ ] Inventory valuation uses `QuantityOnHand` $\times$ `CostPrice`.
-- [ ] Inventory Valuation Razor Page is implemented.
-- [ ] Total inventory value is displayed.
+- [x] Inventory Valuation read model is implemented.
+- [x] Application request and handler are implemented.
+- [x] Persistence abstraction is implemented.
+- [x] EF Core read projection is implemented.
+- [x] Inventory valuation uses `QuantityOnHand` × `CostPrice`.
+- [x] Inventory Valuation Razor Page is implemented.
+- [x] Total inventory value is displayed.
 - [ ] Empty database behavior is verified.
-- [ ] Multiple-product calculation is verified.
-- [ ] Category projection is verified.
+- [x] Multiple-product calculation is verified.
+- [x] Category projection is verified.
 - [ ] Query failures are surfaced appropriately.
-- [ ] No Domain entities are mutated by the report.
-- [ ] No Presentation-to-DbContext dependency exists.
-- [ ] Existing functionality remains working.
-- [ ] Solution builds successfully.
-- [ ] Browser report is verified.
+- [x] No Domain entities are mutated by the report.
+- [x] No Presentation-to-DbContext dependency exists.
+- [x] Existing functionality remains working.
+- [x] Solution builds successfully.
+- [x] Browser report is verified.
 - [ ] Sprint documentation is updated.
 - [ ] Final documentation is consolidated into one documentation commit.
+
+---
+
+## Implementation Completed
+
+### Inventory Valuation
+
+Implemented the first Reporting vertical slice with:
+
+- `InventoryValuationDto`
+- `GetInventoryValuationRequest`
+- `GetInventoryValuationHandler`
+- `IInventoryValuationRepository`
+- `InventoryValuationRepository`
+- Inventory Valuation Razor Page
+- Navigation entry under Operations
+
+The repository uses a read-only EF Core projection with `AsNoTracking()`.
+
+Inventory valuation is calculated as:
+
+```text
+QuantityOnHand × CostPrice
+```
+
+The report total was verified against the existing Dashboard Inventory Value.
+
+## EF Core Query Adjustment
+
+The initial query attempted to order the projected DTO:
+
+```text
+Projection
+    ↓
+OrderBy(DTO.ProductName)
+```
+
+This could not be translated by EF Core.
+
+The query was changed to order the Product entity before projection:
+
+```text
+Products
+    ↓
+OrderBy(Product.Name)
+    ↓
+Projection
+    ↓
+InventoryValuationDto
+```
+
+This kept the query fully database-side without using client evaluation.
+
+## Browser Verification
+
+Verified that:
+
+- Inventory Valuation is accessible from the application navigation.
+- Product data loads from the database.
+- Category information is displayed.
+- Quantity On Hand is displayed.
+- Cost Price is displayed.
+- Individual Inventory Value is calculated correctly.
+- Total Inventory Value is calculated correctly.
+- Report total matches the Dashboard Inventory Value.
 
 ---
 
@@ -353,9 +420,9 @@ The goal is to support reporting without forcing read-only queries through Domai
 
 # Sprint 5 Success Criteria
 
-The first Reporting vertical slice will be considered successful when Inventory Valuation is available as a usable browser-accessible report backed by actual database data and implemented without architectural redesign.
+The first Reporting vertical slice is functionally complete when Inventory Valuation is available as a usable browser-accessible report backed by actual database data and implemented without architectural redesign.
 
-The resulting pattern should provide a foundation for future reporting features while avoiding premature creation of a generic Reporting framework.
+Remaining validation items are limited to empty-database behavior and explicit query-failure testing.
 
 ## One deliberate decision
 

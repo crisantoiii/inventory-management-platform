@@ -1,5 +1,188 @@
 # Changelog
 
+## [v1.2.0] - 2026-08-09
+
+### Release Summary
+
+This release introduces the first Reporting vertical slice through the Inventory Valuation report.
+
+The report provides a read-only view of current inventory valuation using the existing inventory valuation definition:
+
+```text
+Inventory Value
+= Σ (QuantityOnHand × CostPrice)
+```
+
+The implementation extends the existing Dashboard read-model approach into a dedicated Reporting feature without requiring architectural redesign.
+
+---
+
+## Added
+
+### Inventory Valuation Report
+
+- Inventory Valuation Razor Page
+- Inventory Valuation read model
+- Inventory Valuation application request
+- Inventory Valuation application handler
+- Inventory Valuation persistence abstraction
+- Inventory Valuation repository
+- Product-level inventory valuation
+- Category information
+- Quantity On Hand display
+- Cost Price display
+- Inventory Value display
+- Total Inventory Value
+- Inventory Valuation navigation entry
+
+### Reporting Read Model
+
+- InventoryValuationDto
+- Read-only EF Core projection
+- AsNoTracking() query
+
+---
+
+## Changed
+
+- Extended the Application layer with the Reporting feature.
+- Added `IInventoryValuationRepository` following the existing repository pattern.
+- Added `InventoryValuationRepository` to the Infrastructure layer.
+- Added Inventory Valuation presentation under Razor Pages.
+- Added Inventory Valuation to the Operations navigation.
+- Reused the existing Dashboard inventory valuation definition.
+
+---
+
+## Improved
+- Added a dedicated browser-accessible Inventory Valuation report.
+- Preserved separation between Presentation, Application, Domain, and Infrastructure layers.
+- Kept Reporting read-only and separate from transactional Domain workflows.
+- Used EF Core projection to retrieve only the data required by the report.
+- Kept inventory valuation calculation database-side.
+- Reused the existing Result<T> application pattern.
+
+---
+
+## Validated
+
+### Inventory Valuation
+
+```text
+QuantityOnHand × CostPrice
+```
+
+Each product's inventory value was verified against the expected calculation.
+
+### Total Inventory Value
+
+```text
+Total Inventory Value
+=
+Σ Product Inventory Value
+```
+
+The report total was verified against the existing Dashboard Inventory Value.
+
+### Browser Verification
+
+- Inventory Valuation navigation
+- Inventory Valuation page loading
+- Product data retrieval
+- Category projection
+- Quantity On Hand display
+- Cost Price display
+- Individual Inventory Value calculation
+- Total Inventory Value calculation
+- Dashboard/report total consistency
+- Existing application functionality
+
+### EF Core Query Translation
+
+The initial query attempted to order the projected DTO:
+
+```text
+Projection
+    ↓
+OrderBy(DTO.ProductName)
+```
+
+EF Core could not translate this expression.
+
+The query was changed to:
+
+```text
+Products
+    ↓
+OrderBy(Product.Name)
+    ↓
+Projection
+    ↓
+InventoryValuationDto
+```
+
+This kept the query fully database-side without introducing client-side evaluation.
+
+---
+
+## Technical Findings
+
+The following items remain intentionally deferred:
+
+- Empty database behavior verification
+- Explicit query-failure testing for the Reporting feature
+- Excel export
+- PDF export
+- Purchase History report
+- Supplier Purchase Analysis
+- Stock Movement report
+- Low Stock report
+- Inventory Movement report
+- Advanced report filtering
+- Advanced report sorting
+- Report scheduling
+- Generic reporting framework
+
+These are not considered completed features of this release.
+
+---
+
+## Documentation
+
+- Added SPRINT_05_APPLICATION.md
+- Updated Reporting architecture documentation
+- Updated project status documentation
+- Updated roadmap documentation
+- Updated feature documentation
+- Updated engineering journal
+- Updated design decisions where required
+
+---
+
+## Outcome
+
+The Reporting module now has its first usable vertical slice:
+
+```text
+Presentation
+     ↓
+Application
+     ↓
+Read Model
+     ↓
+Infrastructure
+     ↓
+Database
+```
+
+Inventory Valuation is available as a browser-accessible report backed by actual persisted database data.
+
+The implementation validates that the existing architecture can support read-oriented Reporting capabilities alongside the transactional workflows introduced by the Purchasing module.
+
+The first Reporting slice was implemented without requiring structural architectural redesign.
+
+---
+
 ## [v1.1.0] - 2026-08-08
 
 ### Release Summary

@@ -96,6 +96,7 @@ Current implementation:
 - InventoryTransactionRepository
 - DashboardRepository
 - PurchaseOrderRepository
+- InventoryValuationRepository
 
 ## Outcome
 
@@ -849,6 +850,48 @@ Accepted.
 
 ---
 
+DD-025 — Purchase Order Details as Workflow Screen
+
+Version Introduced: v1.1.0
+
+Decision
+
+Purchase Order workflow actions are implemented on the Purchase Order Details page rather than creating a separate Razor Page for each workflow action.
+
+The Details page currently supports:
+
+Submit
+Approve
+Receive
+Rationale
+
+The Purchase Order Details page already represents the current state of the Purchase Order and its items.
+
+Keeping workflow actions on the same page:
+
+Keeps the workflow localized.
+Reduces unnecessary navigation.
+Provides immediate visibility of the current Purchase Order state.
+Allows actions to be displayed according to the current status.
+
+The Presentation layer reflects the workflow while the Domain remains responsible for enforcing valid state transitions.
+
+Alternatives Considered
+
+Create separate Razor Pages for:
+
+Submit Purchase Order
+Approve Purchase Order
+Receive Purchase Order
+
+This approach was rejected because it would fragment a workflow that is naturally centered around the Purchase Order Details view.
+
+Outcome
+
+Accepted.
+
+---
+
 # DD-026 — Item-Level Purchase Order Receiving
 
 Version Introduced: v1.1.0
@@ -973,6 +1016,107 @@ This approach was rejected because it provides poorer immediate user feedback.
 ## Outcome
 
 Accepted.
+
+---
+
+# DD-029 — Read-only Reporting Projections
+
+Version Introduced: v1.2.0
+
+## Decision
+
+Read-only Reporting features use dedicated DTO projections rather than loading Domain entities into memory.
+
+The first implementation is Inventory Valuation.
+
+The Reporting flow is:
+
+```text
+Presentation
+     ↓
+Application Handler
+     ↓
+Read Model
+     ↓
+Repository Abstraction
+     ↓
+Infrastructure Repository
+     ↓
+EF Core Projection
+     ↓
+Database
+```
+
+Inventory Valuation returns a dedicated InventoryValuationDto containing only the data required by the report.
+
+## Rationale
+
+Reporting queries have different requirements from transactional workflows.
+
+A read-only report does not need to load Domain aggregates when it only needs a projection of persisted data.
+
+Using dedicated DTO projections:
+
+- Keeps reporting concerns separate from transactional workflows.
+- Avoids unnecessary Domain entity loading.
+- Reduces coupling between Presentation and Domain entities.
+- Retrieves only the fields required by the report.
+- Keeps calculations and projections database-side.
+- Supports efficient read-oriented queries.
+- Preserves Clean Architecture boundaries.
+
+Inventory Valuation calculates:
+
+```text
+Inventory Value
+= QuantityOnHand × CostPrice
+```
+
+without modifying Product or Inventory Transaction entities.
+
+## Alternatives Considered
+
+Load Product and Category Domain entities and construct the report in application memory.
+
+This approach was rejected because it would retrieve more data than required and move report processing away from the database.
+
+Return Domain entities directly to the Presentation layer.
+
+This approach was rejected because it exposes persistence/domain models to presentation concerns and increases coupling.
+
+## EF Core Translation Consideration
+
+The initial Inventory Valuation query attempted to order the projected DTO directly.
+
+```text
+Projection
+     ↓
+OrderBy(DTO.ProductName)
+```
+
+EF Core could not translate the resulting expression.
+
+The query was changed to order the underlying entity property before performing the DTO projection:
+
+```text
+Product
+     ↓
+OrderBy(Product.Name)
+     ↓
+DTO Projection
+     ↓
+InventoryValuationDto
+```
+
+This keeps ordering, calculation, and projection database-side without introducing client-side evaluation.
+
+## Outcome
+
+Accepted.
+
+Inventory Valuation successfully validates the read-only Reporting projection approach in practice.
+
+The implementation required no structural architectural redesign.
 
 ---
 
