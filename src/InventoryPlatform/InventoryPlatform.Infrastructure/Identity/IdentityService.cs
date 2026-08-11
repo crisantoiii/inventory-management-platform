@@ -53,7 +53,7 @@ public sealed class IdentityService : IIdentityService
         if (user is null)
         {
             return Result.Failure(
-                UserErrors.NotFound(request.Id));
+                AccountErrors.NotFound(request.Id));
         }
 
         var token = await _userManager
@@ -85,7 +85,7 @@ public sealed class IdentityService : IIdentityService
         if (user is null)
         {
             return Result.Failure(
-                UserErrors.NotFound(request.Id));
+                AccountErrors.NotFound(request.Id));
         }
 
         if(request.IsActive)
@@ -111,7 +111,7 @@ public sealed class IdentityService : IIdentityService
         if (user is null)
         {
             return Result.Failure(
-                UserErrors.NotFound(request.Id));
+                AccountErrors.NotFound(request.Id));
         }
 
         var currentRoles = await _userManager.GetRolesAsync(user);
@@ -146,7 +146,7 @@ public sealed class IdentityService : IIdentityService
         if (user is null)
         {
             return Result.Failure(
-                UserErrors.NotFound(request.Id));
+                AccountErrors.NotFound(request.Id));
         }
 
         user.UserName = request.UserName;
@@ -175,14 +175,14 @@ public sealed class IdentityService : IIdentityService
 
         if (user is not null)
         {
-            return Result<Guid>.Failure(UserErrors.DuplicateUserName);
+            return Result<Guid>.Failure(AccountErrors.DuplicateUserName);
         }
 
         user = await _userManager.FindByEmailAsync(request.Email);
 
         if (user is not null)
         {
-            return Result<Guid>.Failure(UserErrors.DuplicateEmail);
+            return Result<Guid>.Failure(AccountErrors.DuplicateEmail);
         }
 
         user = new ApplicationUser
@@ -223,7 +223,7 @@ public sealed class IdentityService : IIdentityService
         if (user is null)
         {
             return Result<GetUserResponse>.Failure(
-                UserErrors.NotFound(id));
+                AccountErrors.NotFound(id));
         }
 
         var roles = await _userManager.GetRolesAsync(user);

@@ -1,64 +1,60 @@
 ﻿using FluentValidation;
-using Microsoft.Extensions.DependencyInjection;
-
-using InventoryPlatform.Application.Features.Products.CreateProduct;
-using InventoryPlatform.Application.Features.Products.DeactivateProduct;
-using InventoryPlatform.Application.Features.Products.GetProduct;
-using InventoryPlatform.Application.Features.Products.GetProducts;
-using InventoryPlatform.Application.Features.Products.UpdateProduct;
-using InventoryPlatform.Application.Features.Products.ActivateProduct;
-
+using InventoryPlatform.Application.Features.Account;
+using AccountResetPassword = InventoryPlatform.Application.Features.Account.ResetPassword;
+using InventoryPlatform.Application.Features.Account.ChangePassword;
+using InventoryPlatform.Application.Features.Account.ForgotPassword;
+using InventoryPlatform.Application.Features.Account.GetProfile;
+using InventoryPlatform.Application.Features.Account.UpdateProfile;
+using InventoryPlatform.Application.Features.Categories.ActivateCategory;
 using InventoryPlatform.Application.Features.Categories.CreateCategory;
 using InventoryPlatform.Application.Features.Categories.DeactivateCategory;
-using InventoryPlatform.Application.Features.Categories.GetCategory;
 using InventoryPlatform.Application.Features.Categories.GetCategories;
+using InventoryPlatform.Application.Features.Categories.GetCategory;
 using InventoryPlatform.Application.Features.Categories.UpdateCategory;
-using InventoryPlatform.Application.Features.Categories.ActivateCategory;
-
-using InventoryPlatform.Application.Features.Suppliers.CreateSupplier;
-using InventoryPlatform.Application.Features.Suppliers.DeactivateSupplier;
-using InventoryPlatform.Application.Features.Suppliers.GetSupplier;
-using InventoryPlatform.Application.Features.Suppliers.GetSuppliers;
-using InventoryPlatform.Application.Features.Suppliers.UpdateSupplier;
-using InventoryPlatform.Application.Features.Suppliers.ActivateSupplier;
-
+using InventoryPlatform.Application.Features.Customers.ActivateCustomer;
 using InventoryPlatform.Application.Features.Customers.CreateCustomer;
 using InventoryPlatform.Application.Features.Customers.DeactivateCustomer;
 using InventoryPlatform.Application.Features.Customers.GetCustomer;
 using InventoryPlatform.Application.Features.Customers.GetCustomers;
 using InventoryPlatform.Application.Features.Customers.UpdateCustomer;
-using InventoryPlatform.Application.Features.Customers.ActivateCustomer;
-
+using InventoryPlatform.Application.Features.Dashboard.GetDashboard;
+using InventoryPlatform.Application.Features.InventoryTransactions.CreateInventoryTransaction;
+using InventoryPlatform.Application.Features.InventoryTransactions.GetInventoryTransaction;
+using InventoryPlatform.Application.Features.InventoryTransactions.GetInventoryTransactions;
+using InventoryPlatform.Application.Features.Products.ActivateProduct;
+using InventoryPlatform.Application.Features.Products.CreateProduct;
+using InventoryPlatform.Application.Features.Products.DeactivateProduct;
+using InventoryPlatform.Application.Features.Products.GetProduct;
+using InventoryPlatform.Application.Features.Products.GetProducts;
+using InventoryPlatform.Application.Features.Products.UpdateProduct;
+using InventoryPlatform.Application.Features.Purchasing.ApprovePurchaseOrder;
+using InventoryPlatform.Application.Features.Purchasing.CreatePurchaseOrder;
+using InventoryPlatform.Application.Features.Purchasing.GetPurchaseOrder;
+using InventoryPlatform.Application.Features.Purchasing.GetPurchaseOrders;
+using InventoryPlatform.Application.Features.Purchasing.ReceivePurchaseOrder;
+using InventoryPlatform.Application.Features.Purchasing.SubmitPurchaseOrder;
+using InventoryPlatform.Application.Features.Reporting.GetInventoryValuation;
+using InventoryPlatform.Application.Features.Suppliers.ActivateSupplier;
+using InventoryPlatform.Application.Features.Suppliers.CreateSupplier;
+using InventoryPlatform.Application.Features.Suppliers.DeactivateSupplier;
+using InventoryPlatform.Application.Features.Suppliers.GetSupplier;
+using InventoryPlatform.Application.Features.Suppliers.GetSuppliers;
+using InventoryPlatform.Application.Features.Suppliers.UpdateSupplier;
+using InventoryPlatform.Application.Features.Units.ActivateUnit;
 using InventoryPlatform.Application.Features.Units.CreateUnit;
 using InventoryPlatform.Application.Features.Units.DeactivateUnit;
 using InventoryPlatform.Application.Features.Units.GetUnit;
 using InventoryPlatform.Application.Features.Units.GetUnits;
 using InventoryPlatform.Application.Features.Units.UpdateUnit;
-using InventoryPlatform.Application.Features.Units.ActivateUnit;
-
-using InventoryPlatform.Application.Features.InventoryTransactions.CreateInventoryTransaction;
-using InventoryPlatform.Application.Features.InventoryTransactions.GetInventoryTransactions;
-using InventoryPlatform.Application.Features.InventoryTransactions.GetInventoryTransaction;
-
-using InventoryPlatform.Application.Features.Dashboard.GetDashboard;
-
-using InventoryPlatform.Application.Features.Users.GetUsers;
-using InventoryPlatform.Application.Features.Users.GetUser;
 using InventoryPlatform.Application.Features.Users.CreateUser;
 using InventoryPlatform.Application.Features.Users.GetRoles;
+using InventoryPlatform.Application.Features.Users.GetUser;
+using InventoryPlatform.Application.Features.Users.GetUsers;
+using UserResetPassword = InventoryPlatform.Application.Features.Users.ResetPassword;
 using InventoryPlatform.Application.Features.Users.UpdateUser;
 using InventoryPlatform.Application.Features.Users.UpdateUserRoles;
 using InventoryPlatform.Application.Features.Users.UpdateUserStatus;
-using InventoryPlatform.Application.Features.Users.ResetPassword;
-
-using InventoryPlatform.Application.Features.Purchasing.GetPurchaseOrders;
-using InventoryPlatform.Application.Features.Purchasing.GetPurchaseOrder;
-using InventoryPlatform.Application.Features.Purchasing.CreatePurchaseOrder;
-using InventoryPlatform.Application.Features.Purchasing.SubmitPurchaseOrder;
-using InventoryPlatform.Application.Features.Purchasing.ApprovePurchaseOrder;
-using InventoryPlatform.Application.Features.Purchasing.ReceivePurchaseOrder;
-
-using InventoryPlatform.Application.Features.Reporting.GetInventoryValuation;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace InventoryPlatform.Application.DependencyInjection;
 
@@ -116,7 +112,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<UpdateUserHandler>();
         services.AddScoped<UpdateUserRolesHandler>();
         services.AddScoped<UpdateUserStatusHandler>();
-        services.AddScoped<ResetPasswordHandler>();
+        services.AddScoped<UserResetPassword.ResetPasswordHandler>();
 
         services.AddScoped<GetPurchaseOrdersHandler>();
         services.AddScoped<GetPurchaseOrderHandler>();
@@ -126,6 +122,12 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ReceivePurchaseOrderHandler>();
 
         services.AddScoped<GetInventoryValuationHandler>();
+
+        services.AddScoped<GetProfileHandler>();
+        services.AddScoped<UpdateProfileHandler>();
+        services.AddScoped<ChangePasswordHandler>();
+        services.AddScoped<ForgotPasswordHandler>();
+        services.AddScoped<AccountResetPassword.ResetPasswordHandler>();
 
         services.AddValidatorsFromAssembly(
             typeof(ServiceCollectionExtensions).Assembly);
