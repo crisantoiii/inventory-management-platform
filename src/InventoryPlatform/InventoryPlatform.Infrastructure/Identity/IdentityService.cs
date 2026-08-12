@@ -73,6 +73,19 @@ public sealed class IdentityService : IIdentityService
                         result.Errors.Select(e => e.Description))));
         }
 
+        user.MustChangePassword = true;
+
+        var updateResult = await _userManager.UpdateAsync(user);
+
+        if (!updateResult.Succeeded)
+        {
+            return Result.Failure(
+                Error.Validation2(
+                    string.Join(
+                        Environment.NewLine,
+                        updateResult.Errors.Select(e => e.Description))));
+        }
+
         return ToResult(result);
     }
 

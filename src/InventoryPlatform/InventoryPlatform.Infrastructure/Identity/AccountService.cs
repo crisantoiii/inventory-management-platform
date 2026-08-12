@@ -57,7 +57,7 @@ public sealed class AccountService : IAccountService
 
         if (user is null)
         {
-            return Result.Failure( 
+            return Result.Failure(
                 AccountErrors.UserNotFound( request.UserId ));
         }
 
@@ -106,6 +106,24 @@ public sealed class AccountService : IAccountService
                     string.Join(
                         Environment.NewLine,
                         result.Errors.Select(e => e.Description))));
+        }
+
+        // A successful password change satisfies the
+        // forced password change requirement.
+        if (user.MustChangePassword)
+        {
+            user.MustChangePassword = false;
+
+            var updateResult = await _userManager.UpdateAsync(user);
+
+            if (!updateResult.Succeeded)
+            {
+                return Result.Failure(
+                    Error.Validation2(
+                        string.Join(
+                            Environment.NewLine,
+                            updateResult.Errors.Select(e => e.Description))));
+            }
         }
 
         return Result.Success();

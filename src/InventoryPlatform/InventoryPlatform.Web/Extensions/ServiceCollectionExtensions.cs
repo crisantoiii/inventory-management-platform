@@ -1,7 +1,6 @@
 ﻿using InventoryPlatform.Infrastructure.Persistence.Context;
 using InventoryPlatform.Web.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.DependencyInjection;
 using LocalIdentity = InventoryPlatform.Infrastructure.Identity;
 
 namespace InventoryPlatform.Web.Extensions;
@@ -26,6 +25,10 @@ public static class ServiceCollectionExtensions
             })
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders();
+
+        services.AddScoped<
+            IUserClaimsPrincipalFactory<LocalIdentity.ApplicationUser>,
+            ApplicationUserClaimsPrincipalFactory>();
 
         services.ConfigureApplicationCookie(options =>
         {

@@ -1,4 +1,6 @@
 using InventoryPlatform.Application.Features.Account.ChangePassword;
+using InventoryPlatform.Infrastructure.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.ComponentModel.DataAnnotations;
@@ -9,11 +11,17 @@ namespace InventoryPlatform.Web.Pages.Account;
 public sealed class ChangePasswordModel : PageModel
 {
     private readonly ChangePasswordHandler _changePasswordHandler;
+    private readonly SignInManager<ApplicationUser> _signInManager;
+    private readonly UserManager<ApplicationUser> _userManager;
 
     public ChangePasswordModel(
-        ChangePasswordHandler changePasswordHandler)
+        ChangePasswordHandler changePasswordHandler,
+        SignInManager<ApplicationUser> signInManager,
+        UserManager<ApplicationUser> userManager)
     {
         _changePasswordHandler = changePasswordHandler;
+        _signInManager = signInManager;
+        _userManager = userManager;
     }
 
     [BindProperty]
@@ -77,6 +85,15 @@ public sealed class ChangePasswordModel : PageModel
 
             return Page();
         }
+
+        var user = await _userManager.GetUserAsync(User);
+
+        if (user is null)
+        {
+            return Challenge();
+        }
+
+        await _signInManager.RefreshSignInAsync(user);
 
         TempData["StatusMessage"] =
             "Your password has been changed successfully.";
