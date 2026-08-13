@@ -202,7 +202,7 @@ public sealed class IdentityService : IIdentityService
         {
             UserName = request.UserName,
             Email = request.Email,
-            EmailConfirmed = request.EmailConfirmed,
+            EmailConfirmed = false,
         };
 
         var createResult = await _userManager.CreateAsync(user, request.Password);

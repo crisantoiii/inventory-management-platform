@@ -1,7 +1,9 @@
-﻿using InventoryPlatform.Application.Features.Account.ResetPassword;
-using InventoryPlatform.Application.Features.Account.ChangePassword;
+﻿using InventoryPlatform.Application.Features.Account.ChangePassword;
+using InventoryPlatform.Application.Features.Account.ConfirmEmail;
 using InventoryPlatform.Application.Features.Account.ForgotPassword;
 using InventoryPlatform.Application.Features.Account.GetProfile;
+using InventoryPlatform.Application.Features.Account.RequestEmailVerification;
+using InventoryPlatform.Application.Features.Account.ResetPassword;
 using InventoryPlatform.Application.Features.Account.UpdateProfile;
 using InventoryPlatform.Shared.Results;
 
@@ -27,5 +29,13 @@ public interface IAccountService
 
     Task<Result> ResetPasswordAsync(
         ResetPasswordRequest request,
+        CancellationToken cancellationToken = default);
+
+    Task<Result<RequestEmailVerificationResponse>> RequestEmailVerificationAsync(
+        RequestEmailVerificationRequest request,
+        CancellationToken cancellationToken = default);
+
+    Task<Result> ConfirmEmailAsync(
+        ConfirmEmailRequest request,
         CancellationToken cancellationToken = default);
 }

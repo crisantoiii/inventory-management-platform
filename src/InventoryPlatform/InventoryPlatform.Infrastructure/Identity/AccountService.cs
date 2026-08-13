@@ -1,8 +1,10 @@
 ﻿using InventoryPlatform.Application.Features.Account;
-using InventoryPlatform.Application.Features.Account.ResetPassword;
 using InventoryPlatform.Application.Features.Account.ChangePassword;
+using InventoryPlatform.Application.Features.Account.ConfirmEmail;
 using InventoryPlatform.Application.Features.Account.ForgotPassword;
 using InventoryPlatform.Application.Features.Account.GetProfile;
+using InventoryPlatform.Application.Features.Account.RequestEmailVerification;
+using InventoryPlatform.Application.Features.Account.ResetPassword;
 using InventoryPlatform.Application.Features.Account.UpdateProfile;
 using InventoryPlatform.Application.Interfaces.Communication;
 using InventoryPlatform.Application.Interfaces.Identity;
@@ -58,7 +60,7 @@ public sealed class AccountService : IAccountService
         if (user is null)
         {
             return Result.Failure(
-                AccountErrors.UserNotFound( request.UserId ));
+                AccountErrors.UserNotFound(request.UserId));
         }
 
         user.PhoneNumber = string.IsNullOrWhiteSpace(request.PhoneNumber)
@@ -182,6 +184,92 @@ public sealed class AccountService : IAccountService
             user,
             request.Token,
             request.NewPassword);
+
+        if (!result.Succeeded)
+        {
+            return Result.Failure(
+                Error.Validation2(
+                    string.Join(
+                        Environment.NewLine,
+                        result.Errors.Select(e => e.Description))));
+        }
+
+        return Result.Success();
+    }
+
+    public async Task<Result<RequestEmailVerificationResponse>>
+        RequestEmailVerificationAsync(
+            RequestEmailVerificationRequest request,
+            CancellationToken cancellationToken = default)
+    {
+        var user = await _userManager.FindByIdAsync(
+            request.UserId.ToString());
+
+        if (user is null)
+        {
+            return Result<RequestEmailVerificationResponse>.Failure(
+                AccountErrors.NotFound(request.UserId));
+        }
+
+        if (user.EmailConfirmed)
+        {
+            return Result<RequestEmailVerificationResponse>.Success(
+                new RequestEmailVerificationResponse
+                {
+                    AlreadyVerified = true
+                });
+        }
+
+        var token = await _userManager
+            .GenerateEmailConfirmationTokenAsync(user);
+
+        var verificationUrl =
+            $"/Account/ConfirmEmail?userId={Uri.EscapeDataString(user.Id.ToString())}&token={Uri.EscapeDataString(token)}";
+
+        var body = $"""
+        Please verify your email address for your Inventory Platform account.
+
+        Use the following link to verify your email:
+
+        {verificationUrl}
+
+        If you did not request this, you can safely ignore this message.
+        """;
+
+        await _emailService.SendAsync(
+            user.Email!,
+            "Inventory Platform - Verify Your Email",
+            body,
+            cancellationToken);
+
+        return Result<RequestEmailVerificationResponse>.Success(
+            new RequestEmailVerificationResponse
+            {
+                AlreadyVerified = false
+            });
+    }
+
+    public async Task<Result> ConfirmEmailAsync(
+        ConfirmEmailRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var user = await _userManager.FindByIdAsync(
+            request.UserId.ToString());
+
+        if (user is null)
+        {
+            return Result.Failure(
+                AccountErrors.NotFound(request.UserId));
+        }
+
+        if (user.EmailConfirmed)
+        {
+            return Result.Success();
+        }
+
+        var result = await _userManager.ConfirmEmailAsync(
+            user,
+            request.Token);
 
         if (!result.Succeeded)
         {

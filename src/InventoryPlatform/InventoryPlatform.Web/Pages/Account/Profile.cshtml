@@ -15,6 +15,20 @@
         </div>
     </div>
 
+    @if (TempData["StatusMessage"] is string statusMessage)
+    {
+        <div class="alert alert-success" role="alert">
+            @statusMessage
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] is string errorMessage)
+    {
+        <div class="alert alert-danger" role="alert">
+            @errorMessage
+        </div>
+    }
+
     @if (Model.Profile is not null)
     {
         <div class="card">
@@ -35,7 +49,23 @@
 
                     <dt class="col-sm-3">Email Verified</dt>
                     <dd class="col-sm-9">
-                        @(Model.Profile.EmailConfirmed ? "Yes" : "No")
+                        @if (Model.Profile.EmailConfirmed)
+                        {
+                            <span>Yes</span>
+                        }
+                        else
+                        {
+                            <span>No</span>
+
+                            <form method="post"
+                                  asp-page="/Account/RequestEmailVerification"
+                                  class="d-inline ms-2">
+                                <button type="submit"
+                                        class="btn btn-sm btn-outline-primary">
+                                    Verify Email
+                                </button>
+                            </form>
+                        }
                     </dd>
 
                     <dt class="col-sm-3">Phone Verified</dt>
