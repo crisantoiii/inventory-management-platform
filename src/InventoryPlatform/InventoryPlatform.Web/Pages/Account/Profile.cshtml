@@ -72,6 +72,37 @@
                     <dd class="col-sm-9">
                         @(Model.Profile.PhoneNumberConfirmed ? "Yes" : "No")
                     </dd>
+
+                    <dt class="col-sm-3">Two-Factor Authentication</dt>
+                    <dd class="col-sm-9">
+                        @if (Model.Profile.TwoFactorEnabled)
+                        {
+                            <span class="text-success">
+                                Enabled
+                            </span>
+
+                            <div class="mt-3">
+                                <a asp-page="/Account/TwoFactorAuthentication"
+                                   class="btn btn-primary">
+                                    Manage Two-Factor Authentication
+                                </a>
+                            </div>
+                        }
+                        else
+                        {
+                            <span class="text-muted">
+                                Disabled
+                            </span>
+
+                            <div class="mt-3">
+                                <a asp-page="/Account/TwoFactorAuthentication"
+                                   class="btn btn-primary">
+                                    Set Up Two-Factor Authentication
+                                </a>
+                            </div>
+                        }
+                    </dd>
+
                 </dl>
             </div>
         </div>

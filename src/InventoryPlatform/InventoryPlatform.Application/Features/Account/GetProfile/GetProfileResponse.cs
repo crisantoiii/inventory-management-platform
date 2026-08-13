@@ -13,4 +13,6 @@ public sealed record GetProfileResponse
     public bool EmailConfirmed { get; init; }
 
     public bool PhoneNumberConfirmed { get; init; }
+
+    public bool TwoFactorEnabled { get; set; }
 }

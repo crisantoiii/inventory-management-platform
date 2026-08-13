@@ -1,11 +1,17 @@
 ﻿using FluentValidation;
 using InventoryPlatform.Application.Features.Account;
-using InventoryPlatform.Application.Features.Account.RequestEmailVerification;
-using AccountResetPassword = InventoryPlatform.Application.Features.Account.ResetPassword;
 using InventoryPlatform.Application.Features.Account.ChangePassword;
+using InventoryPlatform.Application.Features.Account.ConfirmEmail;
+using InventoryPlatform.Application.Features.Account.DisableTwoFactor;
 using InventoryPlatform.Application.Features.Account.ForgotPassword;
+using InventoryPlatform.Application.Features.Account.GenerateTwoFactorRecoveryCodes;
 using InventoryPlatform.Application.Features.Account.GetProfile;
+using InventoryPlatform.Application.Features.Account.GetTwoFactorStatus;
+using InventoryPlatform.Application.Features.Account.RegenerateTwoFactorRecoveryCodes;
+using InventoryPlatform.Application.Features.Account.RequestEmailVerification;
+using InventoryPlatform.Application.Features.Account.SetupTwoFactor;
 using InventoryPlatform.Application.Features.Account.UpdateProfile;
+using InventoryPlatform.Application.Features.Account.VerifyTwoFactor;
 using InventoryPlatform.Application.Features.Categories.ActivateCategory;
 using InventoryPlatform.Application.Features.Categories.CreateCategory;
 using InventoryPlatform.Application.Features.Categories.DeactivateCategory;
@@ -51,12 +57,12 @@ using InventoryPlatform.Application.Features.Users.CreateUser;
 using InventoryPlatform.Application.Features.Users.GetRoles;
 using InventoryPlatform.Application.Features.Users.GetUser;
 using InventoryPlatform.Application.Features.Users.GetUsers;
-using UserResetPassword = InventoryPlatform.Application.Features.Users.ResetPassword;
 using InventoryPlatform.Application.Features.Users.UpdateUser;
 using InventoryPlatform.Application.Features.Users.UpdateUserRoles;
 using InventoryPlatform.Application.Features.Users.UpdateUserStatus;
 using Microsoft.Extensions.DependencyInjection;
-using InventoryPlatform.Application.Features.Account.ConfirmEmail;
+using AccountResetPassword = InventoryPlatform.Application.Features.Account.ResetPassword;
+using UserResetPassword = InventoryPlatform.Application.Features.Users.ResetPassword;
 
 namespace InventoryPlatform.Application.DependencyInjection;
 
@@ -132,6 +138,12 @@ public static class ServiceCollectionExtensions
         services.AddScoped<AccountResetPassword.ResetPasswordHandler>();
         services.AddScoped<RequestEmailVerificationHandler>();
         services.AddScoped<ConfirmEmailHandler>();
+        services.AddScoped<GetTwoFactorStatusHandler>();
+        services.AddScoped<SetupTwoFactorHandler>();
+        services.AddScoped<VerifyTwoFactorHandler>();
+        services.AddScoped<GenerateTwoFactorRecoveryCodesHandler>();
+        services.AddScoped<DisableTwoFactorHandler>();
+        services.AddScoped<RegenerateTwoFactorRecoveryCodesHandler>();
 
         services.AddValidatorsFromAssembly(
             typeof(ServiceCollectionExtensions).Assembly);

@@ -59,6 +59,7 @@ public static class ServiceCollectionExtensions
 
             options.Conventions.AllowAnonymousToPage("/Account/ForgotPassword");
             options.Conventions.AllowAnonymousToPage("/Account/ResetPassword");
+            options.Conventions.AllowAnonymousToPage("/Account/TwoFactorLogin");
 
             options.Conventions.AllowAnonymousToAreaPage(
                 "Identity",

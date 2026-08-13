@@ -1,0 +1,53 @@
+﻿@page
+@model InventoryPlatform.Web.Pages.Account.TwoFactorRecoveryCodesModel
+
+@{
+    ViewData["Title"] = "Two-Factor Recovery Codes";
+}
+
+<div class="container py-4">
+    <div class="row">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+
+                    <h2 class="card-title mb-3">
+                        Two-Factor Authentication Enabled
+                    </h2>
+
+                    <div class="alert alert-warning">
+                        <strong>Save your recovery codes.</strong>
+                        <br />
+                        These codes can be used to access your account
+                        if you lose access to your authenticator app.
+                    </div>
+
+                    <p>
+                        Each recovery code can be used only once.
+                        Store these codes somewhere safe.
+                    </p>
+
+                    <div class="border rounded p-3 mb-4">
+                        @foreach (var code in Model.RecoveryCodes)
+                        {
+                            <div>
+                                <code>@code</code>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="alert alert-danger">
+                        These recovery codes will not be shown again.
+                        Make sure you have saved them before continuing.
+                    </div>
+
+                    <a asp-page="/Account/TwoFactorAuthentication"
+                       class="btn btn-primary">
+                        I've Saved My Recovery Codes
+                    </a>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

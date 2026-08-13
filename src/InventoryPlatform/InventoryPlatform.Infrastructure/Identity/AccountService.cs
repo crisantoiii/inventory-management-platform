@@ -2,10 +2,15 @@
 using InventoryPlatform.Application.Features.Account.ChangePassword;
 using InventoryPlatform.Application.Features.Account.ConfirmEmail;
 using InventoryPlatform.Application.Features.Account.ForgotPassword;
+using InventoryPlatform.Application.Features.Account.GenerateTwoFactorRecoveryCodes;
 using InventoryPlatform.Application.Features.Account.GetProfile;
+using InventoryPlatform.Application.Features.Account.GetTwoFactorStatus;
+using InventoryPlatform.Application.Features.Account.RegenerateTwoFactorRecoveryCodes;
 using InventoryPlatform.Application.Features.Account.RequestEmailVerification;
 using InventoryPlatform.Application.Features.Account.ResetPassword;
+using InventoryPlatform.Application.Features.Account.SetupTwoFactor;
 using InventoryPlatform.Application.Features.Account.UpdateProfile;
+using InventoryPlatform.Application.Features.Account.VerifyTwoFactor;
 using InventoryPlatform.Application.Interfaces.Communication;
 using InventoryPlatform.Application.Interfaces.Identity;
 using InventoryPlatform.Shared.Results;
@@ -46,7 +51,8 @@ public sealed class AccountService : IAccountService
                 Email = user.Email ?? string.Empty,
                 PhoneNumber = user.PhoneNumber,
                 EmailConfirmed = user.EmailConfirmed,
-                PhoneNumberConfirmed = user.PhoneNumberConfirmed
+                PhoneNumberConfirmed = user.PhoneNumberConfirmed,
+                TwoFactorEnabled = user.TwoFactorEnabled
             });
     }
 
@@ -281,5 +287,216 @@ public sealed class AccountService : IAccountService
         }
 
         return Result.Success();
+    }
+
+    public async Task<Result<GetTwoFactorStatusResponse>>
+    GetTwoFactorStatusAsync(
+        Guid userId,
+        CancellationToken cancellationToken = default)
+    {
+        var user = await _userManager.FindByIdAsync(
+            userId.ToString());
+
+        if (user is null)
+        {
+            return Result<GetTwoFactorStatusResponse>.Failure(
+                AccountErrors.NotFound(userId));
+        }
+
+        return Result<GetTwoFactorStatusResponse>.Success(
+            new GetTwoFactorStatusResponse
+            {
+                TwoFactorEnabled = user.TwoFactorEnabled
+            });
+    }
+
+    public async Task<Result<SetupTwoFactorResponse>>
+    SetupTwoFactorAsync(
+        Guid userId,
+        CancellationToken cancellationToken = default)
+    {
+        var user = await _userManager.FindByIdAsync(
+            userId.ToString());
+
+        if (user is null)
+        {
+            return Result<SetupTwoFactorResponse>.Failure(
+                AccountErrors.NotFound(userId));
+        }
+
+        var authenticatorKey =
+            await _userManager.GetAuthenticatorKeyAsync(user);
+
+        if (string.IsNullOrWhiteSpace(authenticatorKey))
+        {
+            await _userManager.ResetAuthenticatorKeyAsync(user);
+
+            authenticatorKey =
+                await _userManager.GetAuthenticatorKeyAsync(user);
+        }
+
+        if (string.IsNullOrWhiteSpace(authenticatorKey))
+        {
+            return Result<SetupTwoFactorResponse>.Failure(
+                Error.Validation2(
+                    "Unable to initialize authenticator setup."));
+        }
+
+        return Result<SetupTwoFactorResponse>.Success(
+            new SetupTwoFactorResponse
+            {
+                AuthenticatorKey = authenticatorKey
+            });
+    }
+
+    public async Task<Result<VerifyTwoFactorResponse>>
+        VerifyTwoFactorAsync(
+            Guid userId,
+            string code,
+            CancellationToken cancellationToken = default)
+    {
+        var user = await _userManager.FindByIdAsync(
+            userId.ToString());
+
+        if (user is null)
+        {
+            return Result<VerifyTwoFactorResponse>.Failure(
+                AccountErrors.NotFound(userId));
+        }
+
+        var isValid = await _userManager.VerifyTwoFactorTokenAsync(
+            user,
+            _userManager.Options.Tokens.AuthenticatorTokenProvider,
+            code);
+
+        if (!isValid)
+        {
+            return Result<VerifyTwoFactorResponse>.Failure(
+                Error.Validation2(
+                    "The verification code is invalid."));
+        }
+
+        var result = await _userManager.SetTwoFactorEnabledAsync(
+            user,
+            true);
+
+        var recoveryCodes =
+        await _userManager.GenerateNewTwoFactorRecoveryCodesAsync(
+            user,
+            10);
+
+        if (!result.Succeeded)
+        {
+            return Result<VerifyTwoFactorResponse>.Failure(
+                Error.Validation2(
+                    "Unable to enable two-factor authentication."));
+        }
+
+        return Result<VerifyTwoFactorResponse>.Success(
+            new VerifyTwoFactorResponse
+            {
+                Enabled = true,
+                RecoveryCodes = recoveryCodes.ToArray()
+            });
+    }
+
+    public async Task<Result<GenerateTwoFactorRecoveryCodesResponse>>
+    GenerateTwoFactorRecoveryCodesAsync(
+        Guid userId,
+        CancellationToken cancellationToken = default)
+    {
+        var user = await _userManager.FindByIdAsync(
+            userId.ToString());
+
+        if (user is null)
+        {
+            return Result<GenerateTwoFactorRecoveryCodesResponse>.Failure(
+                AccountErrors.NotFound(userId));
+        }
+
+        if (!user.TwoFactorEnabled)
+        {
+            return Result<GenerateTwoFactorRecoveryCodesResponse>.Failure(
+                Error.Validation2(
+                    "Two-factor authentication is not enabled."));
+        }
+
+        var recoveryCodes =
+            await _userManager.GenerateNewTwoFactorRecoveryCodesAsync(
+                user,
+                10);
+
+        return Result<GenerateTwoFactorRecoveryCodesResponse>.Success(
+            new GenerateTwoFactorRecoveryCodesResponse
+            {
+                RecoveryCodes = recoveryCodes.ToArray()
+            });
+    }
+
+    public async Task<Result> DisableTwoFactorAsync(
+        Guid userId,
+        CancellationToken cancellationToken = default)
+    {
+        var user = await _userManager.FindByIdAsync(
+            userId.ToString());
+
+        if (user is null)
+        {
+            return Result.Failure(
+                AccountErrors.NotFound(userId));
+        }
+
+        if (!user.TwoFactorEnabled)
+        {
+            return Result.Failure(
+                Error.Validation2(
+                    "Two-factor authentication is already disabled."));
+        }
+
+        var result = await _userManager.SetTwoFactorEnabledAsync(
+            user,
+            false);
+
+        if (!result.Succeeded)
+        {
+            return Result.Failure(
+                Error.Validation2(
+                    "Unable to disable two-factor authentication."));
+        }
+
+        return Result.Success();
+    }
+
+    public async Task<Result<RegenerateTwoFactorRecoveryCodesResponse>>
+        RegenerateTwoFactorRecoveryCodesAsync(
+            Guid userId,
+            CancellationToken cancellationToken = default)
+    {
+        var user = await _userManager.FindByIdAsync(
+            userId.ToString());
+
+        if (user is null)
+        {
+            return Result<RegenerateTwoFactorRecoveryCodesResponse>.Failure(
+                AccountErrors.NotFound(userId));
+        }
+
+        if (!user.TwoFactorEnabled)
+        {
+            return Result<RegenerateTwoFactorRecoveryCodesResponse>.Failure(
+                Error.Validation2(
+                    "Two-factor authentication is not enabled."));
+        }
+
+        var recoveryCodes =
+            await _userManager.GenerateNewTwoFactorRecoveryCodesAsync(
+                user,
+                10);
+
+        return Result<RegenerateTwoFactorRecoveryCodesResponse>.Success(
+            new RegenerateTwoFactorRecoveryCodesResponse
+            {
+                RecoveryCodes = recoveryCodes.ToArray()
+            });
     }
 }
