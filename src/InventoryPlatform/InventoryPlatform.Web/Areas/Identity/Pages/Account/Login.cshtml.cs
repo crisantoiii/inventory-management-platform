@@ -69,6 +69,16 @@ public sealed class LoginModel : PageModel
             return LocalRedirect(ReturnUrl);
         }
 
+        if (result.RequiresTwoFactor)
+        {
+            return RedirectToPage(
+                "/Account/TwoFactorLogin",
+                new
+                {
+                    ReturnUrl
+                });
+        }
+
         ModelState.AddModelError(
             string.Empty,
             "Invalid login attempt.");

@@ -11,6 +11,4 @@ public sealed record CreateUserRequest
     public string ConfirmPassword { get; init; } = string.Empty;
 
     public List<string> Roles { get; init; } = [];
-
-    public bool EmailConfirmed { get; init; }
 }

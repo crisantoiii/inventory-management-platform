@@ -46,10 +46,11 @@ Rather than documenting daily work, it captures important architectural decision
 | 18 | Purchasing Application Layer |
 | 19 | Purchasing Presentation Layer |
 | 20 | Reporting: Inventory Valuation |
+| 21 | Account Management |
 
 ---
 
-# Milestone 1 — Project Initialization
+# Milestone 1 - Project Initialization
 
 ## Summary
 
@@ -69,7 +70,7 @@ Established a modular architecture with clearly defined responsibilities.
 
 ---
 
-# Milestone 2 — Entity Framework Core Setup
+# Milestone 2 - Entity Framework Core Setup
 
 ## Summary
 
@@ -90,7 +91,7 @@ Completed:
 
 ---
 
-# Milestone 3 — Product Module
+# Milestone 3 - Product Module
 
 ## Summary
 
@@ -109,7 +110,7 @@ Validated the overall Clean Architecture design.
 
 ---
 
-# Milestone 4 — Shared Paging Infrastructure
+# Milestone 4 - Shared Paging Infrastructure
 
 ## Summary
 
@@ -131,7 +132,7 @@ Generalize only after the implementation has proven to be reusable.
 
 ---
 
-# Milestone 5 — Server-side Searching
+# Milestone 5 - Server-side Searching
 
 ## Summary
 
@@ -149,7 +150,7 @@ Filtering should occur as close to the database as possible.
 
 ---
 
-# Milestone 6 — Server-side Sorting
+# Milestone 6 - Server-side Sorting
 
 ## Summary
 
@@ -177,7 +178,7 @@ Shared metadata belongs in the Shared project, not in a feature-specific layer.
 
 ---
 
-# Milestone 7 — Status Filtering
+# Milestone 7 - Status Filtering
 
 ## Summary
 
@@ -217,7 +218,7 @@ Applying filters before sorting and paging results in a cleaner and more efficie
 
 ---
 
-# Milestone 8 — Product Lifecycle
+# Milestone 8 - Product Lifecycle
 
 ## Summary
 
@@ -243,7 +244,7 @@ Future modules should reuse the shared infrastructure rather than introducing mo
 
 ---
 
-# Milestone 9 — Category Module
+# Milestone 9 - Category Module
 
 ## Summary
 
@@ -270,7 +271,7 @@ Reusable infrastructure should be extracted only after proving its value through
 
 ---
 
-# Milestone 10 — Supplier Module
+# Milestone 10 - Supplier Module
 
 ## Summary
 
@@ -297,7 +298,7 @@ Consistency across modules improves maintainability, readability, and developmen
 
 ---
 
-# Milestone 11 — Customer Module
+# Milestone 11 - Customer Module
 
 ## Summary
 
@@ -324,7 +325,7 @@ A well-designed shared infrastructure enables feature development to focus on bu
 
 ---
 
-# Milestone 12 — Product Foundation Improvements
+# Milestone 12 - Product Foundation Improvements
 
 ## Summary
 
@@ -333,8 +334,8 @@ Expanded the Product domain model to support future inventory operations by intr
 Completed:
 
 - Unit Management
-- Product–Category relationship
-- Product–Unit relationship
+- Product-Category relationship
+- Product-Unit relationship
 - Barcode
 - QuantityOnHand
 
@@ -348,7 +349,7 @@ Establish a complete domain model before implementing transactional workflows. A
 
 ---
 
-# Milestone 13 — Inventory Transactions
+# Milestone 13 - Inventory Transactions
 
 ## Summary
 
@@ -382,7 +383,7 @@ The Product entity now serves as the aggregate root for inventory operations whi
 
 ---
 
-# Milestone 14 — Dashboard
+# Milestone 14 - Dashboard
 
 ## Summary
 
@@ -413,7 +414,7 @@ The Dashboard demonstrates that the same Clean Architecture can support both tra
 
 ---
 
-# Milestone 15 — Authentication & Authorization
+# Milestone 15 - Authentication & Authorization
 
 ## Summary
 
@@ -443,7 +444,7 @@ Identity framework components remain encapsulated within the Infrastructure laye
 
 ---
 
-# Milestone 16 — User Management
+# Milestone 16 - User Management
 
 ## Summary
 
@@ -478,7 +479,7 @@ The Identity module became another feature within the application rather than a 
 
 ---
 
-# Milestone 17 — Architecture Sprint 1
+# Milestone 17 - Architecture Sprint 1
 
 ## Summary
 
@@ -574,16 +575,23 @@ Together, these milestones demonstrate that the architecture successfully suppor
 - Reporting
 - Authentication
 - Administrative user management
+- Self-service account management
+- Email verification
+- Two-factor authentication
 
-without requiring architectural redesign.
+The Account Management milestone further validated that security-sensitive self-service workflows can be introduced using the existing Identity abstraction and Application handler patterns without requiring structural architectural redesign.
+
+The implementation also reinforced the separation between administrative User Management, self-service Account Management, and authentication enforcement. This separation provides clearer authorization boundaries while allowing each workflow to evolve independently.
 
 Architecture Sprint 1 provided an opportunity to validate these assumptions through a comprehensive review of the Application, Infrastructure, and Web layers. Rather than identifying major redesigns, the review confirmed that the existing architectural decisions remained consistent and scalable across all implemented modules.
 
-This milestone marks the transition from building the platform foundation to expanding business capabilities. Future development will focus primarily on implementing new workflow-driven modules, beginning with Purchasing, while preserving the validated architectural principles established during the project's early stages.
+This milestone represents the continued evolution of the platform from its foundational business modules into a broader set of validated capabilities, including workflow-driven business processes, read-oriented reporting, administrative identity management, and self-service account security.
+
+Future development will focus primarily on expanding business capabilities such as Sales and additional Reporting features while preserving the validated architectural principles established throughout the project's development.
 
 ---
 
-# Milestone 18 — Purchasing Application Layer
+# Milestone 18 - Purchasing Application Layer
 
 ## Summary
 
@@ -656,7 +664,7 @@ This milestone represents the project's transition from CRUD-oriented business m
 
 ---
 
-# Milestone 19 — Purchasing Presentation Layer
+# Milestone 19 - Purchasing Presentation Layer
 
 ## Summary
 
@@ -924,7 +932,7 @@ These findings are therefore treated as technical debt/future design work rather
 
 ---
 
-# Milestone 20 — Reporting: Inventory Valuation
+# Milestone 20 - Reporting: Inventory Valuation
 
 ## Summary
 
@@ -1129,6 +1137,147 @@ The remaining Reporting roadmap includes additional reports, Excel/PDF export, a
 
 ---
 
+# Milestone 21 - Account Management
+
+## Summary
+
+Implemented the Account Management vertical slice to provide authenticated users with self-service account management capabilities while preserving the existing Identity abstraction and Clean Architecture boundaries.
+
+The milestone extended the existing Identity and User Management foundation into end-user account workflows without introducing a separate authentication architecture.
+
+Completed:
+
+### Profile Management
+
+- User Profile
+- Update Profile
+- Phone Number Update
+- Blank Phone Handling
+- Self-Service Account Management
+
+### Password Management
+
+- Change Password
+- Forgot Password
+- Reset Password
+- Force Password Change
+- `MustChangePassword` support
+
+### Email Verification
+
+- Request Email Verification
+- Email Verification
+- Email Confirmation
+- Verification state displayed in Profile
+
+### Two-Factor Authentication
+
+- 2FA Setup
+- Authenticator-based TOTP Verification
+- 2FA Login Challenge
+- Recovery Codes
+- Recovery Code Login
+- Recovery Code Regeneration
+- Recovery Code Invalidation
+- Disable 2FA
+
+## Identity Integration
+
+The Account Management workflows use the existing Identity Service abstraction rather than exposing ASP.NET Core Identity framework types directly to the Web or Application layers.
+
+The resulting flow remains:
+
+```text
+Razor Page
+     ↓
+Application Handler
+     ↓
+Identity Service Abstraction
+     ↓
+ASP.NET Core Identity
+```
+
+This preserves the existing separation between:
+
+```text
+Administrative User Management
+        ↓
+Manage users
+
+Account Management
+        ↓
+Manage authenticated user's own account
+
+Authentication
+        ↓
+Authenticate the user
+```
+
+## Two-Factor Authentication Flow
+
+The 2FA implementation separates account security configuration from authentication enforcement.
+
+Account Management is responsible for:
+
+- Enabling 2FA
+- Verifying authenticator setup
+- Generating recovery codes
+- Regenerating recovery codes
+- Invalidating previous recovery codes
+- Disabling 2FA
+
+The authentication flow is responsible for:
+
+- Detecting that 2FA is required during login
+- Displaying the 2FA challenge
+- Verifying the authenticator code
+- Supporting recovery-code authentication
+
+This separation keeps security configuration and authentication enforcement within their respective workflows.
+
+## Validation Testing
+
+The Account Management features were verified through actual browser workflows.
+
+Validated:
+
+- Profile display and update
+- Phone number update
+- Blank phone number handling
+- Password change
+- Forced password change
+- Forgot password
+- Password reset
+- Email verification request
+- Email confirmation
+- 2FA setup
+- Authenticator-code verification
+- 2FA login challenge
+- Recovery-code login
+- Recovery-code regeneration
+- Recovery-code invalidation
+- 2FA disablement
+- Navigation to Account Management and 2FA
+
+The solution was repeatedly built during implementation and completed successfully after resolving integration issues encountered during development.
+
+## Lessons Learned
+- Existing Identity abstractions can support self-service account workflows without exposing framework-specific APIs.
+- Administrative User Management and self-service Account Management should remain separate concerns.
+- Two-factor authentication configuration and authentication enforcement are related but distinct workflows.
+- Recovery-code lifecycle management should explicitly handle generation, regeneration, single-use authentication, and invalidation.
+- Browser-based validation is essential for authentication workflows because successful compilation does not guarantee correct authentication state transitions.
+- Existing Application handler and Razor Pages patterns were sufficient for Account Management without introducing a new architectural pattern.
+- Security-sensitive workflows benefit from incremental implementation and validation rather than implementing the entire feature at once.
+
+## Outcome
+
+The Account Management vertical slice was completed and validated without requiring structural architectural redesign.
+
+The implementation extended the existing Identity architecture while preserving the established Clean Architecture, feature-first organization, Application handler patterns, and Razor Pages workflows.
+
+---
+
 # Architecture Validation
 
 After implementing:
@@ -1145,6 +1294,7 @@ After implementing:
 - Purchasing Application Layer
 - Purchasing Presentation Layer
 - Reporting: Inventory Valuation
+- Account Management
 
 the architecture has demonstrated:
 
@@ -1166,6 +1316,9 @@ The combined milestones demonstrate that the architecture supports:
 - Administrative user management
 - Workflow-driven business modules
 - Browser-accessible end-to-end workflows
+- Self-service account management
+- Email verification
+- Two-factor authentication
 
 without requiring structural redesign.
 
@@ -1214,6 +1367,8 @@ Throughout development the following principles have consistently guided impleme
 - Model business workflows as explicit commands
 - Return dedicated read models for query operations
 - Prefer workflow-oriented business behavior over generic CRUD operations
+- Separate administrative identity management from self-service account management
+- Separate account security configuration from authentication enforcement
 
 ---
 

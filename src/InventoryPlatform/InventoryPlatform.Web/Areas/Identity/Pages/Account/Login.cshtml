@@ -21,6 +21,12 @@
         <label asp-for="Input.Password"></label>
         <input asp-for="Input.Password" class="form-control" />
         <span asp-validation-for="Input.Password"></span>
+
+        <div class="text-end mt-1">
+            <a asp-page="/Account/ForgotPassword" class="text-decoration-none small">
+                Forgot your password?
+            </a>
+        </div>
     </div>
 
     <div class="form-check mb-3">

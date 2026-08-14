@@ -15,6 +15,10 @@ The project is designed as a production-style portfolio application that demonst
 - Server-side search, sorting, and pagination
 - Reusable shared infrastructure
 - Business analytics dashboard
+- Self-Service Account Management
+- Email Verification
+- Two-Factor Authentication
+- Recovery Code Authentication
 - ASP.NET Core Identity Authentication
 - Enterprise User Management
 - Workflow-driven Purchasing module
@@ -34,7 +38,7 @@ The focus is not only on implementing business features but also on applying pro
 
 ## Project Status
 
-**Current Version:** v1.2.0 – Reporting: Inventory Valuation
+**Current Version:** v1.3.0 - Account Management
 
 ## Completed Modules
 
@@ -47,28 +51,29 @@ The focus is not only on implementing business features but also on applying pro
 - ✅ Dashboard
 - ✅ Authentication & Authorization
 - ✅ User Management
+- ✅ Account Management
 - 🟨 Purchasing (Core Workflow Complete)
 - 🟨 Reporting (Inventory Valuation Complete)
 
 ## Latest Release
 
-## v1.2.0 — Reporting: Inventory Valuation
+## v1.3.0 - Account Management
 
 ### Highlights
 
-- Added Inventory Valuation report
-- Added Inventory Valuation read model
-- Added `InventoryValuationDto`
-- Added Inventory Valuation Application handler
-- Added Inventory Valuation repository abstraction
-- Added Inventory Valuation repository
-- Added read-only EF Core projection
-- Added category projection
-- Added product-level inventory valuation
-- Added total inventory valuation
-- Added Inventory Valuation navigation
-- Verified Dashboard/report valuation consistency
-- Verified the report through the browser using persisted database records
+- Self-service user profile management
+- Change Password
+- Forgot Password
+- Reset Password
+- Force Password Change
+- Email Verification
+- Two-Factor Authentication
+- Authenticator-based TOTP verification
+- 2FA login challenge
+- Recovery Code Authentication
+- Recovery Code Regeneration
+- Recovery Code Invalidation
+- Disable 2FA
 - Preserved the existing architecture without structural redesign
 
 ---
@@ -80,6 +85,23 @@ The project completed **Architecture Sprint 1**, a comprehensive architectural r
 Sprint 3 validated the architecture through the Purchasing Application layer, while Sprint 4 extended that validation into the Presentation layer by delivering a complete browser-accessible Purchasing workflow.
 
 Sprint 5 extended the architecture into dedicated read-oriented Reporting through Inventory Valuation.
+
+Sprint 6 extended the architecture into self-service Account Management.
+
+The Account Management implementation validated the existing Identity abstraction, Application handler patterns, Razor Pages workflow, and separation between administrative User Management and self-service account management.
+
+The Account Management vertical slice was implemented without requiring structural architectural redesign.
+
+### Account Management Validation
+
+- ✅ Profile management
+- ✅ Password management
+- ✅ Email verification
+- ✅ Two-factor authentication
+- ✅ Recovery code authentication
+- ✅ Self-service authorization boundaries
+
+### Reporting Validation
 
 The Reporting path is:
 
@@ -103,16 +125,13 @@ The implementation uses a dedicated DTO projection and does not modify Domain en
 
 The first Reporting vertical slice was implemented without requiring structural architectural redesign.
 
-This confirmed that the existing architecture scales from CRUD-oriented modules to workflow-driven business processes and complete end-to-end vertical slices without requiring structural redesign.
-
 ### Review Outcome
-
 - ✅ Application layer validated
 - ✅ Infrastructure layer validated
 - ✅ Web layer validated
 - ✅ Architecture approved for future module expansion
 
-The review concluded that the existing architecture scales successfully without requiring structural redesign.
+The completed Purchasing, Reporting, and Account Management vertical slices further validated that the existing architecture can support CRUD-oriented modules, workflow-driven business processes, read-oriented reporting, and self-service account security workflows without requiring structural redesign.
 
 ---
 
@@ -162,6 +181,10 @@ The long-term goal is to evolve this project into a complete inventory managemen
 - Role-based Authorization
 - User Management
 - Password Management
+- Self-Service Account Management
+- Email Verification
+- Two-Factor Authentication
+- Recovery Code Management
 - Architecture Review Process
 - Feature-first Organization
 - ASP.NET Core Identity Isolation
@@ -419,9 +442,7 @@ Database
 - ✅ Low stock monitoring
 - ✅ Empty state handling
 
-## User Management
-
-### Authentication
+## Authentication
 
 - ✅ Login
 - ✅ Logout
@@ -429,6 +450,8 @@ Database
 - ✅ Role-based Authorization
 - ✅ ASP.NET Core Identity
 - ✅ Identity Cookie Authentication
+
+## User Management
 
 ### User Lifecycle
 
@@ -449,6 +472,40 @@ Database
 - ✅ Server-side Pagination
 - ✅ Server-side Sorting
 - ✅ Status Filtering
+
+---
+
+## Account Management
+
+### Profile
+
+- ✅ User Profile
+- ✅ Update Profile
+- ✅ Self-Service Account Management
+
+### Password Management
+
+- ✅ Change Password
+- ✅ Forgot Password
+- ✅ Reset Password
+- ✅ Force Password Change
+
+### Email Verification
+
+- ✅ Email Verification
+- ✅ Verification Request
+- ✅ Email Confirmation
+
+### Two-Factor Authentication
+
+- ✅ 2FA Setup
+- ✅ TOTP Verification
+- ✅ 2FA Login Challenge
+- ✅ Recovery Codes
+- ✅ Recovery Code Login
+- ✅ Recovery Code Regeneration
+- ✅ Recovery Code Invalidation
+- ✅ Disable 2FA
 
 ---
 
@@ -726,6 +783,7 @@ Development Tools
 | Dashboard | ✅ Complete |
 | Authentication & Authorization | ✅ Complete |
 | User Management | ✅ Complete |
+| Account Management | ✅ Complete |
 | Purchasing | 🟨 Core Workflow Complete |
 | Reporting | 🟨 Inventory Valuation Complete |
 
@@ -751,7 +809,7 @@ Development Tools
 
 ## Current
 
-- v1.2.0 — Reporting: Inventory Valuation
+- v1.3.0 - Account Management
 
 ## Next
 
@@ -765,8 +823,6 @@ Development Tools
 - Excel Export
 - PDF Export
 - Audit Logging
-- Self-Service Account Management
-- Two-Factor Authentication
 
 ---
 
@@ -829,15 +885,40 @@ The following screenshots demonstrate the current implementation:
 ![Dashboard-2](docs/screenshots/dashboard-2.png)
 
 ### Authentication & Authorization
+
 ![Login](docs/screenshots/user_login.png)
 
 ### User Management
+
 ![Users](docs/screenshots/users_list.png)
+
 ![User Details](docs/screenshots/user_details.png)
+
 ![User Edit](docs/screenshots/users_edit.png)
+
 ![User Roles](docs/screenshots/users_roles.png)
+
 ![Reset Password](docs/screenshots/user_reset.png)
+
 ![Deact/Activate User](docs/screenshots/user_deact.png)
+
+### Account Management
+
+![Profile](docs/screenshots/2fa_profile.png)
+
+![Change Password](docs/screenshots/change_password.png)
+
+![Email Verification](docs/screenshots/verify_email.png)
+
+![2FA Setup](docs/screenshots/2fa_setup.png)
+
+![2FA Setup2](docs/screenshots/2fa_setup2.png)
+
+![2FA Setup3](docs/screenshots/2fa_setup3.png)
+
+![2FA Login](docs/screenshots/2fa_login.png)
+
+![Recovery Codes](docs/screenshots/2fa_login_recovery.png)
 
 ### Purchasing
 
@@ -894,6 +975,12 @@ This project is focused on applying modern enterprise development practices incl
 - Database-side Reporting Queries
 - EF Core Query Translation
 - Reporting Vertical Slices
+- Self-Service Account Management
+- Email Verification
+- Two-Factor Authentication
+- Recovery Code Management
+- Identity Security Workflows
+- Authentication Challenge Flows
 
 ---
 

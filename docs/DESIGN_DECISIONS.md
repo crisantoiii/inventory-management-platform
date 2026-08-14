@@ -454,7 +454,8 @@ Administrative operations include:
 - Activate / Deactivate
 - Reset Password
 
-Self-service account operations will be implemented separately.
+Self-service account operations are implemented separately through
+the Account Management feature.
 
 ## Rationale
 
@@ -630,6 +631,8 @@ The review confirmed that:
 - Existing abstractions remain appropriate.
 - No architectural redesign was required.
 - The Rule of Three continues to guide shared infrastructure.
+- The Identity Service abstraction successfully supports both administrative User Management and self-service Account Management.
+- Account Management and Two-Factor Authentication were implemented without requiring structural architectural changes.
 - Future development should prioritize business capabilities rather than architectural restructuring.
 
 This document will continue to evolve only when new architectural decisions become necessary.
@@ -1120,15 +1123,147 @@ The implementation required no structural architectural redesign.
 
 ---
 
+# DD-030 — Self-Service Account Management
+
+Version Introduced: v1.3.0
+
+## Decision
+
+Implement Account Management as a self-service capability separate from Administrative User Management.
+
+Authenticated users can manage their own account through dedicated Account pages.
+
+Account Management includes:
+
+- User Profile
+- Update Profile
+- Change Password
+- Forgot Password
+- Reset Password
+- Force Password Change
+- Email Verification
+- Two-Factor Authentication
+
+Administrative User Management remains responsible for administrator-driven operations such as:
+
+- Create User
+- Edit User
+- Assign Roles
+- Activate / Deactivate
+- Reset Password
+
+## Rationale
+
+Administrative User Management and self-service Account Management have different responsibilities and authorization requirements.
+
+Administrative workflows operate on users managed by an administrator, while Account Management operates only on the currently authenticated user's own account.
+
+Separating these concerns provides:
+
+- Clear authorization boundaries.
+- Reduced risk of cross-user account modification.
+- Clearer feature organization.
+- Simpler security reasoning.
+- Independent evolution of administrative and self-service capabilities.
+
+The implementation preserves the existing Identity Service abstraction and Application handler architecture.
+
+## Alternatives Considered
+
+Implement all user and account functionality inside a single User Management or Account area.
+
+This approach was rejected because administrative operations and self-service operations have different responsibilities, authorization requirements, and user experiences.
+
+## Outcome
+
+Accepted.
+
+The Account Management vertical slice was implemented and validated through browser workflows without requiring structural architectural redesign.
+
+---
+
+# DD-031 — Two-Factor Authentication
+
+Version Introduced: v1.3.0
+
+## Decision
+
+Implement Two-Factor Authentication using ASP.NET Core Identity's existing authentication infrastructure with authenticator-based TOTP verification and recovery codes.
+
+Two-factor authentication is integrated into both:
+
+- Account Management for enrollment and configuration.
+- Authentication for the login challenge.
+
+The workflow supports:
+
+- 2FA Setup
+- TOTP Verification
+- 2FA Login Challenge
+- Recovery Codes
+- Recovery Code Login
+- Recovery Code Regeneration
+- Recovery Code Invalidation
+- Disable 2FA
+
+## Rationale
+
+Two-factor authentication provides an additional authentication factor beyond the user's password.
+
+Using the existing ASP.NET Core Identity infrastructure keeps authentication concerns within the established Identity abstraction rather than introducing a separate authentication mechanism.
+
+Recovery codes provide an alternative authentication method when the user's authenticator is unavailable.
+
+Recovery codes are single-use and are invalidated after successful use. Regenerating recovery codes invalidates the previous set.
+
+Keeping 2FA configuration within Account Management while handling the authentication challenge within the login flow preserves the separation between:
+
+```text
+Account Management
+        ↓
+Configure Account Security
+
+Authentication
+        ↓
+Verify Authentication Challenge
+```
+
+This also preserves the existing separation between self-service account management and administrative user management.
+
+## Alternatives Considered
+
+Implement a custom TOTP or 2FA mechanism outside ASP.NET Core Identity.
+
+This approach was rejected because it would duplicate framework authentication capabilities and introduce unnecessary security-sensitive infrastructure.
+
+Treat 2FA only as an Account Management feature.
+
+This approach was rejected because 2FA configuration and 2FA authentication are separate concerns. Account Management configures the feature, while the authentication flow enforces the second factor during login.
+
+## Outcome
+
+Accepted.
+
+Two-factor authentication was implemented and validated through browser workflows, including:
+
+- Successful 2FA setup.
+- Authenticator-code verification.
+- 2FA login challenge.
+- Recovery-code login.
+- Recovery-code regeneration.
+- Invalidating previously generated recovery codes.
+- Disabling 2FA.
+
+The implementation required no structural architectural redesign.
+
+---
+
 # Future Decisions
 
 This document will continue to evolve as the project grows.
 
-Examples:
+Potential future decisions may include:
 
-- Account Management
-- Change Password workflow
-- Purchase Order workflow
 - Sales Order workflow
 - Audit Logging
 - Background Jobs

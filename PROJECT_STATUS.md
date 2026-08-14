@@ -1,6 +1,6 @@
 ## Overall Progress
 
-████████████████░░░ 85%
+█████████████████░░░ 90%
 
 Foundation
 ████████████████████ 100%
@@ -20,10 +20,13 @@ Purchase Orders
 Reporting
 ████████████████░░░░ 80%
 
+Account Management
+████████████████████ 100%
+
 
 # Project Status
 
-**Current Version:** v1.2.0
+**Current Version:** v1.3.0
 
 **Project Status:** Active Development
 
@@ -31,27 +34,28 @@ Reporting
 
 # Latest Release
 
-## v1.2.0 — Reporting: Inventory Valuation
+## v1.3.0 - Account Management
 
 Released: August 2026
 
 Completed:
 
-- Inventory Valuation Report
-- Inventory Valuation Read Model
-- Inventory Valuation Application Handler
-- Inventory Valuation Persistence Abstraction
-- Inventory Valuation Repository
-- Read-only EF Core Projection
-- Product-level Inventory Valuation
-- Category Projection
-- Quantity On Hand Display
-- Cost Price Display
-- Inventory Value Display
-- Total Inventory Value
-- Inventory Valuation Navigation
-- Dashboard/Report Value Consistency
-- Browser Verification
+- User Profile
+- Change Password
+- Forgot Password
+- Reset Password
+- Force Password Change
+- Email Verification
+- Two-Factor Authentication
+- 2FA Setup
+- 2FA Verification
+- 2FA Login Challenge
+- Recovery Codes
+- Recovery Code Login
+- Recovery Code Regeneration
+- Recovery Code Invalidation
+- 2FA Disable
+- Self-Service Account Management
 
 ---
 
@@ -69,15 +73,16 @@ Completed:
 - ✅ v1.0.0 - Purchasing Application Layer
 - ✅ v1.1.0 - Purchasing Presentation Layer
 - 🟨 v1.2.0 - Reporting: Inventory Valuation
+- ✅ v1.3.0 - Account Management
 
 ---
 
 # Overall Completion
 
-- **Completed Modules:** 9
+- **Completed Modules:** 10
 - **Architecture Status:** Validated
-- **Current Milestone:** Reporting — Inventory Valuation
-- **Next Milestone:** Additional Reporting Capabilities
+- **Current Milestone:** Additinoal Reporting Capabilities
+- **Next Milestone:** TBD
 
 ---
 
@@ -120,7 +125,7 @@ The architecture has been validated and is considered stable for future business
 | User Management | ✅ Complete | 100% |
 | Purchasing | ✅ Presentation Complete | 100% |
 | Reporting | 🟨 Inventory Valuation Complete | Partial |
-| Account Management | ⬜ Not Started | 0% |
+| Account Management | ✅ Complete | 100% |
 
 ---
 
@@ -245,6 +250,35 @@ The architecture has been validated and is considered stable for future business
 - ✅ Server-side Sorting
 - ✅ Status Filtering
 
+## Account Management
+
+### Profile
+
+- ✅ User Profile
+- ✅ Self-Service Account Management
+
+### Password Management
+
+- ✅ Change Password
+- ✅ Forgot Password
+- ✅ Reset Password
+- ✅ Force Password Change
+
+### Email
+
+- ✅ Email Verification
+
+### Two-Factor Authentication
+
+- ✅ Two-Factor Authentication
+- ✅ 2FA Setup
+- ✅ 2FA Verification
+- ✅ 2FA Login Challenge
+- ✅ Recovery Codes
+- ✅ Recovery Code Regeneration
+- ✅ Recovery Code Invalidation
+- ✅ 2FA Disable
+
 ## Purchasing
 
 ### Application Layer
@@ -299,7 +333,7 @@ The architecture has been validated and is considered stable for future business
 - ✅ Dashboard/Report Value Consistency
 - ✅ Browser Verification
 
-### Reporting — Remaining Work
+### Reporting - Remaining Work
 
 - ⬜ Empty database behavior verification
 - ⬜ Explicit query-failure testing
@@ -340,9 +374,13 @@ The architecture has been validated and is considered stable for future business
 
 # Current Focus
 
-v1.2.0 – Reporting: Inventory Valuation
+Additional Reporting Capabilities
 
-The first Reporting vertical slice has been implemented and verified as a browser-accessible read-only report backed by actual persisted database data.
+The Account Management milestone has been completed, including
+self-service profile management, password workflows, email
+verification, and two-factor authentication.
+
+The next development focus is additional Reporting capabilities.
 
 ---
 
@@ -377,13 +415,6 @@ Purchasing
 - Purchase Order search, filtering, sorting, and pagination
 - Inventory synchronization during Purchase Order receiving
 
-Account Features
-
-- Account Management
-- Change Password
-- Forgot Password
-- Two-Factor Authentication
-
 Platform
 
 - Audit Logging
@@ -393,7 +424,7 @@ Platform
 
 # Overall Assessment
 
-The Dashboard, Product, Category, Supplier, Customer, Unit, and Inventory Transaction modules are feature-complete for their current planned scope.
+The Dashboard, Product, Category, Supplier, Customer, Unit, Inventory Transaction, and Account Management modules are feature-complete for their current planned scope.
 
 The architecture has been validated through master data modules, transactional workflows, dashboard reporting, authentication, comprehensive user management, and the Purchasing workflow.
 
@@ -472,3 +503,15 @@ Database
 The implementation demonstrates that the existing architecture supports read-oriented Reporting capabilities alongside transactional business workflows without requiring structural redesign.
 
 The Reporting module remains partially complete, with additional reports and export capabilities planned for future work.
+
+The architecture has now been validated through:
+
+- Master data modules
+- Inventory transactions
+- Dashboard reporting
+- Authentication
+- Administrative user management
+- Purchasing workflows
+- Read-oriented Reporting
+- Self-service Account Management
+- Two-factor authentication

@@ -17,6 +17,7 @@ The platform currently provides business modules for:
 - Reporting
 - Authentication
 - User Management
+- Account Management
 
 Shared infrastructure such as paging, filtering, sorting, the Result pattern, and Identity service abstractions are reused consistently across modules while maintaining a clear separation of concerns.
 
@@ -50,6 +51,7 @@ The first Reporting vertical slice has also been implemented through Inventory V
 | Authentication | ✅ Complete |
 | User Management | ✅ Complete |
 | Product Management | ✅ Complete |
+| Account Management | ✅ Complete |
 | Category Management | ✅ Complete |
 | Supplier Management | ✅ Complete |
 | Customer Management | ✅ Complete |
@@ -75,7 +77,8 @@ Completed modules:
 - ✅ Purchasing Application Layer
 - ✅ Purchasing Presentation Layer
 - 🟨 Reporting
-- ✅ Inventory Valuation
+  - ✅ Inventory Valuation
+- ✅ Account Management
 
 Shared capabilities:
 
@@ -455,6 +458,9 @@ The Dashboard aggregates inventory statistics, recent inventory activity, and lo
 - ✅ ASP.NET Core Identity
 - ✅ Role-based Authorization
 - ✅ Policy-based Authorization
+- ✅ Two-Factor Authentication Login Challenge
+- ✅ Authenticator Code Verification
+- ✅ Recovery Code Authentication
 
 ## Security
 
@@ -496,6 +502,40 @@ Each user supports:
 
 ---
 
+# Account Management
+
+## Profile
+
+- ✅ User Profile
+- ✅ Update Profile
+- ✅ Self-Service Account Management
+
+## Password Management
+
+- ✅ Change Password
+- ✅ Forgot Password
+- ✅ Reset Password
+- ✅ Force Password Change
+
+## Email Verification
+
+- ✅ Email Verification
+- ✅ Verification Request
+- ✅ Email Confirmation
+
+## Two-Factor Authentication
+
+- ✅ 2FA Setup
+- ✅ TOTP Verification
+- ✅ 2FA Login Challenge
+- ✅ Recovery Codes
+- ✅ Recovery Code Login
+- ✅ Recovery Code Regeneration
+- ✅ Recovery Code Invalidation
+- ✅ Disable 2FA
+
+---
+
 # Shared Infrastructure
 
 ## Shared Identity Infrastructure
@@ -510,6 +550,9 @@ Features:
 - Cookie Authentication
 - Authorization Policies
 - Identity Service Abstraction
+- Email Verification
+- Two-Factor Authentication
+- Recovery Code Management
 
 ## Paging
 
@@ -697,6 +740,10 @@ Operation results are standardized using:
 - Role-based Authorization
 - Policy-based Authorization
 - Administrative User Management
+- Self-Service Account Management
+- Email Verification
+- Two-Factor Authentication
+- Recovery Code Management
 
 ## User Administration
 
@@ -749,13 +796,6 @@ Remaining work:
 - Purchase Order Pagination
 - Inventory Integration During Receiving
 - Additional User Experience Improvements
-
-## Account Management
-
-- Change Password
-- Forgot Password
-- Two-Factor Authentication
-- User Profile
 
 ## Reporting
 

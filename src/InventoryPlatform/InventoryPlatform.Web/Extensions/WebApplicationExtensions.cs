@@ -1,4 +1,5 @@
 ﻿using InventoryPlatform.Infrastructure.Identity;
+using InventoryPlatform.Web.Middleware;
 using Microsoft.AspNetCore.Builder;
 
 namespace InventoryPlatform.Web.Extensions;
@@ -18,6 +19,8 @@ public static class WebApplicationExtensions
         app.UseRouting();
 
         app.UseAuthentication();
+
+        app.UseMiddleware<PasswordChangeMiddleware>();
 
         app.UseAuthorization();
 

@@ -1,0 +1,143 @@
+﻿@page
+@model InventoryPlatform.Web.Pages.Account.TwoFactorLoginModel
+
+@{
+    ViewData["Title"] = "Two-Factor Authentication";
+}
+
+<div class="container py-4">
+    <div class="row">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+
+                    <h2 class="card-title mb-3">
+                        Two-Factor Authentication
+                    </h2>
+
+                    @if (!Model.UseRecoveryCode)
+                    {
+                        <p class="text-muted">
+                            Enter the six-digit code from your
+                            authenticator app.
+                        </p>
+
+                        <form method="post">
+
+                            <input type="hidden"
+                                   name="returnUrl"
+                                   value="@Model.ReturnUrl" />
+
+                            <div asp-validation-summary="All"
+                                 class="text-danger mb-3">
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="Input.Code"
+                                       class="form-label">
+                                    Verification Code
+                                </label>
+
+                                <input asp-for="Input.Code"
+                                       class="form-control"
+                                       autocomplete="one-time-code"
+                                       inputmode="numeric"
+                                       maxlength="6"
+                                       placeholder="123456"
+                                       autofocus />
+
+                                <span asp-validation-for="Input.Code"
+                                      class="text-danger">
+                                </span>
+                            </div>
+
+                            <div class="form-check mb-3">
+                                <input asp-for="Input.RememberMachine"
+                                       class="form-check-input" />
+
+                                <label asp-for="Input.RememberMachine"
+                                       class="form-check-label">
+                                    Remember this device
+                                </label>
+                            </div>
+
+                            <button type="submit"
+                                    class="btn btn-primary">
+                                Verify
+                            </button>
+
+                            <a asp-area="Identity"
+                               asp-page="/Account/Login"
+                               asp-route-returnUrl="@Model.ReturnUrl"
+                               class="btn btn-secondary ms-2">
+                                Back to Login
+                            </a>
+
+                        </form>
+
+                        <hr class="my-4" />
+
+                        <form method="get">
+
+                            <input type="hidden"
+                                   name="returnUrl"
+                                   value="@Model.ReturnUrl" />
+
+                            <a asp-page="/Account/TwoFactorLogin"
+                               asp-route-returnUrl="@Model.ReturnUrl"
+                               asp-route-recoveryCode="true"
+                               class="btn btn-link p-0">
+                                Use a recovery code instead
+                            </a>
+
+                        </form>
+                    }
+                    else
+                    {
+                        <p class="text-muted">
+                            Enter one of your recovery codes.
+                        </p>
+
+                        <form method="post"
+                              asp-page-handler="RecoveryCode">
+
+                            <input type="hidden"
+                                   name="returnUrl"
+                                   value="@Model.ReturnUrl" />
+
+                            <div asp-validation-summary="All"
+                                 class="text-danger mb-3">
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">
+                                    Recovery Code
+                                </label>
+
+                                <input name="Input.Code"
+                                       class="form-control"
+                                       autocomplete="off"
+                                       placeholder="Enter recovery code"
+                                       autofocus />
+                            </div>
+
+                            <button type="submit"
+                                    class="btn btn-primary">
+                                Verify Recovery Code
+                            </button>
+
+                        </form>
+
+                        <hr class="my-4" />
+
+                        <a asp-page="/Account/TwoFactorLogin"
+                           asp-route-returnUrl="@Model.ReturnUrl"
+                           class="btn btn-link p-0">
+                            Use authenticator code instead
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,46 @@
+﻿@page
+@model InventoryPlatform.Web.Pages.Account.ConfirmEmailModel
+
+@{
+    ViewData["Title"] = "Email Verification";
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card shadow-sm">
+                <div class="card-body p-4 text-center">
+
+                    @if (Model.IsConfirmed)
+                    {
+                        <h1 class="h3 mb-3">Email Verified</h1>
+
+                        <div class="alert alert-success" role="alert">
+                            Your email address has been verified successfully.
+                        </div>
+
+                        <a asp-page="/Account/Profile"
+                           class="btn btn-primary">
+                            Go to Profile
+                        </a>
+                    }
+                    else
+                    {
+                        <h1 class="h3 mb-3">Email Verification Failed</h1>
+
+                        <div class="alert alert-danger" role="alert">
+                            @(Model.ErrorMessage
+                                ?? "The email verification link is invalid or has expired.")
+                        </div>
+
+                        <a asp-page="/Account/Profile"
+                           class="btn btn-secondary">
+                            Back to Profile
+                        </a>
+                    }
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
