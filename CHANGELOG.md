@@ -1,5 +1,151 @@
 # Changelog
 
+## [v1.3.0] - 2026-08-13
+
+### Release Summary
+
+This release completes the Account Management vertical slice, providing authenticated users with self-service account management capabilities while preserving the separation between administrative User Management and authentication workflows.
+
+The implementation extends the existing ASP.NET Core Identity integration through the established Identity abstraction, Application handler patterns, and Razor Pages architecture without requiring structural architectural redesign.
+
+---
+
+### Added
+
+#### Account Management
+
+- User Profile
+- Update Profile
+- Phone Number Update
+- Change Password
+- Forgot Password
+- Reset Password
+- Force Password Change
+
+#### Email Verification
+
+- Request Email Verification
+- Email Verification
+- Email Confirmation
+- Email verification status in the user profile
+
+#### Two-Factor Authentication
+
+- Two-Factor Authentication setup
+- Authenticator-based TOTP verification
+- 2FA login challenge
+- Recovery codes
+- Recovery code authentication
+- Recovery code regeneration
+- Recovery code invalidation
+- 2FA disablement
+
+#### Account Management Navigation
+
+- Account Management navigation entry
+- Two-Factor Authentication navigation entry
+
+---
+
+### Changed
+
+- Separated self-service Account Management from administrative User Management.
+- Updated new user creation so email confirmation defaults to unverified.
+- Extended the existing Identity service abstraction to support account-management workflows.
+- Integrated email verification with the existing development email service.
+- Integrated Two-Factor Authentication with the existing ASP.NET Core Identity infrastructure.
+- Added authentication challenge handling for users with 2FA enabled.
+- Preserved existing Application handler and Razor Pages patterns.
+
+---
+
+### Improved
+
+- Added self-service profile management for authenticated users.
+- Added password management and recovery workflows.
+- Added email ownership verification.
+- Added authenticator-based two-factor authentication.
+- Added recovery-code authentication for users without access to their authenticator.
+- Added recovery-code regeneration with invalidation of previously generated codes.
+- Added account security management without exposing administrative User Management functionality.
+- Preserved Clean Architecture and feature-first organization.
+- Preserved the separation between Account Management configuration and authentication enforcement.
+
+---
+
+### Validated
+
+#### Profile and Password Management
+
+- Profile display and update
+- Phone number update
+- Blank phone number handling
+- Password change
+- Forgot password
+- Password reset
+- Forced password change
+
+#### Email Verification
+
+- Verification request
+- Verification token generation
+- Email confirmation
+- Already-verified handling
+- Verification state displayed in Profile
+
+#### Two-Factor Authentication
+
+- 2FA setup
+- Authenticator-code verification
+- 2FA login challenge
+- Recovery-code login
+- Recovery-code regeneration
+- Recovery-code invalidation
+- 2FA disablement
+
+#### Regression Validation
+
+- Existing administrative User Management workflows
+- Authentication and authorization behavior
+- Account Management navigation
+- Solution build
+- Browser-based workflows
+
+---
+
+### Technical Findings
+
+- Existing ASP.NET Core Identity infrastructure was sufficient for Two-Factor Authentication without introducing custom authentication infrastructure.
+- The existing Identity abstraction successfully supports both administrative User Management and self-service Account Management.
+- Account Management and authentication enforcement remain separate workflows.
+- Recovery-code lifecycle management requires explicit handling of generation, single-use authentication, regeneration, and invalidation.
+- The completed Account Management vertical slice required no structural architectural redesign.
+
+---
+
+### Documentation
+
+- Updated `PROJECT_STATUS.md`
+- Updated `FEATURES.md`
+- Updated `ROADMAP.md`
+- Updated `README.md`
+- Updated `DESIGN_DECISIONS.md`
+- Updated `ENGINEERING_JOURNAL.md`
+- Updated `ARCHITECTURE_REVIEW.md`
+- Updated Sprint 6 Account Management documentation
+
+---
+
+### Outcome
+
+Account Management is now a completed v1.3.0 milestone.
+
+The platform now provides authenticated users with self-service profile, password, email verification, and two-factor authentication capabilities while preserving the existing Clean Architecture, Vertical Slice Architecture, Identity abstraction, Application handler patterns, and Razor Pages workflows.
+
+The release was validated through repeated solution builds and actual browser workflows without requiring structural architectural redesign.
+
+---
+
 ## [v1.2.0] - 2026-08-09
 
 ### Release Summary

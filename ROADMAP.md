@@ -18,7 +18,7 @@ v0.9  Architecture Sprint      ✅
 v1.0  Purchasing Application   ✅
 v1.1  Purchasing Presentation  ✅
 v1.2  Reporting                🟨
-v1.3  Account Management       ⏳
+v1.3  Account Management       ✅
 
 ---
 
@@ -43,181 +43,63 @@ Each major business capability should be implemented from Domain and Application
 
 # Current Release
 
-## Version 1.2.0 – Reporting: Inventory Valuation
+## Version 1.3.0 – Account Management
 
 ### Completed
 
-- Inventory Valuation Report
-- Inventory Valuation Read Model
-- Inventory Valuation Application Handler
-- Inventory Valuation Persistence Abstraction
-- Inventory Valuation Repository
-- Read-only EF Core Projection
-- Product-level Inventory Valuation
-- Category Projection
-- Quantity On Hand Display
-- Cost Price Display
-- Inventory Value Display
-- Total Inventory Value
-- Inventory Valuation Navigation
-- Dashboard/Report Value Consistency
-- Browser Verification
+#### Profile
+
+- User Profile
+- Update Profile
+- Self-Service Account Management
+
+#### Password Management
+
+- Change Password
+- Forgot Password
+- Reset Password
+- Force Password Change
+
+#### Email Verification
+
+- Email Verification
+- Verification Request
+- Email Confirmation
+
+#### Two-Factor Authentication
+
+- 2FA Setup
+- TOTP Verification
+- 2FA Login Challenge
+- Recovery Codes
+- Recovery Code Login
+- Recovery Code Regeneration
+- Recovery Code Invalidation
+- Disable 2FA
 
 ### Result
 
-The first Reporting vertical slice is now available as a browser-accessible read-only report backed by actual persisted database data.
+The Account Management vertical slice is now complete.
 
-Inventory valuation is calculated using:
+The implementation provides authenticated users with self-service
+account management capabilities while preserving the existing
+Clean Architecture, Vertical Slice Architecture, Application
+handler patterns, Identity abstraction, and Razor Pages workflows.
 
-```text
-QuantityOnHand × CostPrice
-```
+The completed functionality includes:
 
-The report total was verified against the existing Dashboard Inventory Value.
+- Self-service user profile management
+- Password management
+- Email verification
+- Two-factor authentication
+- Authenticator-based TOTP verification
+- Recovery-code authentication
+- Recovery-code regeneration
+- Recovery-code invalidation
+- 2FA disablement
 
-The implementation preserves the existing Clean Architecture, Vertical Slice Architecture, Application handler patterns, and repository abstractions.
-
-The Reporting read path is:
-
-```text
-Presentation
-     ↓
-Application
-     ↓
-Read Model
-     ↓
-Infrastructure
-     ↓
-Database
-```
-
-### Remaining Reporting Work
-
-- Inventory Valuation empty-state verification
-- Explicit query-failure testing
-- Purchase History
-- Supplier Purchase Analysis
-- Stock Movement
-- Low Stock Report
-- Inventory Movement Report
-- Excel Export
-- PDF Export
-
-### Product Management
-
-- ✅ Product CRUD
-- ✅ Product Details
-- ✅ Server-side Search
-- ✅ Server-side Pagination
-- ✅ Server-side Sorting
-- ✅ Status Filtering
-- ✅ Product Activation
-- ✅ Product Deactivation
-
-### Category Management
-
-- ✅ Category CRUD
-- ✅ Category Details
-- ✅ Server-side Search
-- ✅ Server-side Pagination
-- ✅ Server-side Sorting
-- ✅ Status Filtering
-- ✅ Category Activation
-- ✅ Category Deactivation
-
-### Supplier Management
-
-- ✅ Supplier CRUD
-- ✅ Supplier Details
-- ✅ Server-side Search
-- ✅ Server-side Pagination
-- ✅ Server-side Sorting
-- ✅ Status Filtering
-- ✅ Supplier Activation
-- ✅ Supplier Deactivation
-
-### Customer Management
-
-- ✅ Customer CRUD
-- ✅ Customer Details
-- ✅ Server-side Search
-- ✅ Server-side Pagination
-- ✅ Server-side Sorting
-- ✅ Status Filtering
-- ✅ Customer Activation
-- ✅ Customer Deactivation
-
-### Unit Management
-
-- ✅ Unit CRUD
-- ✅ Unit Details
-- ✅ Server-side Search
-- ✅ Server-side Pagination
-- ✅ Server-side Sorting
-- ✅ Status Filtering
-- ✅ Unit Activation
-- ✅ Unit Deactivation
-
-### Product Foundation
-
-- ✅ Product → Category
-- ✅ Product → Unit
-- ✅ Quantity On Hand
-- ✅ Barcode
-
-### Shared Infrastructure
-
-- ✅ Clean Architecture
-- ✅ Repository Pattern
-- ✅ Result Pattern
-- ✅ Shared Paging
-- ✅ Shared Filtering
-- ✅ Shared Sorting
-
-### Inventory Transactions
-
-- ✅ Create Inventory Transaction
-- ✅ Transaction Details
-- ✅ Stock In
-- ✅ Stock Out
-- ✅ Stock Adjustment
-- ✅ Inventory History
-- ✅ Product Quantity Updates
-- ✅ Server-side Search
-- ✅ Server-side Pagination
-- ✅ Server-side Sorting
-
-### Dashboard
-
-- ✅ Dashboard Overview
-- ✅ Inventory Statistics
-- ✅ Inventory Value Summary
-- ✅ Recent Inventory Transactions
-- ✅ Low Stock Products
-- ✅ Responsive Dashboard Layout
-- ✅ Empty State Handling
-
-### Authentication
-
-- ✅ ASP.NET Core Identity
-- ✅ Cookie Authentication
-- ✅ Login
-- ✅ Logout
-- ✅ Role-based Authorization
-- ✅ Policy-based Authorization
-
-### User Management
-
-- ✅ User Listing
-- ✅ User Details
-- ✅ Create User
-- ✅ Edit User
-- ✅ Assign Roles
-- ✅ Activate / Deactivate User
-- ✅ Reset Password
-- ✅ Server-side Search
-- ✅ Server-side Pagination
-- ✅ Server-side Sorting
+The implementation was verified through actual browser workflows
+and completed without requiring structural architectural redesign.
 
 ---
 
@@ -305,16 +187,27 @@ Status: 🟨 In Progress
 
 # Phase 7 — Account Management
 
-Status: ⏳ Planned
+Status: ✅ Complete
 
-Planned
+Completed
 
+- User Profile
+- Update Profile
 - Change Password
 - Forgot Password
+- Reset Password
 - Force Password Change
 - Email Verification
 - Two-Factor Authentication
-- User Profile
+- 2FA Setup
+- TOTP Verification
+- 2FA Login Challenge
+- Recovery Codes
+- Recovery Code Login
+- Recovery Code Regeneration
+- Recovery Code Invalidation
+- Disable 2FA
+- Self-Service Account Management
 
 ---
 
@@ -373,7 +266,7 @@ Future enhancements may include:
 | v1.0.0 | Purchasing Application Layer ✅ |
 | v1.1.0 | Purchasing Presentation Layer ✅ |
 | v1.2.0 | Reporting — Inventory Valuation 🟨 |
-| v1.3.0 | Account Management ⏳ |
+| v1.3.0 | Account Management ✅ |
 | v1.4.0 | Sales Module ⏳ |
 | v2.0.0 | REST API & Blazor ⏳ |
 
