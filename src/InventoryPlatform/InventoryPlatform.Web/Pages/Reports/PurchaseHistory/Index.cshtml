@@ -1,0 +1,93 @@
+﻿@page
+@model InventoryPlatform.Web.Pages.Reports.PurchaseHistory.IndexModel
+
+@{
+    ViewData["Title"] = "Purchase History";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1>Purchase History</h1>
+            <p class="text-muted mb-0">
+                Purchase order history and receiving status.
+            </p>
+        </div>
+    </div>
+
+    <div asp-validation-summary="ModelOnly"
+         class="text-danger mb-3"></div>
+
+    @if (Model.Items.Count == 0)
+    {
+        <div class="alert alert-info" role="alert">
+            No purchase order records are available.
+        </div>
+    }
+    else
+    {
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="text-muted">Total Purchase Amount</div>
+                <h2 class="mb-0">
+                    @Model.TotalPurchaseAmount.ToString("N2")
+                </h2>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Purchase Order</th>
+                                <th>Supplier</th>
+                                <th>Order Date</th>
+                                <th>Status</th>
+                                <th class="text-end">Total Amount</th>
+                                <th class="text-end">Ordered</th>
+                                <th class="text-end">Received</th>
+                                <th class="text-end">Remaining</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.Items)
+                            {
+                                <tr>
+                                    <td>@item.PurchaseOrderId</td>
+                                    <td>@item.SupplierName</td>
+                                    <td>@item.OrderDate.ToString("yyyy-MM-dd")</td>
+                                    <td>@item.Status</td>
+                                    <td class="text-end">
+                                        @item.TotalAmount.ToString("N2")
+                                    </td>
+                                    <td class="text-end">
+                                        @item.TotalQuantity.ToString("N2")
+                                    </td>
+                                    <td class="text-end">
+                                        @item.ReceivedQuantity.ToString("N2")
+                                    </td>
+                                    <td class="text-end">
+                                        @item.RemainingQuantity.ToString("N2")
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot>
+                            <tr class="fw-bold">
+                                <td colspan="4" class="text-end">
+                                    Total
+                                </td>
+                                <td class="text-end">
+                                    @Model.TotalPurchaseAmount.ToString("N2")
+                                </td>
+                                <td colspan="3"></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+</div>

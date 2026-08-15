@@ -1,0 +1,3 @@
+﻿namespace InventoryPlatform.Application.Features.Reporting.GetPurchaseHistory;
+
+public sealed record GetPurchaseHistoryRequest;
