@@ -59,7 +59,7 @@ The first Reporting vertical slice has also been implemented through Inventory V
 | Inventory Transactions | ✅ Complete |
 | Architecture Sprint | ✅ Complete |
 | Purchasing | 🟨 Core Workflow Complete |
-| Reporting | 🟨 Inventory Valuation Complete |
+| Reporting | 🟨 Inventory Valuation & Purchase History Complete |
 
 ## Current Implementation
 
@@ -78,6 +78,11 @@ Completed modules:
 - ✅ Purchasing Presentation Layer
 - 🟨 Reporting
   - ✅ Inventory Valuation
+  - ✅ Purchase History
+    - Server-side Search
+    - From/To Date Filtering
+    - Server-side Pagination
+    - Server-side Sorting
 - ✅ Account Management
 
 Shared capabilities:
@@ -352,7 +357,30 @@ Completed
 
 ---
 
-# Reporting
+## Reporting
+
+### Completed
+
+- Inventory Valuation
+- Purchase History
+
+### Purchase History
+
+- Purchase History Report
+- Server-side Search
+- From/To Date Filtering
+- Server-side Pagination
+- Server-side Sorting
+
+### Remaining
+
+- Supplier Purchase Analysis
+- Stock Movement
+- Low Stock Report
+- Inventory Movement Report
+- Product Reports
+- Export to Excel
+- Export to PDF
 
 ## Inventory Valuation
 
@@ -403,7 +431,6 @@ Database
 
 - ⬜ Empty database behavior verification
 - ⬜ Explicit query-failure testing
-- ⬜ Purchase History
 - ⬜ Supplier Purchase Analysis
 - ⬜ Stock Movement
 - ⬜ Low Stock Report
@@ -745,6 +772,32 @@ Operation results are standardized using:
 - Two-Factor Authentication
 - Recovery Code Management
 
+## Planned Authorization
+
+The platform will evolve from the current Identity role/policy
+authorization model toward Dynamic Capability-Based Authorization.
+
+Planned structure:
+
+```text
+User
+  ↓
+Group
+  ↓
+Capabilities
+  ↓
+Application Action
+  ↓
+Domain State Validation
+```
+
+Status:
+
+- Design finalized
+- Implementation not yet started
+- Additional Reporting remains the current implementation priority
+
+
 ## User Administration
 
 - Create User
@@ -788,7 +841,6 @@ Engineering practices include:
 
 Remaining work:
 
-- Purchase History
 - Multiple Purchase Order Item Management
 - Purchase Order Search
 - Purchase Order Filtering
@@ -802,10 +854,14 @@ Remaining work:
 Completed:
 
 - Inventory Valuation
+- Purchase History
+- Purchase History Search
+- Purchase History Date Filtering
+- Purchase History Pagination
+- Purchase History Sorting
 
 Remaining:
 
-- Purchase History
 - Supplier Purchase Analysis
 - Stock Movement
 - Low Stock Report

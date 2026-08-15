@@ -1,4 +1,8 @@
-Each decision is recorded only after implementation has validated the approach in practice, ensuring that architectural guidance reflects proven patterns rather than speculative design.
+Architectural decisions are recorded when a significant design direction has been evaluated and accepted.
+
+Where possible, decisions are validated through implementation before being treated as established patterns.
+
+Some decisions may intentionally be recorded before implementation when they define the architecture for an upcoming cross-cutting change. These decisions are explicitly marked as planned and are not treated as implemented capabilities until validated in code.
 
 # Design Decisions
 
@@ -1255,6 +1259,157 @@ Two-factor authentication was implemented and validated through browser workflow
 - Disabling 2FA.
 
 The implementation required no structural architectural redesign.
+
+---
+
+# DD-032 — Dynamic Capability-Based Authorization
+
+Version Introduced: Planned after v1.3.0
+
+## Decision
+
+The platform will evolve its authorization model toward a Dynamic Capability-Based Authorization architecture.
+
+Authorization will be composed from:
+
+```text
+User
+  ↓
+Group
+  ↓
+Capabilities
+  ↓
+Application Action
+  ↓
+Domain State Validation
+```
+
+A Capability represents an atomic functionality, action, or permission within the application.
+
+Examples include:
+
+- PurchaseOrder.View
+- PurchaseOrder.Create
+- PurchaseOrder.Edit
+- PurchaseOrder.Submit
+- PurchaseOrder.Approve
+- PurchaseOrder.Reject
+- PurchaseOrder.Receive
+
+A Group represents a reusable collection of capabilities.
+
+Examples include:
+
+- PO Account
+- IT Account
+- Inventory Manager
+- Viewer
+- Administrator
+
+Users receive capabilities through their assigned groups.
+
+## Authorization and Domain Rules
+
+Capability authorization does not replace Domain business rules.
+
+An action is valid only when:
+
+```text
+Required Capability
+        AND
+Valid Domain State
+```
+
+For example:
+
+```text
+Can Submit Purchase Order
+=
+PurchaseOrder.Submit capability
+AND
+PurchaseOrder.Status == Draft
+```
+
+The Domain aggregate remains responsible for enforcing business state transitions and invariants.
+
+## Rationale
+
+A fixed list of business-specific roles does not scale well as the platform grows.
+
+Different business responsibilities may require different combinations of capabilities.
+
+A capability-based model allows the platform to create reusable groups without introducing a new authorization implementation for every business responsibility.
+
+For example:
+
+```text
+PO Account
+    ↓
+PurchaseOrder.View
+PurchaseOrder.Create
+PurchaseOrder.Edit
+PurchaseOrder.Submit
+```
+
+while:
+
+```text
+IT Account
+    ↓
+PurchaseOrder.View
+PurchaseOrder.Approve
+PurchaseOrder.Reject
+PurchaseOrder.Receive
+```
+
+This allows responsibilities to evolve through configuration and composition rather than hard-coded role-specific logic.
+
+## Relationship to Existing Identity
+
+The current platform already uses ASP.NET Core Identity, role-based authorization, policy-based authorization, and the Identity Service abstraction.
+
+The new capability model will evolve from this existing foundation rather than immediately replacing the authentication system.
+
+Existing Identity roles will be reviewed and mapped appropriately during implementation.
+
+## Alternatives Considered
+
+### Add every business responsibility as a hard-coded Identity role
+
+Examples:
+
+- PO
+- IT
+- Warehouse Receiver
+- Reporting Analyst
+
+Rejected because the number of roles would grow with individual business responsibilities and combinations.
+
+### Add a separate AccountType property
+
+Rejected because it would create a second authorization concept alongside Identity roles and require synchronization between account type and authorization behavior.
+
+### Implement authorization entirely inside Domain entities
+
+Rejected because user authorization is an application/security concern, while Domain entities should remain responsible for business rules and state invariants.
+
+## Implementation Status
+
+Accepted as the future authorization architecture.
+
+Not yet implemented.
+
+Additional Reporting remains the current implementation priority.
+
+### Implementation Boundary
+
+The future capability model is an authorization model, not an authentication replacement.
+
+Authentication will continue to be responsible for establishing the user's identity.
+
+Authorization will determine whether the authenticated user has the required capability to attempt an application action.
+
+Domain business rules will determine whether the action is valid for the current business state.
 
 ---
 

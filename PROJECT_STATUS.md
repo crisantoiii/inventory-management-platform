@@ -18,7 +18,7 @@ Purchase Orders
 ████████████████████ 100%
 
 Reporting
-████████████████░░░░ 80%
+████████████████░░░░ In Progress
 
 Account Management
 ████████████████████ 100%
@@ -81,8 +81,8 @@ Completed:
 
 - **Completed Modules:** 10
 - **Architecture Status:** Validated
-- **Current Milestone:** Additinoal Reporting Capabilities
-- **Next Milestone:** TBD
+- **Current Milestone:** Additional Reporting Capabilities
+- **Next Milestone:** Complete Remaining Reporting Capabilities
 
 ---
 
@@ -123,8 +123,8 @@ The architecture has been validated and is considered stable for future business
 | Dashboard | ✅ Complete | 100% |
 | Authentication & Authorization |  ✅ Complete | 100% |
 | User Management | ✅ Complete | 100% |
-| Purchasing | ✅ Presentation Complete | 100% |
-| Reporting | 🟨 Inventory Valuation Complete | Partial |
+| Purchasing | 🟨 Core Workflow Complete | Partial |
+| Reporting | 🟨 Inventory Valuation & Purchase History Complete | Partial |
 | Account Management | ✅ Complete | 100% |
 
 ---
@@ -333,13 +333,31 @@ The architecture has been validated and is considered stable for future business
 - ✅ Dashboard/Report Value Consistency
 - ✅ Browser Verification
 
+### Purchase History
+
+- ✅ Purchase History Report
+- ✅ Purchase History Read Model
+- ✅ Purchase History Application Handler
+- ✅ Purchase History Persistence Abstraction
+- ✅ Purchase History Repository
+- ✅ Supplier Information
+- ✅ Purchase Order Status
+- ✅ Total Amount
+- ✅ Total Quantity
+- ✅ Received Quantity
+- ✅ Remaining Quantity
+- ✅ Server-side Search
+- ✅ From/To Date Filtering
+- ✅ Server-side Pagination
+- ✅ Server-side Sorting
+- ✅ Browser Verification
+
 ### Reporting - Remaining Work
 
 - ⬜ Empty database behavior verification
 - ⬜ Explicit query-failure testing
 - ⬜ Excel export
 - ⬜ PDF export
-- ⬜ Purchase History
 - ⬜ Supplier Purchase Analysis
 - ⬜ Stock Movement
 - ⬜ Low Stock Report
@@ -374,13 +392,52 @@ The architecture has been validated and is considered stable for future business
 
 # Current Focus
 
-Additional Reporting Capabilities
+## Additional Reporting Capabilities
 
-The Account Management milestone has been completed, including
-self-service profile management, password workflows, email
-verification, and two-factor authentication.
+Purchase History reporting has been completed with:
 
-The next development focus is additional Reporting capabilities.
+- Server-side search
+- From/To date filtering
+- Server-side pagination
+- Server-side sorting
+
+The broader Additional Reporting initiative remains in progress.
+
+The current implementation priority is to complete the remaining reporting capabilities before beginning the planned Dynamic Capability-Based Authorization implementation.
+
+## Planned Authorization Architecture
+
+The Dynamic Capability-Based Authorization architecture has been finalized as a design decision but has not yet been implemented.
+
+The planned structure is:
+
+```text
+User
+  ↓
+Group
+  ↓
+Capabilities
+  ↓
+Application Action
+  ↓
+Domain State Validation
+```
+
+The current ASP.NET Core Identity authorization implementation remains unchanged until the authorization implementation phase.
+
+The agreed development sequence is:
+
+```text
+Additional Reporting
+        ↓
+Complete current reporting scope
+        ↓
+Dynamic Capability-Based Authorization
+        ↓
+Apply capabilities to Purchasing
+        ↓
+Extend Purchasing workflow where required
+```
 
 ---
 
@@ -388,17 +445,19 @@ The next development focus is additional Reporting capabilities.
 
 Additional Reporting Capabilities
 
-Potential future work includes:
+The next implementation work will focus on the remaining Additional Reporting capabilities:
 
-- Excel export
-- PDF export
-- Purchase History
 - Supplier Purchase Analysis
 - Stock Movement
 - Low Stock Report
 - Inventory Movement Report
+- Product Reports
+- Excel export
+- PDF export
+- Empty database behavior verification
+- Explicit query-failure testing
 
----
+After the current Additional Reporting scope is completed, development will proceed to the planned Dynamic Capability-Based Authorization architecture.
 
 # Known Limitations
 
@@ -410,7 +469,6 @@ Business Modules
 
 Purchasing
 
-- Purchase History
 - Multiple Purchase Order item management in the Create UI
 - Purchase Order search, filtering, sorting, and pagination
 - Inventory synchronization during Purchase Order receiving
@@ -477,6 +535,25 @@ The Purchasing module is now ready for future enhancements while the platform re
 Sprint 5 introduced the first Reporting vertical slice through Inventory Valuation.
 
 The Inventory Valuation report provides a read-only browser-accessible view backed by actual persisted database data.
+
+Sprint 6 extended the Reporting architecture through the Purchase
+History vertical slice.
+
+The Purchase History report provides a read-only view of historical
+Purchase Orders backed by persisted database data and supports:
+
+- Server-side search
+- From/To date filtering
+- Server-side pagination
+- Server-side sorting
+
+The Purchase History implementation confirmed that the read-oriented
+Reporting architecture established by Inventory Valuation can be
+reused for additional reporting domains without structural
+redesign.
+
+The platform is currently continuing development of Additional
+Reporting capabilities.
 
 Inventory valuation is calculated using:
 

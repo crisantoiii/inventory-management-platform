@@ -147,7 +147,6 @@ Completed:
 Remaining:
 
 - Inventory Integration
-- Purchase History
 - Supplier Purchase History
 - Multiple Purchase Order Item Management
 - Purchase Order Search
@@ -164,14 +163,19 @@ Status: 🟨 In Progress
 ### Completed
 
 - Inventory Valuation
+- Purchase History
+- Purchase History Search
+- Purchase History Date Filtering
+- Purchase History Pagination
+- Purchase History Sorting
 
 ### Remaining Reports
 
-- Purchase History
 - Supplier Purchase Analysis
 - Stock Movement
 - Low Stock Report
 - Inventory Movement Report
+- Product Reports
 
 ### Export Options
 
@@ -185,29 +189,79 @@ Status: 🟨 In Progress
 
 ---
 
-# Phase 7 — Account Management
+# Phase 7 — Dynamic Capability-Based Authorization
 
-Status: ✅ Complete
+Status: ⏳ Planned
 
-Completed
+**Implementation status:** Design finalized; implementation not yet started.
 
-- User Profile
-- Update Profile
-- Change Password
-- Forgot Password
-- Reset Password
-- Force Password Change
-- Email Verification
-- Two-Factor Authentication
-- 2FA Setup
-- TOTP Verification
-- 2FA Login Challenge
-- Recovery Codes
-- Recovery Code Login
-- Recovery Code Regeneration
-- Recovery Code Invalidation
-- Disable 2FA
-- Self-Service Account Management
+### Objective
+
+Evolve the existing Identity-based authorization model into a
+dynamic capability-based authorization model.
+
+### Model
+
+```text
+User
+  ↓
+Group
+  ↓
+Capabilities
+  ↓
+Application Action
+  ↓
+Domain State Validation
+```
+
+### Capabilities
+
+Capabilities represent atomic application functionality,
+actions, or permissions.
+
+Examples:
+
+- PurchaseOrder.View
+- PurchaseOrder.Create
+- PurchaseOrder.Edit
+- PurchaseOrder.Submit
+- PurchaseOrder.Approve
+- PurchaseOrder.Reject
+- PurchaseOrder.Receive
+
+### Groups
+
+Groups compose reusable capabilities into business
+responsibilities.
+
+Examples:
+
+- PO Account
+- IT Account
+- Inventory Manager
+- Viewer
+- Administrator
+
+### Implementation Goals
+
+- Define capability catalog
+- Define groups
+- Map groups to capabilities
+- Assign groups to users
+- Introduce capability authorization
+- Preserve existing Identity infrastructure where appropriate
+- Preserve Domain state validation
+- Apply authorization to Purchasing workflow
+- Apply authorization to Reporting
+- Validate UI and server-side authorization behavior
+
+### Sequencing
+
+Dynamic Capability-Based Authorization will be implemented
+after the current Additional Reporting work.
+
+Additional Reporting does not depend on the new authorization
+architecture and can continue independently.
 
 ---
 

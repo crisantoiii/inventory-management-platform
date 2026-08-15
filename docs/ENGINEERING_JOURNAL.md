@@ -47,6 +47,8 @@ Rather than documenting daily work, it captures important architectural decision
 | 19 | Purchasing Presentation Layer |
 | 20 | Reporting: Inventory Valuation |
 | 21 | Account Management |
+| 22 | Dynamic Authorization Architecture Decision |
+| 23 | Reporting: Purchase History |
 
 ---
 
@@ -1278,6 +1280,230 @@ The implementation extended the existing Identity architecture while preserving 
 
 ---
 
+# Milestone 22 - Dynamic Authorization Architecture Decision
+
+## Summary
+
+Reviewed the existing Identity and authorization implementation in preparation for expanding business workflow responsibilities.
+
+The current platform uses ASP.NET Core Identity with role-based and policy-based authorization behind the Identity Service abstraction.
+
+The current authorization implementation remains unchanged during the Additional Reporting phase.
+
+The capability model is an architectural decision only at this stage.
+
+The review identified that future business responsibilities should not require a growing collection of hard-coded roles.
+
+A Dynamic Capability-Based Authorization model was therefore selected as the future authorization direction.
+
+## Finalized Model
+
+```text
+User
+  ↓
+Group
+  ↓
+Capabilities
+  ↓
+Application Action
+  ↓
+Domain State Validation
+```
+
+Capabilities represent atomic functionality or actions.
+
+Groups compose capabilities into reusable business responsibilities.
+
+Examples:
+
+```text
+PO Account
+    ↓
+PurchaseOrder.View
+PurchaseOrder.Create
+PurchaseOrder.Edit
+PurchaseOrder.Submit
+```
+
+```text
+IT Account
+    ↓
+PurchaseOrder.View
+PurchaseOrder.Approve
+PurchaseOrder.Reject
+PurchaseOrder.Receive
+```
+
+## Architectural Boundary
+
+Capability authorization will determine whether the current user is authorized to attempt an application action.
+
+The Domain Model will continue to determine whether that action is valid for the current business state.
+
+Therefore:
+
+```text
+Authorization
+       +
+Domain State Validation
+```
+
+remain separate responsibilities.
+
+## Implementation Sequencing
+
+The Dynamic Capability-Based Authorization architecture will not interrupt the current Additional Reporting work.
+
+The agreed sequence is:
+
+```text
+Additional Reporting
+        ↓
+Complete current reporting scope
+        ↓
+Dynamic Capability-Based Authorization
+        ↓
+Apply capabilities to Purchasing
+        ↓
+Extend Purchasing workflow where required
+```
+
+Additional Reporting can continue independently because the
+reporting architecture does not depend on the future
+authorization implementation.
+
+## Outcome
+
+The Dynamic Capability-Based Authorization architecture was
+accepted as the future authorization direction.
+
+No authorization implementation changes were made as part of
+this design decision.
+
+The current Identity implementation remains unchanged until the
+authorization implementation phase begins.
+
+## Lessons Learned
+
+- Authorization should represent capabilities rather than individual business labels whenever responsibilities are expected to evolve.
+- Groups provide a reusable way to compose capabilities.
+- Authorization and Domain state validation are separate concerns.
+- Architectural decisions should be recorded before introducing cross-cutting implementation changes.
+- Current feature development should not be blocked by future architectural enhancements when the two concerns are independently evolvable.
+
+---
+
+# Milestone 23 - Reporting: Purchase History
+
+## Summary
+
+Implemented the Purchase History reporting vertical slice,
+extending the existing read-oriented Reporting architecture
+established by Inventory Valuation.
+
+The feature provides a read-only view of historical Purchase
+Orders without modifying Purchasing Domain aggregates.
+
+## Completed
+
+### Application
+
+- Purchase History read model
+- Purchase History DTO
+- Purchase History request model
+- Purchase History application handler
+- Purchase History repository abstraction
+
+### Infrastructure
+
+- Purchase History repository
+- Read-only EF Core projection
+- Supplier projection
+- Purchase Order status projection
+- Purchase Order totals projection
+
+### Presentation
+
+- Purchase History Razor Page
+- Reporting navigation
+- Search
+- From/To date filtering
+- Pagination
+- Sorting
+
+## Reporting Query
+
+The reporting flow is:
+
+```text
+Purchase History Razor Page
+        ↓
+GetPurchaseHistoryHandler
+        ↓
+IPurchaseHistoryRepository
+        ↓
+PurchaseHistoryRepository
+        ↓
+EF Core Projection
+        ↓
+SQL Server
+        ↓
+PurchaseHistoryDto
+        ↓
+Purchase History View
+```
+
+The report is read-only and does not modify Purchase Order, Purchase Order Item, Product, Supplier, or Inventory state.
+
+## Filtering
+
+The report supports:
+
+- Server-side search
+- From date
+- To date
+- Pagination
+- Sorting
+
+Filtering, sorting, and paging are performed server-side to avoid loading the complete Purchase History dataset into memory.
+
+## Architecture Validation
+
+Purchase History confirms that the read-oriented Reporting
+architecture established by Inventory Valuation can be reused
+for another business domain without introducing a separate
+Reporting architecture.
+
+The implementation continues to follow:
+
+```text
+Presentation
+     ↓
+Application
+     ↓
+Read Model
+     ↓
+Repository Abstraction
+     ↓
+Infrastructure
+     ↓
+Database
+```
+
+## Outcome
+
+Purchase History reporting is complete for the current scope.
+
+Remaining Reporting work includes additional reports, export capabilities, and explicit empty-state/query-failure validation.
+
+## Lessons Learned
+- Reporting features can reuse the same read-oriented architecture across different business domains.
+- Server-side filtering, sorting, and pagination should remain part of the query pipeline.
+- Reporting should remain independent from transactional Domain workflows.
+- Additional capabilities can be added without coupling the report to the Purchasing aggregate.
+
+---
+
 # Architecture Validation
 
 After implementing:
@@ -1323,6 +1549,42 @@ The combined milestones demonstrate that the architecture supports:
 without requiring structural redesign.
 
 Architecture Sprint 1 formally validated these conclusions through a comprehensive review of the solution before the introduction of larger business workflow modules.
+
+---
+
+# Current Development Position
+
+The platform is currently continuing development of Additional
+Reporting capabilities.
+
+Purchase History reporting has been implemented with:
+
+- Server-side Search
+- From/To Date Filtering
+- Server-side Pagination
+- Server-side Sorting
+
+The next reporting work will continue independently of the future
+authorization architecture.
+
+Dynamic Capability-Based Authorization has been finalized as the
+future authorization direction but has not yet been implemented.
+
+The agreed implementation sequence is:
+
+```text
+Additional Reporting
+        ↓
+Complete current reporting scope
+        ↓
+Dynamic Capability-Based Authorization
+        ↓
+Apply capabilities to Purchasing
+        ↓
+Extend Purchasing workflow where required
+```
+
+This sequencing intentionally prevents a cross-cutting authorization redesign from interrupting the current reporting implementation.
 
 ---
 
@@ -1384,13 +1646,22 @@ The project deliberately applies the Rule of Three to balance maintainability ag
 
 ---
 
-# Future Journal Entries
+# Current and Future Journal Entries
 
-Future milestones are expected to include:
+## Current Development
+
+- Additional Reporting
+- Purchase History Reporting
+- Remaining Reporting Enhancements
+
+## Planned Architecture
+
+- Dynamic Capability-Based Authorization
+- Purchasing Workflow Authorization
+
+## Future Milestones
 
 - Sales Module
-- Reporting Enhancements
-- Additional Reporting Modules
 - Audit Logging
 - REST API
 - Integration Testing
