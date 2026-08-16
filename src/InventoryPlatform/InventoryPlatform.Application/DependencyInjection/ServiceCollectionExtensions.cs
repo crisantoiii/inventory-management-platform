@@ -42,6 +42,7 @@ using InventoryPlatform.Application.Features.Purchasing.ReceivePurchaseOrder;
 using InventoryPlatform.Application.Features.Purchasing.SubmitPurchaseOrder;
 using InventoryPlatform.Application.Features.Reporting.GetInventoryValuation;
 using InventoryPlatform.Application.Features.Reporting.GetPurchaseHistory;
+using InventoryPlatform.Application.Features.Reporting.GetSupplierPurchaseAnalysis;
 using InventoryPlatform.Application.Features.Suppliers.ActivateSupplier;
 using InventoryPlatform.Application.Features.Suppliers.CreateSupplier;
 using InventoryPlatform.Application.Features.Suppliers.DeactivateSupplier;
@@ -132,6 +133,7 @@ public static class ServiceCollectionExtensions
 
         services.AddScoped<GetInventoryValuationHandler>();
         services.AddScoped<GetPurchaseHistoryHandler>();
+        services.AddScoped<GetSupplierPurchaseAnalysisHandler>();
 
         services.AddScoped<GetProfileHandler>();
         services.AddScoped<UpdateProfileHandler>();

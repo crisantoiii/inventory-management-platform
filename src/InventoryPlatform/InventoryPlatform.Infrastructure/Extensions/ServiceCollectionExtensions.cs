@@ -38,6 +38,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IEmailService, EmailService>();
 
         services.AddScoped<IPurchaseHistoryRepository,PurchaseHistoryRepository>();
+		services.AddScoped<ISupplierPurchaseAnalysisRepository, SupplierPurchaseAnalysisRepository>();
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
