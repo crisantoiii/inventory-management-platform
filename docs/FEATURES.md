@@ -851,18 +851,41 @@ Remaining work:
 
 ## Reporting
 
-Completed:
+### Completed
 
 - Inventory Valuation
 - Purchase History
-- Purchase History Search
-- Purchase History Date Filtering
-- Purchase History Pagination
-- Purchase History Sorting
-
-Remaining:
-
 - Supplier Purchase Analysis
+
+### Purchase History
+
+- Purchase History Report
+- Server-side Search
+- From/To Date Filtering
+- Server-side Pagination
+- Server-side Sorting
+
+### Supplier Purchase Analysis
+
+- Supplier Purchase Analysis Report
+- Supplier-level Purchase Aggregation
+- Purchase Period
+- Purchase Order Count
+- Ordered Quantity
+- Received Quantity
+- Remaining Quantity
+- Total Amount
+- Server-side Supplier Search
+- From/To Date Filtering
+- Status Filtering
+- Server-side Pagination
+- Server-side Sorting
+- Pagination State Preservation
+- No-result Behavior
+- Browser Verification
+
+### Remaining
+
 - Stock Movement
 - Low Stock Report
 - Inventory Movement Report

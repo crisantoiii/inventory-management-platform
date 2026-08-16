@@ -1034,7 +1034,8 @@ Version Introduced: v1.2.0
 
 Read-only Reporting features use dedicated DTO projections rather than loading Domain entities into memory.
 
-The first implementation is Inventory Valuation.
+The Reporting implementations include Inventory Valuation,
+Purchase History, and Supplier Purchase Analysis.
 
 The Reporting flow is:
 
@@ -1054,7 +1055,13 @@ EF Core Projection
 Database
 ```
 
-Inventory Valuation returns a dedicated InventoryValuationDto containing only the data required by the report.
+Reporting features return dedicated DTOs containing only the data required by each report.
+
+Examples include:
+
+- `InventoryValuationDto`
+- `PurchaseHistoryDto`
+- `SupplierPurchaseAnalysisDto`
 
 ## Rationale
 
@@ -1116,6 +1123,63 @@ InventoryValuationDto
 ```
 
 This keeps ordering, calculation, and projection database-side without introducing client-side evaluation.
+
+## Aggregated Reporting Consideration
+
+Supplier Purchase Analysis extends the read-only Reporting approach
+from direct projections into database-side supplier aggregation.
+
+The report groups Purchase Orders by Supplier and calculates:
+
+- Purchase Order count
+- Ordered quantity
+- Received quantity
+- Remaining quantity
+- Total amount
+- Earliest Purchase Order date
+- Latest Purchase Order date
+
+The aggregation remains inside the Infrastructure query and is
+projected into a dedicated read model.
+
+This preserves the same architectural boundary:
+
+```text
+Presentation
+     ↓
+Application Handler
+     ↓
+Read Model
+     ↓
+Repository Abstraction
+     ↓
+Infrastructure Repository
+     ↓
+EF Core Query
+     ↓
+Database
+```
+
+The implementation does not require loading transactional Domain
+aggregates into application memory.
+
+## EF Core Translation Consideration
+
+Supplier Purchase Analysis initially exposed a translation limitation
+when sorting directly against a grouped query containing a nested
+Purchase Order Item aggregate.
+
+The query was restructured to first project the supplier-level
+aggregate values and then apply sorting to those projected values.
+
+This keeps aggregation, sorting, and pagination database-side and
+avoids client-side evaluation.
+
+The experience reinforces the existing principle:
+
+- Keep report calculations database-side when practical.
+- Structure EF Core queries according to translatable database operations.
+- Prefer query restructuring over client-side evaluation.
 
 ## Outcome
 

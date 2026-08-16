@@ -1504,6 +1504,178 @@ Remaining Reporting work includes additional reports, export capabilities, and e
 
 ---
 
+# Milestone 24 - Reporting: Supplier Purchase Analysis
+
+## Summary
+
+Implemented the Supplier Purchase Analysis reporting vertical slice, extending the read-oriented Reporting architecture validated through Inventory Valuation and Purchase History.
+
+The feature provides a supplier-level analytical view of Purchase Order activity without modifying Purchasing Domain aggregates.
+
+## Completed
+
+### Application
+
+- Supplier Purchase Analysis read model
+- Supplier Purchase Analysis DTO
+- Supplier Purchase Analysis request model
+- Supplier Purchase Analysis application handler
+- Supplier Purchase Analysis repository abstraction
+
+### Infrastructure
+
+- Supplier Purchase Analysis repository
+- Read-only EF Core projection
+- Supplier-level aggregation
+- Purchase Order count aggregation
+- Ordered quantity aggregation
+- Received quantity aggregation
+- Remaining quantity aggregation
+- Total amount aggregation
+- First and last Purchase Order date projection
+
+### Presentation
+
+- Supplier Purchase Analysis Razor Page
+- Reporting navigation
+- Supplier search
+- From/To date filtering
+- Status filtering
+- Purchase Period display
+- Pagination
+- Sorting
+
+## Reporting Query
+
+The reporting flow is:
+
+```text
+Supplier Purchase Analysis Razor Page
+        ↓
+GetSupplierPurchaseAnalysisHandler
+        ↓
+ISupplierPurchaseAnalysisRepository
+        ↓
+SupplierPurchaseAnalysisRepository
+        ↓
+EF Core Projection
+        ↓
+SQL Server
+        ↓
+SupplierPurchaseAnalysisDto
+        ↓
+Supplier Purchase Analysis View
+```
+
+The report is read-only and does not modify Purchase Order, Purchase Order Item, Product, Supplier, or Inventory state.
+
+## Filtering
+
+The report supports:
+
+- Server-side supplier search
+- From date
+- To date
+- Status filtering
+- Pagination
+- Sorting
+
+Date filtering is inclusive.
+
+When only a From date is supplied, Purchase Orders from that date onward are included.
+
+When only a To date is supplied, Purchase Orders up to that date are included.
+
+When both dates are the same, only Purchase Orders on that date are included.
+
+## Aggregation
+
+Supplier Purchase Analysis aggregates Purchase Orders by Supplier.
+
+The report displays:
+
+- Supplier
+- Purchase Period
+- Purchase Order Count
+- Ordered Quantity
+- Received Quantity
+- Remaining Quantity
+- Total Amount
+
+Purchase Period represents the earliest and latest Purchase
+Order dates included in the supplier aggregation.
+
+## Pagination and Sorting
+
+Pagination and sorting are performed server-side.
+
+Pagination preserves the active:
+
+- Supplier search
+- Date filters
+- Status filter
+- Sort field
+- Sort direction
+- Page size
+
+## Browser Verification
+
+Verified that:
+
+- Supplier Purchase Analysis is accessible from the application navigation.
+- Supplier aggregation is calculated correctly.
+- Purchase Period is displayed correctly.
+- Supplier search works.
+- From/To date filtering works.
+- Same-day date filtering works.
+- Status filtering works.
+- Server-side sorting works.
+- Server-side pagination works.
+- Pagination preserves active filters and sorting.
+- No-result behavior displays correctly.
+
+## EF Core Query Adjustment
+
+The initial Supplier Purchase Analysis ordering expression attempted to order a grouped query directly using a nested aggregate over Purchase Order Items.
+
+EF Core could not translate that expression.
+
+The query was restructured so that supplier-level aggregate values are projected first and sorting is then applied to the projected aggregate row.
+
+This preserves database-side aggregation, sorting, and pagination without introducing client-side evaluation.
+
+## Architecture Validation
+
+Supplier Purchase Analysis further validates that the read-oriented Reporting architecture can support analytical aggregation in addition to direct read projections.
+
+The implementation continues to follow:
+
+```text
+Presentation
+     ↓
+Application
+     ↓
+Read Model
+     ↓
+Repository Abstraction
+     ↓
+Infrastructure
+     ↓
+Database
+```
+
+No structural architectural redesign was required.
+
+## Outcome
+
+Supplier Purchase Analysis reporting is complete for the current scope.
+
+Empty database behavior and explicit query-failure testing remain deferred to broader final Reporting/system verification.
+
+The next Reporting work will continue independently of the future Dynamic Capability-Based Authorization architecture.
+
+---
+
 # Architecture Validation
 
 After implementing:

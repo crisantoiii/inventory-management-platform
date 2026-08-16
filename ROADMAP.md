@@ -168,10 +168,16 @@ Status: 🟨 In Progress
 - Purchase History Date Filtering
 - Purchase History Pagination
 - Purchase History Sorting
+- Supplier Purchase Analysis
+- Supplier Purchase Analysis Search
+- Supplier Purchase Analysis Date Filtering
+- Supplier Purchase Analysis Status Filtering
+- Supplier Purchase Analysis Pagination
+- Supplier Purchase Analysis Sorting
+- Supplier Purchase Analysis Purchase Period
 
 ### Remaining Reports
 
-- Supplier Purchase Analysis
 - Stock Movement
 - Low Stock Report
 - Inventory Movement Report
@@ -184,7 +190,7 @@ Status: 🟨 In Progress
 
 ### Remaining Validation
 
-- Inventory Valuation empty-state verification
+- Empty database behavior verification
 - Explicit query-failure testing
 
 ---
