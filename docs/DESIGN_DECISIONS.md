@@ -1062,6 +1062,7 @@ Examples include:
 - `InventoryValuationDto`
 - `PurchaseHistoryDto`
 - `SupplierPurchaseAnalysisDto`
+- `StockMovementDto`
 
 ## Rationale
 
@@ -1162,6 +1163,36 @@ Database
 
 The implementation does not require loading transactional Domain
 aggregates into application memory.
+
+## Transactional Reporting Consideration
+
+Stock Movement extends the read-only Reporting approach to
+inventory transaction history.
+
+The report reads existing Inventory Transaction records and
+projects only the information required by the report:
+
+- Product
+- SKU
+- Movement Type
+- Quantity
+- Reference Number
+- Remarks
+- Transaction Date
+
+The report does not modify Inventory Transaction, Product, or
+inventory state.
+
+Filtering, sorting, and pagination remain database-side through
+the Infrastructure repository.
+
+The implementation does not require:
+
+- Domain entity changes
+- Database schema changes
+- New migrations
+- A separate transactional model
+- Changes to the existing Inventory Transaction workflow
 
 ## EF Core Translation Consideration
 

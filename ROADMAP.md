@@ -175,10 +175,15 @@ Status: 🟨 In Progress
 - Supplier Purchase Analysis Pagination
 - Supplier Purchase Analysis Sorting
 - Supplier Purchase Analysis Purchase Period
+- Stock Movement
+- Stock Movement Search
+- Stock Movement Date Filtering
+- Stock Movement Movement Type Filtering
+- Stock Movement Pagination
+- Stock Movement Sorting
 
 ### Remaining Reports
 
-- Stock Movement
 - Low Stock Report
 - Inventory Movement Report
 - Product Reports

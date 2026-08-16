@@ -856,6 +856,7 @@ Remaining work:
 - Inventory Valuation
 - Purchase History
 - Supplier Purchase Analysis
+- Stock Movement
 
 ### Purchase History
 
@@ -884,9 +885,29 @@ Remaining work:
 - No-result Behavior
 - Browser Verification
 
+### Stock Movement
+
+- Stock Movement Report
+- Stock Movement Read Model
+- Stock Movement Application Handler
+- Stock Movement Persistence Abstraction
+- Stock Movement Repository
+- Product Information
+- SKU Information
+- Movement Type
+- Quantity Display
+- Reference Number
+- Remarks
+- Server-side Search
+- From/To Date Filtering
+- Movement Type Filtering
+- Server-side Pagination
+- Server-side Sorting
+- Stock Movement Navigation
+- Browser Verification
+
 ### Remaining
 
-- Stock Movement
 - Low Stock Report
 - Inventory Movement Report
 - Product Reports

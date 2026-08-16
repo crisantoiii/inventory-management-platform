@@ -1674,6 +1674,161 @@ Empty database behavior and explicit query-failure testing remain deferred to br
 
 The next Reporting work will continue independently of the future Dynamic Capability-Based Authorization architecture.
 
+
+---
+
+# Milestone 25 - Reporting: Stock Movement
+
+## Summary
+
+Implemented the Stock Movement reporting vertical slice, extending
+the read-oriented Reporting architecture to inventory transaction
+history.
+
+The feature provides a read-only view of inventory movement activity
+without modifying Inventory Transaction or Product Domain state.
+
+## Completed
+
+### Application
+
+- Stock Movement read model
+- Stock Movement DTO
+- Stock Movement request model
+- Stock Movement application handler
+- Stock Movement repository abstraction
+
+### Infrastructure
+
+- Stock Movement repository
+- Read-only EF Core projection
+- Inventory Transaction projection
+- Server-side filtering
+- Server-side sorting
+- Server-side pagination
+
+### Presentation
+
+- Stock Movement Razor Page
+- Operations navigation
+- Product/SKU search
+- Reference/remarks search
+- From/To date filtering
+- Movement type filtering
+- Pagination
+- Sorting
+
+## Reporting Query
+
+The reporting flow is:
+
+```text
+Stock Movement Razor Page
+        ↓
+GetStockMovementHandler
+        ↓
+IStockMovementRepository
+        ↓
+StockMovementRepository
+        ↓
+EF Core Query
+        ↓
+SQL Server
+        ↓
+StockMovementDto
+        ↓
+Stock Movement View
+```
+
+The report is read-only and does not modify Inventory Transaction,
+Product, or inventory state.
+
+## Report Data
+
+Stock Movement displays:
+
+- Transaction Date
+- Product
+- SKU
+- Movement Type
+- Quantity
+- Reference Number
+- Remarks
+
+The report uses the existing Inventory Transaction data model.
+
+No new Domain entity or database table was introduced.
+
+## Filtering
+
+The report supports:
+
+- Server-side product/SKU search
+- Reference/remarks search
+- From date
+- To date
+- Movement type filtering
+- Pagination
+- Sorting
+
+Date filtering is inclusive.
+
+When a To date is supplied, transactions through the end of that
+date are included.
+
+## Pagination and Sorting
+
+Pagination and sorting are performed server-side.
+
+The active filtering and sorting state is preserved while navigating through the report results.
+
+## Browser Verification
+
+Verified that:
+
+- Stock Movement is accessible from the application navigation.
+- Stock Movement page loads successfully.
+- Inventory transaction data is displayed correctly.
+- Product/SKU search works.
+- Reference/remarks search works.
+- From/To date filtering works.
+- Movement type filtering works.
+- Server-side sorting works.
+- Server-side pagination works.
+- Combined filtering works.
+- Reset behavior works.
+- Existing application functionality remains operational.
+
+## Architecture Validation
+
+Stock Movement further validates that the existing read-oriented Reporting architecture can consume transactional inventory history without modifying the transactional workflow.
+
+The implementation continues to follow:
+
+```text
+Presentation
+     ↓
+Application
+     ↓
+Read Model
+     ↓
+Repository Abstraction
+     ↓
+Infrastructure
+     ↓
+Database
+```
+
+No structural architectural redesign was required.
+
+## Outcome
+
+Stock Movement reporting is complete for the current scope.
+
+Empty database behavior and explicit query-failure testing remain deferred to broader final Reporting/system verification.
+
+The next Reporting work will continue independently of the future Dynamic Capability-Based Authorization architecture.
+
 ---
 
 # Architecture Validation

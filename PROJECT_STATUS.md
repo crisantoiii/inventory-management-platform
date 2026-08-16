@@ -375,16 +375,36 @@ The architecture has been validated and is considered stable for future business
 - ✅ No-result Behavior
 - ✅ Browser Verification
 
+### Stock Movement
+
+- ✅ Stock Movement Report
+- ✅ Stock Movement Read Model
+- ✅ Stock Movement Application Handler
+- ✅ Stock Movement Persistence Abstraction
+- ✅ Stock Movement Repository
+- ✅ Product Information
+- ✅ SKU Information
+- ✅ Movement Type
+- ✅ Quantity Display
+- ✅ Reference Number
+- ✅ Remarks
+- ✅ Server-side Search
+- ✅ From/To Date Filtering
+- ✅ Movement Type Filtering
+- ✅ Server-side Pagination
+- ✅ Server-side Sorting
+- ✅ Stock Movement Navigation
+- ✅ Browser Verification
+
 ### Reporting - Remaining Work
 
 - ⬜ Empty database behavior verification
 - ⬜ Explicit query-failure testing
-- ⬜ Stock Movement
+- ⬜ Excel export
+- ⬜ PDF export
 - ⬜ Low Stock Report
 - ⬜ Inventory Movement Report
 - ⬜ Product Reports
-- ⬜ Excel export
-- ⬜ PDF export
 
 ---
 
@@ -417,7 +437,7 @@ The architecture has been validated and is considered stable for future business
 
 ## Additional Reporting Capabilities
 
-Purchase History reporting has been completed with:
+Purchase History has been implemented with:
 
 - Server-side search
 - From/To date filtering
@@ -434,6 +454,17 @@ Supplier Purchase Analysis has also been completed and verified with:
 - Purchase period display
 - Supplier-level purchase aggregation
 - No-result behavior
+
+Stock Movement has also been completed and verified with:
+
+- Product/SKU search
+- Reference/remarks search
+- From/To date filtering
+- Movement type filtering
+- Server-side pagination
+- Server-side sorting
+- Stock Movement navigation
+- Browser verification
 
 The broader Additional Reporting initiative remains in progress.
 
@@ -477,7 +508,7 @@ Extend Purchasing workflow where required
 
 # Next Milestone
 
-Additional Reporting Capabilities
+## Additional Reporting Capabilities
 
 The next implementation work will focus on the remaining Additional Reporting capabilities:
 
