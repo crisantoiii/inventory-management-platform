@@ -906,9 +906,29 @@ Remaining work:
 - Stock Movement Navigation
 - Browser Verification
 
-### Remaining
+### Low Stock
 
 - Low Stock Report
+- Low Stock Read Model
+- Low Stock Application Handler
+- Low Stock Persistence Abstraction
+- Low Stock Repository
+- Product Information
+- SKU Information
+- Category Information
+- Quantity On Hand Display
+- Existing Low Stock Threshold
+- Server-side Product/SKU Search
+- Server-side Pagination
+- Server-side Sorting
+- Pagination State Preservation
+- Reset Behavior
+- Combined Search, Sorting, and Pagination
+- Low Stock Navigation
+- Browser Verification
+
+### Remaining
+
 - Inventory Movement Report
 - Product Reports
 - Export to Excel

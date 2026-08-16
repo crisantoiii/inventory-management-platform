@@ -1212,6 +1212,32 @@ The experience reinforces the existing principle:
 - Structure EF Core queries according to translatable database operations.
 - Prefer query restructuring over client-side evaluation.
 
+### Low Stock Reporting Consideration
+
+Low Stock extends the read-oriented Reporting approach to current
+Product inventory state.
+
+The report uses the existing Product quantity information and the
+existing application low-stock threshold rather than introducing a
+separate reporting-specific inventory rule.
+
+The report remains read-only and provides:
+
+- Product
+- SKU
+- Category
+- Quantity On Hand
+
+Filtering, sorting, and pagination remain database-side through the
+Infrastructure repository.
+
+The implementation does not require:
+
+- Domain entity changes
+- Database schema changes
+- New migrations
+- Changes to the existing inventory transaction workflow
+
 ## Outcome
 
 Accepted.

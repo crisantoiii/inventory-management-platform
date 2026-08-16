@@ -181,10 +181,13 @@ Status: 🟨 In Progress
 - Stock Movement Movement Type Filtering
 - Stock Movement Pagination
 - Stock Movement Sorting
+- Low Stock Report
+- Low Stock Search
+- Low Stock Pagination
+- Low Stock Sorting
 
 ### Remaining Reports
 
-- Low Stock Report
 - Inventory Movement Report
 - Product Reports
 

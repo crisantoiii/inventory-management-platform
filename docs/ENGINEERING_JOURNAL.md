@@ -49,6 +49,9 @@ Rather than documenting daily work, it captures important architectural decision
 | 21 | Account Management |
 | 22 | Dynamic Authorization Architecture Decision |
 | 23 | Reporting: Purchase History |
+| 24 | Reporting: Supplier Purchase Analysis |
+| 25 | Reporting: Stock Movement |
+| 26 | Reporting: Low Stock |
 
 ---
 
@@ -1824,6 +1827,167 @@ No structural architectural redesign was required.
 ## Outcome
 
 Stock Movement reporting is complete for the current scope.
+
+Empty database behavior and explicit query-failure testing remain deferred to broader final Reporting/system verification.
+
+The next Reporting work will continue independently of the future Dynamic Capability-Based Authorization architecture.
+
+---
+
+# Milestone 26 - Reporting: Low Stock
+
+## Summary
+
+Implemented the Low Stock reporting vertical slice, extending the read-oriented Reporting architecture to current Product inventory state.
+
+The feature provides a read-only view of products that meet the existing low-stock condition without modifying Product or Inventory Transaction state.
+
+## Completed
+
+### Application
+
+- Low Stock read model
+- Low Stock DTO
+- Low Stock request model
+- Low Stock application handler
+- Low Stock repository abstraction
+
+### Infrastructure
+
+- Low Stock repository
+- Read-only EF Core projection
+- Server-side Product/SKU search
+- Server-side sorting
+- Server-side pagination
+
+### Presentation
+
+- Low Stock Razor Page
+- Reports navigation
+- Product/SKU search
+- Pagination
+- Sorting
+- Reset behavior
+
+## Low Stock Rule
+
+The report uses the existing application low-stock condition:
+
+```text
+QuantityOnHand <= 10
+```
+
+The existing low-stock rule was reused rather than introducing a separate reporting-specific threshold.
+
+## Reporting Query
+
+The reporting flow is:
+
+```text
+Low Stock Razor Page
+        ↓
+GetLowStockHandler
+        ↓
+ILowStockRepository
+        ↓
+LowStockRepository
+        ↓
+EF Core Query
+        ↓
+SQL Server
+        ↓
+LowStockDto
+        ↓
+Low Stock View
+```
+
+The report is read-only and does not modify Product, Inventory Transaction, or inventory state.
+
+## Report Data
+
+Low Stock displays:
+
+- Product
+- SKU
+- Category
+- Quantity On Hand
+
+## Filtering
+
+The report supports:
+
+- Server-side Product search
+- Server-side SKU search
+- Pagination
+- Sorting
+
+## Pagination
+
+Pagination is performed server-side.
+
+During implementation, the page number supplied in the Razor Page query string was not being propagated correctly into the reporting query.
+
+The PageModel was adjusted to explicitly read the requested page value from the request before constructing the shared PagedQuery.
+
+This ensured that:
+
+```text
+Page 1
+    ↓
+Skip(0)
+Take(PageSize)
+
+Page 2
+    ↓
+Skip(PageSize)
+Take(PageSize)
+```
+
+The final implementation preserves the existing shared paging infrastructure and does not introduce a report-specific paging model.
+
+## Browser Verification
+
+Verified that:
+
+- Low Stock is accessible from the application navigation.
+- Low Stock page loads successfully.
+- Low-stock products are displayed correctly.
+- Product/SKU search works.
+- Server-side sorting works.
+- Server-side pagination works.
+- Page-size changes work.
+- Reset behavior works.
+- Combined search, sorting, and pagination work.
+- The low-stock boundary condition works.
+- Existing application functionality remains operational.
+
+## Architecture Validation
+
+Low Stock further validates that the existing read-oriented Reporting architecture can support current inventory-state reporting without modifying transactional workflows.
+
+The implementation continues to follow:
+
+```text
+Presentation
+     ↓
+Application
+     ↓
+Read Model
+     ↓
+Repository Abstraction
+     ↓
+Infrastructure
+     ↓
+Database
+```
+
+No structural architectural redesign was required.
+
+No Domain entity or database schema changes were required.
+
+## Outcome
+
+Low Stock reporting is complete for the current scope.
 
 Empty database behavior and explicit query-failure testing remain deferred to broader final Reporting/system verification.
 
