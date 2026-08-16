@@ -1,4 +1,4 @@
-﻿using InventoryPlatform.Application.Interfaces.Communication;
+using InventoryPlatform.Application.Interfaces.Communication;
 using InventoryPlatform.Application.Interfaces.Identity;
 using InventoryPlatform.Application.Interfaces.Persistence;
 using InventoryPlatform.Infrastructure.Email;
@@ -40,6 +40,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IPurchaseHistoryRepository,PurchaseHistoryRepository>();
 		services.AddScoped<ISupplierPurchaseAnalysisRepository, SupplierPurchaseAnalysisRepository>();
         services.AddScoped<IStockMovementRepository, StockMovementRepository>();
+        services.AddScoped<ILowStockRepository, LowStockRepository>();
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 

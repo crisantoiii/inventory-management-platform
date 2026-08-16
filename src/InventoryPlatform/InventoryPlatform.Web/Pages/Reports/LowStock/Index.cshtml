@@ -1,0 +1,144 @@
+@page
+@model InventoryPlatform.Web.Pages.Reports.LowStock.IndexModel
+@using InventoryPlatform.Shared.Sorting
+
+@{
+    ViewData["Title"] = "Low Stock";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1>Low Stock</h1>
+    </div>
+
+    <form method="get" class="row g-3 mb-4">
+        <div class="col-md-6">
+            <label asp-for="Search" class="form-label">Search</label>
+            <input asp-for="Search"
+                   class="form-control"
+                   placeholder="Product or SKU" />
+        </div>
+
+        <div class="col-md-3 d-flex align-items-end gap-2">
+            <button type="submit"
+                    class="btn btn-primary">
+                Search
+            </button>
+
+            <a asp-page="./Index"
+               class="btn btn-outline-secondary">
+                Reset
+            </a>
+        </div>
+    </form>
+
+    @if (Model.Result is not null)
+    {
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>
+                            <a asp-page="./Index"
+                               asp-route-Search="@Model.Search"
+                               asp-route-Page="1"
+                               asp-route-PageSize="@Model.PageSize"
+                               asp-route-SortBy="@LowStockSortFields.ProductName"
+                               asp-route-Descending="@(Model.SortBy == LowStockSortFields.ProductName && !Model.Descending)">
+                                Product
+                            </a>
+                        </th>
+
+                        <th>
+                            <a asp-page="./Index"
+                               asp-route-Search="@Model.Search"
+                               asp-route-Page="1"
+                               asp-route-PageSize="@Model.PageSize"
+                               asp-route-SortBy="@LowStockSortFields.ProductSku"
+                               asp-route-Descending="@(Model.SortBy == LowStockSortFields.ProductSku && !Model.Descending)">
+                                SKU
+                            </a>
+                        </th>
+
+                        <th>Category</th>
+
+                        <th>
+                            <a asp-page="./Index"
+                               asp-route-Search="@Model.Search"
+                               asp-route-Page="1"
+                               asp-route-PageSize="@Model.PageSize"
+                               asp-route-SortBy="@LowStockSortFields.QuantityOnHand"
+                               asp-route-Descending="@(Model.SortBy == LowStockSortFields.QuantityOnHand && !Model.Descending)">
+                                Quantity On Hand
+                            </a>
+                        </th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (var item in Model.Result.Items)
+                    {
+                        <tr>
+                            <td>@item.ProductName</td>
+                            <td>@item.ProductSku</td>
+                            <td>@item.CategoryName</td>
+                            <td>@item.QuantityOnHand</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @if (Model.Result.TotalCount == 0)
+        {
+            <div class="alert alert-info">
+                No low stock products found.
+            </div>
+        }
+        else if (Model.TotalPages > 1)
+        {
+            <nav aria-label="Low stock pagination">
+                <ul class="pagination">
+                    <li class="page-item @(Model.PageNum <= 1 ? "disabled" : "")">
+                        <a class="page-link"
+                           asp-page="./Index"
+                           asp-route-Search="@Model.Search"
+                           asp-route-PageNum="@(Model.PageNum - 1)"
+                           asp-route-PageSize="@Model.PageSize"
+                           asp-route-SortBy="@Model.SortBy"
+                           asp-route-Descending="@Model.Descending">
+                            Previous
+                        </a>
+                    </li>
+
+                    @for (var pageNumber = 1; pageNumber <= Model.TotalPages; pageNumber++)
+                    {
+                        <li class="page-item @(pageNumber == Model.PageNum ? "active" : "")">
+                            <a class="page-link"
+                               asp-page="./Index"
+                               asp-route-Search="@Model.Search"
+                               asp-route-PageNum="@pageNumber"
+                               asp-route-PageSize="@Model.PageSize"
+                               asp-route-SortBy="@Model.SortBy"
+                               asp-route-Descending="@Model.Descending">
+                                @pageNumber
+                            </a>
+                        </li>
+                    }
+
+                    <li class="page-item @(Model.PageNum >= Model.TotalPages ? "disabled" : "")">
+                        <a class="page-link"
+                           asp-page="./Index"
+                           asp-route-Search="@Model.Search"
+                           asp-route-PageNum="@(Model.PageNum + 1)"
+                           asp-route-PageSize="@Model.PageSize"
+                           asp-route-SortBy="@Model.SortBy"
+                           asp-route-Descending="@Model.Descending">
+                            Next
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        }
+    }
+</div>
