@@ -363,6 +363,10 @@ Completed
 
 - Inventory Valuation
 - Purchase History
+- Supplier Purchase Analysis
+- Stock Movement
+- Low Stock Report
+- Inventory Movement Report
 
 ### Purchase History
 
@@ -374,10 +378,6 @@ Completed
 
 ### Remaining
 
-- Supplier Purchase Analysis
-- Stock Movement
-- Low Stock Report
-- Inventory Movement Report
 - Product Reports
 - Export to Excel
 - Export to PDF
@@ -429,14 +429,14 @@ Database
 
 ## Remaining Reporting Work
 
-- ⬜ Empty database behavior verification
-- ⬜ Explicit query-failure testing
-- ⬜ Supplier Purchase Analysis
-- ⬜ Stock Movement
-- ⬜ Low Stock Report
-- ⬜ Inventory Movement Report
+- ⬜ Product Report
 - ⬜ Excel Export
 - ⬜ PDF Export
+
+### Deferred Reporting Validation
+
+- ⬜ Empty database behavior verification
+- ⬜ Explicit query-failure testing
 
 ---
 
@@ -851,85 +851,8 @@ Remaining work:
 
 ## Reporting
 
-### Completed
+Remaining work:
 
-- Inventory Valuation
-- Purchase History
-- Supplier Purchase Analysis
-- Stock Movement
-
-### Purchase History
-
-- Purchase History Report
-- Server-side Search
-- From/To Date Filtering
-- Server-side Pagination
-- Server-side Sorting
-
-### Supplier Purchase Analysis
-
-- Supplier Purchase Analysis Report
-- Supplier-level Purchase Aggregation
-- Purchase Period
-- Purchase Order Count
-- Ordered Quantity
-- Received Quantity
-- Remaining Quantity
-- Total Amount
-- Server-side Supplier Search
-- From/To Date Filtering
-- Status Filtering
-- Server-side Pagination
-- Server-side Sorting
-- Pagination State Preservation
-- No-result Behavior
-- Browser Verification
-
-### Stock Movement
-
-- Stock Movement Report
-- Stock Movement Read Model
-- Stock Movement Application Handler
-- Stock Movement Persistence Abstraction
-- Stock Movement Repository
-- Product Information
-- SKU Information
-- Movement Type
-- Quantity Display
-- Reference Number
-- Remarks
-- Server-side Search
-- From/To Date Filtering
-- Movement Type Filtering
-- Server-side Pagination
-- Server-side Sorting
-- Stock Movement Navigation
-- Browser Verification
-
-### Low Stock
-
-- Low Stock Report
-- Low Stock Read Model
-- Low Stock Application Handler
-- Low Stock Persistence Abstraction
-- Low Stock Repository
-- Product Information
-- SKU Information
-- Category Information
-- Quantity On Hand Display
-- Existing Low Stock Threshold
-- Server-side Product/SKU Search
-- Server-side Pagination
-- Server-side Sorting
-- Pagination State Preservation
-- Reset Behavior
-- Combined Search, Sorting, and Pagination
-- Low Stock Navigation
-- Browser Verification
-
-### Remaining
-
-- Inventory Movement Report
 - Product Reports
 - Export to Excel
 - Export to PDF

@@ -52,6 +52,7 @@ Rather than documenting daily work, it captures important architectural decision
 | 24 | Reporting: Supplier Purchase Analysis |
 | 25 | Reporting: Stock Movement |
 | 26 | Reporting: Low Stock |
+| 27 | Reporting: Inventory Movement |
 
 ---
 
@@ -1992,6 +1993,159 @@ Low Stock reporting is complete for the current scope.
 Empty database behavior and explicit query-failure testing remain deferred to broader final Reporting/system verification.
 
 The next Reporting work will continue independently of the future Dynamic Capability-Based Authorization architecture.
+
+---
+
+# Milestone 27 - Reporting: Inventory Movement
+
+## Summary
+
+Implemented the Inventory Movement reporting vertical slice, extending
+the read-oriented Reporting architecture from transaction-level
+movement history into product-level movement analysis.
+
+The report summarizes inventory movement for each product over a
+selected reporting period.
+
+## Completed
+
+### Application
+
+- Inventory Movement read model
+- Inventory Movement DTO
+- Inventory Movement request model
+- Inventory Movement application handler
+- Inventory Movement repository abstraction
+
+### Infrastructure
+
+- Inventory Movement repository
+- Read-only EF Core query
+- Product-level movement aggregation
+- Opening quantity calculation
+- Stock In aggregation
+- Stock Out aggregation
+- Adjustment aggregation
+- Closing quantity calculation
+- Server-side Product/SKU search
+- Server-side date filtering
+- Server-side sorting
+- Server-side pagination
+
+### Presentation
+
+- Inventory Movement Razor Page
+- Reports navigation
+- Product/SKU search
+- From/To date filtering
+- Reporting Period display
+- Sorting
+- Pagination
+- Page-size changes
+- Reset behavior
+
+## Report Data
+
+Inventory Movement displays:
+
+- Product
+- SKU
+- Opening Quantity
+- Stock In
+- Stock Out
+- Adjustment
+- Closing Quantity
+
+The report is product-level and aggregated rather than transaction-level.
+
+Stock Movement remains responsible for individual transaction history.
+
+## Reporting Period
+
+The selected From and To dates define the reporting period used for
+the aggregated movement values.
+
+The reporting period is displayed separately above the table rather
+than adding a transaction date column, because each row represents
+multiple transactions over the selected period.
+
+## Query Design
+
+The report uses existing Product and Inventory Transaction data.
+
+Opening and closing quantities are reconstructed from the current
+inventory state and persisted transaction history.
+
+The query remains read-only and performs aggregation, filtering,
+sorting, and pagination on the database side.
+
+## EF Core Query Adjustment
+
+The initial implementation used grouped aggregate projections with
+left joins.
+
+During browser verification, EF Core raised a nullable materialization
+exception:
+
+```text
+Nullable object must have a value.
+```
+
+The query was restructured to use product-driven correlated aggregate subqueries with explicit nullable aggregate handling.
+
+This removed the nullable aggregate left-join boundary while preserving database-side processing.
+
+## Browser Verification
+
+Verified that:
+
+- Inventory Movement is accessible from application navigation.
+- Inventory Movement page loads successfully.
+- Product/SKU search works.
+- From/To date filtering works.
+- Reporting Period display works.
+- Combined search and date filtering works.
+- Server-side sorting works.
+- Reset behavior works.
+- Server-side pagination works.
+- Page-size changes work.
+- Pagination preserves active filters.
+- Boundary/no-result behavior works.
+- Aggregated movement values are displayed correctly.
+
+## Architecture Validation
+
+Inventory Movement further validates that the existing read-oriented Reporting architecture supports analytical inventory reporting without modifying transactional workflows.
+
+The implementation follows:
+
+```text
+Presentation
+     ↓
+Application
+     ↓
+Read Model
+     ↓
+Repository Abstraction
+     ↓
+Infrastructure
+     ↓
+Database
+```
+
+No structural architectural redesign was required.
+
+No Domain entity or database schema changes were required.
+
+## Outcome
+
+Inventory Movement reporting is complete for the current scope.
+
+Empty database behavior and explicit query-failure testing remain deferred to broader final Reporting/system verification.
+
+The remaining Additional Reporting work includes Product Reports and Excel/PDF export.
+
+The feature continues independently of the future Dynamic Capability-Based Authorization architecture.
 
 ---
 

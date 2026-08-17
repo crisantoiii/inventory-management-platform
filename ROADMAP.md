@@ -185,10 +185,15 @@ Status: 🟨 In Progress
 - Low Stock Search
 - Low Stock Pagination
 - Low Stock Sorting
+- Inventory Movement Report
+- Inventory Movement Search
+- Inventory Movement Date Filtering
+- Inventory Movement Reporting Period
+- Inventory Movement Pagination
+- Inventory Movement Sorting
 
 ### Remaining Reports
 
-- Inventory Movement Report
 - Product Reports
 
 ### Export Options
@@ -200,6 +205,26 @@ Status: 🟨 In Progress
 
 - Empty database behavior verification
 - Explicit query-failure testing
+
+### Additional Reporting
+
+Additional Reporting is being developed as Sprint 7 within the broader
+Phase 6 Reporting roadmap.
+
+Sprint 7 currently includes:
+
+- Inventory Valuation
+- Purchase History
+- Supplier Purchase Analysis
+- Stock Movement
+- Low Stock Report
+- Inventory Movement Report
+
+Remaining Sprint 7 scope:
+
+- Product Reports
+- Excel export
+- PDF export
 
 ---
 

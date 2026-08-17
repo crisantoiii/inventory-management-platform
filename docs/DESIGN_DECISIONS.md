@@ -1238,6 +1238,88 @@ The implementation does not require:
 - New migrations
 - Changes to the existing inventory transaction workflow
 
+### Inventory Movement Reporting Consideration
+
+Inventory Movement extends the read-oriented Reporting architecture
+from transaction-level movement history into product-level movement
+analysis.
+
+Stock Movement remains responsible for displaying individual inventory
+transactions.
+
+Inventory Movement instead summarizes movement for each product over
+a selected reporting period.
+
+The report provides:
+
+- Product
+- SKU
+- Opening Quantity
+- Stock In
+- Stock Out
+- Adjustment
+- Closing Quantity
+
+The selected reporting period is displayed separately from the table
+because the report represents aggregated movement rather than
+individual transactions.
+
+The implementation reconstructs opening and closing quantities from
+the current inventory state and persisted inventory transactions.
+
+The report remains read-only and does not modify Product or Inventory
+Transaction state.
+
+Filtering, aggregation, sorting, and pagination remain database-side
+through the Infrastructure repository.
+
+No Domain entity changes, database schema changes, or migrations were
+required.
+
+The implementation continues to follow:
+
+```text
+Presentation
+     ↓
+Application Handler
+     ↓
+Read Model
+     ↓
+Repository Abstraction
+     ↓
+Infrastructure Repository
+     ↓
+EF Core Query
+     ↓
+Database
+```
+
+### Inventory Movement EF Core Query Adjustment
+
+The initial Inventory Movement query used grouped aggregate projections
+combined with left joins.
+
+During browser verification, EF Core raised:
+
+`Nullable object must have a value.`
+
+The issue was caused by nullable SQL results crossing the aggregate
+and left-join projection boundary.
+
+The query was restructured to use product-driven correlated aggregate
+subqueries with explicit nullable aggregate handling.
+
+This removed the nullable anonymous aggregate join boundary while
+keeping the calculations database-side.
+
+The final implementation was browser-verified successfully.
+
+The experience reinforces the existing principle:
+
+- Keep reporting calculations database-side.
+- Respect SQL aggregate nullability at the query boundary.
+- Prefer query restructuring over client-side evaluation.
+
 ## Outcome
 
 Accepted.

@@ -124,7 +124,7 @@ The architecture has been validated and is considered stable for future business
 | Authentication & Authorization |  ✅ Complete | 100% |
 | User Management | ✅ Complete | 100% |
 | Purchasing | 🟨 Core Workflow Complete | Partial |
-| Reporting | 🟨 Inventory Valuation & Purchase History Complete | Partial |
+| Reporting | 🟨 Additional Reporting In Progress | Partial |
 | Account Management | ✅ Complete | 100% |
 
 ---
@@ -417,14 +417,43 @@ The architecture has been validated and is considered stable for future business
 - ✅ Low Stock navigation
 - ✅ Browser verification
 
+### Inventory Movement
+
+- ✅ Inventory Movement Report
+- ✅ Inventory Movement Read Model
+- ✅ Inventory Movement Application Handler
+- ✅ Inventory Movement Persistence Abstraction
+- ✅ Inventory Movement Repository
+- ✅ Product Information
+- ✅ SKU Information
+- ✅ Opening Quantity
+- ✅ Stock In Quantity
+- ✅ Stock Out Quantity
+- ✅ Adjustment Quantity
+- ✅ Closing Quantity
+- ✅ Server-side Product/SKU Search
+- ✅ From/To Date Filtering
+- ✅ Reporting Period Display
+- ✅ Server-side Pagination
+- ✅ Server-side Sorting
+- ✅ Pagination State Preservation
+- ✅ Page-size Changes
+- ✅ Reset Behavior
+- ✅ Combined Search and Date Filtering
+- ✅ Boundary / No-result Behavior
+- ✅ Inventory Movement Navigation
+- ✅ Browser Verification
+
 ### Reporting - Remaining Work
+
+- ⬜ Product Reports
+- ⬜ Excel export
+- ⬜ PDF export
+
+### Reporting - Deferred Work
 
 - ⬜ Empty database behavior verification
 - ⬜ Explicit query-failure testing
-- ⬜ Excel export
-- ⬜ PDF export
-- ⬜ Inventory Movement Report
-- ⬜ Product Reports
 
 ---
 
@@ -530,18 +559,30 @@ Extend Purchasing workflow where required
 
 ## Additional Reporting Capabilities
 
-The next implementation work will focus on the remaining Additional Reporting capabilities:
+The remaining implementation work will focus on:
 
-- Stock Movement
-- Low Stock Report
-- Inventory Movement Report
 - Product Reports
 - Excel export
 - PDF export
+
+The following reporting capabilities are already complete:
+
+- Inventory Valuation
+- Purchase History
+- Supplier Purchase Analysis
+- Stock Movement
+- Low Stock Report
+- Inventory Movement Report
+
+The following validation activities remain deferred until final
+project-wide verification:
+
 - Empty database behavior verification
 - Explicit query-failure testing
 
-After the current Additional Reporting scope is completed, development will proceed to the planned Dynamic Capability-Based Authorization architecture.
+After the current Additional Reporting scope is completed, development
+will proceed to the planned Dynamic Capability-Based Authorization
+architecture.
 
 # Known Limitations
 
