@@ -191,10 +191,11 @@ Status: 🟨 In Progress
 - Inventory Movement Reporting Period
 - Inventory Movement Pagination
 - Inventory Movement Sorting
-
-### Remaining Reports
-
 - Product Reports
+- Product Reports Search
+- Product Reports Status Filtering
+- Product Reports Pagination
+- Product Reports Sorting
 
 ### Export Options
 
@@ -222,7 +223,6 @@ Sprint 7 currently includes:
 
 Remaining Sprint 7 scope:
 
-- Product Reports
 - Excel export
 - PDF export
 

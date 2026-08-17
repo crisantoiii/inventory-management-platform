@@ -367,6 +367,7 @@ Completed
 - Stock Movement
 - Low Stock Report
 - Inventory Movement Report
+- Product Reports
 
 ### Purchase History
 
@@ -378,7 +379,6 @@ Completed
 
 ### Remaining
 
-- Product Reports
 - Export to Excel
 - Export to PDF
 
@@ -427,9 +427,47 @@ EF Core
 Database
 ```
 
+## Product Reports
+
+Status: **Complete**
+
+Implemented:
+
+- Product Reports read model
+- Product Reports application handler
+- Product Reports persistence abstraction
+- Product Reports repository
+- Product/SKU search
+- Category search
+- Unit search
+- Product status filtering
+- Active / Inactive / All filtering
+- Server-side sorting
+- Server-side pagination
+- Page-size changes
+- Reset
+- Combined filtering
+- No-result behavior
+- Reports navigation
+
+Verification:
+
+- Page loading
+- Reports navigation
+- Product/SKU search
+- Category/Unit filtering
+- Status filtering
+- Combined filtering
+- Sorting
+- Reset
+- Pagination
+- Page-size changes
+- Pagination while filters are active
+- Boundary/no-result behavior
+- Browser verification
+
 ## Remaining Reporting Work
 
-- ⬜ Product Report
 - ⬜ Excel Export
 - ⬜ PDF Export
 

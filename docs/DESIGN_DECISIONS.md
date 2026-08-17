@@ -1294,6 +1294,64 @@ EF Core Query
 Database
 ```
 
+### Product Reports Consideration
+
+Product Reports extends the read-oriented Reporting architecture to
+current Product state.
+
+The report provides:
+
+- Product
+- SKU
+- Category
+- Unit
+- Quantity On Hand
+- Cost Price
+- Selling Price
+- Product Status
+
+The report supports:
+
+- Active / Inactive / All Products filtering
+- Server-side Product/SKU/Category/Unit search
+- Server-side sorting
+- Server-side pagination
+- Pagination state preservation
+- Page-size changes
+- Reset behavior
+- Combined search and status filtering
+- Boundary / No-result behavior
+
+The implementation uses a dedicated read model and repository rather
+than reusing the transactional Product management query directly.
+
+The query remains read-only and uses `AsNoTracking()` with database-side
+projection, filtering, sorting, and pagination.
+
+No Domain entity changes, database schema changes, or migrations were
+required.
+
+The implementation continues to follow:
+
+```text
+Presentation
+     ↓
+Application Handler
+     ↓
+Read Model
+     ↓
+Repository Abstraction
+     ↓
+Infrastructure Repository
+     ↓
+EF Core Query
+     ↓
+Database
+```
+
+The report remains independent of the future Dynamic Capability-Based
+Authorization architecture.
+
 ### Inventory Movement EF Core Query Adjustment
 
 The initial Inventory Movement query used grouped aggregate projections

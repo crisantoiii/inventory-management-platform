@@ -879,6 +879,44 @@ This prevents a failed lookup from being silently interpreted as an empty select
 
 ## Architecture Validation
 
+Product Reports further validates that the existing read-oriented
+Reporting architecture supports general product-state reporting
+without modifying transactional Product behavior.
+
+The implementation follows:
+
+```text
+Presentation
+     ↓
+Application
+     ↓
+Read Model
+     ↓
+Repository Abstraction
+     ↓
+Infrastructure
+     ↓
+Database
+```
+
+No structural architectural redesign was required.
+
+The implementation remains independent of the future Dynamic
+Capability-Based Authorization architecture.
+
+## Outcome
+
+Product Reports is complete for the current scope.
+
+The remaining Additional Reporting work is Excel and PDF export.
+
+Empty database behavior and explicit query-failure testing remain
+deferred to broader final Reporting/system verification.
+
+---
+
+# Architecture Validation
+
 Sprint 4 confirmed that the existing architecture could support a complete workflow-driven Presentation layer without structural redesign.
 
 The review confirmed:
@@ -2113,6 +2151,101 @@ Verified that:
 - Boundary/no-result behavior works.
 - Aggregated movement values are displayed correctly.
 
+# Milestone 28 - Reporting: Product Reports
+
+## Summary
+
+Implemented the Product Reports reporting vertical slice, extending
+the read-oriented Reporting architecture to current Product state.
+
+## Completed
+
+### Application
+
+- Product Report read model
+- Product Report DTO
+- Product Report request model
+- Product Report application handler
+- Product Report repository abstraction
+
+### Infrastructure
+
+- Product Report repository
+- Read-only EF Core query
+- Product information projection
+- SKU information projection
+- Category information projection
+- Unit information projection
+- Quantity On Hand projection
+- Cost Price projection
+- Selling Price projection
+- Product status projection
+- Server-side Product/SKU/Category/Unit search
+- Active / Inactive / All Products filtering
+- Server-side sorting
+- Server-side pagination
+
+### Presentation
+
+- Product Reports Razor Page
+- Reports navigation
+- Product/SKU/Category/Unit search
+- Active / Inactive / All Products filtering
+- Sorting
+- Pagination
+- Page-size changes
+- Reset behavior
+- Combined filtering
+
+## Report Data
+
+Product Reports displays:
+
+- Product
+- SKU
+- Category
+- Unit
+- Quantity On Hand
+- Cost Price
+- Selling Price
+- Status
+
+## Query Design
+
+The report uses existing Product, Category, and Unit data.
+
+The query remains read-only and uses `AsNoTracking()` with database-side
+projection, filtering, sorting, and pagination.
+
+The implementation uses a dedicated reporting read model and repository
+rather than reusing the transactional Product management query directly.
+
+No Domain entity or database schema changes were required.
+
+No migration was required.
+
+## Browser Verification
+
+Product Reports was built successfully and verified through actual
+browser workflows.
+
+Verified:
+
+- Product Reports page loading
+- Reports navigation
+- Product/SKU/Category/Unit search
+- Active / Inactive / All Products filtering
+- Server-side sorting
+- Server-side pagination
+- Pagination state preservation
+- Page-size changes
+- Reset behavior
+- Combined search and status filtering
+- Boundary/no-result behavior
+
+All implemented Product Reports test cases were confirmed through
+manual verification.
+
 ## Architecture Validation
 
 Inventory Movement further validates that the existing read-oriented Reporting architecture supports analytical inventory reporting without modifying transactional workflows.
@@ -2143,7 +2276,7 @@ Inventory Movement reporting is complete for the current scope.
 
 Empty database behavior and explicit query-failure testing remain deferred to broader final Reporting/system verification.
 
-The remaining Additional Reporting work includes Product Reports and Excel/PDF export.
+The remaining Additional Reporting work includes Excel and PDF export.
 
 The feature continues independently of the future Dynamic Capability-Based Authorization architecture.
 
@@ -2202,12 +2335,20 @@ Architecture Sprint 1 formally validated these conclusions through a comprehensi
 The platform is currently continuing development of Additional
 Reporting capabilities.
 
-Purchase History reporting has been implemented with:
+Completed reporting capabilities include:
 
-- Server-side Search
-- From/To Date Filtering
-- Server-side Pagination
-- Server-side Sorting
+- Inventory Valuation
+- Purchase History
+- Supplier Purchase Analysis
+- Stock Movement
+- Low Stock Report
+- Inventory Movement Report
+- Product Reports
+
+The remaining reporting work is Excel and PDF export.
+
+Empty database behavior and explicit query-failure testing remain
+deferred until final project-wide verification.
 
 The next reporting work will continue independently of the future
 authorization architecture.
@@ -2296,8 +2437,8 @@ The project deliberately applies the Rule of Three to balance maintainability ag
 ## Current Development
 
 - Additional Reporting
-- Purchase History Reporting
-- Remaining Reporting Enhancements
+- Excel Export
+- PDF Export
 
 ## Planned Architecture
 
