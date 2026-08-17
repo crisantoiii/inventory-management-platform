@@ -1,0 +1,215 @@
+@page
+@model InventoryPlatform.Web.Pages.Reports.ProductReports.IndexModel
+@using InventoryPlatform.Shared.Sorting
+
+@{
+    ViewData["Title"] = "Product Reports";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1>Product Reports</h1>
+    </div>
+
+    <form method="get" class="row g-3 mb-4">
+        <div class="col-md-4">
+            <label asp-for="Search" class="form-label">Search</label>
+            <input asp-for="Search"
+                   class="form-control"
+                   placeholder="SKU, product, category or unit" />
+        </div>
+
+        <div class="col-md-3">
+            <label asp-for="Status" class="form-label">Status</label>
+            <select asp-for="Status"
+                    class="form-select"
+                    asp-items="Model.StatusOptions">
+            </select>
+        </div>
+
+        <div class="col-md-5 d-flex align-items-end gap-2">
+            <button type="submit" class="btn btn-primary">Search</button>
+            <a asp-page="./Index" class="btn btn-outline-secondary">Reset</a>
+        </div>
+    </form>
+
+    @if (Model.Result is not null)
+    {
+        <p class="text-muted">
+            Showing
+            @((Model.Result.TotalCount == 0)
+                ? 0
+                : ((Model.Result.Page - 1) * Model.Result.PageSize + 1))
+            –@Math.Min(Model.Result.Page * Model.Result.PageSize, Model.Result.TotalCount)
+            of @Model.Result.TotalCount products
+        </p>
+
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>
+                            <a asp-page="./Index"
+                               asp-route-Search="@Model.Search"
+                               asp-route-Status="@Model.Status"
+                               asp-route-PageNum="1"
+                               asp-route-PageSize="@Model.PageSize"
+                               asp-route-SortBy="@ProductReportSortFields.ProductName"
+                               asp-route-Descending="@(Model.SortBy == ProductReportSortFields.ProductName && !Model.Descending)">
+                                Product
+                            </a>
+                        </th>
+                        <th>
+                            <a asp-page="./Index"
+                               asp-route-Search="@Model.Search"
+                               asp-route-Status="@Model.Status"
+                               asp-route-PageNum="1"
+                               asp-route-PageSize="@Model.PageSize"
+                               asp-route-SortBy="@ProductReportSortFields.ProductSku"
+                               asp-route-Descending="@(Model.SortBy == ProductReportSortFields.ProductSku && !Model.Descending)">
+                                SKU
+                            </a>
+                        </th>
+                        <th>
+                            <a asp-page="./Index"
+                               asp-route-Search="@Model.Search"
+                               asp-route-Status="@Model.Status"
+                               asp-route-PageNum="1"
+                               asp-route-PageSize="@Model.PageSize"
+                               asp-route-SortBy="@ProductReportSortFields.CategoryName"
+                               asp-route-Descending="@(Model.SortBy == ProductReportSortFields.CategoryName && !Model.Descending)">
+                                Category
+                            </a>
+                        </th>
+                        <th>
+                            <a asp-page="./Index"
+                               asp-route-Search="@Model.Search"
+                               asp-route-Status="@Model.Status"
+                               asp-route-PageNum="1"
+                               asp-route-PageSize="@Model.PageSize"
+                               asp-route-SortBy="@ProductReportSortFields.UnitName"
+                               asp-route-Descending="@(Model.SortBy == ProductReportSortFields.UnitName && !Model.Descending)">
+                                Unit
+                            </a>
+                        </th>
+                        <th>
+                            <a asp-page="./Index"
+                               asp-route-Search="@Model.Search"
+                               asp-route-Status="@Model.Status"
+                               asp-route-PageNum="1"
+                               asp-route-PageSize="@Model.PageSize"
+                               asp-route-SortBy="@ProductReportSortFields.QuantityOnHand"
+                               asp-route-Descending="@(Model.SortBy == ProductReportSortFields.QuantityOnHand && !Model.Descending)">
+                                Quantity On Hand
+                            </a>
+                        </th>
+                        <th>
+                            <a asp-page="./Index"
+                               asp-route-Search="@Model.Search"
+                               asp-route-Status="@Model.Status"
+                               asp-route-PageNum="1"
+                               asp-route-PageSize="@Model.PageSize"
+                               asp-route-SortBy="@ProductReportSortFields.CostPrice"
+                               asp-route-Descending="@(Model.SortBy == ProductReportSortFields.CostPrice && !Model.Descending)">
+                                Cost
+                            </a>
+                        </th>
+                        <th>
+                            <a asp-page="./Index"
+                               asp-route-Search="@Model.Search"
+                               asp-route-Status="@Model.Status"
+                               asp-route-PageNum="1"
+                               asp-route-PageSize="@Model.PageSize"
+                               asp-route-SortBy="@ProductReportSortFields.SellingPrice"
+                               asp-route-Descending="@(Model.SortBy == ProductReportSortFields.SellingPrice && !Model.Descending)">
+                                Selling
+                            </a>
+                        </th>
+                        <th>
+                            <a asp-page="./Index"
+                               asp-route-Search="@Model.Search"
+                               asp-route-Status="@Model.Status"
+                               asp-route-PageNum="1"
+                               asp-route-PageSize="@Model.PageSize"
+                               asp-route-SortBy="@ProductReportSortFields.IsActive"
+                               asp-route-Descending="@(Model.SortBy == ProductReportSortFields.IsActive && !Model.Descending)">
+                                Status
+                            </a>
+                        </th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (var item in Model.Result.Items)
+                    {
+                        <tr>
+                            <td>@item.ProductName</td>
+                            <td>@item.ProductSku</td>
+                            <td>@item.CategoryName</td>
+                            <td>@item.UnitName</td>
+                            <td>@item.QuantityOnHand</td>
+                            <td>@item.CostPrice.ToString("N2")</td>
+                            <td>@item.SellingPrice.ToString("N2")</td>
+                            <td>@(item.IsActive ? "Active" : "Inactive")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @if (Model.Result.TotalCount == 0)
+        {
+            <div class="alert alert-info">
+                No products found.
+            </div>
+        }
+        else if (Model.TotalPages > 1)
+        {
+            <nav aria-label="Product reports pagination">
+                <ul class="pagination">
+                    <li class="page-item @(Model.PageNum <= 1 ? "disabled" : "")">
+                        <a class="page-link"
+                           asp-page="./Index"
+                           asp-route-Search="@Model.Search"
+                           asp-route-Status="@Model.Status"
+                           asp-route-PageNum="@(Model.PageNum - 1)"
+                           asp-route-PageSize="@Model.PageSize"
+                           asp-route-SortBy="@Model.SortBy"
+                           asp-route-Descending="@Model.Descending">
+                            Previous
+                        </a>
+                    </li>
+
+                    @for (var pageNumber = 1; pageNumber <= Model.TotalPages; pageNumber++)
+                    {
+                        <li class="page-item @(pageNumber == Model.PageNum ? "active" : "")">
+                            <a class="page-link"
+                               asp-page="./Index"
+                               asp-route-Search="@Model.Search"
+                               asp-route-Status="@Model.Status"
+                               asp-route-PageNum="@pageNumber"
+                               asp-route-PageSize="@Model.PageSize"
+                               asp-route-SortBy="@Model.SortBy"
+                               asp-route-Descending="@Model.Descending">
+                                @pageNumber
+                            </a>
+                        </li>
+                    }
+
+                    <li class="page-item @(Model.PageNum >= Model.TotalPages ? "disabled" : "")">
+                        <a class="page-link"
+                           asp-page="./Index"
+                           asp-route-Search="@Model.Search"
+                           asp-route-Status="@Model.Status"
+                           asp-route-PageNum="@(Model.PageNum + 1)"
+                           asp-route-PageSize="@Model.PageSize"
+                           asp-route-SortBy="@Model.SortBy"
+                           asp-route-Descending="@Model.Descending">
+                            Next
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        }
+    }
+</div>

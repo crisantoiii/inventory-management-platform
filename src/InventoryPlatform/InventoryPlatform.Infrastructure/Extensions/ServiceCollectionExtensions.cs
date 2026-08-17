@@ -42,6 +42,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IStockMovementRepository, StockMovementRepository>();
         services.AddScoped<IInventoryMovementRepository, InventoryMovementRepository>();
         services.AddScoped<ILowStockRepository, LowStockRepository>();
+        services.AddScoped<IProductReportsRepository, ProductReportsRepository>();
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
