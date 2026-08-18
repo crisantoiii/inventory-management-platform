@@ -1674,6 +1674,54 @@ Domain business rules will determine whether the action is valid for the current
 
 ---
 
+# DD-032 — Reporting Excel Export
+
+Version Introduced: Sprint 7
+
+## Decision
+
+Excel export for completed Reporting features is implemented as a Web-layer output concern using ClosedXML while reusing the existing read-oriented Reporting handlers, DTOs, filters, and sorting behavior.
+
+The export flow is:
+
+```text
+Razor Page
+     ↓
+Application Handler
+     ↓
+Existing Report Read Model / DTO
+     ↓
+Excel Report Writer
+     ↓
+.xlsx Response
+```
+
+The export preserves the report's active filters and sorting but does not preserve the UI pagination limit. The workbook contains the full filtered result set.
+
+The Inventory Valuation export also includes the report-level Total Inventory Value summary already displayed by the browser report.
+
+## Rationale
+
+Excel generation is an output-format concern and does not belong in Domain or the read repositories. Keeping workbook generation in the Web layer avoids coupling the Application and Domain layers to an external document-generation library.
+
+Reusing the existing report queries and DTOs prevents the Excel export from developing separate filtering, sorting, or business rules from the browser report.
+
+No generic reporting export framework was introduced because the current requirement can be satisfied by a focused Excel writer without creating premature abstraction.
+
+## Consequences
+
+- Existing Reporting architecture remains unchanged.
+- No Domain entity changes are required.
+- No database schema changes or migrations are required.
+- Report filters and sorting remain consistent between browser and Excel output.
+- Excel-specific formatting remains isolated from the Application and Domain layers.
+
+## Implementation Status
+
+Implemented and browser-verified for the completed Reporting pages.
+
+PDF export remains the next Reporting implementation.
+
 # Future Decisions
 
 This document will continue to evolve as the project grows.

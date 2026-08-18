@@ -471,9 +471,12 @@ The architecture has been validated and is considered stable for future business
 - ✅ Product Reports Navigation
 - ✅ Browser Verification
 
+### Reporting - Completed Export Work
+
+- ✅ Excel export
+
 ### Reporting - Remaining Work
 
-- ⬜ Excel export
 - ⬜ PDF export
 
 ### Reporting - Deferred Work
@@ -555,9 +558,20 @@ Product Reports has also been completed and verified with:
 - Product Reports navigation
 - Browser verification
 
+Excel Export has also been completed and verified for the completed reporting pages.
+
+Verified export behavior includes:
+
+- Export to Excel action on completed report pages
+- Current report filters preserved during export
+- Current report sorting preserved during export
+- Export includes the full filtered result set rather than only the current paginated page
+- Inventory Valuation includes the Total Inventory Value summary
+- Generated `.xlsx` workbooks contain report-specific columns and values
+
 The broader Additional Reporting initiative remains in progress.
 
-Product Reports has now been completed and verified. The remaining implementation scope is Excel and PDF export before final project-wide verification.
+Product Reports has now been completed and verified. Excel export has also been implemented and browser-verified across the completed reporting pages. The remaining implementation scope is PDF export before final project-wide verification.
 
 ## Planned Authorization Architecture
 
@@ -601,7 +615,6 @@ Extend Purchasing workflow where required
 
 The remaining implementation work will focus on:
 
-- Excel export
 - PDF export
 
 The following reporting capabilities are already complete:
@@ -613,6 +626,7 @@ The following reporting capabilities are already complete:
 - Low Stock Report
 - Inventory Movement Report
 - Product Reports
+- Excel Export
 
 The following validation activities remain deferred until final
 project-wide verification:
@@ -763,7 +777,7 @@ The architecture has now been validated through:
 
 ### Sprint 7 — Additional Reporting
 
-Product Reports is complete and browser-verified.
+Product Reports and Excel Export are complete and browser-verified.
 
 Completed:
 
@@ -774,15 +788,15 @@ Completed:
 - Low Stock Report
 - Inventory Movement Report
 - Product Reports
+- Excel Export
 
 ### Next Feature
 
-**Excel Export**
+**PDF Export**
 
-After Excel Export:
+After PDF Export:
 
-1. PDF Export
-2. Final project-wide verification
+1. Final project-wide verification
 
 ### Final Project-wide Verification
 

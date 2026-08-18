@@ -196,6 +196,7 @@ Status: 🟨 In Progress
 - Product Reports Status Filtering
 - Product Reports Pagination
 - Product Reports Sorting
+- Excel Export
 
 ### Export Options
 
@@ -220,10 +221,11 @@ Sprint 7 currently includes:
 - Stock Movement
 - Low Stock Report
 - Inventory Movement Report
+- Product Reports
+- Excel export
 
 Remaining Sprint 7 scope:
 
-- Excel export
 - PDF export
 
 ---

@@ -377,10 +377,10 @@ Completed
 - Server-side Pagination
 - Server-side Sorting
 
-### Remaining
+### Export
 
-- Export to Excel
-- Export to PDF
+- ✅ Export to Excel
+- ⬜ Export to PDF
 
 ## Inventory Valuation
 
@@ -466,9 +466,21 @@ Verification:
 - Boundary/no-result behavior
 - Browser verification
 
+## Excel Export
+
+- ✅ Excel Export
+- ✅ Export actions on completed reporting pages
+- ✅ Existing report filters preserved during export
+- ✅ Existing report sorting preserved during export
+- ✅ Full filtered result set exported without UI pagination limits
+- ✅ Inventory Valuation total inventory value included in the workbook
+- ✅ Report-specific workbook columns and values
+- ✅ Browser/manual verification
+
+The Excel export uses the existing read-oriented Reporting queries and DTOs. No new Domain entities, database tables, or migrations were required.
+
 ## Remaining Reporting Work
 
-- ⬜ Excel Export
 - ⬜ PDF Export
 
 ### Deferred Reporting Validation
@@ -891,8 +903,6 @@ Remaining work:
 
 Remaining work:
 
-- Product Reports
-- Export to Excel
 - Export to PDF
 
 ## Sales

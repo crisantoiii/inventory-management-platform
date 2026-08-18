@@ -2246,7 +2246,75 @@ Verified:
 All implemented Product Reports test cases were confirmed through
 manual verification.
 
-## Architecture Validation
+# Milestone 29 - Reporting: Excel Export
+
+## Summary
+
+Implemented Excel export for the completed Sprint 7 Reporting features using the existing read-oriented Reporting architecture.
+
+## Completed
+
+### Application
+
+The existing Reporting handlers were extended with export-specific query handling while preserving the existing report filters and sorting behavior.
+
+No new report DTOs or repository abstractions were introduced.
+
+### Presentation
+
+Added Export to Excel actions to the completed Reporting pages. The export preserves the active report filters and sorting state.
+
+The export is not limited by the current UI page size and instead includes the full filtered result set.
+
+### Excel Generation
+
+Added a focused Web-layer Excel report writer using ClosedXML.
+
+The writer produces report-specific `.xlsx` workbooks for:
+
+- Inventory Valuation
+- Purchase History
+- Supplier Purchase Analysis
+- Stock Movement
+- Low Stock Report
+- Inventory Movement Report
+- Product Reports
+
+Inventory Valuation also includes the Total Inventory Value summary displayed by the browser report.
+
+## Architecture Outcome
+
+Excel generation remains isolated from Domain and Infrastructure persistence concerns. Existing Reporting queries and DTOs remain the source of report data.
+
+No Domain entity, database schema, or migration changes were required.
+
+No generic reporting export framework was introduced.
+
+## Verification
+
+Excel Export was built successfully and verified through browser/manual workflows.
+
+Validated:
+
+- Export action availability on completed Reporting pages
+- Workbook generation
+- Report-specific columns and values
+- Preservation of active filters
+- Preservation of active sorting
+- Export of the full filtered result set without UI pagination limits
+- Inventory Valuation Total Inventory Value summary
+
+The development launch port was also changed from the unavailable/reserved `5260` endpoint to `7237` to allow the application to run locally without the Windows port exclusion conflict.
+
+## Sprint Position
+
+Excel Export is complete for the current Sprint 7 scope.
+
+PDF Export remains the next Reporting implementation. Empty database behavior and explicit query-failure testing remain deferred until final project-wide verification.
+
+The implementation remains independent of the future Dynamic Capability-Based Authorization architecture.
+
+# Architecture Validation
 
 Inventory Movement further validates that the existing read-oriented Reporting architecture supports analytical inventory reporting without modifying transactional workflows.
 
@@ -2344,8 +2412,9 @@ Completed reporting capabilities include:
 - Low Stock Report
 - Inventory Movement Report
 - Product Reports
+- Excel Export
 
-The remaining reporting work is Excel and PDF export.
+The remaining reporting work is PDF export.
 
 Empty database behavior and explicit query-failure testing remain
 deferred until final project-wide verification.
@@ -2437,7 +2506,6 @@ The project deliberately applies the Rule of Three to balance maintainability ag
 ## Current Development
 
 - Additional Reporting
-- Excel Export
 - PDF Export
 
 ## Planned Architecture
