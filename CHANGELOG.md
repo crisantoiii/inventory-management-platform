@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Release State
+
+Sprint 7 Additional Reporting is complete and verified. The changes are prepared for the v1.4.0 release tag.
+
 ### Sprint 7 — Additional Reporting
 
 Sprint 7 Additional Reporting is complete and has passed final project-wide verification.

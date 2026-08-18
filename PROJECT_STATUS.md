@@ -18,7 +18,7 @@ Purchase Orders
 ████████████████████ 100%
 
 Reporting
-████████████████░░░░ In Progress
+████████████████████ 100%
 
 Account Management
 ████████████████████ 100%
@@ -26,7 +26,9 @@ Account Management
 
 # Project Status
 
-**Current Version:** v1.3.0
+**Current Version:** v1.4.0
+
+**Next Release:** Sprint 8 — To be determined through Sprint Planning
 
 **Project Status:** Active Development
 
@@ -34,28 +36,34 @@ Account Management
 
 # Latest Release
 
-## v1.3.0 - Account Management
+## v1.4.0 - Additional Reporting & Exports
 
 Released: August 2026
 
 Completed:
 
-- User Profile
-- Change Password
-- Forgot Password
-- Reset Password
-- Force Password Change
-- Email Verification
-- Two-Factor Authentication
-- 2FA Setup
-- 2FA Verification
-- 2FA Login Challenge
-- Recovery Codes
-- Recovery Code Login
-- Recovery Code Regeneration
-- Recovery Code Invalidation
-- 2FA Disable
-- Self-Service Account Management
+- Inventory Valuation
+- Purchase History
+- Supplier Purchase Analysis
+- Stock Movement
+- Low Stock Report
+- Inventory Movement Report
+- Product Reports
+- Excel Export
+- PDF Export
+- Final project-wide verification
+
+Verified:
+
+- Authentication, Account Management, and 2FA
+- Management and inventory operations regression
+- Reporting filters, sorting, pagination, navigation, and no-result behavior
+- All seven Excel exports
+- All seven PDF exports
+- Empty database behavior
+- Explicit query failure and database recovery
+- Existing authorization boundaries
+- `dotnet restore` and `dotnet build`
 
 ---
 
@@ -72,7 +80,7 @@ Completed:
 - ✅ v0.9.0 - Architecture Sprint 1
 - ✅ v1.0.0 - Purchasing Application Layer
 - ✅ v1.1.0 - Purchasing Presentation Layer
-- 🟨 v1.2.0 - Reporting: Inventory Valuation
+- ✅ v1.2.0 - Reporting: Inventory Valuation
 - ✅ v1.3.0 - Account Management
 
 ---
@@ -82,7 +90,7 @@ Completed:
 - **Completed Modules:** 10
 - **Architecture Status:** Validated
 - **Current Milestone:** Sprint 7 Additional Reporting — Complete
-- **Next Milestone:** Next development milestone to be selected
+- **Next Milestone:** Sprint 8 Planning
 
 ---
 
@@ -124,7 +132,7 @@ The architecture has been validated and is considered stable for future business
 | Authentication & Authorization |  ✅ Complete | 100% |
 | User Management | ✅ Complete | 100% |
 | Purchasing | 🟨 Core Workflow Complete | Partial |
-| Reporting | 🟨 Additional Reporting In Progress | Partial |
+| Reporting | ✅ Additional Reporting Complete | 100% |
 | Account Management | ✅ Complete | 100% |
 
 ---
@@ -531,110 +539,30 @@ Final verification covered normal application regression, reporting workflows, e
 
 # Current Focus
 
-## Additional Reporting Capabilities
+Sprint 7 Additional Reporting is complete, verified, and documented.
 
-Purchase History has been implemented with:
+Completed:
 
-- Server-side search
-- From/To date filtering
-- Server-side pagination
-- Server-side sorting
+- Inventory Valuation
+- Purchase History
+- Supplier Purchase Analysis
+- Stock Movement
+- Low Stock Report
+- Inventory Movement Report
+- Product Reports
+- Excel Export
+- PDF Export
+- Final project-wide verification
 
-Supplier Purchase Analysis has also been completed and verified with:
-
-- Supplier search
-- From/To date filtering
-- Status filtering
-- Server-side pagination
-- Server-side sorting
-- Purchase period display
-- Supplier-level purchase aggregation
-- No-result behavior
-
-Stock Movement has also been completed and verified with:
-
-- Product/SKU search
-- Reference/remarks search
-- From/To date filtering
-- Movement type filtering
-- Server-side pagination
-- Server-side sorting
-- Stock Movement navigation
-- Browser verification
-
-Product Reports has also been completed and verified with:
-
-- Product/SKU/Category/Unit search
-- Active / Inactive / All Products filtering
-- Server-side pagination
-- Server-side sorting
-- Pagination state preservation
-- Page-size changes
-- Reset behavior
-- Combined search and status filtering
-- Boundary/no-result behavior
-- Product Reports navigation
-- Browser verification
-
-Excel Export and PDF Export have now been completed and verified for the completed reporting pages.
-
-Verified export behavior includes:
-
-- Export actions on completed report pages
-- Current report filters preserved during export
-- Current report sorting preserved during export
-- Export includes the full filtered result set rather than only the current paginated page
-- Inventory Valuation includes the Total Inventory Value summary
-- Generated `.xlsx` workbooks contain report-specific columns and values
-- Generated `.pdf` reports contain report-specific columns and values
-
-The broader Additional Reporting initiative remains in progress only because final project-wide verification is still outstanding.
-
-Product Reports, Excel Export, and PDF Export have now been completed and verified. The remaining work is final project-wide verification, including the deferred validation scenarios.
-
-## Planned Authorization Architecture
-
-The Dynamic Capability-Based Authorization architecture has been finalized as a design decision but has not yet been implemented.
-
-The planned structure is:
-
-```text
-User
-  ↓
-Group
-  ↓
-Capabilities
-  ↓
-Application Action
-  ↓
-Domain State Validation
-```
-
-The current ASP.NET Core Identity authorization implementation remains unchanged until the authorization implementation phase.
-
-The agreed development sequence is:
-
-```text
-Additional Reporting
-        ↓
-Complete current reporting scope
-        ↓
-Dynamic Capability-Based Authorization
-        ↓
-Apply capabilities to Purchasing
-        ↓
-Extend Purchasing workflow where required
-```
-
----
+Verification included empty-database behavior, explicit query failure and recovery, authorization regression, and final solution build verification.
 
 # Next Milestone
 
-## Additional Reporting Capabilities
+## Sprint 8 Planning
 
-The remaining implementation work will focus on:
+The next development scope will be established through the Sprint Planning process.
 
-- Final project-wide verification
+Sprint 7 Additional Reporting is complete and no Sprint 7 implementation work remains.
 
 The following reporting capabilities are already complete:
 
@@ -648,15 +576,9 @@ The following reporting capabilities are already complete:
 - Excel Export
 - PDF Export
 
-The following validation activities remain deferred until final
-project-wide verification:
+Sprint 7 final verification is complete.
 
-- Empty database behavior verification
-- Explicit query-failure testing
-
-After the current Additional Reporting scope is completed, development
-will proceed to the planned Dynamic Capability-Based Authorization
-architecture.
+Dynamic Capability-Based Authorization remains a future architectural direction. Its implementation will be considered through a separate Sprint Planning process and was not part of Sprint 7.
 
 # Known Limitations
 
@@ -811,15 +733,36 @@ Completed:
 - Excel Export
 - PDF Export
 
-### Next Feature
-
-**Final project-wide verification**
-
 ### Final Project-wide Verification
 
-The following verification items remain intentionally deferred until all
-Sprint 7 reporting features are complete:
+- [X] Empty database behavior verification
+- [X] Explicit query-failure testing
+- [X] Authorization regression verification
+- [X] Final build verification
 
-- Empty database behavior verification
-- Explicit query-failure testing
 
+
+
+# Sprint 7 Final Verification
+
+Sprint 7 Additional Reporting has completed final project-wide verification successfully.
+
+Verified:
+
+- All seven reporting pages
+- All seven Excel exports
+- All seven PDF exports
+- Filtering, sorting, pagination, and navigation
+- Full filtered dataset exports
+- Multi-page PDF output
+- Inventory Valuation Total Inventory Value
+- Empty database behavior
+- Explicit query failure and database recovery
+- Existing authorization and Access Denied behavior
+- Authentication, Account Management, 2FA, management, and operations regression
+- `dotnet restore`
+- `dotnet build`
+
+No in-scope implementation defects were discovered during final verification.
+
+Dynamic Capability-Based Authorization was not implemented as part of Sprint 7.

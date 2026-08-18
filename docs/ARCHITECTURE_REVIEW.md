@@ -170,11 +170,13 @@ The review confirmed that:
 - Presentation workflows continue to respect Application and Infrastructure boundaries.
 - No structural architectural redesign was required.
 
+Sprint 7 further validated the architecture through seven read-oriented reporting workflows and Web-layer Excel/PDF export writers. The reporting and export implementation reused the established Application, DTO/read-model, repository, and EF Core patterns without structural redesign.
+
 The current architecture is suitable for continued expansion into:
 
 - Purchasing enhancements
 - Sales
-- Additional Reporting
+- Additional Reporting enhancements
 - API modules
 - Additional account security capabilities
 

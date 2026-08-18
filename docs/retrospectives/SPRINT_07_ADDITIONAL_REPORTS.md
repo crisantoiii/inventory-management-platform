@@ -22,19 +22,19 @@ and analytical inventory reports.
 - [X] Inventory Movement Report
 - [X] Product Reports
 
-### Remaining
+### Completed Sprint Scope
 
 - [X] Excel Export
 - [X] PDF Export
 - [X] Final Project-wide Verification
 
-### Deferred
+### Deferred Validation — Completed
 
-- [ ] Empty database behavior verification
-- [ ] Explicit query-failure testing
+- [X] Empty database behavior verification
+- [X] Explicit query-failure testing
+- [X] Authorization regression
 
-The deferred items are reserved for final project-wide verification
-and are not treated as individual report implementation blockers.
+These validation items were completed during final project-wide verification.
 
 ## Reporting Architecture
 
@@ -257,7 +257,7 @@ The reporting implementation remains independent of the future Dynamic Capabilit
 
 Sprint 7 Additional Reporting is complete and has passed final project-wide verification.
 
-Final project-wide verification included the deferred empty-database and query-failure scenarios.
+Final verification included application regression, reporting verification, export verification, empty-database behavior, explicit query-failure behavior and database recovery, authorization regression, and final build verification.
 
 ## Sprint Outcome
 

@@ -15,13 +15,17 @@ The project is designed as a production-style portfolio application that demonst
 - Server-side search, sorting, and pagination
 - Reusable shared infrastructure
 - Business analytics dashboard
-- Self-Service Account Management
-- Email Verification
-- Two-Factor Authentication
-- Recovery Code Authentication
-- ASP.NET Core Identity Authentication
-- Enterprise User Management
 - Workflow-driven Purchasing module
+- Read-oriented Reporting architecture
+- Inventory Valuation
+- Purchase History
+- Supplier Purchase Analysis
+- Stock Movement
+- Low Stock Report
+- Inventory Movement Report
+- Product Reports
+- Excel Export
+- PDF Export
 - Rich Domain Model
 - Vertical Slice Architecture
 
@@ -38,7 +42,7 @@ The focus is not only on implementing business features but also on applying pro
 
 ## Project Status
 
-**Current Version:** v1.3.0 - Account Management
+**Current Version:** v1.4.0 - Additional Reporting & Exports
 
 **Current Development Status:** Sprint 7 Additional Reporting — Complete and Verified
 
@@ -59,24 +63,41 @@ The focus is not only on implementing business features but also on applying pro
 
 ## Latest Release
 
-## v1.3.0 - Account Management
+## v1.4.0 - Additional Reporting & Exports
 
 ### Highlights
 
-- Self-service user profile management
-- Change Password
-- Forgot Password
-- Reset Password
-- Force Password Change
-- Email Verification
-- Two-Factor Authentication
-- Authenticator-based TOTP verification
-- 2FA login challenge
-- Recovery Code Authentication
-- Recovery Code Regeneration
-- Recovery Code Invalidation
-- Disable 2FA
-- Preserved the existing architecture without structural redesign
+#### Reporting
+
+- Inventory Valuation
+- Purchase History
+- Supplier Purchase Analysis
+- Stock Movement
+- Low Stock Report
+- Inventory Movement Report
+- Product Reports
+
+#### Export
+
+- Excel Export for all seven reports
+- PDF Export for all seven reports
+- Existing report filters preserved during export
+- Existing report sorting preserved during export
+- Full filtered result set exported without UI pagination limits
+- Inventory Valuation Total Inventory Value included in Excel and PDF output
+
+#### Verification
+
+- All seven reports browser/manual verified
+- All seven Excel exports verified
+- All seven PDF exports verified
+- Empty database behavior verified
+- Explicit query-failure behavior verified
+- Database recovery verified
+- Existing authorization boundaries verified
+- Final project-wide verification completed
+
+The release preserves the established read-oriented Reporting architecture and isolates PDF generation in the Web layer using QuestPDF.
 
 ---
 
@@ -413,17 +434,23 @@ Infrastructure
 Database
 ```
 
-### Remaining Reporting Work
+### Reporting Status
 
-- ⬜ Empty database behavior verification
-- ⬜ Explicit query-failure testing
-- ⬜ Purchase History
-- ⬜ Supplier Purchase Analysis
-- ⬜ Stock Movement
-- ⬜ Low Stock Report
-- ⬜ Inventory Movement Report
-- ⬜ Excel Export
-- ⬜ PDF Export
+Sprint 7 Additional Reporting is complete and verified.
+
+Completed reporting capabilities and exports:
+
+- ✅ Inventory Valuation
+- ✅ Purchase History
+- ✅ Supplier Purchase Analysis
+- ✅ Stock Movement
+- ✅ Low Stock Report
+- ✅ Inventory Movement Report
+- ✅ Product Reports
+- ✅ Excel Export
+- ✅ PDF Export
+
+Final project-wide verification is complete, including application regression, reporting verification, export verification, empty-database behavior, explicit query-failure behavior and recovery, authorization regression, and final build verification.
 
 
 ## Dashboard
@@ -787,7 +814,7 @@ Development Tools
 | User Management | ✅ Complete |
 | Account Management | ✅ Complete |
 | Purchasing | 🟨 Core Workflow Complete |
-| Reporting | 🟨 Inventory Valuation Complete |
+| Reporting | ✅ Sprint 7 Additional Reporting Complete and Verified |
 
 ---
 
@@ -811,11 +838,11 @@ Development Tools
 
 ## Current
 
-- v1.3.0 - Account Management
+- v1.4.0 - Additional Reporting & Exports
 
 ## Next
 
-- Additional Reporting Capabilities
+- Sprint Planning for the next development sprint
 
 ## Future
 

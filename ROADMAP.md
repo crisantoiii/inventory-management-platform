@@ -17,7 +17,7 @@ v0.8  Identity & Users         ✅
 v0.9  Architecture Sprint      ✅
 v1.0  Purchasing Application   ✅
 v1.1  Purchasing Presentation  ✅
-v1.2  Reporting                🟨
+v1.2  Reporting                ✅
 v1.3  Account Management       ✅
 
 ---
@@ -41,7 +41,7 @@ Each major business capability should be implemented from Domain and Application
 
 ### Sprint 7 Status
 
-Sprint 7 Additional Reporting is complete and has passed final project-wide verification.
+Sprint 7 Additional Reporting is complete, verified, and documented.
 
 Completed:
 
@@ -55,13 +55,13 @@ Completed:
 - Excel Export
 - PDF Export
 
-The next development milestone has not been selected in this documentation update.
+The next development milestone will be selected through the next Sprint Planning process.
 
 ---
 
 # Current Release
 
-## Version 1.3.0 – Account Management
+## Version 1.4.0 – Additional Reporting & Exports
 
 ### Completed
 
@@ -176,7 +176,7 @@ Remaining:
 
 # Phase 6 — Reporting
 
-Status: 🟨 In Progress
+Status: ✅ Complete
 
 ### Completed
 
@@ -215,23 +215,25 @@ Status: 🟨 In Progress
 - Product Reports Pagination
 - Product Reports Sorting
 - Excel Export
+- PDF Export
 
 ### Export Options
 
 - Excel
 - PDF
 
-### Remaining Validation
+### Final Verification
 
 - Empty database behavior verification
 - Explicit query-failure testing
+- Authorization regression
+- Final build verification
 
 ### Additional Reporting
 
-Additional Reporting is being developed as Sprint 7 within the broader
-Phase 6 Reporting roadmap.
+Additional Reporting was completed as Sprint 7 within the broader Phase 6 Reporting roadmap.
 
-Sprint 7 currently includes:
+Completed Sprint 7 scope:
 
 - Inventory Valuation
 - Purchase History
@@ -242,9 +244,6 @@ Sprint 7 currently includes:
 - Product Reports
 - Excel export
 - PDF export
-
-Remaining Sprint 7 scope:
-
 - Final project-wide verification
 
 ---
@@ -317,8 +316,7 @@ Examples:
 
 ### Sequencing
 
-Dynamic Capability-Based Authorization will be implemented
-after the current Additional Reporting work.
+Dynamic Capability-Based Authorization remains planned after the completed Additional Reporting release and the next sprint planning decision.
 
 Additional Reporting does not depend on the new authorization
 architecture and can continue independently.
@@ -379,9 +377,10 @@ Future enhancements may include:
 | v0.9.0 | Architecture Sprint 1 ✅ |
 | v1.0.0 | Purchasing Application Layer ✅ |
 | v1.1.0 | Purchasing Presentation Layer ✅ |
-| v1.2.0 | Reporting — Inventory Valuation 🟨 |
+| v1.2.0 | Reporting — Inventory Valuation ✅ |
 | v1.3.0 | Account Management ✅ |
-| v1.4.0 | Sales Module ⏳ |
+| v1.4.0 | Additional Reporting & Exports — Ready for Release |
+| v1.5.0 | Sales Module ⏳ |
 | v2.0.0 | REST API & Blazor ⏳ |
 
 ---

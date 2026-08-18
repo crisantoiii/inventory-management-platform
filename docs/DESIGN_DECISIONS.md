@@ -1525,7 +1525,7 @@ The implementation required no structural architectural redesign.
 
 # DD-032 — Dynamic Capability-Based Authorization
 
-Version Introduced: Planned after v1.3.0
+Version Introduced: Planned after v1.4.0
 
 ## Decision
 
@@ -1660,7 +1660,7 @@ Accepted as the future authorization architecture.
 
 Not yet implemented.
 
-Additional Reporting remains the current implementation priority.
+Additional Reporting is complete for Sprint 7; the next implementation scope will be established through Sprint Planning.
 
 ### Implementation Boundary
 
@@ -1740,7 +1740,7 @@ Potential future decisions may include:
 
 ## Context
 
-PDF export was the remaining export capability for the completed Sprint 7 Reporting features. The goal was to provide downloadable PDF reports while preserving the established read-oriented Reporting architecture and avoiding a generic export framework.
+PDF export was the final export capability for the completed Sprint 7 Reporting features. The goal was to provide downloadable PDF reports while preserving the established read-oriented Reporting architecture and avoiding a generic export framework.
 
 ## Decision
 
@@ -1802,7 +1802,7 @@ Validated:
 
 ## Sprint Position
 
-PDF Export is complete for the current Sprint 7 implementation scope.
+PDF Export is complete for Sprint 7.
 
 Final project-wide verification has been completed successfully.
 
