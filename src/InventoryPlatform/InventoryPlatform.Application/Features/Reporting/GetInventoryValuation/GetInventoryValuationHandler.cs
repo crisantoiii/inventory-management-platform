@@ -22,4 +22,12 @@ public sealed class GetInventoryValuationHandler
 
         return Result<IReadOnlyList<InventoryValuationDto>>.Success(result);
     }
+
+    public async Task<Result<IReadOnlyList<InventoryValuationDto>>> HandleExportAsync(
+        CancellationToken cancellationToken = default)
+    {
+        var result = await _repository.GetInventoryValuationAsync(cancellationToken);
+
+        return Result<IReadOnlyList<InventoryValuationDto>>.Success(result);
+    }
 }

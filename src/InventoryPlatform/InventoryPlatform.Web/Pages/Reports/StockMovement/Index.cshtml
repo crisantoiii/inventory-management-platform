@@ -1,0 +1,186 @@
+﻿@page
+@model InventoryPlatform.Web.Pages.Reports.StockMovement.IndexModel
+@using InventoryPlatform.Shared.Sorting;
+
+@{
+    ViewData["Title"] = "Stock Movement";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1>Stock Movement</h1>
+
+        <a asp-page-handler="ExportToExcel"
+           asp-route-Search="@Model.Search"
+           asp-route-FromDate="@Model.FromDate"
+           asp-route-ToDate="@Model.ToDate"
+           asp-route-TransactionType="@Model.TransactionType"
+           asp-route-SortBy="@Model.SortBy"
+           asp-route-Descending="@Model.Descending"
+           class="btn btn-outline-success">
+            Export to Excel
+        </a>
+
+        <a asp-page-handler="ExportToPdf"
+           asp-route-Search="@Model.Search"
+           asp-route-FromDate="@Model.FromDate"
+           asp-route-ToDate="@Model.ToDate"
+           asp-route-TransactionType="@Model.TransactionType"
+           asp-route-SortBy="@Model.SortBy"
+           asp-route-Descending="@Model.Descending"
+           class="btn btn-outline-danger">
+            Export to PDF
+        </a>
+    </div>
+
+    <form method="get" class="row g-3 mb-4">
+        <div class="col-md-3">
+            <label asp-for="Search" class="form-label">Search</label>
+            <input asp-for="Search"
+                   class="form-control"
+                   placeholder="Product, SKU, reference, remarks" />
+        </div>
+
+        <div class="col-md-2">
+            <label asp-for="FromDate" class="form-label">From</label>
+            <input asp-for="FromDate"
+                   type="date"
+                   class="form-control" />
+        </div>
+
+        <div class="col-md-2">
+            <label asp-for="ToDate" class="form-label">To</label>
+            <input asp-for="ToDate"
+                   type="date"
+                   class="form-control" />
+        </div>
+
+        <div class="col-md-2">
+            <label asp-for="TransactionType" class="form-label">
+                Movement Type
+            </label>
+
+            <select asp-for="TransactionType"
+                    class="form-select">
+                <option value="">All</option>
+                <option value="StockIn">Stock In</option>
+                <option value="StockOut">Stock Out</option>
+                <option value="Adjustment">Adjustment</option>
+            </select>
+        </div>
+
+        <div class="col-md-3 d-flex align-items-end gap-2">
+            <button type="submit"
+                    class="btn btn-primary">
+                Search
+            </button>
+
+            <a asp-page="./Index"
+               class="btn btn-outline-secondary">
+                Reset
+            </a>
+        </div>
+    </form>
+
+    @if (Model.Result is not null)
+    {
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>
+                            <a asp-page="./Index"
+                               asp-route-Search="@Model.Search"
+                               asp-route-FromDate="@Model.FromDate"
+                               asp-route-ToDate="@Model.ToDate"
+                               asp-route-TransactionType="@Model.TransactionType"
+                               asp-route-Page="1"
+                               asp-route-PageSize="@Model.PageSize"
+                               asp-route-SortBy="TransactionDateUtc"
+                               asp-route-Descending="@(Model.SortBy == StockMovementSortFields.TransactionDateUtc && !Model.Descending)">
+                                Date
+                            </a>
+                        </th>
+
+                        <th>
+                            <a asp-page="./Index"
+                               asp-route-Search="@Model.Search"
+                               asp-route-FromDate="@Model.FromDate"
+                               asp-route-ToDate="@Model.ToDate"
+                               asp-route-TransactionType="@Model.TransactionType"
+                               asp-route-Page="1"
+                               asp-route-PageSize="@Model.PageSize"
+                               asp-route-SortBy="ProductName"
+                               asp-route-Descending="@(Model.SortBy == StockMovementSortFields.ProductName && !Model.Descending)">
+                                Product
+                            </a>
+                        </th>
+
+                        <th>SKU</th>
+
+                        <th>
+                            <a asp-page="./Index"
+                               asp-route-Search="@Model.Search"
+                               asp-route-FromDate="@Model.FromDate"
+                               asp-route-ToDate="@Model.ToDate"
+                               asp-route-TransactionType="@Model.TransactionType"
+                               asp-route-Page="1"
+                               asp-route-PageSize="@Model.PageSize"
+                               asp-route-SortBy="TransactionType"
+                               asp-route-Descending="@(Model.SortBy == StockMovementSortFields.TransactionType && !Model.Descending)">
+                                Movement Type
+                            </a>
+                        </th>
+
+                        <th>
+                            <a asp-page="./Index"
+                               asp-route-Search="@Model.Search"
+                               asp-route-FromDate="@Model.FromDate"
+                               asp-route-ToDate="@Model.ToDate"
+                               asp-route-TransactionType="@Model.TransactionType"
+                               asp-route-Page="1"
+                               asp-route-PageSize="@Model.PageSize"
+                               asp-route-SortBy="Quantity"
+                               asp-route-Descending="@(Model.SortBy == StockMovementSortFields.Quantity && !Model.Descending)">
+                                Quantity
+                            </a>
+                        </th>
+
+                        <th>Reference</th>
+                        <th>Remarks</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (var item in Model.Result.Items)
+                    {
+                        <tr>
+                            <td>
+                                @item.TransactionDateUtc.ToLocalTime()
+                            </td>
+
+                            <td>@item.ProductName</td>
+
+                            <td>@item.ProductSku</td>
+
+                            <td>@item.TransactionType</td>
+
+                            <td>@item.Quantity</td>
+
+                            <td>@item.ReferenceNumber</td>
+
+                            <td>@item.Remarks</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @if (Model.Result.TotalCount == 0)
+        {
+            <div class="alert alert-info">
+                No stock movements found.
+            </div>
+        }
+    }
+</div>

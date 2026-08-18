@@ -1,5 +1,4 @@
-﻿using FluentValidation;
-using InventoryPlatform.Application.Features.Account;
+using FluentValidation;
 using InventoryPlatform.Application.Features.Account.ChangePassword;
 using InventoryPlatform.Application.Features.Account.ConfirmEmail;
 using InventoryPlatform.Application.Features.Account.DisableTwoFactor;
@@ -41,6 +40,12 @@ using InventoryPlatform.Application.Features.Purchasing.GetPurchaseOrders;
 using InventoryPlatform.Application.Features.Purchasing.ReceivePurchaseOrder;
 using InventoryPlatform.Application.Features.Purchasing.SubmitPurchaseOrder;
 using InventoryPlatform.Application.Features.Reporting.GetInventoryValuation;
+using InventoryPlatform.Application.Features.Reporting.GetPurchaseHistory;
+using InventoryPlatform.Application.Features.Reporting.GetSupplierPurchaseAnalysis;
+using InventoryPlatform.Application.Features.Reporting.GetStockMovement;
+using InventoryPlatform.Application.Features.Reporting.GetInventoryMovement;
+using InventoryPlatform.Application.Features.Reporting.GetLowStock;
+using InventoryPlatform.Application.Features.Reporting.GetProductReports;
 using InventoryPlatform.Application.Features.Suppliers.ActivateSupplier;
 using InventoryPlatform.Application.Features.Suppliers.CreateSupplier;
 using InventoryPlatform.Application.Features.Suppliers.DeactivateSupplier;
@@ -130,6 +135,12 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ReceivePurchaseOrderHandler>();
 
         services.AddScoped<GetInventoryValuationHandler>();
+        services.AddScoped<GetPurchaseHistoryHandler>();
+        services.AddScoped<GetSupplierPurchaseAnalysisHandler>();
+        services.AddScoped<GetStockMovementHandler>();
+        services.AddScoped<GetInventoryMovementHandler>();
+        services.AddScoped<GetLowStockHandler>();
+        services.AddScoped<GetProductReportsHandler>();
 
         services.AddScoped<GetProfileHandler>();
         services.AddScoped<UpdateProfileHandler>();

@@ -1,0 +1,128 @@
+@page
+@model InventoryPlatform.Web.Pages.Reports.InventoryMovement.IndexModel
+@using InventoryPlatform.Shared.Sorting
+
+@{
+    ViewData["Title"] = "Inventory Movement";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1>Inventory Movement</h1>
+
+        <a asp-page-handler="ExportToExcel"
+           asp-route-Search="@Model.Search"
+           asp-route-FromDate="@Model.FromDate"
+           asp-route-ToDate="@Model.ToDate"
+           asp-route-SortBy="@Model.SortBy"
+           asp-route-Descending="@Model.Descending"
+           class="btn btn-outline-success">
+            Export to Excel
+        </a>
+
+        <a asp-page-handler="ExportToPdf"
+           asp-route-Search="@Model.Search"
+           asp-route-FromDate="@Model.FromDate"
+           asp-route-ToDate="@Model.ToDate"
+           asp-route-SortBy="@Model.SortBy"
+           asp-route-Descending="@Model.Descending"
+           class="btn btn-outline-danger">
+            Export to PDF
+        </a>
+    </div>
+
+    <form method="get" class="row g-3 mb-4">
+        <div class="col-md-3">
+            <label asp-for="Search" class="form-label">Search</label>
+            <input asp-for="Search" class="form-control" placeholder="Product or SKU" />
+        </div>
+        <div class="col-md-2">
+            <label asp-for="FromDate" class="form-label">From</label>
+            <input asp-for="FromDate" type="date" class="form-control" />
+        </div>
+        <div class="col-md-2">
+            <label asp-for="ToDate" class="form-label">To</label>
+            <input asp-for="ToDate" type="date" class="form-control" />
+        </div>
+        <div class="col-md-5 d-flex align-items-end gap-2">
+            <button type="submit" class="btn btn-primary">Search</button>
+            <a asp-page="./Index" class="btn btn-outline-secondary">Reset</a>
+        </div>
+    </form>
+
+    @if (Model.Result is not null)
+    {
+        <div class="alert alert-secondary mb-3">
+            <strong>Reporting Period:</strong>
+            @if (Model.FromDate.HasValue && Model.ToDate.HasValue)
+            {
+                @($"{Model.FromDate.Value:MMM d, yyyy} – {Model.ToDate.Value:MMM d, yyyy}")
+            }
+            else if (Model.FromDate.HasValue)
+            {
+                @($"From {Model.FromDate.Value:MMM d, yyyy}")
+            }
+            else if (Model.ToDate.HasValue)
+            {
+                @($"Through {Model.ToDate.Value:MMM d, yyyy}")
+            }
+            else
+            {
+                @:All Dates
+            }
+        </div>
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th><a asp-page="./Index" asp-route-Search="@Model.Search" asp-route-FromDate="@Model.FromDate" asp-route-ToDate="@Model.ToDate" asp-route-PageNum="1" asp-route-PageSize="@Model.PageSize" asp-route-SortBy="@InventoryMovementSortFields.ProductName" asp-route-Descending="@(Model.SortBy == InventoryMovementSortFields.ProductName && !Model.Descending)">Product</a></th>
+                        <th><a asp-page="./Index" asp-route-Search="@Model.Search" asp-route-FromDate="@Model.FromDate" asp-route-ToDate="@Model.ToDate" asp-route-PageNum="1" asp-route-PageSize="@Model.PageSize" asp-route-SortBy="@InventoryMovementSortFields.ProductSku" asp-route-Descending="@(Model.SortBy == InventoryMovementSortFields.ProductSku && !Model.Descending)">SKU</a></th>
+                        <th><a asp-page="./Index" asp-route-Search="@Model.Search" asp-route-FromDate="@Model.FromDate" asp-route-ToDate="@Model.ToDate" asp-route-PageNum="1" asp-route-PageSize="@Model.PageSize" asp-route-SortBy="@InventoryMovementSortFields.OpeningQuantity" asp-route-Descending="@(Model.SortBy == InventoryMovementSortFields.OpeningQuantity && !Model.Descending)">Opening</a></th>
+                        <th><a asp-page="./Index" asp-route-Search="@Model.Search" asp-route-FromDate="@Model.FromDate" asp-route-ToDate="@Model.ToDate" asp-route-PageNum="1" asp-route-PageSize="@Model.PageSize" asp-route-SortBy="@InventoryMovementSortFields.StockInQuantity" asp-route-Descending="@(Model.SortBy == InventoryMovementSortFields.StockInQuantity && !Model.Descending)">Stock In</a></th>
+                        <th><a asp-page="./Index" asp-route-Search="@Model.Search" asp-route-FromDate="@Model.FromDate" asp-route-ToDate="@Model.ToDate" asp-route-PageNum="1" asp-route-PageSize="@Model.PageSize" asp-route-SortBy="@InventoryMovementSortFields.StockOutQuantity" asp-route-Descending="@(Model.SortBy == InventoryMovementSortFields.StockOutQuantity && !Model.Descending)">Stock Out</a></th>
+                        <th><a asp-page="./Index" asp-route-Search="@Model.Search" asp-route-FromDate="@Model.FromDate" asp-route-ToDate="@Model.ToDate" asp-route-PageNum="1" asp-route-PageSize="@Model.PageSize" asp-route-SortBy="@InventoryMovementSortFields.AdjustmentQuantity" asp-route-Descending="@(Model.SortBy == InventoryMovementSortFields.AdjustmentQuantity && !Model.Descending)">Adjustment</a></th>
+                        <th><a asp-page="./Index" asp-route-Search="@Model.Search" asp-route-FromDate="@Model.FromDate" asp-route-ToDate="@Model.ToDate" asp-route-PageNum="1" asp-route-PageSize="@Model.PageSize" asp-route-SortBy="@InventoryMovementSortFields.ClosingQuantity" asp-route-Descending="@(Model.SortBy == InventoryMovementSortFields.ClosingQuantity && !Model.Descending)">Closing</a></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Result.Items)
+                    {
+                        <tr>
+                            <td>@item.ProductName</td>
+                            <td>@item.ProductSku</td>
+                            <td>@item.OpeningQuantity</td>
+                            <td>@item.StockInQuantity</td>
+                            <td>@item.StockOutQuantity</td>
+                            <td>@item.AdjustmentQuantity</td>
+                            <td>@item.ClosingQuantity</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @if (Model.Result.TotalCount == 0)
+        {
+            <div class="alert alert-info">No inventory movement found.</div>
+        }
+        else if (Model.TotalPages > 1)
+        {
+            <nav aria-label="Inventory movement pagination">
+                <ul class="pagination">
+                    <li class="page-item @(Model.PageNum <= 1 ? "disabled" : "")">
+                        <a class="page-link" asp-page="./Index" asp-route-Search="@Model.Search" asp-route-FromDate="@Model.FromDate" asp-route-ToDate="@Model.ToDate" asp-route-PageNum="@(Model.PageNum - 1)" asp-route-PageSize="@Model.PageSize" asp-route-SortBy="@Model.SortBy" asp-route-Descending="@Model.Descending">Previous</a>
+                    </li>
+                    @for (var pageNumber = 1; pageNumber <= Model.TotalPages; pageNumber++)
+                    {
+                        <li class="page-item @(pageNumber == Model.PageNum ? "active" : "")">
+                            <a class="page-link" asp-page="./Index" asp-route-Search="@Model.Search" asp-route-FromDate="@Model.FromDate" asp-route-ToDate="@Model.ToDate" asp-route-PageNum="@pageNumber" asp-route-PageSize="@Model.PageSize" asp-route-SortBy="@Model.SortBy" asp-route-Descending="@Model.Descending">@pageNumber</a>
+                        </li>
+                    }
+                    <li class="page-item @(Model.PageNum >= Model.TotalPages ? "disabled" : "")">
+                        <a class="page-link" asp-page="./Index" asp-route-Search="@Model.Search" asp-route-FromDate="@Model.FromDate" asp-route-ToDate="@Model.ToDate" asp-route-PageNum="@(Model.PageNum + 1)" asp-route-PageSize="@Model.PageSize" asp-route-SortBy="@Model.SortBy" asp-route-Descending="@Model.Descending">Next</a>
+                    </li>
+                </ul>
+            </nav>
+        }
+    }
+</div>

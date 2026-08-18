@@ -1,4 +1,8 @@
-Each decision is recorded only after implementation has validated the approach in practice, ensuring that architectural guidance reflects proven patterns rather than speculative design.
+Architectural decisions are recorded when a significant design direction has been evaluated and accepted.
+
+Where possible, decisions are validated through implementation before being treated as established patterns.
+
+Some decisions may intentionally be recorded before implementation when they define the architecture for an upcoming cross-cutting change. These decisions are explicitly marked as planned and are not treated as implemented capabilities until validated in code.
 
 # Design Decisions
 
@@ -1030,7 +1034,8 @@ Version Introduced: v1.2.0
 
 Read-only Reporting features use dedicated DTO projections rather than loading Domain entities into memory.
 
-The first implementation is Inventory Valuation.
+The Reporting implementations include Inventory Valuation,
+Purchase History, and Supplier Purchase Analysis.
 
 The Reporting flow is:
 
@@ -1050,7 +1055,14 @@ EF Core Projection
 Database
 ```
 
-Inventory Valuation returns a dedicated InventoryValuationDto containing only the data required by the report.
+Reporting features return dedicated DTOs containing only the data required by each report.
+
+Examples include:
+
+- `InventoryValuationDto`
+- `PurchaseHistoryDto`
+- `SupplierPurchaseAnalysisDto`
+- `StockMovementDto`
 
 ## Rationale
 
@@ -1112,6 +1124,259 @@ InventoryValuationDto
 ```
 
 This keeps ordering, calculation, and projection database-side without introducing client-side evaluation.
+
+## Aggregated Reporting Consideration
+
+Supplier Purchase Analysis extends the read-only Reporting approach
+from direct projections into database-side supplier aggregation.
+
+The report groups Purchase Orders by Supplier and calculates:
+
+- Purchase Order count
+- Ordered quantity
+- Received quantity
+- Remaining quantity
+- Total amount
+- Earliest Purchase Order date
+- Latest Purchase Order date
+
+The aggregation remains inside the Infrastructure query and is
+projected into a dedicated read model.
+
+This preserves the same architectural boundary:
+
+```text
+Presentation
+     ↓
+Application Handler
+     ↓
+Read Model
+     ↓
+Repository Abstraction
+     ↓
+Infrastructure Repository
+     ↓
+EF Core Query
+     ↓
+Database
+```
+
+The implementation does not require loading transactional Domain
+aggregates into application memory.
+
+## Transactional Reporting Consideration
+
+Stock Movement extends the read-only Reporting approach to
+inventory transaction history.
+
+The report reads existing Inventory Transaction records and
+projects only the information required by the report:
+
+- Product
+- SKU
+- Movement Type
+- Quantity
+- Reference Number
+- Remarks
+- Transaction Date
+
+The report does not modify Inventory Transaction, Product, or
+inventory state.
+
+Filtering, sorting, and pagination remain database-side through
+the Infrastructure repository.
+
+The implementation does not require:
+
+- Domain entity changes
+- Database schema changes
+- New migrations
+- A separate transactional model
+- Changes to the existing Inventory Transaction workflow
+
+## EF Core Translation Consideration
+
+Supplier Purchase Analysis initially exposed a translation limitation
+when sorting directly against a grouped query containing a nested
+Purchase Order Item aggregate.
+
+The query was restructured to first project the supplier-level
+aggregate values and then apply sorting to those projected values.
+
+This keeps aggregation, sorting, and pagination database-side and
+avoids client-side evaluation.
+
+The experience reinforces the existing principle:
+
+- Keep report calculations database-side when practical.
+- Structure EF Core queries according to translatable database operations.
+- Prefer query restructuring over client-side evaluation.
+
+### Low Stock Reporting Consideration
+
+Low Stock extends the read-oriented Reporting approach to current
+Product inventory state.
+
+The report uses the existing Product quantity information and the
+existing application low-stock threshold rather than introducing a
+separate reporting-specific inventory rule.
+
+The report remains read-only and provides:
+
+- Product
+- SKU
+- Category
+- Quantity On Hand
+
+Filtering, sorting, and pagination remain database-side through the
+Infrastructure repository.
+
+The implementation does not require:
+
+- Domain entity changes
+- Database schema changes
+- New migrations
+- Changes to the existing inventory transaction workflow
+
+### Inventory Movement Reporting Consideration
+
+Inventory Movement extends the read-oriented Reporting architecture
+from transaction-level movement history into product-level movement
+analysis.
+
+Stock Movement remains responsible for displaying individual inventory
+transactions.
+
+Inventory Movement instead summarizes movement for each product over
+a selected reporting period.
+
+The report provides:
+
+- Product
+- SKU
+- Opening Quantity
+- Stock In
+- Stock Out
+- Adjustment
+- Closing Quantity
+
+The selected reporting period is displayed separately from the table
+because the report represents aggregated movement rather than
+individual transactions.
+
+The implementation reconstructs opening and closing quantities from
+the current inventory state and persisted inventory transactions.
+
+The report remains read-only and does not modify Product or Inventory
+Transaction state.
+
+Filtering, aggregation, sorting, and pagination remain database-side
+through the Infrastructure repository.
+
+No Domain entity changes, database schema changes, or migrations were
+required.
+
+The implementation continues to follow:
+
+```text
+Presentation
+     ↓
+Application Handler
+     ↓
+Read Model
+     ↓
+Repository Abstraction
+     ↓
+Infrastructure Repository
+     ↓
+EF Core Query
+     ↓
+Database
+```
+
+### Product Reports Consideration
+
+Product Reports extends the read-oriented Reporting architecture to
+current Product state.
+
+The report provides:
+
+- Product
+- SKU
+- Category
+- Unit
+- Quantity On Hand
+- Cost Price
+- Selling Price
+- Product Status
+
+The report supports:
+
+- Active / Inactive / All Products filtering
+- Server-side Product/SKU/Category/Unit search
+- Server-side sorting
+- Server-side pagination
+- Pagination state preservation
+- Page-size changes
+- Reset behavior
+- Combined search and status filtering
+- Boundary / No-result behavior
+
+The implementation uses a dedicated read model and repository rather
+than reusing the transactional Product management query directly.
+
+The query remains read-only and uses `AsNoTracking()` with database-side
+projection, filtering, sorting, and pagination.
+
+No Domain entity changes, database schema changes, or migrations were
+required.
+
+The implementation continues to follow:
+
+```text
+Presentation
+     ↓
+Application Handler
+     ↓
+Read Model
+     ↓
+Repository Abstraction
+     ↓
+Infrastructure Repository
+     ↓
+EF Core Query
+     ↓
+Database
+```
+
+The report remains independent of the future Dynamic Capability-Based
+Authorization architecture.
+
+### Inventory Movement EF Core Query Adjustment
+
+The initial Inventory Movement query used grouped aggregate projections
+combined with left joins.
+
+During browser verification, EF Core raised:
+
+`Nullable object must have a value.`
+
+The issue was caused by nullable SQL results crossing the aggregate
+and left-join projection boundary.
+
+The query was restructured to use product-driven correlated aggregate
+subqueries with explicit nullable aggregate handling.
+
+This removed the nullable anonymous aggregate join boundary while
+keeping the calculations database-side.
+
+The final implementation was browser-verified successfully.
+
+The experience reinforces the existing principle:
+
+- Keep reporting calculations database-side.
+- Respect SQL aggregate nullability at the query boundary.
+- Prefer query restructuring over client-side evaluation.
 
 ## Outcome
 
@@ -1258,6 +1523,205 @@ The implementation required no structural architectural redesign.
 
 ---
 
+# DD-032 — Dynamic Capability-Based Authorization
+
+Version Introduced: Planned after v1.3.0
+
+## Decision
+
+The platform will evolve its authorization model toward a Dynamic Capability-Based Authorization architecture.
+
+Authorization will be composed from:
+
+```text
+User
+  ↓
+Group
+  ↓
+Capabilities
+  ↓
+Application Action
+  ↓
+Domain State Validation
+```
+
+A Capability represents an atomic functionality, action, or permission within the application.
+
+Examples include:
+
+- PurchaseOrder.View
+- PurchaseOrder.Create
+- PurchaseOrder.Edit
+- PurchaseOrder.Submit
+- PurchaseOrder.Approve
+- PurchaseOrder.Reject
+- PurchaseOrder.Receive
+
+A Group represents a reusable collection of capabilities.
+
+Examples include:
+
+- PO Account
+- IT Account
+- Inventory Manager
+- Viewer
+- Administrator
+
+Users receive capabilities through their assigned groups.
+
+## Authorization and Domain Rules
+
+Capability authorization does not replace Domain business rules.
+
+An action is valid only when:
+
+```text
+Required Capability
+        AND
+Valid Domain State
+```
+
+For example:
+
+```text
+Can Submit Purchase Order
+=
+PurchaseOrder.Submit capability
+AND
+PurchaseOrder.Status == Draft
+```
+
+The Domain aggregate remains responsible for enforcing business state transitions and invariants.
+
+## Rationale
+
+A fixed list of business-specific roles does not scale well as the platform grows.
+
+Different business responsibilities may require different combinations of capabilities.
+
+A capability-based model allows the platform to create reusable groups without introducing a new authorization implementation for every business responsibility.
+
+For example:
+
+```text
+PO Account
+    ↓
+PurchaseOrder.View
+PurchaseOrder.Create
+PurchaseOrder.Edit
+PurchaseOrder.Submit
+```
+
+while:
+
+```text
+IT Account
+    ↓
+PurchaseOrder.View
+PurchaseOrder.Approve
+PurchaseOrder.Reject
+PurchaseOrder.Receive
+```
+
+This allows responsibilities to evolve through configuration and composition rather than hard-coded role-specific logic.
+
+## Relationship to Existing Identity
+
+The current platform already uses ASP.NET Core Identity, role-based authorization, policy-based authorization, and the Identity Service abstraction.
+
+The new capability model will evolve from this existing foundation rather than immediately replacing the authentication system.
+
+Existing Identity roles will be reviewed and mapped appropriately during implementation.
+
+## Alternatives Considered
+
+### Add every business responsibility as a hard-coded Identity role
+
+Examples:
+
+- PO
+- IT
+- Warehouse Receiver
+- Reporting Analyst
+
+Rejected because the number of roles would grow with individual business responsibilities and combinations.
+
+### Add a separate AccountType property
+
+Rejected because it would create a second authorization concept alongside Identity roles and require synchronization between account type and authorization behavior.
+
+### Implement authorization entirely inside Domain entities
+
+Rejected because user authorization is an application/security concern, while Domain entities should remain responsible for business rules and state invariants.
+
+## Implementation Status
+
+Accepted as the future authorization architecture.
+
+Not yet implemented.
+
+Additional Reporting remains the current implementation priority.
+
+### Implementation Boundary
+
+The future capability model is an authorization model, not an authentication replacement.
+
+Authentication will continue to be responsible for establishing the user's identity.
+
+Authorization will determine whether the authenticated user has the required capability to attempt an application action.
+
+Domain business rules will determine whether the action is valid for the current business state.
+
+---
+
+# DD-033 — Reporting Excel Export
+
+Version Introduced: Sprint 7
+
+## Decision
+
+Excel export for completed Reporting features is implemented as a Web-layer output concern using ClosedXML while reusing the existing read-oriented Reporting handlers, DTOs, filters, and sorting behavior.
+
+The export flow is:
+
+```text
+Razor Page
+     ↓
+Application Handler
+     ↓
+Existing Report Read Model / DTO
+     ↓
+Excel Report Writer
+     ↓
+.xlsx Response
+```
+
+The export preserves the report's active filters and sorting but does not preserve the UI pagination limit. The workbook contains the full filtered result set.
+
+The Inventory Valuation export also includes the report-level Total Inventory Value summary already displayed by the browser report.
+
+## Rationale
+
+Excel generation is an output-format concern and does not belong in Domain or the read repositories. Keeping workbook generation in the Web layer avoids coupling the Application and Domain layers to an external document-generation library.
+
+Reusing the existing report queries and DTOs prevents the Excel export from developing separate filtering, sorting, or business rules from the browser report.
+
+No generic reporting export framework was introduced because the current requirement can be satisfied by a focused Excel writer without creating premature abstraction.
+
+## Consequences
+
+- Existing Reporting architecture remains unchanged.
+- No Domain entity changes are required.
+- No database schema changes or migrations are required.
+- Report filters and sorting remain consistent between browser and Excel output.
+- Excel-specific formatting remains isolated from the Application and Domain layers.
+
+## Implementation Status
+
+Implemented and browser-verified for the completed Reporting pages.
+
+PDF export is complete for the completed Sprint 7 Reporting scope.
+
 # Future Decisions
 
 This document will continue to evolve as the project grows.
@@ -1271,4 +1735,90 @@ Potential future decisions may include:
 - Caching Strategy
 
 ---
+
+# DD-034 — Reporting PDF Export
+
+## Context
+
+PDF export was the remaining export capability for the completed Sprint 7 Reporting features. The goal was to provide downloadable PDF reports while preserving the established read-oriented Reporting architecture and avoiding a generic export framework.
+
+## Decision
+
+Implement PDF generation as a focused Web-layer output concern using QuestPDF.
+
+The export flow is:
+
+```text
+Razor Page
+    ↓
+Application Handler
+    ↓
+Existing Report DTO / Read Model
+    ↓
+PdfReportWriter
+    ↓
+PDF File Response
+```
+
+The existing Reporting queries and DTOs remain the source of report data. The PDF writer is responsible only for document composition and presentation.
+
+## Scope
+
+PDF export was implemented for:
+
+- Inventory Valuation
+- Purchase History
+- Supplier Purchase Analysis
+- Stock Movement
+- Low Stock Report
+- Inventory Movement Report
+- Product Reports
+
+The export preserves active report filters and sorting while removing the UI pagination limit so the generated PDF contains the full filtered result set.
+
+Inventory Valuation also includes the Total Inventory Value summary already displayed by the browser report.
+
+## Rationale
+
+QuestPDF provides a focused C# document-generation API suitable for the project's report-oriented PDF requirements without requiring PDF generation concerns in Domain, Application, or Infrastructure.
+
+No generic reporting/export abstraction was introduced because the current requirements are satisfied by a focused Web-layer writer.
+
+No Domain entity, database schema, or migration changes were required.
+
+## Verification
+
+PDF Export was built and verified through browser/manual workflows.
+
+Validated:
+
+- PDF export action availability on completed Reporting pages
+- PDF generation
+- Report-specific columns and values
+- Preservation of active filters
+- Preservation of active sorting
+- Export of the full filtered result set without UI pagination limits
+- Inventory Valuation Total Inventory Value summary
+
+## Sprint Position
+
+PDF Export is complete for the current Sprint 7 implementation scope.
+
+Final project-wide verification has been completed successfully.
+
+Verified:
+
+- Normal application regression
+- All seven reporting pages
+- All seven Excel exports
+- All seven PDF exports
+- Filters and sorting preservation
+- Full filtered result set export
+- Multi-page PDF output
+- Inventory Valuation Total Inventory Value
+- Empty database behavior
+- Explicit query failure and database recovery
+- Existing authorization boundaries
+
+The implementation remains independent of the future Dynamic Capability-Based Authorization architecture.
 

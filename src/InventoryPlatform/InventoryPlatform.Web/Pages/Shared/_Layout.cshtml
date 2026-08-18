@@ -1,4 +1,4 @@
-﻿@using InventoryPlatform.Infrastructure.Identity;
+@using InventoryPlatform.Infrastructure.Identity;
 
 <!DOCTYPE html>
 <html lang="en">
@@ -48,10 +48,15 @@
                                 Operations
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="inventoryDropdown">
-                                <li><a class="dropdown-item" asp-page="/Purchasing/PurchaseOrder/Index">Purchase Orders</a></li>
+                                <li><a class="dropdown-item" asp-page="/Purchasing/PurchaseOrders/Index">Purchase Orders</a></li>
                                 <li><a class="dropdown-item" asp-page="/InventoryTransactions/Index">Inventory Transactions</a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" asp-page="/Reports/InventoryValuation/Index">Inventory Valuation</a></li>
+                                <li><a class="dropdown-item" asp-page="/Reports/SupplierPurchaseAnalysis/Index">Supplier Purchase Analysis</a></li>
+                                <li><a class="dropdown-item" asp-page="/Reports/StockMovement/Index">Stock Movement</a></li>
+                                <li><a class="dropdown-item" asp-page="/Reports/InventoryMovement/Index">Inventory Movement</a></li>
+                                <li><a class="dropdown-item" asp-page="/Reports/LowStock/Index">Low Stock</a></li>
+                                <li><a class="dropdown-item" asp-page="/Reports/ProductReports/Index">Product Reports</a></li>
                             </ul>
                         </li>
 

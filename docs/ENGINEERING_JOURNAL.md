@@ -47,6 +47,12 @@ Rather than documenting daily work, it captures important architectural decision
 | 19 | Purchasing Presentation Layer |
 | 20 | Reporting: Inventory Valuation |
 | 21 | Account Management |
+| 22 | Dynamic Authorization Architecture Decision |
+| 23 | Reporting: Purchase History |
+| 24 | Reporting: Supplier Purchase Analysis |
+| 25 | Reporting: Stock Movement |
+| 26 | Reporting: Low Stock |
+| 27 | Reporting: Inventory Movement |
 
 ---
 
@@ -873,6 +879,44 @@ This prevents a failed lookup from being silently interpreted as an empty select
 
 ## Architecture Validation
 
+Product Reports further validates that the existing read-oriented
+Reporting architecture supports general product-state reporting
+without modifying transactional Product behavior.
+
+The implementation follows:
+
+```text
+Presentation
+     ↓
+Application
+     ↓
+Read Model
+     ↓
+Repository Abstraction
+     ↓
+Infrastructure
+     ↓
+Database
+```
+
+No structural architectural redesign was required.
+
+The implementation remains independent of the future Dynamic
+Capability-Based Authorization architecture.
+
+## Outcome
+
+Product Reports is complete for the current scope.
+
+The remaining Additional Reporting work is Excel and PDF export.
+
+Empty database behavior and explicit query-failure testing remain
+deferred to broader final Reporting/system verification.
+
+---
+
+# Architecture Validation
+
 Sprint 4 confirmed that the existing architecture could support a complete workflow-driven Presentation layer without structural redesign.
 
 The review confirmed:
@@ -1278,6 +1322,1034 @@ The implementation extended the existing Identity architecture while preserving 
 
 ---
 
+# Milestone 22 - Dynamic Authorization Architecture Decision
+
+## Summary
+
+Reviewed the existing Identity and authorization implementation in preparation for expanding business workflow responsibilities.
+
+The current platform uses ASP.NET Core Identity with role-based and policy-based authorization behind the Identity Service abstraction.
+
+The current authorization implementation remains unchanged during the Additional Reporting phase.
+
+The capability model is an architectural decision only at this stage.
+
+The review identified that future business responsibilities should not require a growing collection of hard-coded roles.
+
+A Dynamic Capability-Based Authorization model was therefore selected as the future authorization direction.
+
+## Finalized Model
+
+```text
+User
+  ↓
+Group
+  ↓
+Capabilities
+  ↓
+Application Action
+  ↓
+Domain State Validation
+```
+
+Capabilities represent atomic functionality or actions.
+
+Groups compose capabilities into reusable business responsibilities.
+
+Examples:
+
+```text
+PO Account
+    ↓
+PurchaseOrder.View
+PurchaseOrder.Create
+PurchaseOrder.Edit
+PurchaseOrder.Submit
+```
+
+```text
+IT Account
+    ↓
+PurchaseOrder.View
+PurchaseOrder.Approve
+PurchaseOrder.Reject
+PurchaseOrder.Receive
+```
+
+## Architectural Boundary
+
+Capability authorization will determine whether the current user is authorized to attempt an application action.
+
+The Domain Model will continue to determine whether that action is valid for the current business state.
+
+Therefore:
+
+```text
+Authorization
+       +
+Domain State Validation
+```
+
+remain separate responsibilities.
+
+## Implementation Sequencing
+
+The Dynamic Capability-Based Authorization architecture will not interrupt the current Additional Reporting work.
+
+The agreed sequence is:
+
+```text
+Additional Reporting
+        ↓
+Complete current reporting scope
+        ↓
+Dynamic Capability-Based Authorization
+        ↓
+Apply capabilities to Purchasing
+        ↓
+Extend Purchasing workflow where required
+```
+
+Additional Reporting can continue independently because the
+reporting architecture does not depend on the future
+authorization implementation.
+
+## Outcome
+
+The Dynamic Capability-Based Authorization architecture was
+accepted as the future authorization direction.
+
+No authorization implementation changes were made as part of
+this design decision.
+
+The current Identity implementation remains unchanged until the
+authorization implementation phase begins.
+
+## Lessons Learned
+
+- Authorization should represent capabilities rather than individual business labels whenever responsibilities are expected to evolve.
+- Groups provide a reusable way to compose capabilities.
+- Authorization and Domain state validation are separate concerns.
+- Architectural decisions should be recorded before introducing cross-cutting implementation changes.
+- Current feature development should not be blocked by future architectural enhancements when the two concerns are independently evolvable.
+
+---
+
+# Milestone 23 - Reporting: Purchase History
+
+## Summary
+
+Implemented the Purchase History reporting vertical slice,
+extending the existing read-oriented Reporting architecture
+established by Inventory Valuation.
+
+The feature provides a read-only view of historical Purchase
+Orders without modifying Purchasing Domain aggregates.
+
+## Completed
+
+### Application
+
+- Purchase History read model
+- Purchase History DTO
+- Purchase History request model
+- Purchase History application handler
+- Purchase History repository abstraction
+
+### Infrastructure
+
+- Purchase History repository
+- Read-only EF Core projection
+- Supplier projection
+- Purchase Order status projection
+- Purchase Order totals projection
+
+### Presentation
+
+- Purchase History Razor Page
+- Reporting navigation
+- Search
+- From/To date filtering
+- Pagination
+- Sorting
+
+## Reporting Query
+
+The reporting flow is:
+
+```text
+Purchase History Razor Page
+        ↓
+GetPurchaseHistoryHandler
+        ↓
+IPurchaseHistoryRepository
+        ↓
+PurchaseHistoryRepository
+        ↓
+EF Core Projection
+        ↓
+SQL Server
+        ↓
+PurchaseHistoryDto
+        ↓
+Purchase History View
+```
+
+The report is read-only and does not modify Purchase Order, Purchase Order Item, Product, Supplier, or Inventory state.
+
+## Filtering
+
+The report supports:
+
+- Server-side search
+- From date
+- To date
+- Pagination
+- Sorting
+
+Filtering, sorting, and paging are performed server-side to avoid loading the complete Purchase History dataset into memory.
+
+## Architecture Validation
+
+Purchase History confirms that the read-oriented Reporting
+architecture established by Inventory Valuation can be reused
+for another business domain without introducing a separate
+Reporting architecture.
+
+The implementation continues to follow:
+
+```text
+Presentation
+     ↓
+Application
+     ↓
+Read Model
+     ↓
+Repository Abstraction
+     ↓
+Infrastructure
+     ↓
+Database
+```
+
+## Outcome
+
+Purchase History reporting is complete for the current scope.
+
+Remaining Reporting work includes additional reports, export capabilities, and explicit empty-state/query-failure validation.
+
+## Lessons Learned
+- Reporting features can reuse the same read-oriented architecture across different business domains.
+- Server-side filtering, sorting, and pagination should remain part of the query pipeline.
+- Reporting should remain independent from transactional Domain workflows.
+- Additional capabilities can be added without coupling the report to the Purchasing aggregate.
+
+---
+
+# Milestone 24 - Reporting: Supplier Purchase Analysis
+
+## Summary
+
+Implemented the Supplier Purchase Analysis reporting vertical slice, extending the read-oriented Reporting architecture validated through Inventory Valuation and Purchase History.
+
+The feature provides a supplier-level analytical view of Purchase Order activity without modifying Purchasing Domain aggregates.
+
+## Completed
+
+### Application
+
+- Supplier Purchase Analysis read model
+- Supplier Purchase Analysis DTO
+- Supplier Purchase Analysis request model
+- Supplier Purchase Analysis application handler
+- Supplier Purchase Analysis repository abstraction
+
+### Infrastructure
+
+- Supplier Purchase Analysis repository
+- Read-only EF Core projection
+- Supplier-level aggregation
+- Purchase Order count aggregation
+- Ordered quantity aggregation
+- Received quantity aggregation
+- Remaining quantity aggregation
+- Total amount aggregation
+- First and last Purchase Order date projection
+
+### Presentation
+
+- Supplier Purchase Analysis Razor Page
+- Reporting navigation
+- Supplier search
+- From/To date filtering
+- Status filtering
+- Purchase Period display
+- Pagination
+- Sorting
+
+## Reporting Query
+
+The reporting flow is:
+
+```text
+Supplier Purchase Analysis Razor Page
+        ↓
+GetSupplierPurchaseAnalysisHandler
+        ↓
+ISupplierPurchaseAnalysisRepository
+        ↓
+SupplierPurchaseAnalysisRepository
+        ↓
+EF Core Projection
+        ↓
+SQL Server
+        ↓
+SupplierPurchaseAnalysisDto
+        ↓
+Supplier Purchase Analysis View
+```
+
+The report is read-only and does not modify Purchase Order, Purchase Order Item, Product, Supplier, or Inventory state.
+
+## Filtering
+
+The report supports:
+
+- Server-side supplier search
+- From date
+- To date
+- Status filtering
+- Pagination
+- Sorting
+
+Date filtering is inclusive.
+
+When only a From date is supplied, Purchase Orders from that date onward are included.
+
+When only a To date is supplied, Purchase Orders up to that date are included.
+
+When both dates are the same, only Purchase Orders on that date are included.
+
+## Aggregation
+
+Supplier Purchase Analysis aggregates Purchase Orders by Supplier.
+
+The report displays:
+
+- Supplier
+- Purchase Period
+- Purchase Order Count
+- Ordered Quantity
+- Received Quantity
+- Remaining Quantity
+- Total Amount
+
+Purchase Period represents the earliest and latest Purchase
+Order dates included in the supplier aggregation.
+
+## Pagination and Sorting
+
+Pagination and sorting are performed server-side.
+
+Pagination preserves the active:
+
+- Supplier search
+- Date filters
+- Status filter
+- Sort field
+- Sort direction
+- Page size
+
+## Browser Verification
+
+Verified that:
+
+- Supplier Purchase Analysis is accessible from the application navigation.
+- Supplier aggregation is calculated correctly.
+- Purchase Period is displayed correctly.
+- Supplier search works.
+- From/To date filtering works.
+- Same-day date filtering works.
+- Status filtering works.
+- Server-side sorting works.
+- Server-side pagination works.
+- Pagination preserves active filters and sorting.
+- No-result behavior displays correctly.
+
+## EF Core Query Adjustment
+
+The initial Supplier Purchase Analysis ordering expression attempted to order a grouped query directly using a nested aggregate over Purchase Order Items.
+
+EF Core could not translate that expression.
+
+The query was restructured so that supplier-level aggregate values are projected first and sorting is then applied to the projected aggregate row.
+
+This preserves database-side aggregation, sorting, and pagination without introducing client-side evaluation.
+
+## Architecture Validation
+
+Supplier Purchase Analysis further validates that the read-oriented Reporting architecture can support analytical aggregation in addition to direct read projections.
+
+The implementation continues to follow:
+
+```text
+Presentation
+     ↓
+Application
+     ↓
+Read Model
+     ↓
+Repository Abstraction
+     ↓
+Infrastructure
+     ↓
+Database
+```
+
+No structural architectural redesign was required.
+
+## Outcome
+
+Supplier Purchase Analysis reporting is complete for the current scope.
+
+Empty database behavior and explicit query-failure testing remain deferred to broader final Reporting/system verification.
+
+The next Reporting work will continue independently of the future Dynamic Capability-Based Authorization architecture.
+
+
+---
+
+# Milestone 25 - Reporting: Stock Movement
+
+## Summary
+
+Implemented the Stock Movement reporting vertical slice, extending
+the read-oriented Reporting architecture to inventory transaction
+history.
+
+The feature provides a read-only view of inventory movement activity
+without modifying Inventory Transaction or Product Domain state.
+
+## Completed
+
+### Application
+
+- Stock Movement read model
+- Stock Movement DTO
+- Stock Movement request model
+- Stock Movement application handler
+- Stock Movement repository abstraction
+
+### Infrastructure
+
+- Stock Movement repository
+- Read-only EF Core projection
+- Inventory Transaction projection
+- Server-side filtering
+- Server-side sorting
+- Server-side pagination
+
+### Presentation
+
+- Stock Movement Razor Page
+- Operations navigation
+- Product/SKU search
+- Reference/remarks search
+- From/To date filtering
+- Movement type filtering
+- Pagination
+- Sorting
+
+## Reporting Query
+
+The reporting flow is:
+
+```text
+Stock Movement Razor Page
+        ↓
+GetStockMovementHandler
+        ↓
+IStockMovementRepository
+        ↓
+StockMovementRepository
+        ↓
+EF Core Query
+        ↓
+SQL Server
+        ↓
+StockMovementDto
+        ↓
+Stock Movement View
+```
+
+The report is read-only and does not modify Inventory Transaction,
+Product, or inventory state.
+
+## Report Data
+
+Stock Movement displays:
+
+- Transaction Date
+- Product
+- SKU
+- Movement Type
+- Quantity
+- Reference Number
+- Remarks
+
+The report uses the existing Inventory Transaction data model.
+
+No new Domain entity or database table was introduced.
+
+## Filtering
+
+The report supports:
+
+- Server-side product/SKU search
+- Reference/remarks search
+- From date
+- To date
+- Movement type filtering
+- Pagination
+- Sorting
+
+Date filtering is inclusive.
+
+When a To date is supplied, transactions through the end of that
+date are included.
+
+## Pagination and Sorting
+
+Pagination and sorting are performed server-side.
+
+The active filtering and sorting state is preserved while navigating through the report results.
+
+## Browser Verification
+
+Verified that:
+
+- Stock Movement is accessible from the application navigation.
+- Stock Movement page loads successfully.
+- Inventory transaction data is displayed correctly.
+- Product/SKU search works.
+- Reference/remarks search works.
+- From/To date filtering works.
+- Movement type filtering works.
+- Server-side sorting works.
+- Server-side pagination works.
+- Combined filtering works.
+- Reset behavior works.
+- Existing application functionality remains operational.
+
+## Architecture Validation
+
+Stock Movement further validates that the existing read-oriented Reporting architecture can consume transactional inventory history without modifying the transactional workflow.
+
+The implementation continues to follow:
+
+```text
+Presentation
+     ↓
+Application
+     ↓
+Read Model
+     ↓
+Repository Abstraction
+     ↓
+Infrastructure
+     ↓
+Database
+```
+
+No structural architectural redesign was required.
+
+## Outcome
+
+Stock Movement reporting is complete for the current scope.
+
+Empty database behavior and explicit query-failure testing remain deferred to broader final Reporting/system verification.
+
+The next Reporting work will continue independently of the future Dynamic Capability-Based Authorization architecture.
+
+---
+
+# Milestone 26 - Reporting: Low Stock
+
+## Summary
+
+Implemented the Low Stock reporting vertical slice, extending the read-oriented Reporting architecture to current Product inventory state.
+
+The feature provides a read-only view of products that meet the existing low-stock condition without modifying Product or Inventory Transaction state.
+
+## Completed
+
+### Application
+
+- Low Stock read model
+- Low Stock DTO
+- Low Stock request model
+- Low Stock application handler
+- Low Stock repository abstraction
+
+### Infrastructure
+
+- Low Stock repository
+- Read-only EF Core projection
+- Server-side Product/SKU search
+- Server-side sorting
+- Server-side pagination
+
+### Presentation
+
+- Low Stock Razor Page
+- Reports navigation
+- Product/SKU search
+- Pagination
+- Sorting
+- Reset behavior
+
+## Low Stock Rule
+
+The report uses the existing application low-stock condition:
+
+```text
+QuantityOnHand <= 10
+```
+
+The existing low-stock rule was reused rather than introducing a separate reporting-specific threshold.
+
+## Reporting Query
+
+The reporting flow is:
+
+```text
+Low Stock Razor Page
+        ↓
+GetLowStockHandler
+        ↓
+ILowStockRepository
+        ↓
+LowStockRepository
+        ↓
+EF Core Query
+        ↓
+SQL Server
+        ↓
+LowStockDto
+        ↓
+Low Stock View
+```
+
+The report is read-only and does not modify Product, Inventory Transaction, or inventory state.
+
+## Report Data
+
+Low Stock displays:
+
+- Product
+- SKU
+- Category
+- Quantity On Hand
+
+## Filtering
+
+The report supports:
+
+- Server-side Product search
+- Server-side SKU search
+- Pagination
+- Sorting
+
+## Pagination
+
+Pagination is performed server-side.
+
+During implementation, the page number supplied in the Razor Page query string was not being propagated correctly into the reporting query.
+
+The PageModel was adjusted to explicitly read the requested page value from the request before constructing the shared PagedQuery.
+
+This ensured that:
+
+```text
+Page 1
+    ↓
+Skip(0)
+Take(PageSize)
+
+Page 2
+    ↓
+Skip(PageSize)
+Take(PageSize)
+```
+
+The final implementation preserves the existing shared paging infrastructure and does not introduce a report-specific paging model.
+
+## Browser Verification
+
+Verified that:
+
+- Low Stock is accessible from the application navigation.
+- Low Stock page loads successfully.
+- Low-stock products are displayed correctly.
+- Product/SKU search works.
+- Server-side sorting works.
+- Server-side pagination works.
+- Page-size changes work.
+- Reset behavior works.
+- Combined search, sorting, and pagination work.
+- The low-stock boundary condition works.
+- Existing application functionality remains operational.
+
+## Architecture Validation
+
+Low Stock further validates that the existing read-oriented Reporting architecture can support current inventory-state reporting without modifying transactional workflows.
+
+The implementation continues to follow:
+
+```text
+Presentation
+     ↓
+Application
+     ↓
+Read Model
+     ↓
+Repository Abstraction
+     ↓
+Infrastructure
+     ↓
+Database
+```
+
+No structural architectural redesign was required.
+
+No Domain entity or database schema changes were required.
+
+## Outcome
+
+Low Stock reporting is complete for the current scope.
+
+Empty database behavior and explicit query-failure testing remain deferred to broader final Reporting/system verification.
+
+The next Reporting work will continue independently of the future Dynamic Capability-Based Authorization architecture.
+
+---
+
+# Milestone 27 - Reporting: Inventory Movement
+
+## Summary
+
+Implemented the Inventory Movement reporting vertical slice, extending
+the read-oriented Reporting architecture from transaction-level
+movement history into product-level movement analysis.
+
+The report summarizes inventory movement for each product over a
+selected reporting period.
+
+## Completed
+
+### Application
+
+- Inventory Movement read model
+- Inventory Movement DTO
+- Inventory Movement request model
+- Inventory Movement application handler
+- Inventory Movement repository abstraction
+
+### Infrastructure
+
+- Inventory Movement repository
+- Read-only EF Core query
+- Product-level movement aggregation
+- Opening quantity calculation
+- Stock In aggregation
+- Stock Out aggregation
+- Adjustment aggregation
+- Closing quantity calculation
+- Server-side Product/SKU search
+- Server-side date filtering
+- Server-side sorting
+- Server-side pagination
+
+### Presentation
+
+- Inventory Movement Razor Page
+- Reports navigation
+- Product/SKU search
+- From/To date filtering
+- Reporting Period display
+- Sorting
+- Pagination
+- Page-size changes
+- Reset behavior
+
+## Report Data
+
+Inventory Movement displays:
+
+- Product
+- SKU
+- Opening Quantity
+- Stock In
+- Stock Out
+- Adjustment
+- Closing Quantity
+
+The report is product-level and aggregated rather than transaction-level.
+
+Stock Movement remains responsible for individual transaction history.
+
+## Reporting Period
+
+The selected From and To dates define the reporting period used for
+the aggregated movement values.
+
+The reporting period is displayed separately above the table rather
+than adding a transaction date column, because each row represents
+multiple transactions over the selected period.
+
+## Query Design
+
+The report uses existing Product and Inventory Transaction data.
+
+Opening and closing quantities are reconstructed from the current
+inventory state and persisted transaction history.
+
+The query remains read-only and performs aggregation, filtering,
+sorting, and pagination on the database side.
+
+## EF Core Query Adjustment
+
+The initial implementation used grouped aggregate projections with
+left joins.
+
+During browser verification, EF Core raised a nullable materialization
+exception:
+
+```text
+Nullable object must have a value.
+```
+
+The query was restructured to use product-driven correlated aggregate subqueries with explicit nullable aggregate handling.
+
+This removed the nullable aggregate left-join boundary while preserving database-side processing.
+
+## Browser Verification
+
+Verified that:
+
+- Inventory Movement is accessible from application navigation.
+- Inventory Movement page loads successfully.
+- Product/SKU search works.
+- From/To date filtering works.
+- Reporting Period display works.
+- Combined search and date filtering works.
+- Server-side sorting works.
+- Reset behavior works.
+- Server-side pagination works.
+- Page-size changes work.
+- Pagination preserves active filters.
+- Boundary/no-result behavior works.
+- Aggregated movement values are displayed correctly.
+
+# Milestone 28 - Reporting: Product Reports
+
+## Summary
+
+Implemented the Product Reports reporting vertical slice, extending
+the read-oriented Reporting architecture to current Product state.
+
+## Completed
+
+### Application
+
+- Product Report read model
+- Product Report DTO
+- Product Report request model
+- Product Report application handler
+- Product Report repository abstraction
+
+### Infrastructure
+
+- Product Report repository
+- Read-only EF Core query
+- Product information projection
+- SKU information projection
+- Category information projection
+- Unit information projection
+- Quantity On Hand projection
+- Cost Price projection
+- Selling Price projection
+- Product status projection
+- Server-side Product/SKU/Category/Unit search
+- Active / Inactive / All Products filtering
+- Server-side sorting
+- Server-side pagination
+
+### Presentation
+
+- Product Reports Razor Page
+- Reports navigation
+- Product/SKU/Category/Unit search
+- Active / Inactive / All Products filtering
+- Sorting
+- Pagination
+- Page-size changes
+- Reset behavior
+- Combined filtering
+
+## Report Data
+
+Product Reports displays:
+
+- Product
+- SKU
+- Category
+- Unit
+- Quantity On Hand
+- Cost Price
+- Selling Price
+- Status
+
+## Query Design
+
+The report uses existing Product, Category, and Unit data.
+
+The query remains read-only and uses `AsNoTracking()` with database-side
+projection, filtering, sorting, and pagination.
+
+The implementation uses a dedicated reporting read model and repository
+rather than reusing the transactional Product management query directly.
+
+No Domain entity or database schema changes were required.
+
+No migration was required.
+
+## Browser Verification
+
+Product Reports was built successfully and verified through actual
+browser workflows.
+
+Verified:
+
+- Product Reports page loading
+- Reports navigation
+- Product/SKU/Category/Unit search
+- Active / Inactive / All Products filtering
+- Server-side sorting
+- Server-side pagination
+- Pagination state preservation
+- Page-size changes
+- Reset behavior
+- Combined search and status filtering
+- Boundary/no-result behavior
+
+All implemented Product Reports test cases were confirmed through
+manual verification.
+
+# Milestone 29 - Reporting: Excel Export
+
+## Summary
+
+Implemented Excel export for the completed Sprint 7 Reporting features using the existing read-oriented Reporting architecture.
+
+## Completed
+
+### Application
+
+The existing Reporting handlers were extended with export-specific query handling while preserving the existing report filters and sorting behavior.
+
+No new report DTOs or repository abstractions were introduced.
+
+### Presentation
+
+Added Export to Excel actions to the completed Reporting pages. The export preserves the active report filters and sorting state.
+
+The export is not limited by the current UI page size and instead includes the full filtered result set.
+
+### Excel Generation
+
+Added a focused Web-layer Excel report writer using ClosedXML.
+
+The writer produces report-specific `.xlsx` workbooks for:
+
+- Inventory Valuation
+- Purchase History
+- Supplier Purchase Analysis
+- Stock Movement
+- Low Stock Report
+- Inventory Movement Report
+- Product Reports
+
+Inventory Valuation also includes the Total Inventory Value summary displayed by the browser report.
+
+## Architecture Outcome
+
+Excel generation remains isolated from Domain and Infrastructure persistence concerns. Existing Reporting queries and DTOs remain the source of report data.
+
+No Domain entity, database schema, or migration changes were required.
+
+No generic reporting export framework was introduced.
+
+## Verification
+
+Excel Export was built successfully and verified through browser/manual workflows.
+
+Validated:
+
+- Export action availability on completed Reporting pages
+- Workbook generation
+- Report-specific columns and values
+- Preservation of active filters
+- Preservation of active sorting
+- Export of the full filtered result set without UI pagination limits
+- Inventory Valuation Total Inventory Value summary
+
+The development launch port was also changed from the unavailable/reserved `5260` endpoint to `7237` to allow the application to run locally without the Windows port exclusion conflict.
+
+## Sprint Position
+
+Excel Export is complete for the current Sprint 7 scope.
+
+PDF Export is complete. Final project-wide verification has also been completed, including the previously deferred empty-database and explicit query-failure scenarios.
+
+The implementation remains independent of the future Dynamic Capability-Based Authorization architecture.
+
+# Architecture Validation
+
+Inventory Movement further validates that the existing read-oriented Reporting architecture supports analytical inventory reporting without modifying transactional workflows.
+
+The implementation follows:
+
+```text
+Presentation
+     ↓
+Application
+     ↓
+Read Model
+     ↓
+Repository Abstraction
+     ↓
+Infrastructure
+     ↓
+Database
+```
+
+No structural architectural redesign was required.
+
+No Domain entity or database schema changes were required.
+
+## Outcome
+
+Inventory Movement reporting is complete for the current scope.
+
+Empty database behavior and explicit query-failure testing remain deferred to broader final Reporting/system verification.
+
+The remaining Additional Reporting work includes Excel and PDF export.
+
+The feature continues independently of the future Dynamic Capability-Based Authorization architecture.
+
+---
+
 # Architecture Validation
 
 After implementing:
@@ -1323,6 +2395,105 @@ The combined milestones demonstrate that the architecture supports:
 without requiring structural redesign.
 
 Architecture Sprint 1 formally validated these conclusions through a comprehensive review of the solution before the introduction of larger business workflow modules.
+
+---
+
+# Milestone 30 - Reporting: PDF Export
+
+## Context
+
+PDF Export was the remaining export capability after the seven Sprint 7 Reporting features and Excel Export had been completed and verified.
+
+## Implementation
+
+Implemented PDF export for:
+
+- Inventory Valuation
+- Purchase History
+- Supplier Purchase Analysis
+- Stock Movement
+- Low Stock Report
+- Inventory Movement Report
+- Product Reports
+
+The implementation uses the existing Reporting handlers and DTOs and adds a focused Web-layer `PdfReportWriter` using QuestPDF.
+
+The export preserves active report filters and sorting. It is not limited by the current UI page size and instead exports the full filtered result set.
+
+Inventory Valuation also includes the Total Inventory Value summary.
+
+## Architecture Outcome
+
+PDF generation remains isolated from Domain and Infrastructure persistence concerns. Existing Reporting queries and DTOs remain the source of report data.
+
+No generic reporting export framework was introduced.
+
+No Domain entity, database schema, or migration changes were required.
+
+The implementation remains independent of the future Dynamic Capability-Based Authorization architecture.
+
+## Verification
+
+PDF Export was built and verified through browser/manual workflows.
+
+Validated:
+
+- Export action availability on completed Reporting pages
+- PDF generation
+- Report-specific columns and values
+- Preservation of active filters
+- Preservation of active sorting
+- Full filtered result export without UI pagination limits
+- Inventory Valuation Total Inventory Value summary
+
+## Sprint Position
+
+PDF Export is complete for the current Sprint 7 implementation scope.
+
+Final project-wide verification has been completed, including the previously deferred empty-database and explicit query-failure scenarios.
+
+# Current Development Position
+
+The platform is currently continuing development of Additional
+Reporting capabilities.
+
+Completed reporting capabilities include:
+
+- Inventory Valuation
+- Purchase History
+- Supplier Purchase Analysis
+- Stock Movement
+- Low Stock Report
+- Inventory Movement Report
+- Product Reports
+- Excel Export
+
+The remaining reporting work is PDF export.
+
+Empty database behavior and explicit query-failure testing remain
+deferred until final project-wide verification.
+
+The next reporting work will continue independently of the future
+authorization architecture.
+
+Dynamic Capability-Based Authorization has been finalized as the
+future authorization direction but has not yet been implemented.
+
+The agreed implementation sequence is:
+
+```text
+Additional Reporting
+        ↓
+Complete current reporting scope
+        ↓
+Dynamic Capability-Based Authorization
+        ↓
+Apply capabilities to Purchasing
+        ↓
+Extend Purchasing workflow where required
+```
+
+This sequencing intentionally prevents a cross-cutting authorization redesign from interrupting the current reporting implementation.
 
 ---
 
@@ -1384,13 +2555,131 @@ The project deliberately applies the Rule of Three to balance maintainability ag
 
 ---
 
-# Future Journal Entries
+# Current and Future Journal Entries
 
-Future milestones are expected to include:
+## Current Development
+
+- Additional Reporting
+- PDF Export
+
+## Planned Architecture
+
+- Dynamic Capability-Based Authorization
+- Purchasing Workflow Authorization
+
+## Future Milestones
 
 - Sales Module
-- Reporting Enhancements
-- Additional Reporting Modules
 - Audit Logging
 - REST API
 - Integration Testing
+
+---
+
+# Milestone 31 - Sprint 7 Final Project-wide Verification
+
+## Context
+
+Sprint 7 Additional Reporting implementation was complete after Inventory Valuation, Purchase History, Supplier Purchase Analysis, Stock Movement, Low Stock Report, Inventory Movement Report, Product Reports, Excel Export, and PDF Export were implemented and browser/manual verified.
+
+The final project-wide verification was performed after all implementation work was complete.
+
+## Verification
+
+The application was verified through runtime/browser workflows covering:
+
+- Authentication
+- Account Management
+- 2FA
+- Product management
+- Categories
+- Suppliers
+- Customers
+- Purchase Orders
+- Inventory operations
+- Existing reporting functionality
+
+All seven Sprint 7 reports were verified:
+
+- Inventory Valuation
+- Purchase History
+- Supplier Purchase Analysis
+- Stock Movement
+- Low Stock Report
+- Inventory Movement Report
+- Product Reports
+
+Report verification covered normal data, filters, sorting, pagination, navigation, and no-result behavior.
+
+## Export Verification
+
+All seven Excel exports were verified.
+
+All seven PDF exports were verified.
+
+Export verification covered:
+
+- Download behavior
+- Filename
+- Report identity
+- Report-specific columns and values
+- Filter preservation
+- Sorting preservation
+- Full filtered result set rather than only the current paginated page
+- Multi-page PDF output
+- Inventory Valuation Total Inventory Value
+
+## Deferred Validation — Completed
+
+### Empty Database
+
+A separate empty verification database was used.
+
+The reporting functionality was exercised against the empty database and behaved correctly.
+
+### Explicit Query Failure
+
+The database instance was made unavailable during report execution.
+
+The application displayed the expected Development-mode error.
+
+After the database instance was restored, the application recovered and reporting functionality worked normally.
+
+## Authorization Regression
+
+Existing authorization boundaries were verified using different roles.
+
+Accessing a page outside the current user's authorization resulted in the existing Access Denied behavior.
+
+No Dynamic Capability-Based Authorization implementation was introduced.
+
+## Build Verification
+
+The final repository verification was performed on branch:
+
+`feature/additional-reporting`
+
+The working tree was clean after restoring the temporary development database configuration.
+
+The following commands completed successfully:
+
+```text
+dotnet restore
+dotnet build
+```
+
+All five projects compiled successfully:
+
+- InventoryPlatform.Shared
+- InventoryPlatform.Domain
+- InventoryPlatform.Application
+- InventoryPlatform.Infrastructure
+- InventoryPlatform.Web
+
+## Outcome
+
+Sprint 7 Additional Reporting has completed final project-wide verification successfully.
+
+No in-scope implementation defects were discovered during final verification.
+
+The existing Reporting architecture remains unchanged, with export generation isolated in the Web layer and existing report queries and DTOs reused as the source of report data.

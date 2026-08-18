@@ -39,6 +39,24 @@ Focus Areas:
 
 Each major business capability should be implemented from Domain and Application logic through a usable Presentation workflow before being considered complete.
 
+### Sprint 7 Status
+
+Sprint 7 Additional Reporting is complete and has passed final project-wide verification.
+
+Completed:
+
+- Inventory Valuation
+- Purchase History
+- Supplier Purchase Analysis
+- Stock Movement
+- Low Stock Report
+- Inventory Movement Report
+- Product Reports
+- Excel Export
+- PDF Export
+
+The next development milestone has not been selected in this documentation update.
+
 ---
 
 # Current Release
@@ -147,7 +165,6 @@ Completed:
 Remaining:
 
 - Inventory Integration
-- Purchase History
 - Supplier Purchase History
 - Multiple Purchase Order Item Management
 - Purchase Order Search
@@ -164,14 +181,40 @@ Status: 🟨 In Progress
 ### Completed
 
 - Inventory Valuation
-
-### Remaining Reports
-
 - Purchase History
+- Purchase History Search
+- Purchase History Date Filtering
+- Purchase History Pagination
+- Purchase History Sorting
 - Supplier Purchase Analysis
+- Supplier Purchase Analysis Search
+- Supplier Purchase Analysis Date Filtering
+- Supplier Purchase Analysis Status Filtering
+- Supplier Purchase Analysis Pagination
+- Supplier Purchase Analysis Sorting
+- Supplier Purchase Analysis Purchase Period
 - Stock Movement
+- Stock Movement Search
+- Stock Movement Date Filtering
+- Stock Movement Movement Type Filtering
+- Stock Movement Pagination
+- Stock Movement Sorting
 - Low Stock Report
+- Low Stock Search
+- Low Stock Pagination
+- Low Stock Sorting
 - Inventory Movement Report
+- Inventory Movement Search
+- Inventory Movement Date Filtering
+- Inventory Movement Reporting Period
+- Inventory Movement Pagination
+- Inventory Movement Sorting
+- Product Reports
+- Product Reports Search
+- Product Reports Status Filtering
+- Product Reports Pagination
+- Product Reports Sorting
+- Excel Export
 
 ### Export Options
 
@@ -180,34 +223,105 @@ Status: 🟨 In Progress
 
 ### Remaining Validation
 
-- Inventory Valuation empty-state verification
+- Empty database behavior verification
 - Explicit query-failure testing
+
+### Additional Reporting
+
+Additional Reporting is being developed as Sprint 7 within the broader
+Phase 6 Reporting roadmap.
+
+Sprint 7 currently includes:
+
+- Inventory Valuation
+- Purchase History
+- Supplier Purchase Analysis
+- Stock Movement
+- Low Stock Report
+- Inventory Movement Report
+- Product Reports
+- Excel export
+- PDF export
+
+Remaining Sprint 7 scope:
+
+- Final project-wide verification
 
 ---
 
-# Phase 7 — Account Management
+# Phase 7 — Dynamic Capability-Based Authorization
 
-Status: ✅ Complete
+Status: ⏳ Planned
 
-Completed
+**Implementation status:** Design finalized; implementation not yet started.
 
-- User Profile
-- Update Profile
-- Change Password
-- Forgot Password
-- Reset Password
-- Force Password Change
-- Email Verification
-- Two-Factor Authentication
-- 2FA Setup
-- TOTP Verification
-- 2FA Login Challenge
-- Recovery Codes
-- Recovery Code Login
-- Recovery Code Regeneration
-- Recovery Code Invalidation
-- Disable 2FA
-- Self-Service Account Management
+### Objective
+
+Evolve the existing Identity-based authorization model into a
+dynamic capability-based authorization model.
+
+### Model
+
+```text
+User
+  ↓
+Group
+  ↓
+Capabilities
+  ↓
+Application Action
+  ↓
+Domain State Validation
+```
+
+### Capabilities
+
+Capabilities represent atomic application functionality,
+actions, or permissions.
+
+Examples:
+
+- PurchaseOrder.View
+- PurchaseOrder.Create
+- PurchaseOrder.Edit
+- PurchaseOrder.Submit
+- PurchaseOrder.Approve
+- PurchaseOrder.Reject
+- PurchaseOrder.Receive
+
+### Groups
+
+Groups compose reusable capabilities into business
+responsibilities.
+
+Examples:
+
+- PO Account
+- IT Account
+- Inventory Manager
+- Viewer
+- Administrator
+
+### Implementation Goals
+
+- Define capability catalog
+- Define groups
+- Map groups to capabilities
+- Assign groups to users
+- Introduce capability authorization
+- Preserve existing Identity infrastructure where appropriate
+- Preserve Domain state validation
+- Apply authorization to Purchasing workflow
+- Apply authorization to Reporting
+- Validate UI and server-side authorization behavior
+
+### Sequencing
+
+Dynamic Capability-Based Authorization will be implemented
+after the current Additional Reporting work.
+
+Additional Reporting does not depend on the new authorization
+architecture and can continue independently.
 
 ---
 
@@ -294,3 +408,7 @@ Each new module should:
 - Validate read-oriented queries against actual EF Core translation before introducing client-side evaluation.
 
 The architecture should evolve through reuse rather than introducing module-specific implementations whenever possible.
+
+## Sprint 7 Final Verification
+
+- [x] Final Project-wide Verification

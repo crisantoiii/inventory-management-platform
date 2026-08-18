@@ -59,7 +59,7 @@ The first Reporting vertical slice has also been implemented through Inventory V
 | Inventory Transactions | ✅ Complete |
 | Architecture Sprint | ✅ Complete |
 | Purchasing | 🟨 Core Workflow Complete |
-| Reporting | 🟨 Inventory Valuation Complete |
+| Reporting | 🟨 Inventory Valuation & Purchase History Complete |
 
 ## Current Implementation
 
@@ -78,6 +78,11 @@ Completed modules:
 - ✅ Purchasing Presentation Layer
 - 🟨 Reporting
   - ✅ Inventory Valuation
+  - ✅ Purchase History
+    - Server-side Search
+    - From/To Date Filtering
+    - Server-side Pagination
+    - Server-side Sorting
 - ✅ Account Management
 
 Shared capabilities:
@@ -352,7 +357,30 @@ Completed
 
 ---
 
-# Reporting
+## Reporting
+
+### Completed
+
+- Inventory Valuation
+- Purchase History
+- Supplier Purchase Analysis
+- Stock Movement
+- Low Stock Report
+- Inventory Movement Report
+- Product Reports
+
+### Purchase History
+
+- Purchase History Report
+- Server-side Search
+- From/To Date Filtering
+- Server-side Pagination
+- Server-side Sorting
+
+### Export
+
+- ✅ Export to Excel
+- ✅ Export to PDF
 
 ## Inventory Valuation
 
@@ -399,17 +427,79 @@ EF Core
 Database
 ```
 
+## Product Reports
+
+Status: **Complete**
+
+Implemented:
+
+- Product Reports read model
+- Product Reports application handler
+- Product Reports persistence abstraction
+- Product Reports repository
+- Product/SKU search
+- Category search
+- Unit search
+- Product status filtering
+- Active / Inactive / All filtering
+- Server-side sorting
+- Server-side pagination
+- Page-size changes
+- Reset
+- Combined filtering
+- No-result behavior
+- Reports navigation
+
+Verification:
+
+- Page loading
+- Reports navigation
+- Product/SKU search
+- Category/Unit filtering
+- Status filtering
+- Combined filtering
+- Sorting
+- Reset
+- Pagination
+- Page-size changes
+- Pagination while filters are active
+- Boundary/no-result behavior
+- Browser verification
+
+## Excel Export
+
+- ✅ Excel Export
+- ✅ Export actions on completed reporting pages
+- ✅ Existing report filters preserved during export
+- ✅ Existing report sorting preserved during export
+- ✅ Full filtered result set exported without UI pagination limits
+- ✅ Inventory Valuation total inventory value included in the workbook
+- ✅ Report-specific workbook columns and values
+- ✅ Browser/manual verification
+
+The Excel export uses the existing read-oriented Reporting queries and DTOs. No new Domain entities, database tables, or migrations were required.
+
+## PDF Export
+
+- ✅ PDF Export
+- ✅ Export actions on completed reporting pages
+- ✅ Existing report filters preserved during export
+- ✅ Existing report sorting preserved during export
+- ✅ Full filtered result set exported without UI pagination limits
+- ✅ Inventory Valuation total inventory value included in the PDF
+- ✅ Report-specific PDF columns and values
+- ✅ Browser/manual verification
+
+The PDF export uses the existing read-oriented Reporting queries and DTOs. PDF generation is isolated in the Web layer using QuestPDF. No new Domain entities, database tables, or migrations were required.
+
 ## Remaining Reporting Work
+
+- ⬜ Final project-wide verification
+
+### Deferred Reporting Validation
 
 - ⬜ Empty database behavior verification
 - ⬜ Explicit query-failure testing
-- ⬜ Purchase History
-- ⬜ Supplier Purchase Analysis
-- ⬜ Stock Movement
-- ⬜ Low Stock Report
-- ⬜ Inventory Movement Report
-- ⬜ Excel Export
-- ⬜ PDF Export
 
 ---
 
@@ -745,6 +835,32 @@ Operation results are standardized using:
 - Two-Factor Authentication
 - Recovery Code Management
 
+## Planned Authorization
+
+The platform will evolve from the current Identity role/policy
+authorization model toward Dynamic Capability-Based Authorization.
+
+Planned structure:
+
+```text
+User
+  ↓
+Group
+  ↓
+Capabilities
+  ↓
+Application Action
+  ↓
+Domain State Validation
+```
+
+Status:
+
+- Design finalized
+- Implementation not yet started
+- Additional Reporting remains the current implementation priority
+
+
 ## User Administration
 
 - Create User
@@ -788,7 +904,6 @@ Engineering practices include:
 
 Remaining work:
 
-- Purchase History
 - Multiple Purchase Order Item Management
 - Purchase Order Search
 - Purchase Order Filtering
@@ -799,19 +914,8 @@ Remaining work:
 
 ## Reporting
 
-Completed:
+Remaining work:
 
-- Inventory Valuation
-
-Remaining:
-
-- Purchase History
-- Supplier Purchase Analysis
-- Stock Movement
-- Low Stock Report
-- Inventory Movement Report
-- Product Reports
-- Export to Excel
 - Export to PDF
 
 ## Sales
@@ -820,3 +924,25 @@ Remaining:
 - Customer Invoicing
 - Stock Reservation
 - Sales History
+
+## Final Project-wide Verification
+
+Sprint 7 Additional Reporting has completed final project-wide verification.
+
+Verified:
+
+- Authentication, Account Management, and 2FA
+- Product, Category, Supplier, and Customer management
+- Purchase Orders and Inventory operations
+- All seven reporting pages
+- All seven Excel exports
+- All seven PDF exports
+- Filtering, sorting, pagination, and navigation
+- Full filtered dataset exports
+- Multi-page PDF output
+- Inventory Valuation Total Inventory Value
+- Empty database behavior
+- Explicit query failure and database recovery
+- Existing authorization boundaries
+
+No Dynamic Capability-Based Authorization was introduced.

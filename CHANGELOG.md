@@ -1,5 +1,44 @@
 # Changelog
 
+## [Unreleased]
+
+### Sprint 7 — Additional Reporting
+
+Sprint 7 Additional Reporting is complete and has passed final project-wide verification.
+
+#### Completed Reporting
+
+- Inventory Valuation
+- Purchase History
+- Supplier Purchase Analysis
+- Stock Movement
+- Low Stock Report
+- Inventory Movement Report
+- Product Reports
+
+#### Completed Exports
+
+- Excel Export for all seven completed reports
+- PDF Export for all seven completed reports using QuestPDF
+
+#### Final Verification
+
+- Authentication, Account Management, and 2FA regression
+- Product, Category, Supplier, and Customer management regression
+- Purchase Orders and Inventory operations regression
+- Reporting filters, sorting, pagination, navigation, and no-result behavior
+- Full filtered dataset export verification
+- Multi-page PDF verification
+- Inventory Valuation Total Inventory Value verification
+- Empty database verification
+- Explicit query-failure and database recovery verification
+- Existing authorization and Access Denied behavior verification
+- `dotnet restore` and `dotnet build` verification
+
+No Dynamic Capability-Based Authorization implementation was introduced during Sprint 7.
+
+---
+
 ## [v1.3.0] - 2026-08-13
 
 ### Release Summary
@@ -7,6 +46,64 @@
 This release completes the Account Management vertical slice, providing authenticated users with self-service account management capabilities while preserving the separation between administrative User Management and authentication workflows.
 
 The implementation extends the existing ASP.NET Core Identity integration through the established Identity abstraction, Application handler patterns, and Razor Pages architecture without requiring structural architectural redesign.
+
+
+### Changed
+
+#### Additional Reporting
+
+- Completed Purchase History reporting.
+- Added server-side Purchase History search.
+- Added From/To date filtering.
+- Added server-side pagination.
+- Added server-side sorting.
+
+### Architecture
+
+- Finalized the direction for Dynamic Capability-Based
+  Authorization.
+- Defined the User → Group → Capability model.
+- Established capabilities as atomic application actions.
+- Established groups as reusable capability collections.
+- Established that authorization and Domain state validation
+  remain separate concerns.
+- Deferred authorization implementation until Additional
+  Reporting work is completed.
+
+### Development Sequence
+
+Current priority:
+
+```text
+Additional Reporting
+        ↓
+Dynamic Capability-Based Authorization
+        ↓
+Purchasing Workflow Authorization
+```
+
+The new authorization architecture does not block the current
+Additional Reporting implementation.
+
+
+This preserves the existing historical releases such as v1.3.0 rather than incorrectly assigning today's design decision to a released version. The current changelog correctly identifies v1.3.0 as the completed Account Management release. :contentReference[oaicite:6]{index=6}
+
+---
+
+# One correction to our previous plan
+
+After looking at the actual documentation, I would **not add a new numbered roadmap phase for authorization immediately**.
+
+Your roadmap's numbered phases currently represent historical development milestones:
+
+```text
+v1.0 Purchasing Application
+v1.1 Purchasing Presentation
+v1.2 Reporting
+v1.3 Account Management
+```
+
+The Dynamic Capability-Based Authorization decision is currently architecture planning, not a completed milestone.
 
 ---
 

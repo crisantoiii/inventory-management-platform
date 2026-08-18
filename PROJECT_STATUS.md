@@ -18,7 +18,7 @@ Purchase Orders
 ████████████████████ 100%
 
 Reporting
-████████████████░░░░ 80%
+████████████████░░░░ In Progress
 
 Account Management
 ████████████████████ 100%
@@ -81,8 +81,8 @@ Completed:
 
 - **Completed Modules:** 10
 - **Architecture Status:** Validated
-- **Current Milestone:** Additinoal Reporting Capabilities
-- **Next Milestone:** TBD
+- **Current Milestone:** Sprint 7 Additional Reporting — Complete
+- **Next Milestone:** Next development milestone to be selected
 
 ---
 
@@ -123,8 +123,8 @@ The architecture has been validated and is considered stable for future business
 | Dashboard | ✅ Complete | 100% |
 | Authentication & Authorization |  ✅ Complete | 100% |
 | User Management | ✅ Complete | 100% |
-| Purchasing | ✅ Presentation Complete | 100% |
-| Reporting | 🟨 Inventory Valuation Complete | Partial |
+| Purchasing | 🟨 Core Workflow Complete | Partial |
+| Reporting | 🟨 Additional Reporting In Progress | Partial |
 | Account Management | ✅ Complete | 100% |
 
 ---
@@ -333,17 +333,174 @@ The architecture has been validated and is considered stable for future business
 - ✅ Dashboard/Report Value Consistency
 - ✅ Browser Verification
 
-### Reporting - Remaining Work
+### Purchase History
 
-- ⬜ Empty database behavior verification
-- ⬜ Explicit query-failure testing
-- ⬜ Excel export
-- ⬜ PDF export
-- ⬜ Purchase History
-- ⬜ Supplier Purchase Analysis
-- ⬜ Stock Movement
-- ⬜ Low Stock Report
-- ⬜ Inventory Movement Report
+- ✅ Purchase History Report
+- ✅ Purchase History Read Model
+- ✅ Purchase History Application Handler
+- ✅ Purchase History Persistence Abstraction
+- ✅ Purchase History Repository
+- ✅ Supplier Information
+- ✅ Purchase Order Status
+- ✅ Total Amount
+- ✅ Total Quantity
+- ✅ Received Quantity
+- ✅ Remaining Quantity
+- ✅ Server-side Search
+- ✅ From/To Date Filtering
+- ✅ Server-side Pagination
+- ✅ Server-side Sorting
+- ✅ Browser Verification
+
+### Supplier Purchase Analysis
+
+- ✅ Supplier Purchase Analysis Report
+- ✅ Supplier Purchase Analysis Read Model
+- ✅ Supplier Purchase Analysis Application Handler
+- ✅ Supplier Purchase Analysis Persistence Abstraction
+- ✅ Supplier Purchase Analysis Repository
+- ✅ Supplier Aggregation
+- ✅ Purchase Period Display
+- ✅ Purchase Order Count
+- ✅ Ordered Quantity
+- ✅ Received Quantity
+- ✅ Remaining Quantity
+- ✅ Total Amount
+- ✅ Server-side Supplier Search
+- ✅ From/To Date Filtering
+- ✅ Status Filtering
+- ✅ Server-side Pagination
+- ✅ Server-side Sorting
+- ✅ Pagination State Preservation
+- ✅ No-result Behavior
+- ✅ Browser Verification
+
+### Stock Movement
+
+- ✅ Stock Movement Report
+- ✅ Stock Movement Read Model
+- ✅ Stock Movement Application Handler
+- ✅ Stock Movement Persistence Abstraction
+- ✅ Stock Movement Repository
+- ✅ Product Information
+- ✅ SKU Information
+- ✅ Movement Type
+- ✅ Quantity Display
+- ✅ Reference Number
+- ✅ Remarks
+- ✅ Server-side Search
+- ✅ From/To Date Filtering
+- ✅ Movement Type Filtering
+- ✅ Server-side Pagination
+- ✅ Server-side Sorting
+- ✅ Stock Movement Navigation
+- ✅ Browser Verification
+
+### Low Stock
+
+- ✅ Low Stock Report
+- ✅ Low Stock Read Model
+- ✅ Low Stock Application Handler
+- ✅ Low Stock Persistence Abstraction
+- ✅ Low Stock Repository
+- ✅ Product information
+- ✅ SKU information
+- ✅ Category information
+- ✅ Quantity On Hand
+- ✅ Low-stock threshold based on the existing Dashboard rule: QuantityOnHand <= 10
+- ✅ Server-side Product/SKU search
+- ✅ Server-side sorting
+- ✅ Server-side pagination
+- ✅ Pagination state preservation
+- ✅ Reset behavior
+- ✅ Combined search/sorting/pagination
+- ✅ Low Stock navigation
+- ✅ Browser verification
+
+### Inventory Movement
+
+- ✅ Inventory Movement Report
+- ✅ Inventory Movement Read Model
+- ✅ Inventory Movement Application Handler
+- ✅ Inventory Movement Persistence Abstraction
+- ✅ Inventory Movement Repository
+- ✅ Product Information
+- ✅ SKU Information
+- ✅ Opening Quantity
+- ✅ Stock In Quantity
+- ✅ Stock Out Quantity
+- ✅ Adjustment Quantity
+- ✅ Closing Quantity
+- ✅ Server-side Product/SKU Search
+- ✅ From/To Date Filtering
+- ✅ Reporting Period Display
+- ✅ Server-side Pagination
+- ✅ Server-side Sorting
+- ✅ Pagination State Preservation
+- ✅ Page-size Changes
+- ✅ Reset Behavior
+- ✅ Combined Search and Date Filtering
+- ✅ Boundary / No-result Behavior
+- ✅ Inventory Movement Navigation
+- ✅ Browser Verification
+
+### Product Reports
+
+- ✅ Product Reports
+- ✅ Product Report Read Model
+- ✅ Product Report Application Handler
+- ✅ Product Report Persistence Abstraction
+- ✅ Product Report Repository
+- ✅ Product Information
+- ✅ SKU Information
+- ✅ Category Information
+- ✅ Unit Information
+- ✅ Quantity On Hand
+- ✅ Cost Price
+- ✅ Selling Price
+- ✅ Product Status
+- ✅ Active / Inactive / All Products Filtering
+- ✅ Server-side Product/SKU/Category/Unit Search
+- ✅ Server-side Sorting
+- ✅ Server-side Pagination
+- ✅ Pagination State Preservation
+- ✅ Page-size Changes
+- ✅ Reset Behavior
+- ✅ Combined Search and Status Filtering
+- ✅ Boundary / No-result Behavior
+- ✅ Product Reports Navigation
+- ✅ Browser Verification
+
+### Reporting - Completed Export Work
+
+- ✅ Excel export
+- ✅ PDF export
+
+### Reporting - Final Verification
+
+- ✅ Final project-wide verification
+- ✅ Empty database behavior verification
+- ✅ Explicit query-failure testing
+- ✅ Authorization regression verification
+- ✅ Final build verification
+
+### Reporting - Sprint 7 Outcome
+
+Sprint 7 Additional Reporting is complete and fully verified.
+
+Completed reporting capabilities:
+
+- Inventory Valuation
+- Purchase History
+- Supplier Purchase Analysis
+- Stock Movement
+- Low Stock Report
+- Inventory Movement Report
+- Product Reports
+- Excel Export
+- PDF Export
+
+Final verification covered normal application regression, reporting workflows, export behavior, empty-database behavior, explicit query failure and recovery, authorization boundaries, and final solution build verification.
 
 ---
 
@@ -374,31 +531,132 @@ The architecture has been validated and is considered stable for future business
 
 # Current Focus
 
-Additional Reporting Capabilities
+## Additional Reporting Capabilities
 
-The Account Management milestone has been completed, including
-self-service profile management, password workflows, email
-verification, and two-factor authentication.
+Purchase History has been implemented with:
 
-The next development focus is additional Reporting capabilities.
+- Server-side search
+- From/To date filtering
+- Server-side pagination
+- Server-side sorting
+
+Supplier Purchase Analysis has also been completed and verified with:
+
+- Supplier search
+- From/To date filtering
+- Status filtering
+- Server-side pagination
+- Server-side sorting
+- Purchase period display
+- Supplier-level purchase aggregation
+- No-result behavior
+
+Stock Movement has also been completed and verified with:
+
+- Product/SKU search
+- Reference/remarks search
+- From/To date filtering
+- Movement type filtering
+- Server-side pagination
+- Server-side sorting
+- Stock Movement navigation
+- Browser verification
+
+Product Reports has also been completed and verified with:
+
+- Product/SKU/Category/Unit search
+- Active / Inactive / All Products filtering
+- Server-side pagination
+- Server-side sorting
+- Pagination state preservation
+- Page-size changes
+- Reset behavior
+- Combined search and status filtering
+- Boundary/no-result behavior
+- Product Reports navigation
+- Browser verification
+
+Excel Export and PDF Export have now been completed and verified for the completed reporting pages.
+
+Verified export behavior includes:
+
+- Export actions on completed report pages
+- Current report filters preserved during export
+- Current report sorting preserved during export
+- Export includes the full filtered result set rather than only the current paginated page
+- Inventory Valuation includes the Total Inventory Value summary
+- Generated `.xlsx` workbooks contain report-specific columns and values
+- Generated `.pdf` reports contain report-specific columns and values
+
+The broader Additional Reporting initiative remains in progress only because final project-wide verification is still outstanding.
+
+Product Reports, Excel Export, and PDF Export have now been completed and verified. The remaining work is final project-wide verification, including the deferred validation scenarios.
+
+## Planned Authorization Architecture
+
+The Dynamic Capability-Based Authorization architecture has been finalized as a design decision but has not yet been implemented.
+
+The planned structure is:
+
+```text
+User
+  ↓
+Group
+  ↓
+Capabilities
+  ↓
+Application Action
+  ↓
+Domain State Validation
+```
+
+The current ASP.NET Core Identity authorization implementation remains unchanged until the authorization implementation phase.
+
+The agreed development sequence is:
+
+```text
+Additional Reporting
+        ↓
+Complete current reporting scope
+        ↓
+Dynamic Capability-Based Authorization
+        ↓
+Apply capabilities to Purchasing
+        ↓
+Extend Purchasing workflow where required
+```
 
 ---
 
 # Next Milestone
 
-Additional Reporting Capabilities
+## Additional Reporting Capabilities
 
-Potential future work includes:
+The remaining implementation work will focus on:
 
-- Excel export
-- PDF export
+- Final project-wide verification
+
+The following reporting capabilities are already complete:
+
+- Inventory Valuation
 - Purchase History
 - Supplier Purchase Analysis
 - Stock Movement
 - Low Stock Report
 - Inventory Movement Report
+- Product Reports
+- Excel Export
+- PDF Export
 
----
+The following validation activities remain deferred until final
+project-wide verification:
+
+- Empty database behavior verification
+- Explicit query-failure testing
+
+After the current Additional Reporting scope is completed, development
+will proceed to the planned Dynamic Capability-Based Authorization
+architecture.
 
 # Known Limitations
 
@@ -410,7 +668,6 @@ Business Modules
 
 Purchasing
 
-- Purchase History
 - Multiple Purchase Order item management in the Create UI
 - Purchase Order search, filtering, sorting, and pagination
 - Inventory synchronization during Purchase Order receiving
@@ -478,6 +735,25 @@ Sprint 5 introduced the first Reporting vertical slice through Inventory Valuati
 
 The Inventory Valuation report provides a read-only browser-accessible view backed by actual persisted database data.
 
+Sprint 6 extended the Reporting architecture through the Purchase
+History vertical slice.
+
+The Purchase History report provides a read-only view of historical
+Purchase Orders backed by persisted database data and supports:
+
+- Server-side search
+- From/To date filtering
+- Server-side pagination
+- Server-side sorting
+
+The Purchase History implementation confirmed that the read-oriented
+Reporting architecture established by Inventory Valuation can be
+reused for additional reporting domains without structural
+redesign.
+
+The platform is currently continuing development of Additional
+Reporting capabilities.
+
 Inventory valuation is calculated using:
 
 ```text
@@ -515,3 +791,35 @@ The architecture has now been validated through:
 - Read-oriented Reporting
 - Self-service Account Management
 - Two-factor authentication
+
+
+## Current Focus
+
+### Sprint 7 — Additional Reporting
+
+Product Reports, Excel Export, and PDF Export are complete and browser-verified.
+
+Completed:
+
+- Inventory Valuation
+- Purchase History
+- Supplier Purchase Analysis
+- Stock Movement
+- Low Stock Report
+- Inventory Movement Report
+- Product Reports
+- Excel Export
+- PDF Export
+
+### Next Feature
+
+**Final project-wide verification**
+
+### Final Project-wide Verification
+
+The following verification items remain intentionally deferred until all
+Sprint 7 reporting features are complete:
+
+- Empty database behavior verification
+- Explicit query-failure testing
+
