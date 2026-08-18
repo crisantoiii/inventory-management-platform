@@ -5,6 +5,7 @@ using InventoryPlatform.Shared.Paging;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using InventoryPlatform.Web.Reports.Excel;
+using InventoryPlatform.Web.Reports.Pdf;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace InventoryPlatform.Web.Pages.Reports.ProductReports;
@@ -13,13 +14,16 @@ public sealed class IndexModel : PageModel
 {
     private readonly GetProductReportsHandler _handler;
     private readonly ExcelReportWriter _excelReportWriter;
+    private readonly PdfReportWriter _pdfReportWriter;
 
     public IndexModel(
         GetProductReportsHandler handler,
-        ExcelReportWriter excelReportWriter)
+        ExcelReportWriter excelReportWriter,
+        PdfReportWriter pdfReportWriter)
     {
         _handler = handler;
         _excelReportWriter = excelReportWriter;
+        _pdfReportWriter = pdfReportWriter;
     }
 
     [BindProperty(SupportsGet = true)]
@@ -134,5 +138,16 @@ public sealed class IndexModel : PageModel
             bytes,
             ExcelReportWriter.ContentType,
             "ProductReports.xlsx");
+    }
+
+    public async Task<IActionResult> OnGetExportToPdfAsync(
+        string? search, ProductStatusFilter status = ProductStatusFilter.Active, string? sortBy = null,
+        bool descending = false, CancellationToken cancellationToken = default)
+    {
+        var query = new PagedQuery { Search = search, Status = status, Page = 1, PageSize = int.MaxValue, SortBy = sortBy, Descending = descending };
+        var result = await _handler.HandleExportAsync(new GetProductReportsRequest(query), cancellationToken);
+        if (result.IsFailure) return BadRequest();
+        var bytes = _pdfReportWriter.CreateProductReports(result.Value ?? Array.Empty<ProductReportDto>());
+        return File(bytes, PdfReportWriter.ContentType, "ProductReports.pdf");
     }
 }

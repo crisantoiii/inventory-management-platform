@@ -4,6 +4,7 @@ using InventoryPlatform.Domain.Enums;
 using InventoryPlatform.Shared.Paging;
 using InventoryPlatform.Shared.Sorting;
 using InventoryPlatform.Web.Reports.Excel;
+using InventoryPlatform.Web.Reports.Pdf;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -13,13 +14,16 @@ public sealed class IndexModel : PageModel
 {
     private readonly GetStockMovementHandler _handler;
     private readonly ExcelReportWriter _excelReportWriter;
+    private readonly PdfReportWriter _pdfReportWriter;
 
     public IndexModel(
         GetStockMovementHandler handler,
-        ExcelReportWriter excelReportWriter)
+        ExcelReportWriter excelReportWriter,
+        PdfReportWriter pdfReportWriter)
     {
         _handler = handler;
         _excelReportWriter = excelReportWriter;
+        _pdfReportWriter = pdfReportWriter;
     }
 
     [BindProperty(SupportsGet = true)]
@@ -122,5 +126,17 @@ public sealed class IndexModel : PageModel
             bytes,
             ExcelReportWriter.ContentType,
             "StockMovement.xlsx");
+    }
+
+    public async Task<IActionResult> OnGetExportToPdfAsync(
+        string? search, DateOnly? fromDate, DateOnly? toDate, TransactionType? transactionType,
+        string? sortBy, bool descending = false, CancellationToken cancellationToken = default)
+    {
+        var query = new PagedQuery { Search = search, Page = 1, PageSize = int.MaxValue, SortBy = sortBy, Descending = descending };
+        var request = new GetStockMovementRequest(query, fromDate, toDate, transactionType);
+        var result = await _handler.HandleExportAsync(request, cancellationToken);
+        if (result.IsFailure) return BadRequest();
+        var bytes = _pdfReportWriter.CreateStockMovement(result.Value ?? Array.Empty<StockMovementDto>());
+        return File(bytes, PdfReportWriter.ContentType, "StockMovement.pdf");
     }
 }

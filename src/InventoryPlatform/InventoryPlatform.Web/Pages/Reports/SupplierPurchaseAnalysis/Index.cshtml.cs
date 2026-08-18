@@ -3,6 +3,7 @@ using InventoryPlatform.Application.Features.Reporting.GetSupplierPurchaseAnalys
 using InventoryPlatform.Domain.Enums;
 using InventoryPlatform.Shared.Paging;
 using InventoryPlatform.Web.Reports.Excel;
+using InventoryPlatform.Web.Reports.Pdf;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -12,13 +13,16 @@ public class IndexModel : PageModel
 {
     private readonly GetSupplierPurchaseAnalysisHandler _handler;
     private readonly ExcelReportWriter _excelReportWriter;
+    private readonly PdfReportWriter _pdfReportWriter;
 
     public IndexModel(
         GetSupplierPurchaseAnalysisHandler handler,
-        ExcelReportWriter excelReportWriter)
+        ExcelReportWriter excelReportWriter,
+        PdfReportWriter pdfReportWriter)
     {
         _handler = handler;
         _excelReportWriter = excelReportWriter;
+        _pdfReportWriter = pdfReportWriter;
     }
 
     public PagedResult<SupplierPurchaseAnalysisDto>? Result { get; private set; }
@@ -136,5 +140,18 @@ public class IndexModel : PageModel
             bytes,
             ExcelReportWriter.ContentType,
             "SupplierPurchaseAnalysis.xlsx");
+    }
+
+    public async Task<IActionResult> OnGetExportToPdfAsync(
+        string? search, DateOnly? fromDate, DateOnly? toDate, string? status,
+        string? sortBy, bool descending = false, CancellationToken cancellationToken = default)
+    {
+        PurchaseOrderStatus? purchaseOrderStatus = null;
+        if (!string.IsNullOrWhiteSpace(status) && Enum.TryParse<PurchaseOrderStatus>(status, true, out var parsedStatus)) purchaseOrderStatus = parsedStatus;
+        var request = new GetSupplierPurchaseAnalysisRequest { Search = search, FromDate = fromDate, ToDate = toDate, PurchaseOrderStatus = purchaseOrderStatus, SortBy = sortBy, Descending = descending };
+        var result = await _handler.HandleExportAsync(request, cancellationToken);
+        if (result.IsFailure) return BadRequest();
+        var bytes = _pdfReportWriter.CreateSupplierPurchaseAnalysis(result.Value ?? Array.Empty<SupplierPurchaseAnalysisDto>());
+        return File(bytes, PdfReportWriter.ContentType, "SupplierPurchaseAnalysis.pdf");
     }
 }

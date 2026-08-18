@@ -1,6 +1,7 @@
 using InventoryPlatform.Application.DTOs.Reporting;
 using InventoryPlatform.Application.Features.Reporting.GetInventoryValuation;
 using InventoryPlatform.Web.Reports.Excel;
+using InventoryPlatform.Web.Reports.Pdf;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -10,13 +11,16 @@ public class IndexModel : PageModel
 {
     private readonly GetInventoryValuationHandler _handler;
     private readonly ExcelReportWriter _excelReportWriter;
+    private readonly PdfReportWriter _pdfReportWriter;
 
     public IndexModel(
         GetInventoryValuationHandler handler,
-        ExcelReportWriter excelReportWriter)
+        ExcelReportWriter excelReportWriter,
+        PdfReportWriter pdfReportWriter)
     {
         _handler = handler;
         _excelReportWriter = excelReportWriter;
+        _pdfReportWriter = pdfReportWriter;
     }
 
     public IReadOnlyList<InventoryValuationDto> Items { get; private set; }
@@ -61,5 +65,14 @@ public class IndexModel : PageModel
             bytes,
             ExcelReportWriter.ContentType,
             "InventoryValuation.xlsx");
+    }
+
+    public async Task<IActionResult> OnGetExportToPdfAsync(
+        CancellationToken cancellationToken)
+    {
+        var result = await _handler.HandleExportAsync(cancellationToken);
+        if (result.IsFailure) return BadRequest();
+        var bytes = _pdfReportWriter.CreateInventoryValuation(result.Value ?? Array.Empty<InventoryValuationDto>());
+        return File(bytes, PdfReportWriter.ContentType, "InventoryValuation.pdf");
     }
 }

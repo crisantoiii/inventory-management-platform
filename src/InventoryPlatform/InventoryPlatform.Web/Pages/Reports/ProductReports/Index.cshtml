@@ -18,6 +18,15 @@
            class="btn btn-outline-success">
             Export to Excel
         </a>
+
+        <a asp-page-handler="ExportToPdf"
+           asp-route-Search="@Model.Search"
+           asp-route-Status="@Model.Status"
+           asp-route-SortBy="@Model.SortBy"
+           asp-route-Descending="@Model.Descending"
+           class="btn btn-outline-danger">
+            Export to PDF
+        </a>
     </div>
 
     <form method="get" class="row g-3 mb-4">
