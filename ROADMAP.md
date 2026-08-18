@@ -223,10 +223,11 @@ Sprint 7 currently includes:
 - Inventory Movement Report
 - Product Reports
 - Excel export
+- PDF export
 
 Remaining Sprint 7 scope:
 
-- PDF export
+- Final project-wide verification
 
 ---
 

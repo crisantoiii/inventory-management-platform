@@ -25,7 +25,7 @@ and analytical inventory reports.
 ### Remaining
 
 - [X] Excel Export
-- [ ] PDF Export
+- [X] PDF Export
 
 ### Deferred
 
@@ -192,6 +192,40 @@ The report supports:
 
 Stock Movement remains the transaction-level report, while Inventory Movement provides product-level aggregation for a selected reporting period.
 
+## PDF Export
+
+PDF Export extends the completed Reporting pages with downloadable `.pdf` output while reusing the established read-oriented Reporting queries and DTOs.
+
+The export supports the completed reports:
+
+- Inventory Valuation
+- Purchase History
+- Supplier Purchase Analysis
+- Stock Movement
+- Low Stock Report
+- Inventory Movement Report
+- Product Reports
+
+The export preserves active report filters and sorting. It exports the full filtered result set rather than only the current paginated page.
+
+QuestPDF is used as the focused Web-layer PDF generation component. No generic export framework, Domain entity, database table, or migration was introduced.
+
+Inventory Valuation also includes the Total Inventory Value summary in the generated PDF.
+
+## PDF Export Verification
+
+PDF Export was built and verified through browser/manual workflows.
+
+Validated:
+
+- Export action availability
+- PDF generation
+- Report-specific columns and values
+- Preservation of active filters
+- Preservation of active sorting
+- Full filtered result export without UI pagination limits
+- Inventory Valuation Total Inventory Value summary
+
 ## Verification
 
 Inventory Movement was verified through actual browser workflows.
@@ -220,12 +254,12 @@ The reporting implementation remains independent of the future Dynamic Capabilit
 
 ## Current Sprint Position
 
-Sprint 7 remains In Progress because PDF export has not yet been implemented.
+Sprint 7 remains In Progress because final project-wide verification has not yet been completed.
 
 Once the remaining reporting scope is complete, final project-wide verification will include the deferred empty-database and query-failure scenarios.
 
 ## Sprint Outcome
 
-Inventory Movement, Product Reports, and Excel Export are complete for the current Sprint 7 scope.
+Inventory Movement, Product Reports, Excel Export, and PDF Export are complete for the current Sprint 7 implementation scope.
 
-Additional Reporting remains in progress until PDF export is completed.
+Additional Reporting remains in progress until final project-wide verification is completed.

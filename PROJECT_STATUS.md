@@ -474,10 +474,11 @@ The architecture has been validated and is considered stable for future business
 ### Reporting - Completed Export Work
 
 - ✅ Excel export
+- ✅ PDF export
 
 ### Reporting - Remaining Work
 
-- ⬜ PDF export
+- ⬜ Final project-wide verification
 
 ### Reporting - Deferred Work
 
@@ -558,20 +559,21 @@ Product Reports has also been completed and verified with:
 - Product Reports navigation
 - Browser verification
 
-Excel Export has also been completed and verified for the completed reporting pages.
+Excel Export and PDF Export have now been completed and verified for the completed reporting pages.
 
 Verified export behavior includes:
 
-- Export to Excel action on completed report pages
+- Export actions on completed report pages
 - Current report filters preserved during export
 - Current report sorting preserved during export
 - Export includes the full filtered result set rather than only the current paginated page
 - Inventory Valuation includes the Total Inventory Value summary
 - Generated `.xlsx` workbooks contain report-specific columns and values
+- Generated `.pdf` reports contain report-specific columns and values
 
-The broader Additional Reporting initiative remains in progress.
+The broader Additional Reporting initiative remains in progress only because final project-wide verification is still outstanding.
 
-Product Reports has now been completed and verified. Excel export has also been implemented and browser-verified across the completed reporting pages. The remaining implementation scope is PDF export before final project-wide verification.
+Product Reports, Excel Export, and PDF Export have now been completed and verified. The remaining work is final project-wide verification, including the deferred validation scenarios.
 
 ## Planned Authorization Architecture
 
@@ -615,7 +617,7 @@ Extend Purchasing workflow where required
 
 The remaining implementation work will focus on:
 
-- PDF export
+- Final project-wide verification
 
 The following reporting capabilities are already complete:
 
@@ -627,6 +629,7 @@ The following reporting capabilities are already complete:
 - Inventory Movement Report
 - Product Reports
 - Excel Export
+- PDF Export
 
 The following validation activities remain deferred until final
 project-wide verification:
@@ -777,7 +780,7 @@ The architecture has now been validated through:
 
 ### Sprint 7 — Additional Reporting
 
-Product Reports and Excel Export are complete and browser-verified.
+Product Reports, Excel Export, and PDF Export are complete and browser-verified.
 
 Completed:
 
@@ -789,14 +792,11 @@ Completed:
 - Inventory Movement Report
 - Product Reports
 - Excel Export
+- PDF Export
 
 ### Next Feature
 
-**PDF Export**
-
-After PDF Export:
-
-1. Final project-wide verification
+**Final project-wide verification**
 
 ### Final Project-wide Verification
 

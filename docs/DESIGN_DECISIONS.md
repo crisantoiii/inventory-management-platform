@@ -1674,7 +1674,7 @@ Domain business rules will determine whether the action is valid for the current
 
 ---
 
-# DD-032 — Reporting Excel Export
+# DD-033 — Reporting Excel Export
 
 Version Introduced: Sprint 7
 
@@ -1735,4 +1735,76 @@ Potential future decisions may include:
 - Caching Strategy
 
 ---
+
+# DD-034 — Reporting PDF Export
+
+## Context
+
+PDF export was the remaining export capability for the completed Sprint 7 Reporting features. The goal was to provide downloadable PDF reports while preserving the established read-oriented Reporting architecture and avoiding a generic export framework.
+
+## Decision
+
+Implement PDF generation as a focused Web-layer output concern using QuestPDF.
+
+The export flow is:
+
+```text
+Razor Page
+    ↓
+Application Handler
+    ↓
+Existing Report DTO / Read Model
+    ↓
+PdfReportWriter
+    ↓
+PDF File Response
+```
+
+The existing Reporting queries and DTOs remain the source of report data. The PDF writer is responsible only for document composition and presentation.
+
+## Scope
+
+PDF export was implemented for:
+
+- Inventory Valuation
+- Purchase History
+- Supplier Purchase Analysis
+- Stock Movement
+- Low Stock Report
+- Inventory Movement Report
+- Product Reports
+
+The export preserves active report filters and sorting while removing the UI pagination limit so the generated PDF contains the full filtered result set.
+
+Inventory Valuation also includes the Total Inventory Value summary already displayed by the browser report.
+
+## Rationale
+
+QuestPDF provides a focused C# document-generation API suitable for the project's report-oriented PDF requirements without requiring PDF generation concerns in Domain, Application, or Infrastructure.
+
+No generic reporting/export abstraction was introduced because the current requirements are satisfied by a focused Web-layer writer.
+
+No Domain entity, database schema, or migration changes were required.
+
+## Verification
+
+PDF Export was built and verified through browser/manual workflows.
+
+Validated:
+
+- PDF export action availability on completed Reporting pages
+- PDF generation
+- Report-specific columns and values
+- Preservation of active filters
+- Preservation of active sorting
+- Export of the full filtered result set without UI pagination limits
+- Inventory Valuation Total Inventory Value summary
+
+## Sprint Position
+
+PDF Export is complete for the current Sprint 7 implementation scope.
+
+Final project-wide verification remains outstanding. Empty database behavior and explicit query-failure testing remain deferred until that final verification.
+
+The implementation remains independent of the future Dynamic Capability-Based Authorization architecture.
 

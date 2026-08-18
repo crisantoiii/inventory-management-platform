@@ -380,7 +380,7 @@ Completed
 ### Export
 
 - ✅ Export to Excel
-- ⬜ Export to PDF
+- ✅ Export to PDF
 
 ## Inventory Valuation
 
@@ -479,9 +479,22 @@ Verification:
 
 The Excel export uses the existing read-oriented Reporting queries and DTOs. No new Domain entities, database tables, or migrations were required.
 
+## PDF Export
+
+- ✅ PDF Export
+- ✅ Export actions on completed reporting pages
+- ✅ Existing report filters preserved during export
+- ✅ Existing report sorting preserved during export
+- ✅ Full filtered result set exported without UI pagination limits
+- ✅ Inventory Valuation total inventory value included in the PDF
+- ✅ Report-specific PDF columns and values
+- ✅ Browser/manual verification
+
+The PDF export uses the existing read-oriented Reporting queries and DTOs. PDF generation is isolated in the Web layer using QuestPDF. No new Domain entities, database tables, or migrations were required.
+
 ## Remaining Reporting Work
 
-- ⬜ PDF Export
+- ⬜ Final project-wide verification
 
 ### Deferred Reporting Validation
 

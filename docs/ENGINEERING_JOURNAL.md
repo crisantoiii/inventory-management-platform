@@ -2398,6 +2398,60 @@ Architecture Sprint 1 formally validated these conclusions through a comprehensi
 
 ---
 
+# Milestone 30 - Reporting: PDF Export
+
+## Context
+
+PDF Export was the remaining export capability after the seven Sprint 7 Reporting features and Excel Export had been completed and verified.
+
+## Implementation
+
+Implemented PDF export for:
+
+- Inventory Valuation
+- Purchase History
+- Supplier Purchase Analysis
+- Stock Movement
+- Low Stock Report
+- Inventory Movement Report
+- Product Reports
+
+The implementation uses the existing Reporting handlers and DTOs and adds a focused Web-layer `PdfReportWriter` using QuestPDF.
+
+The export preserves active report filters and sorting. It is not limited by the current UI page size and instead exports the full filtered result set.
+
+Inventory Valuation also includes the Total Inventory Value summary.
+
+## Architecture Outcome
+
+PDF generation remains isolated from Domain and Infrastructure persistence concerns. Existing Reporting queries and DTOs remain the source of report data.
+
+No generic reporting export framework was introduced.
+
+No Domain entity, database schema, or migration changes were required.
+
+The implementation remains independent of the future Dynamic Capability-Based Authorization architecture.
+
+## Verification
+
+PDF Export was built and verified through browser/manual workflows.
+
+Validated:
+
+- Export action availability on completed Reporting pages
+- PDF generation
+- Report-specific columns and values
+- Preservation of active filters
+- Preservation of active sorting
+- Full filtered result export without UI pagination limits
+- Inventory Valuation Total Inventory Value summary
+
+## Sprint Position
+
+PDF Export is complete for the current Sprint 7 implementation scope.
+
+Final project-wide verification remains the next step. Empty database behavior and explicit query-failure testing remain deferred until final project-wide verification.
+
 # Current Development Position
 
 The platform is currently continuing development of Additional
