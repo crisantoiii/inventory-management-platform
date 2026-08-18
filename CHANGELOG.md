@@ -1,5 +1,44 @@
 # Changelog
 
+## [Unreleased]
+
+### Sprint 7 — Additional Reporting
+
+Sprint 7 Additional Reporting is complete and has passed final project-wide verification.
+
+#### Completed Reporting
+
+- Inventory Valuation
+- Purchase History
+- Supplier Purchase Analysis
+- Stock Movement
+- Low Stock Report
+- Inventory Movement Report
+- Product Reports
+
+#### Completed Exports
+
+- Excel Export for all seven completed reports
+- PDF Export for all seven completed reports using QuestPDF
+
+#### Final Verification
+
+- Authentication, Account Management, and 2FA regression
+- Product, Category, Supplier, and Customer management regression
+- Purchase Orders and Inventory operations regression
+- Reporting filters, sorting, pagination, navigation, and no-result behavior
+- Full filtered dataset export verification
+- Multi-page PDF verification
+- Inventory Valuation Total Inventory Value verification
+- Empty database verification
+- Explicit query-failure and database recovery verification
+- Existing authorization and Access Denied behavior verification
+- `dotnet restore` and `dotnet build` verification
+
+No Dynamic Capability-Based Authorization implementation was introduced during Sprint 7.
+
+---
+
 ## [v1.3.0] - 2026-08-13
 
 ### Release Summary

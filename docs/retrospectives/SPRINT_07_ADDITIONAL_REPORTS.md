@@ -26,6 +26,7 @@ and analytical inventory reports.
 
 - [X] Excel Export
 - [X] PDF Export
+- [X] Final Project-wide Verification
 
 ### Deferred
 
