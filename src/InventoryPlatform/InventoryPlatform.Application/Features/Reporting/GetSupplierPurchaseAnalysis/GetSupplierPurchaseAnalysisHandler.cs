@@ -37,4 +37,27 @@ public sealed class GetSupplierPurchaseAnalysisHandler
 
         return Result<PagedResult<SupplierPurchaseAnalysisDto>>.Success(result);
     }
+
+    public async Task<Result<IReadOnlyList<SupplierPurchaseAnalysisDto>>> HandleExportAsync(
+        GetSupplierPurchaseAnalysisRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var query = new PagedQuery
+        {
+            Page = 1,
+            PageSize = int.MaxValue,
+            Search = request.Search,
+            SortBy = request.SortBy,
+            Descending = request.Descending
+        };
+
+        var result = await _repository.GetSupplierPurchaseAnalysisAsync(
+            query,
+            request.FromDate,
+            request.ToDate,
+            request.PurchaseOrderStatus,
+            cancellationToken);
+
+        return Result<IReadOnlyList<SupplierPurchaseAnalysisDto>>.Success(result.Items);
+    }
 }

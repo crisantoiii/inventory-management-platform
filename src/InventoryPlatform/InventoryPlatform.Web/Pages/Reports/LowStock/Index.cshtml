@@ -9,6 +9,14 @@
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h1>Low Stock</h1>
+
+        <a asp-page-handler="ExportToExcel"
+           asp-route-Search="@Model.Search"
+           asp-route-SortBy="@Model.SortBy"
+           asp-route-Descending="@Model.Descending"
+           class="btn btn-outline-success">
+            Export to Excel
+        </a>
     </div>
 
     <form method="get" class="row g-3 mb-4">

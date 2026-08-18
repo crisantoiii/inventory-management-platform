@@ -2,6 +2,7 @@
 using InventoryPlatform.Web.Authorization;
 using Microsoft.AspNetCore.Identity;
 using LocalIdentity = InventoryPlatform.Infrastructure.Identity;
+using InventoryPlatform.Web.Reports.Excel;
 
 namespace InventoryPlatform.Web.Extensions;
 
@@ -29,6 +30,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<
             IUserClaimsPrincipalFactory<LocalIdentity.ApplicationUser>,
             ApplicationUserClaimsPrincipalFactory>();
+
+        services.AddScoped<ExcelReportWriter>();
 
         services.ConfigureApplicationCookie(options =>
         {

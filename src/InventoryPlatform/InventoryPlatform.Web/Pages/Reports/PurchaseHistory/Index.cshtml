@@ -13,6 +13,17 @@
                 Purchase order history and receiving status.
             </p>
         </div>
+
+        <a asp-page-handler="ExportToExcel"
+           asp-route-search="@Model.Search"
+           asp-route-fromDate="@Model.FromDate?.ToString("yyyy-MM-dd")"
+           asp-route-toDate="@Model.ToDate?.ToString("yyyy-MM-dd")"
+           asp-route-status="@Model.Status"
+           asp-route-sortBy="@Model.SortBy"
+           asp-route-descending="@Model.Descending"
+           class="btn btn-outline-success">
+            Export to Excel
+        </a>
     </div>
 
     <form method="get" class="card mb-4">

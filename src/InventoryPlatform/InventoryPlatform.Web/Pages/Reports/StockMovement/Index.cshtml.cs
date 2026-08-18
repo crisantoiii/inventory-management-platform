@@ -1,7 +1,9 @@
+using InventoryPlatform.Application.DTOs.Reporting;
 using InventoryPlatform.Application.Features.Reporting.GetStockMovement;
 using InventoryPlatform.Domain.Enums;
 using InventoryPlatform.Shared.Paging;
 using InventoryPlatform.Shared.Sorting;
+using InventoryPlatform.Web.Reports.Excel;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -10,11 +12,14 @@ namespace InventoryPlatform.Web.Pages.Reports.StockMovement;
 public sealed class IndexModel : PageModel
 {
     private readonly GetStockMovementHandler _handler;
+    private readonly ExcelReportWriter _excelReportWriter;
 
     public IndexModel(
-        GetStockMovementHandler handler)
+        GetStockMovementHandler handler,
+        ExcelReportWriter excelReportWriter)
     {
         _handler = handler;
+        _excelReportWriter = excelReportWriter;
     }
 
     [BindProperty(SupportsGet = true)]
@@ -41,7 +46,7 @@ public sealed class IndexModel : PageModel
     [BindProperty(SupportsGet = true)]
     public bool Descending { get; set; }
 
-    public PagedResult<InventoryPlatform.Application.DTOs.Reporting.StockMovementDto>? Result { get; private set; }
+    public PagedResult<StockMovementDto>? Result { get; private set; }
 
     public async Task<IActionResult> OnGetAsync(
         CancellationToken cancellationToken)
@@ -77,5 +82,45 @@ public sealed class IndexModel : PageModel
         Result = result.Value;
 
         return Page();
+    }
+
+    public async Task<IActionResult> OnGetExportToExcelAsync(
+        string? search,
+        DateOnly? fromDate,
+        DateOnly? toDate,
+        TransactionType? transactionType,
+        string? sortBy,
+        bool descending = false,
+        CancellationToken cancellationToken = default)
+    {
+        var query = new PagedQuery
+        {
+            Search = search,
+            Page = 1,
+            PageSize = int.MaxValue,
+            SortBy = sortBy,
+            Descending = descending
+        };
+
+        var request = new GetStockMovementRequest(
+            query,
+            fromDate,
+            toDate,
+            transactionType);
+
+        var result = await _handler.HandleExportAsync(
+            request,
+            cancellationToken);
+
+        if (result.IsFailure)
+            return BadRequest();
+
+        var bytes = _excelReportWriter.CreateStockMovement(
+            result.Value ?? Array.Empty<StockMovementDto>());
+
+        return File(
+            bytes,
+            ExcelReportWriter.ContentType,
+            "StockMovement.xlsx");
     }
 }

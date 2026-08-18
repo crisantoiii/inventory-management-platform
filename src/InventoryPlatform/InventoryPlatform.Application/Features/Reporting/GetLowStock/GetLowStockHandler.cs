@@ -25,4 +25,21 @@ public sealed class GetLowStockHandler
 
         return Result<PagedResult<LowStockDto>>.Success(result);
     }
+
+    public async Task<Result<IReadOnlyList<LowStockDto>>> HandleExportAsync(
+        GetLowStockRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var query = request.Query with
+        {
+            Page = 1,
+            PageSize = int.MaxValue
+        };
+
+        var result = await _repository.GetLowStockAsync(
+            query,
+            cancellationToken);
+
+        return Result<IReadOnlyList<LowStockDto>>.Success(result.Items);
+    }
 }

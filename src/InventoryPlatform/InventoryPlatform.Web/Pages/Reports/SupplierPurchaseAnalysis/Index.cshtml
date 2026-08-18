@@ -9,6 +9,17 @@
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h1>Supplier Purchase Analysis</h1>
+
+    <a asp-page-handler="ExportToExcel"
+       asp-route-search="@Model.Search"
+       asp-route-fromDate="@Model.FromDate"
+       asp-route-toDate="@Model.ToDate"
+       asp-route-status="@Model.Status"
+       asp-route-sortBy="@Model.SortBy"
+       asp-route-descending="@Model.Descending"
+       class="btn btn-outline-success">
+        Export to Excel
+    </a>
 </div>
 
 <form method="get" class="row g-3 mb-4">

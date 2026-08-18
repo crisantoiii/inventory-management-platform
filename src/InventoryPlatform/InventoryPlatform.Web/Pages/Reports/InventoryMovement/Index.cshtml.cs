@@ -2,6 +2,7 @@ using InventoryPlatform.Application.DTOs.Reporting;
 using InventoryPlatform.Application.Features.Reporting.GetInventoryMovement;
 using InventoryPlatform.Shared.Paging;
 using Microsoft.AspNetCore.Mvc;
+using InventoryPlatform.Web.Reports.Excel;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace InventoryPlatform.Web.Pages.Reports.InventoryMovement;
@@ -9,8 +10,15 @@ namespace InventoryPlatform.Web.Pages.Reports.InventoryMovement;
 public sealed class IndexModel : PageModel
 {
     private readonly GetInventoryMovementHandler _handler;
+    private readonly ExcelReportWriter _excelReportWriter;
 
-    public IndexModel(GetInventoryMovementHandler handler) => _handler = handler;
+    public IndexModel(
+        GetInventoryMovementHandler handler,
+        ExcelReportWriter excelReportWriter)
+    {
+        _handler = handler;
+        _excelReportWriter = excelReportWriter;
+    }
 
     [BindProperty(SupportsGet = true)] public string? Search { get; set; }
     [BindProperty(SupportsGet = true)] public DateOnly? FromDate { get; set; }
@@ -47,5 +55,37 @@ public sealed class IndexModel : PageModel
 
         Result = result.Value;
         return Page();
+    }
+    public async Task<IActionResult> OnGetExportToExcelAsync(
+        string? search,
+        DateOnly? fromDate,
+        DateOnly? toDate,
+        string? sortBy,
+        bool descending = false,
+        CancellationToken cancellationToken = default)
+    {
+        var query = new PagedQuery
+        {
+            Search = search,
+            Page = 1,
+            PageSize = int.MaxValue,
+            SortBy = sortBy,
+            Descending = descending
+        };
+
+        var result = await _handler.HandleExportAsync(
+            new GetInventoryMovementRequest(query, fromDate, toDate),
+            cancellationToken);
+
+        if (result.IsFailure)
+            return BadRequest();
+
+        var bytes = _excelReportWriter.CreateInventoryMovement(
+            result.Value ?? Array.Empty<InventoryMovementDto>());
+
+        return File(
+            bytes,
+            ExcelReportWriter.ContentType,
+            "InventoryMovement.xlsx");
     }
 }

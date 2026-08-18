@@ -29,4 +29,24 @@ public sealed class GetStockMovementHandler
 
         return Result<PagedResult<StockMovementDto>>.Success(result);
     }
+
+    public async Task<Result<IReadOnlyList<StockMovementDto>>> HandleExportAsync(
+        GetStockMovementRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var query = request.Query with
+        {
+            Page = 1,
+            PageSize = int.MaxValue
+        };
+
+        var result = await _repository.GetStockMovementAsync(
+            query,
+            request.FromDate,
+            request.ToDate,
+            request.TransactionType,
+            cancellationToken);
+
+        return Result<IReadOnlyList<StockMovementDto>>.Success(result.Items);
+    }
 }

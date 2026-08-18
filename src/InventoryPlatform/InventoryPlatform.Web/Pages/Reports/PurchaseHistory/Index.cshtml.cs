@@ -1,6 +1,8 @@
 using InventoryPlatform.Application.DTOs.Reporting;
 using InventoryPlatform.Application.Features.Reporting.GetPurchaseHistory;
 using InventoryPlatform.Shared.Paging;
+using InventoryPlatform.Web.Reports.Excel;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace InventoryPlatform.Web.Pages.Reports.PurchaseHistory;
@@ -8,10 +10,14 @@ namespace InventoryPlatform.Web.Pages.Reports.PurchaseHistory;
 public class IndexModel : PageModel
 {
     private readonly GetPurchaseHistoryHandler _handler;
+    private readonly ExcelReportWriter _excelReportWriter;
 
-    public IndexModel(GetPurchaseHistoryHandler handler)
+    public IndexModel(
+        GetPurchaseHistoryHandler handler,
+        ExcelReportWriter excelReportWriter)
     {
         _handler = handler;
+        _excelReportWriter = excelReportWriter;
     }
 
     public PagedResult<PurchaseHistoryDto>? Result { get; private set; }
@@ -83,5 +89,51 @@ public class IndexModel : PageModel
         }
 
         Result = result.Value;
+    }
+
+    public async Task<IActionResult> OnGetExportToExcelAsync(
+        string? search,
+        DateOnly? fromDate,
+        DateOnly? toDate,
+        string? status,
+        string? sortBy,
+        bool descending = false,
+        CancellationToken cancellationToken = default)
+    {
+        InventoryPlatform.Domain.Enums.PurchaseOrderStatus? purchaseOrderStatus = null;
+
+        if (!string.IsNullOrWhiteSpace(status) &&
+            Enum.TryParse<InventoryPlatform.Domain.Enums.PurchaseOrderStatus>(
+                status,
+                true,
+                out var parsedStatus))
+        {
+            purchaseOrderStatus = parsedStatus;
+        }
+
+        var request = new GetPurchaseHistoryRequest
+        {
+            Search = search,
+            FromDate = fromDate,
+            ToDate = toDate,
+            PurchaseOrderStatus = purchaseOrderStatus,
+            SortBy = sortBy,
+            Descending = descending
+        };
+
+        var result = await _handler.HandleExportAsync(
+            request,
+            cancellationToken);
+
+        if (result.IsFailure)
+            return BadRequest();
+
+        var bytes = _excelReportWriter.CreatePurchaseHistory(
+            result.Value ?? Array.Empty<PurchaseHistoryDto>());
+
+        return File(
+            bytes,
+            ExcelReportWriter.ContentType,
+            "PurchaseHistory.xlsx");
     }
 }

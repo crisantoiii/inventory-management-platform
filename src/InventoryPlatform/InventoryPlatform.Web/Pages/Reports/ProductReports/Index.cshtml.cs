@@ -4,6 +4,7 @@ using InventoryPlatform.Shared.Filtering;
 using InventoryPlatform.Shared.Paging;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using InventoryPlatform.Web.Reports.Excel;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace InventoryPlatform.Web.Pages.Reports.ProductReports;
@@ -11,11 +12,14 @@ namespace InventoryPlatform.Web.Pages.Reports.ProductReports;
 public sealed class IndexModel : PageModel
 {
     private readonly GetProductReportsHandler _handler;
+    private readonly ExcelReportWriter _excelReportWriter;
 
     public IndexModel(
-        GetProductReportsHandler handler)
+        GetProductReportsHandler handler,
+        ExcelReportWriter excelReportWriter)
     {
         _handler = handler;
+        _excelReportWriter = excelReportWriter;
     }
 
     [BindProperty(SupportsGet = true)]
@@ -98,5 +102,37 @@ public sealed class IndexModel : PageModel
         Result = result.Value;
 
         return Page();
+    }
+    public async Task<IActionResult> OnGetExportToExcelAsync(
+        string? search,
+        ProductStatusFilter status = ProductStatusFilter.Active,
+        string? sortBy = null,
+        bool descending = false,
+        CancellationToken cancellationToken = default)
+    {
+        var query = new PagedQuery
+        {
+            Search = search,
+            Status = status,
+            Page = 1,
+            PageSize = int.MaxValue,
+            SortBy = sortBy,
+            Descending = descending
+        };
+
+        var result = await _handler.HandleExportAsync(
+            new GetProductReportsRequest(query),
+            cancellationToken);
+
+        if (result.IsFailure)
+            return BadRequest();
+
+        var bytes = _excelReportWriter.CreateProductReports(
+            result.Value ?? Array.Empty<ProductReportDto>());
+
+        return File(
+            bytes,
+            ExcelReportWriter.ContentType,
+            "ProductReports.xlsx");
     }
 }

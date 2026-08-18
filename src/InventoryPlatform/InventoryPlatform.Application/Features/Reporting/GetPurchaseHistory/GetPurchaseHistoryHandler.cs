@@ -37,4 +37,27 @@ public sealed class GetPurchaseHistoryHandler
 
         return Result<PagedResult<PurchaseHistoryDto>>.Success(result);
     }
+
+    public async Task<Result<IReadOnlyList<PurchaseHistoryDto>>> HandleExportAsync(
+        GetPurchaseHistoryRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var query = new PagedQuery
+        {
+            Page = 1,
+            PageSize = int.MaxValue,
+            Search = request.Search,
+            SortBy = request.SortBy,
+            Descending = request.Descending
+        };
+
+        var result = await _repository.GetPurchaseHistoryAsync(
+            query,
+            request.FromDate,
+            request.ToDate,
+            request.PurchaseOrderStatus,
+            cancellationToken);
+
+        return Result<IReadOnlyList<PurchaseHistoryDto>>.Success(result.Items);
+    }
 }

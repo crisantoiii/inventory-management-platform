@@ -25,4 +25,21 @@ public sealed class GetProductReportsHandler
 
         return Result<PagedResult<ProductReportDto>>.Success(result);
     }
+
+    public async Task<Result<IReadOnlyList<ProductReportDto>>> HandleExportAsync(
+        GetProductReportsRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var query = request.Query with
+        {
+            Page = 1,
+            PageSize = int.MaxValue
+        };
+
+        var result = await _repository.GetProductReportsAsync(
+            query,
+            cancellationToken);
+
+        return Result<IReadOnlyList<ProductReportDto>>.Success(result.Items);
+    }
 }

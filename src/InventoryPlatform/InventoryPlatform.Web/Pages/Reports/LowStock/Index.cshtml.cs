@@ -2,6 +2,7 @@ using InventoryPlatform.Application.DTOs.Reporting;
 using InventoryPlatform.Application.Features.Reporting.GetLowStock;
 using InventoryPlatform.Shared.Paging;
 using Microsoft.AspNetCore.Mvc;
+using InventoryPlatform.Web.Reports.Excel;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace InventoryPlatform.Web.Pages.Reports.LowStock;
@@ -9,11 +10,14 @@ namespace InventoryPlatform.Web.Pages.Reports.LowStock;
 public sealed class IndexModel : PageModel
 {
     private readonly GetLowStockHandler _handler;
+    private readonly ExcelReportWriter _excelReportWriter;
 
     public IndexModel(
-        GetLowStockHandler handler)
+        GetLowStockHandler handler,
+        ExcelReportWriter excelReportWriter)
     {
         _handler = handler;
+        _excelReportWriter = excelReportWriter;
     }
 
     [BindProperty(SupportsGet = true)]
@@ -63,5 +67,35 @@ public sealed class IndexModel : PageModel
         Result = result.Value;
 
         return Page();
+    }
+    public async Task<IActionResult> OnGetExportToExcelAsync(
+        string? search,
+        string? sortBy,
+        bool descending = false,
+        CancellationToken cancellationToken = default)
+    {
+        var query = new PagedQuery
+        {
+            Search = search,
+            Page = 1,
+            PageSize = int.MaxValue,
+            SortBy = sortBy,
+            Descending = descending
+        };
+
+        var result = await _handler.HandleExportAsync(
+            new GetLowStockRequest(query),
+            cancellationToken);
+
+        if (result.IsFailure)
+            return BadRequest();
+
+        var bytes = _excelReportWriter.CreateLowStock(
+            result.Value ?? Array.Empty<LowStockDto>());
+
+        return File(
+            bytes,
+            ExcelReportWriter.ContentType,
+            "LowStock.xlsx");
     }
 }
