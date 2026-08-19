@@ -55,7 +55,7 @@ Completed:
 - Excel Export
 - PDF Export
 
-The next development milestone will be selected through the next Sprint Planning process.
+Sprint 8 Purchasing Enhancements is now active. P0 and P1 are complete, and P2 - Purchase Order Search is the next task.
 
 ---
 
@@ -166,7 +166,6 @@ Remaining:
 
 - Inventory Integration
 - Supplier Purchase History
-- Multiple Purchase Order Item Management
 - Purchase Order Search
 - Purchase Order Filtering
 - Purchase Order Sorting
@@ -380,7 +379,8 @@ Future enhancements may include:
 | v1.2.0 | Reporting — Inventory Valuation ✅ |
 | v1.3.0 | Account Management ✅ |
 | v1.4.0 | Additional Reporting & Exports — Ready for Release |
-| v1.5.0 | Sales Module ⏳ |
+| v1.5.0 | Sprint 8 Purchasing Enhancements ⏳ |
+| v1.6.0 | Sales Module ⏳ |
 | v2.0.0 | REST API & Blazor ⏳ |
 
 ---

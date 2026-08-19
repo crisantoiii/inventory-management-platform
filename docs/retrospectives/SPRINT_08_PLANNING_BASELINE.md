@@ -3,7 +3,7 @@
 **Sprint:** Sprint 8 - Purchasing Enhancements  
 **Repository/Branch:** `feature/purchasing_enhancements`  
 **Baseline Date:** 2026-08-19  
-**Status:** Planning baseline - no Purchasing implementation started
+**Status:** P0 complete; P1 - Multiple Purchase Order Item Management complete and runtime/browser verified
 
 ---
 
@@ -344,9 +344,11 @@ No code changes are permitted during P0 unless required to establish the baselin
 
 Improve Purchase Order item management using the actual existing domain and presentation patterns.
 
+**Current implementation status:** Source implementation completed for multi-item Purchase Order creation in the Create UI. Runtime/browser verification completed successfully.
+
 Primary concern:
 
-- Support the required multi-item Purchase Order creation/editing behavior without bypassing the PurchaseOrder aggregate.
+- Support multi-item Purchase Order creation without bypassing the PurchaseOrder aggregate.
 
 ### P2 - Purchase Order Search
 
@@ -752,14 +754,109 @@ The next priority after Purchasing Enhancements is Dynamic Capability-Based Auth
 
 ---
 
-## 19. Initial Sprint 8 Gate
+## 19. P0/P1 Handoff State
 
-This planning baseline is a documentation-only milestone.
+P0 - Actual Purchasing Source/Documentation Baseline is complete. The actual source baseline was inspected and the documented Purchasing core workflow was reconciled against the implementation.
 
-No Purchasing implementation is authorized by this document.
+P1 - Multiple Purchase Order Item Management is also complete and runtime/browser verified. The Create Purchase Order workflow now supports multiple item rows while preserving the existing Application, Domain, Infrastructure, and persistence boundaries.
+
+No P2-P6 implementation has been started. Dynamic Capability-Based Authorization remains outside the current Purchasing Enhancements scope.
 
 The next task is:
 
-**P0 - Actual Purchasing Source/Documentation Baseline**
+**P2 - Purchase Order Search**
 
-P0 must begin by inspecting the actual `feature/purchasing_enhancements` repository/source and confirming the exact current state before any Purchasing code is changed.
+P2 must begin by reusing the actual Purchase Order listing/query architecture established by the existing source.
+
+
+## 20. P0 - Actual Purchasing Source Baseline
+
+P0 inspected the actual Sprint 8 source and documentation baseline. The existing Purchasing vertical slice was confirmed as implemented across Domain, Application, Infrastructure, and Web.
+
+Confirmed current Purchasing behavior:
+
+- Purchase Order creation
+- Purchase Order listing
+- Purchase Order details
+- Submit
+- Approve
+- Partial receiving
+- Final receiving
+- Completed state
+- Supplier and product validation
+- Purchase Order item domain validation
+- Existing repository and Unit of Work persistence
+- Existing EF Core Purchase Order and Purchase Order Item mappings
+
+Current Purchasing limitations confirmed by source:
+
+- Purchase Order Create previously rendered only one item row.
+- Purchase Order search is not implemented.
+- Purchase Order filtering is not implemented.
+- Purchase Order sorting is not implemented.
+- Purchase Order pagination is not implemented.
+- Purchase Order receiving does not currently synchronize inventory.
+- Dynamic Capability-Based Authorization is not part of Purchasing Enhancements.
+
+The supplied source snapshot did not contain `.git` metadata, so branch status, working-tree status, and commit history were not asserted from the ZIP.
+
+The source snapshot also could not be built in the inspection environment because the .NET CLI was unavailable. Runtime verification was subsequently completed against the updated application by the project owner.
+
+## 21. P1 - Multiple Purchase Order Item Management
+
+P1 is complete. The Purchase Order Create page now supports multiple item rows while preserving the existing Purchasing architecture and Application/Domain contracts.
+
+Implemented behavior:
+
+- Add multiple Purchase Order item rows.
+- Remove individual item rows.
+- Preserve indexed Product, Quantity, and Unit Cost bindings.
+- Preserve existing validation behavior.
+- Preserve the existing Create Purchase Order handler.
+- Preserve the existing `PurchaseOrder.AddItem()` domain operation.
+- Preserve the existing Purchase Order persistence model.
+- Preserve the existing Details page, Submit, Approve, and Receiving workflow.
+
+Runtime/browser verification was completed successfully. Multi-item Purchase Order creation and the existing downstream Purchasing workflow were confirmed working.
+
+No database migration was required for P1.
+No Dynamic Capability-Based Authorization changes were introduced.
+No P2-P6 implementation was started.
+
+### P1 Acceptance Result
+
+**Status: COMPLETE**
+
+P1 acceptance criteria were satisfied through source inspection and successful runtime/browser verification.
+
+The next task is **P2 - Purchase Order Search**.
+
+## 22. P1 Documentation Audit
+
+P1 documentation synchronization was reviewed against the actual source and verified runtime behavior.
+
+### Updated
+
+- `PROJECT_STATUS.md`
+- `ROADMAP.md`
+- `README.md`
+- `CHANGELOG.md`
+- `docs/FEATURES.md`
+- `docs/ENGINEERING_JOURNAL.md`
+- `docs/retrospectives/SPRINT_08_PLANNING_BASELINE.md`
+- `docs/retrospectives/SPRINT_04_APPLICATION.md` - historical cross-reference only
+
+### Reviewed and Preserved
+
+- `ARCHITECTURE.md` - no architectural change introduced by P1
+- `docs/ARCHITECTURE_REVIEW.md` - no new architecture boundary required
+- `docs/DESIGN_DECISIONS.md` - no new design decision required
+- `CODE_STYLE.md` - no project-wide style rule changed
+- `CONTRIBUTING.md` - no contribution workflow changed
+
+### Historical Sprint Documentation Preserved
+
+Sprint 1, Sprint 2, Sprint 3, Sprint 5, Sprint 6, and Sprint 7 retrospective documents were reviewed for P1 impact and left unchanged where their statements remain historically accurate. Sprint 7 reporting documentation remains the historical baseline and was not modified.
+
+Documentation status is therefore synchronized for P1 without rewriting historical records or introducing unsupported assumptions.
+

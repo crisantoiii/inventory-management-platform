@@ -28,7 +28,7 @@ Account Management
 
 **Current Version:** v1.4.0
 
-**Next Release:** Sprint 8 — To be determined through Sprint Planning
+**Next Release:** Sprint 8 — Purchasing Enhancements
 
 **Project Status:** Active Development
 
@@ -89,8 +89,8 @@ Verified:
 
 - **Completed Modules:** 10
 - **Architecture Status:** Validated
-- **Current Milestone:** Sprint 7 Additional Reporting — Complete
-- **Next Milestone:** Sprint 8 Planning
+- **Current Milestone:** Sprint 8 — P1 Multiple Purchase Order Item Management — Complete
+- **Next Milestone:** Sprint 8 — P2 Purchase Order Search
 
 ---
 
@@ -316,6 +316,8 @@ The architecture has been validated and is considered stable for future business
 - ✅ Received Quantity Display
 - ✅ Remaining Quantity Display
 - ✅ Calculated Purchase Order Total
+- ✅ Multiple Purchase Order Item Creation
+- ✅ Dynamic Item Add/Remove in Create UI
 - ✅ Client-side Validation
 - ✅ Domain Validation
 - ✅ Success Messages
@@ -539,30 +541,22 @@ Final verification covered normal application regression, reporting workflows, e
 
 # Current Focus
 
-Sprint 7 Additional Reporting is complete, verified, and documented.
+Sprint 8 Purchasing Enhancements is now active. P0 - Actual Purchasing Source/Documentation Baseline and P1 - Multiple Purchase Order Item Management are complete.
 
-Completed:
+Completed in Sprint 8:
 
-- Inventory Valuation
-- Purchase History
-- Supplier Purchase Analysis
-- Stock Movement
-- Low Stock Report
-- Inventory Movement Report
-- Product Reports
-- Excel Export
-- PDF Export
-- Final project-wide verification
+- P0 - Actual Purchasing Source/Documentation Baseline
+- P1 - Multiple Purchase Order Item Management
 
-Verification included empty-database behavior, explicit query failure and recovery, authorization regression, and final solution build verification.
+P1 was runtime/browser verified successfully. The Purchase Order Create workflow now supports multiple item rows while preserving the existing Purchasing architecture and downstream workflow.
 
 # Next Milestone
 
-## Sprint 8 Planning
+## P2 - Purchase Order Search
 
-The next development scope will be established through the Sprint Planning process.
+The next development task is Purchase Order Search. P2 must reuse the existing Purchase Order listing/query architecture and must not introduce unrelated Purchasing or authorization scope.
 
-Sprint 7 Additional Reporting is complete and no Sprint 7 implementation work remains.
+Sprint 7 Additional Reporting remains complete and unchanged.
 
 The following reporting capabilities are already complete:
 
@@ -590,7 +584,6 @@ Business Modules
 
 Purchasing
 
-- Multiple Purchase Order item management in the Create UI
 - Purchase Order search, filtering, sorting, and pagination
 - Inventory synchronization during Purchase Order receiving
 
@@ -717,21 +710,16 @@ The architecture has now been validated through:
 
 ## Current Focus
 
-### Sprint 7 — Additional Reporting
+### Sprint 8 — Purchasing Enhancements
 
-Product Reports, Excel Export, and PDF Export are complete and browser-verified.
+P0 source/documentation baseline is complete. P1 - Multiple Purchase Order Item Management is implemented and runtime/browser verified.
 
-Completed:
+Completed in Sprint 8 so far:
 
-- Inventory Valuation
-- Purchase History
-- Supplier Purchase Analysis
-- Stock Movement
-- Low Stock Report
-- Inventory Movement Report
-- Product Reports
-- Excel Export
-- PDF Export
+- P0 - Actual Purchasing Source/Documentation Baseline
+- P1 - Multiple Purchase Order Item Management
+
+P1 verification confirmed that Purchase Order creation supports multiple item rows while preserving the existing Application, Domain, persistence, and downstream Purchasing workflow.
 
 ### Final Project-wide Verification
 

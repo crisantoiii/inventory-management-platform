@@ -2675,3 +2675,34 @@ Sprint 7 Additional Reporting has completed final project-wide verification succ
 No in-scope implementation defects were discovered during final verification.
 
 The existing Reporting architecture remains unchanged, with export generation isolated in the Web layer and existing report queries and DTOs reused as the source of report data.
+
+
+---
+
+# Sprint 8 - P1 Multiple Purchase Order Item Management
+
+**Date:** 2026-08-19
+
+## Objective
+
+Extend the existing Purchase Order Create workflow to support multiple Purchase Order items without redesigning the established Purchasing architecture.
+
+## Implementation
+
+The Create Purchase Order Razor Page was updated to manage a dynamic collection of item rows. Users can add and remove item rows while retaining the existing Product, Quantity, and Unit Cost model binding. The existing Application handler, PurchaseOrder aggregate, repository, EF Core mappings, and database schema were preserved.
+
+The implementation intentionally did not introduce Purchase Order search, filtering, sorting, pagination, inventory synchronization, or Dynamic Capability-Based Authorization. Those remain separate Sprint 8 tasks.
+
+## Verification
+
+Source inspection confirmed the multi-item collection is passed through the existing Create Purchase Order flow. Runtime/browser verification was completed successfully and confirmed that multiple Purchase Order items can be created and the existing downstream Purchasing workflow continues to function.
+
+## Result
+
+P1 - Multiple Purchase Order Item Management is complete. No database migration was required.
+
+Next task: **P2 - Purchase Order Search**.
+
+### P1 Documentation Synchronization
+
+P1 documentation was reconciled after runtime verification. Current-state documents were updated to record multi-item Purchase Order creation, while historical Sprint documentation was preserved and cross-referenced where necessary.

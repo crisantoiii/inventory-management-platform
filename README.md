@@ -58,7 +58,7 @@ The focus is not only on implementing business features but also on applying pro
 - ✅ Authentication & Authorization
 - ✅ User Management
 - ✅ Account Management
-- 🟨 Purchasing (Core Workflow Complete)
+- 🟨 Purchasing (Core Workflow Complete + Sprint 8 P1 Multi-Item Creation)
 - ✅ Reporting (Sprint 7 Additional Reporting Complete and Verified)
 
 ## Latest Release
@@ -340,6 +340,8 @@ The long-term goal is to evolve this project into a complete inventory managemen
 
 - ✅ Purchase Order Listing
 - ✅ Purchase Order Creation
+- ✅ Multiple Purchase Order Item Creation
+- ✅ Dynamic Item Add/Remove in Create UI
 - ✅ Purchase Order Details
 - ✅ Supplier Selection
 - ✅ Product Selection
@@ -813,7 +815,7 @@ Development Tools
 | Authentication & Authorization | ✅ Complete |
 | User Management | ✅ Complete |
 | Account Management | ✅ Complete |
-| Purchasing | 🟨 Core Workflow Complete |
+| Purchasing | 🟨 Core Workflow + Sprint 8 P1 Complete |
 | Reporting | ✅ Sprint 7 Additional Reporting Complete and Verified |
 
 ---

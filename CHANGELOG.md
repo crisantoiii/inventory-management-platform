@@ -41,6 +41,19 @@ Sprint 7 Additional Reporting is complete and has passed final project-wide veri
 
 No Dynamic Capability-Based Authorization implementation was introduced during Sprint 7.
 
+### Sprint 8 — Purchasing Enhancements
+
+#### P1 — Multiple Purchase Order Item Management
+
+- Extended the Purchase Order Create UI to support multiple item rows.
+- Added dynamic item-row add/remove behavior.
+- Preserved the existing Product, Quantity, and Unit Cost model binding.
+- Preserved the existing Application handler and `PurchaseOrder.AddItem()` domain operation.
+- Preserved the existing Purchase Order persistence model; no database migration was required.
+- Runtime/browser verification confirmed multi-item Purchase Order creation and the existing downstream Purchasing workflow.
+
+P2 - Purchase Order Search remains the next Sprint 8 task.
+
 ---
 
 ## [v1.3.0] - 2026-08-13

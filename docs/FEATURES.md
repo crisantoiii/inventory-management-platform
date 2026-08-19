@@ -39,7 +39,7 @@ Outcome:
 - ✅ No structural redesign required
 - ✅ Ready for workflow-driven business modules
 
-The Purchasing Presentation Layer is now complete and has been verified through an end-to-end browser workflow using persisted database records.
+The Purchasing Presentation Layer is now complete and has been verified through an end-to-end browser workflow using persisted database records. Sprint 8 P1 extended the Purchase Order Create workflow to support multiple item rows and was runtime/browser verified.
 
 The first Reporting vertical slice has also been implemented through Inventory Valuation and verified using actual persisted database records.
 
@@ -922,7 +922,6 @@ Engineering practices include:
 
 Remaining work:
 
-- Multiple Purchase Order Item Management
 - Purchase Order Search
 - Purchase Order Filtering
 - Purchase Order Sorting
