@@ -80,6 +80,7 @@ public class CreateModel : PageModel
     {
         if (!ModelState.IsValid)
         {
+            EnsureAtLeastOneItem();
             await PopulateDropdownListsAsync(cancellationToken);
             return Page();
         }
@@ -105,6 +106,7 @@ public class CreateModel : PageModel
                 string.Empty,
                 result.Error.Message);
 
+            EnsureAtLeastOneItem();
             await PopulateDropdownListsAsync(cancellationToken);
             return Page();
         }
@@ -113,6 +115,15 @@ public class CreateModel : PageModel
             $"Purchase Order '{result.Value!.Id}' was created successfully.";
 
         return RedirectToPage("Index");
+    }
+
+    private void EnsureAtLeastOneItem()
+    {
+        if (PurchaseOrder.Items.Count == 0)
+        {
+            PurchaseOrder.Items.Add(
+                new PurchaseOrderItemInputModel());
+        }
     }
 
     private async Task<bool> PopulateDropdownListsAsync(
