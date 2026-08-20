@@ -1,17 +1,16 @@
 using InventoryPlatform.Domain.Entities;
 using InventoryPlatform.Domain.Enums;
+using InventoryPlatform.Shared.Paging;
 
 namespace InventoryPlatform.Application.Interfaces.Persistence;
 
 public interface IPurchaseOrderRepository
     : IRepository<PurchaseOrder>
 {
-    Task<IReadOnlyList<PurchaseOrder>> GetPurchaseOrdersAsync(
-        string search = "",
+    Task<PagedResult<PurchaseOrder>> GetPurchaseOrdersAsync(
+        PagedQuery query,
         DateOnly? fromDate = null,
         DateOnly? toDate = null,
         PurchaseOrderStatus? status = null,
-        string? sortBy = null,
-        bool descending = false,
         CancellationToken cancellationToken = default);
 }

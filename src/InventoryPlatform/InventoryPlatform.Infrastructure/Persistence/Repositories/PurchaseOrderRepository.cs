@@ -2,6 +2,7 @@ using InventoryPlatform.Application.Interfaces.Persistence;
 using InventoryPlatform.Domain.Entities;
 using InventoryPlatform.Domain.Enums;
 using InventoryPlatform.Infrastructure.Persistence.Context;
+using InventoryPlatform.Shared.Paging;
 using InventoryPlatform.Shared.Sorting;
 using Microsoft.EntityFrameworkCore;
 
@@ -30,87 +31,97 @@ public sealed class PurchaseOrderRepository
                 cancellationToken);
     }
 
-    public async Task<IReadOnlyList<PurchaseOrder>> GetPurchaseOrdersAsync(
-        string search = "",
+    public async Task<PagedResult<PurchaseOrder>> GetPurchaseOrdersAsync(
+        PagedQuery query,
         DateOnly? fromDate = null,
         DateOnly? toDate = null,
         PurchaseOrderStatus? status = null,
-        string? sortBy = null,
-        bool descending = false,
         CancellationToken cancellationToken = default)
     {
-        IQueryable<PurchaseOrder> query = Context.PurchaseOrders
+        IQueryable<PurchaseOrder> purchaseOrders = Context.PurchaseOrders
             .AsNoTracking()
             .Include(x => x.Supplier)
             .Include(x => x.Items);
 
-        if (!string.IsNullOrWhiteSpace(search))
+        if (!string.IsNullOrWhiteSpace(query.Search))
         {
-            search = search.Trim();
+            var search = query.Search.Trim();
 
             if (int.TryParse(search, out var purchaseOrderId))
             {
-                query = query.Where(po =>
+                purchaseOrders = purchaseOrders.Where(po =>
                     po.Id == purchaseOrderId ||
                     po.Supplier.Name.Contains(search));
             }
             else
             {
-                query = query.Where(po =>
+                purchaseOrders = purchaseOrders.Where(po =>
                     po.Supplier.Name.Contains(search));
             }
         }
 
         if (fromDate.HasValue)
         {
-            query = query.Where(
+            purchaseOrders = purchaseOrders.Where(
                 po => po.OrderDate >= fromDate.Value);
         }
 
         if (toDate.HasValue)
         {
-            query = query.Where(
+            purchaseOrders = purchaseOrders.Where(
                 po => po.OrderDate <= toDate.Value);
         }
 
         if (status.HasValue)
         {
-            query = query.Where(
+            purchaseOrders = purchaseOrders.Where(
                 po => po.Status == status.Value);
         }
 
-        var orderedQuery = ApplySorting(
-            query,
-            sortBy,
-            descending);
+        var totalCount = await purchaseOrders.CountAsync(
+            cancellationToken);
 
-        return await orderedQuery.ToListAsync(cancellationToken);
+        var orderedQuery = ApplySorting(
+            purchaseOrders,
+            query);
+
+        var items = await orderedQuery
+            .Skip((query.Page - 1) * query.PageSize)
+            .Take(query.PageSize)
+            .ToListAsync(cancellationToken);
+
+        return new PagedResult<PurchaseOrder>
+        {
+            Items = items,
+            Page = query.Page,
+            PageSize = query.PageSize,
+            TotalCount = totalCount
+        };
     }
 
     private static IOrderedQueryable<PurchaseOrder> ApplySorting(
         IQueryable<PurchaseOrder> query,
-        string? sortBy,
-        bool descending)
+        PagedQuery request)
     {
-        return sortBy switch
+        return request.SortBy switch
         {
-            PurchaseOrderSortFields.Id => descending
+            PurchaseOrderSortFields.Id => request.Descending
                 ? query.OrderByDescending(po => po.Id)
                 : query.OrderBy(po => po.Id),
 
-            PurchaseOrderSortFields.Supplier => descending
+            PurchaseOrderSortFields.Supplier => request.Descending
                 ? query.OrderByDescending(po => po.Supplier.Name)
                 : query.OrderBy(po => po.Supplier.Name),
 
-            PurchaseOrderSortFields.OrderDate => descending
+            PurchaseOrderSortFields.OrderDate => request.Descending
                 ? query.OrderByDescending(po => po.OrderDate)
                 : query.OrderBy(po => po.OrderDate),
 
-            PurchaseOrderSortFields.Status => descending
+            PurchaseOrderSortFields.Status => request.Descending
                 ? query.OrderByDescending(po => po.Status)
                 : query.OrderBy(po => po.Status),
 
-            PurchaseOrderSortFields.TotalAmount => descending
+            PurchaseOrderSortFields.TotalAmount => request.Descending
                 ? query.OrderByDescending(po => po.Items.Sum(item => item.Quantity * item.UnitCost))
                 : query.OrderBy(po => po.Items.Sum(item => item.Quantity * item.UnitCost)),
 

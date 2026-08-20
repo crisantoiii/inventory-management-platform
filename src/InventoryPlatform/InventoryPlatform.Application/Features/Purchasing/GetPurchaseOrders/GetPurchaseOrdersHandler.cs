@@ -1,4 +1,5 @@
 using InventoryPlatform.Application.Interfaces.Persistence;
+using InventoryPlatform.Shared.Paging;
 using InventoryPlatform.Shared.Results;
 
 namespace InventoryPlatform.Application.Features.Purchasing.GetPurchaseOrders;
@@ -17,25 +18,38 @@ public sealed class GetPurchaseOrdersHandler
         GetPurchaseOrdersRequest request,
         CancellationToken cancellationToken = default)
     {
+        var query = new PagedQuery
+        {
+            Page = request.Page,
+            PageSize = request.PageSize,
+            Search = request.Search,
+            SortBy = request.SortBy,
+            Descending = request.Descending
+        };
+
         var purchaseOrders = await _purchaseOrderRepository
             .GetPurchaseOrdersAsync(
-                request.Search,
+                query,
                 request.FromDate,
                 request.ToDate,
-                request.Status,
-                request.SortBy,
-                request.Descending,
+                request.PurchaseOrderStatus,
                 cancellationToken);
 
         var response = new GetPurchaseOrdersResponse(
-            purchaseOrders
-                .Select(po => new GetPurchaseOrderSummaryResponse(
-                    po.Id,
-                    po.Supplier.Name,
-                    po.OrderDate,
-                    po.Status,
-                    po.TotalAmount))
-                .ToList());
+            new PagedResult<GetPurchaseOrderSummaryResponse>
+            {
+                Items = purchaseOrders.Items
+                    .Select(po => new GetPurchaseOrderSummaryResponse(
+                        po.Id,
+                        po.Supplier.Name,
+                        po.OrderDate,
+                        po.Status,
+                        po.TotalAmount))
+                    .ToList(),
+                Page = purchaseOrders.Page,
+                PageSize = purchaseOrders.PageSize,
+                TotalCount = purchaseOrders.TotalCount
+            });
 
         return Result<GetPurchaseOrdersResponse>.Success(response);
     }

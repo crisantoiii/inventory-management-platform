@@ -1,5 +1,6 @@
 using InventoryPlatform.Application.Features.Purchasing.GetPurchaseOrders;
 using InventoryPlatform.Domain.Enums;
+using InventoryPlatform.Shared.Paging;
 using InventoryPlatform.Shared.Sorting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -16,8 +17,14 @@ public class IndexModel : PageModel
         _handler = handler;
     }
 
-    public IReadOnlyCollection<GetPurchaseOrderSummaryResponse> PurchaseOrders { get; private set; }
-        = Array.Empty<GetPurchaseOrderSummaryResponse>();
+    public PagedResult<GetPurchaseOrderSummaryResponse> PurchaseOrders { get; private set; }
+        = new()
+        {
+            Items = Array.Empty<GetPurchaseOrderSummaryResponse>(),
+            Page = 1,
+            PageSize = 10,
+            TotalCount = 0
+        };
 
     [BindProperty(SupportsGet = true)]
     public string Search { get; set; } = string.Empty;
@@ -37,6 +44,12 @@ public class IndexModel : PageModel
     [BindProperty(SupportsGet = true)]
     public bool Descending { get; set; }
 
+    [BindProperty(SupportsGet = true)]
+    public int PageNum { get; set; } = 1;
+
+    [BindProperty(SupportsGet = true)]
+    public int PageSize { get; set; } = 10;
+
     public string GetSortUrl(string sortBy)
     {
         var descending = string.Equals(SortBy, sortBy, StringComparison.OrdinalIgnoreCase)
@@ -52,7 +65,9 @@ public class IndexModel : PageModel
                 ToDate,
                 Status,
                 SortBy = sortBy,
-                Descending = descending
+                Descending = descending,
+                Page = 1,
+                PageSize
             }) ?? string.Empty;
     }
 
@@ -77,6 +92,23 @@ public class IndexModel : PageModel
             new("Cancelled", nameof(PurchaseOrderStatus.Cancelled))
         };
 
+    public string GetPageUrl(int page)
+    {
+        return Url.Page(
+            "./Index",
+            values: new
+            {
+                Search,
+                FromDate,
+                ToDate,
+                Status,
+                SortBy,
+                Descending,
+                Page = page,
+                PageSize
+            }) ?? string.Empty;
+    }
+
     public async Task<IActionResult> OnGetAsync(
         CancellationToken cancellationToken)
     {
@@ -86,9 +118,11 @@ public class IndexModel : PageModel
                 Search = Search,
                 FromDate = FromDate,
                 ToDate = ToDate,
-                Status = Status,
+                PurchaseOrderStatus = Status,
                 SortBy = SortBy,
-                Descending = Descending
+                Descending = Descending,
+                Page = PageNum,
+                PageSize = PageSize
             },
             cancellationToken);
 

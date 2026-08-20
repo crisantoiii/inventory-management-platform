@@ -1,18 +1,13 @@
 using InventoryPlatform.Domain.Enums;
+using InventoryPlatform.Shared.Paging;
 
 namespace InventoryPlatform.Application.Features.Purchasing.GetPurchaseOrders;
 
-public sealed record GetPurchaseOrdersRequest
+public sealed record GetPurchaseOrdersRequest : PagedRequest
 {
-    public string Search { get; init; } = string.Empty;
-
     public DateOnly? FromDate { get; init; }
 
     public DateOnly? ToDate { get; init; }
 
-    public PurchaseOrderStatus? Status { get; init; }
-
-    public string? SortBy { get; init; }
-
-    public bool Descending { get; init; }
+    public PurchaseOrderStatus? PurchaseOrderStatus { get; init; }
 }
