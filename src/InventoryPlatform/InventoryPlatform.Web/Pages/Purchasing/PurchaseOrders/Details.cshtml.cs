@@ -28,6 +28,9 @@ public class DetailsModel : PageModel
 
     public GetPurchaseOrderResponse? PurchaseOrder { get; private set; }
 
+    [BindProperty(SupportsGet = true)]
+    public string Search { get; set; } = string.Empty;
+
     public async Task<IActionResult> OnGetAsync(
         int id,
         CancellationToken cancellationToken)
@@ -80,7 +83,7 @@ public class DetailsModel : PageModel
 
         return RedirectToPage(
             "./Details",
-            new { id = result.Value.Id });
+            new { id = result.Value.Id, search = Search });
     }
 
     public async Task<IActionResult> OnPostApproveAsync(
@@ -117,7 +120,7 @@ public class DetailsModel : PageModel
 
         return RedirectToPage(
             "./Details",
-            new { id = result.Value.Id });
+            new { id = result.Value.Id, search = Search });
     }
 
     public async Task<IActionResult> OnPostReceiveAsync(
@@ -159,6 +162,6 @@ public class DetailsModel : PageModel
 
         return RedirectToPage(
             "./Details",
-            new { id = result.Value.PurchaseOrderId });
+            new { id = result.Value.PurchaseOrderId, search = Search });
     }
 }

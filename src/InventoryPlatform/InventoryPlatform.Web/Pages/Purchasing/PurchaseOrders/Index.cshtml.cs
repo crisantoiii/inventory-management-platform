@@ -16,11 +16,17 @@ public class IndexModel : PageModel
     public IReadOnlyCollection<GetPurchaseOrderSummaryResponse> PurchaseOrders { get; private set; }
         = Array.Empty<GetPurchaseOrderSummaryResponse>();
 
+    [BindProperty(SupportsGet = true)]
+    public string Search { get; set; } = string.Empty;
+
     public async Task<IActionResult> OnGetAsync(
         CancellationToken cancellationToken)
     {
         var result = await _handler.HandleAsync(
-            new GetPurchaseOrdersRequest(),
+            new GetPurchaseOrdersRequest
+            {
+                Search = Search
+            },
             cancellationToken);
 
         if (result.IsFailure)

@@ -1,4 +1,4 @@
-﻿@page
+@page
 @model InventoryPlatform.Web.Pages.Purchasing.PurchaseOrders.IndexModel
 
 @{
@@ -28,6 +28,28 @@
 
     <div asp-validation-summary="ModelOnly"
          class="text-danger mb-3"></div>
+
+    <form method="get" class="row g-2 mb-4">
+        <div class="col-md-6">
+            <label for="search" class="visually-hidden">Search purchase orders</label>
+            <input id="search"
+                   name="Search"
+                   value="@Model.Search"
+                   class="form-control"
+                   placeholder="Search by purchase order ID or supplier"
+                   autocomplete="off" />
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary">Search</button>
+        </div>
+        @if (!string.IsNullOrWhiteSpace(Model.Search))
+        {
+            <div class="col-auto">
+                <a asp-page="./Index" class="btn btn-outline-secondary">Clear</a>
+            </div>
+        }
+    </form>
+
 
     @if (Model.PurchaseOrders.Count == 0)
     {
@@ -81,6 +103,7 @@
                                     <td class="text-end">
                                         <a asp-page="./Details"
                                            asp-route-id="@purchaseOrder.Id"
+                                           asp-route-search="@Model.Search"
                                            class="btn btn-sm btn-outline-primary">
                                             Details
                                         </a>

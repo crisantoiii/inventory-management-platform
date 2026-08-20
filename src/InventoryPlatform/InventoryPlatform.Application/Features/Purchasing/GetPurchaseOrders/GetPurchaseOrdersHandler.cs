@@ -1,4 +1,4 @@
-﻿using InventoryPlatform.Application.Interfaces.Persistence;
+using InventoryPlatform.Application.Interfaces.Persistence;
 using InventoryPlatform.Shared.Results;
 
 namespace InventoryPlatform.Application.Features.Purchasing.GetPurchaseOrders;
@@ -18,7 +18,7 @@ public sealed class GetPurchaseOrdersHandler
         CancellationToken cancellationToken = default)
     {
         var purchaseOrders = await _purchaseOrderRepository
-            .GetPurchaseOrdersAsync(cancellationToken);
+            .GetPurchaseOrdersAsync(request.Search, cancellationToken);
 
         var response = new GetPurchaseOrdersResponse(
             purchaseOrders

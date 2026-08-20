@@ -1,4 +1,4 @@
-﻿@page "{id:int}"
+@page "{id:int}"
 @model InventoryPlatform.Web.Pages.Purchasing.PurchaseOrders.DetailsModel
 @using InventoryPlatform.Domain.Enums
 
@@ -16,7 +16,9 @@
             </p>
         </div>
 
-        <a asp-page="./Index" class="btn btn-outline-secondary">
+        <a asp-page="./Index"
+           asp-route-search="@Model.Search"
+           class="btn btn-outline-secondary">
             Back to Purchase Orders
         </a>
     </div>
@@ -32,6 +34,7 @@
                 {
                     <form method="post" asp-page-handler="Submit">
                         <input type="hidden" name="id" value="@Model.PurchaseOrder.Id" />
+                        <input type="hidden" name="Search" value="@Model.Search" />
                         <button type="submit" class="btn btn-primary">
                             Submit Purchase Order
                         </button>
@@ -42,6 +45,7 @@
                 {
                     <form method="post" asp-page-handler="Approve">
                         <input type="hidden" name="id" value="@Model.PurchaseOrder.Id" />
+                        <input type="hidden" name="Search" value="@Model.Search" />
                         <button type="submit" class="btn btn-primary">
                             Approve Purchase Order
                         </button>
@@ -198,6 +202,10 @@
                                                     <input type="hidden"
                                                            name="purchaseOrderId"
                                                            value="@Model.PurchaseOrder.Id" />
+
+                                                    <input type="hidden"
+                                                           name="Search"
+                                                           value="@Model.Search" />
 
                                                     <input type="hidden"
                                                            name="productId"
