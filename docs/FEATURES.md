@@ -963,3 +963,22 @@ Verified:
 - Existing authorization boundaries
 
 No Dynamic Capability-Based Authorization was introduced.
+
+### Purchase Order Search - P2
+
+**Status: Complete and verified**
+
+P2 implements server-side Purchase Order search using the existing Purchase Order listing/query architecture.
+
+Verified behavior:
+- Search by Purchase Order ID.
+- Search by Supplier Name.
+- Empty or whitespace-only search returns the normal unfiltered list.
+- No-match searches return the correct empty result state.
+- Search state is preserved through the applicable Purchase Order navigation.
+- Existing authorization behavior remains intact.
+- Existing Purchase Order list behavior outside search remains unchanged.
+
+The project owner completed runtime/browser verification successfully after implementation.
+
+No P3-P6 functionality was implemented as part of P2.
