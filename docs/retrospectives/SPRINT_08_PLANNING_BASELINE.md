@@ -3,7 +3,7 @@
 **Sprint:** Sprint 8 - Purchasing Enhancements  
 **Repository/Branch:** `feature/purchasing_enhancements`  
 **Baseline Date:** 2026-08-19  
-**Status:** P0-P3 complete and runtime/browser verified; P4 - Purchase Order Sorting is next
+**Status:** P0-P4 complete and runtime/browser verified; P5 - Purchase Order Pagination is next
 
 ---
 
@@ -314,6 +314,8 @@ Dynamic Capability-Based Authorization remains a separate future implementation 
 
 ## 9. Task Sequence P0-P7
 
+> **Sprint 8 task sequence revision:** The originally drafted P4-P7 labels were superseded by the approved task prompts. The current sequence places **P4 - Purchase Order Sorting** and **P5 - Purchase Order Pagination** before inventory integration and later regression/completion work.
+
 The task labels below are established by this planning baseline because no prior Sprint 8 P0-P7 task definition was found in the available project documentation.
 
 ### P0 - Actual Purchasing Source / Documentation Baseline
@@ -367,7 +369,7 @@ Verified behavior:
 
 Runtime/browser verification was completed successfully by the project owner.
 
-The next task is **P4 - Purchase Order Sorting**.
+The next task is **P5 - Purchase Order Pagination**.
 
 ### P3 - Purchase Order Filtering
 
@@ -390,11 +392,26 @@ Acceptance/verification result:
 
 Runtime/browser verification was completed successfully by the project owner.
 
-P4 - Purchase Order Sorting is the next task.
-
 ### P4 - Purchase Order Sorting
 
-Extend Purchase Order listing with server-side sorting using the established shared sorting patterns. Do not begin until P3 documentation and implementation commits are complete.
+**Status: Complete and verified**
+
+Extend Purchase Order listing with server-side sorting using the established shared sorting patterns.
+
+Confirmed sort fields:
+- Purchase Order ID
+- Supplier
+- Order Date
+- Status
+- Total Amount
+
+Ascending and descending sorting were runtime/browser verified. Sorting integrates with the existing P2 Search and P3 Filtering behavior.
+
+### P5 - Purchase Order Pagination
+
+**Next task**
+
+Extend Purchase Order listing with server-side pagination using the established shared paging infrastructure while preserving Search, Filtering, and Sorting behavior.
 
 
 
@@ -425,7 +442,9 @@ Verified:
 - Existing authorization boundaries
 - No unrelated Purchase Order behavior changes
 
-P4 - Purchase Order Sorting remains unimplemented and is the next task.
+P4 - Purchase Order Sorting is complete and runtime/browser verified.
+
+P5 - Purchase Order Pagination is the next task.
 
 ### P3 Documentation Audit
 
@@ -442,3 +461,22 @@ The following current-state documentation was synchronized with the verified P3 
 Historical Sprint 7 documentation remains unchanged.
 
 No Dynamic Capability-Based Authorization documentation was marked as implemented.
+
+
+## 24. P4 - Purchase Order Sorting
+
+P4 is complete and runtime/browser verified.
+
+The Purchase Order listing supports server-side sorting for:
+
+- Purchase Order ID
+- Supplier
+- Order Date
+- Status
+- Total Amount
+
+Both ascending and descending directions were verified. Sorting integrates with the existing Search and Filtering behavior and preserves applicable state through Purchase Order navigation and workflow actions.
+
+Current-state documentation was synchronized after verification. Historical Sprint 7 documentation remains unchanged.
+
+P5 - Purchase Order Pagination is the next task.

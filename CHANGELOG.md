@@ -66,7 +66,16 @@ P2 - Purchase Order Search is complete and verified.
 - Preserved existing authorization boundaries.
 - Runtime/browser verification was completed successfully by the project owner.
 
-P4 - Purchase Order Sorting is the next Sprint 8 task.
+#### P4 - Purchase Order Sorting
+
+- Added server-side Purchase Order sorting using the established shared sorting conventions.
+- Added supported sorting for Purchase Order ID, Supplier, Order Date, Status, and Total Amount.
+- Added ascending and descending sorting behavior.
+- Preserved existing Purchase Order Search and Filtering behavior when sorting is applied.
+- Preserved applicable sorting state through Purchase Order navigation and workflow actions.
+- Runtime/browser verification was completed successfully by the project owner.
+
+P5 - Purchase Order Pagination is the next Sprint 8 task.
 
 ---
 

@@ -1822,3 +1822,34 @@ Verified:
 
 The implementation remains independent of the future Dynamic Capability-Based Authorization architecture.
 
+
+
+# DD-029 - Purchase Order Sorting Uses Shared Server-Side Sorting
+
+**Status:** Accepted
+
+**Context**
+
+Sprint 8 P4 required Purchase Order sorting without introducing a separate sorting architecture. The existing platform already uses shared sorting conventions across feature areas.
+
+**Decision**
+
+Purchase Order listing sorting uses the existing shared sorting pattern through `PurchaseOrderSortFields`, the Purchase Order request `SortBy`/`Descending` values, and server-side repository ordering.
+
+The confirmed supported fields are:
+
+- `Id`
+- `Supplier`
+- `OrderDate`
+- `Status`
+- `TotalAmount`
+
+Both ascending and descending ordering are supported. Sorting is applied in the Purchase Order query before the result is returned to the Presentation layer.
+
+**Rationale**
+
+This preserves consistency with existing feature sorting, keeps query work database-side, and avoids duplicating sorting abstractions. It also allows Purchase Order sorting to compose with the existing Search and Filtering behavior.
+
+**Scope Boundary**
+
+P4 does not introduce Purchase Order pagination, inventory synchronization, Dynamic Capability-Based Authorization, or unrelated Purchasing changes. Pagination is the next task in Sprint 8.

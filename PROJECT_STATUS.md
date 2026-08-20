@@ -89,8 +89,8 @@ Verified:
 
 - **Completed Modules:** 10
 - **Architecture Status:** Validated
-- **Current Milestone:** Sprint 8 — P1 Multiple Purchase Order Item Management — Complete
-- **Next Milestone:** Sprint 8 — P2 Purchase Order Search
+- **Current Milestone:** Sprint 8 — P4 Purchase Order Sorting — Complete
+- **Next Milestone:** Sprint 8 — P5 Purchase Order Pagination
 
 ---
 
@@ -131,7 +131,7 @@ The architecture has been validated and is considered stable for future business
 | Dashboard | ✅ Complete | 100% |
 | Authentication & Authorization |  ✅ Complete | 100% |
 | User Management | ✅ Complete | 100% |
-| Purchasing | 🟨 Core Workflow Complete | Partial |
+| Purchasing | 🟨 Core Workflow + Sprint 8 Purchasing Enhancements | Partial |
 | Reporting | ✅ Additional Reporting Complete | 100% |
 | Account Management | ✅ Complete | 100% |
 
@@ -541,20 +541,23 @@ Final verification covered normal application regression, reporting workflows, e
 
 # Current Focus
 
-Sprint 8 Purchasing Enhancements is now active. P0 - Actual Purchasing Source/Documentation Baseline and P1 - Multiple Purchase Order Item Management are complete.
+Sprint 8 Purchasing Enhancements is now active. P0 - Actual Purchasing Source/Documentation Baseline through P4 - Purchase Order Sorting are complete and verified.
 
 Completed in Sprint 8:
 
 - P0 - Actual Purchasing Source/Documentation Baseline
 - P1 - Multiple Purchase Order Item Management
+- P2 - Purchase Order Search
+- P3 - Purchase Order Filtering
+- P4 - Purchase Order Sorting
 
-P1 was runtime/browser verified successfully. The Purchase Order Create workflow now supports multiple item rows while preserving the existing Purchasing architecture and downstream workflow.
+P1, P2, P3, and P4 were runtime/browser verified successfully. The Purchase Order workflow now supports multiple item rows, search, filtering, and sorting while preserving the existing Purchasing architecture and downstream workflow.
 
 # Next Milestone
 
-## P2 - Purchase Order Search
+## P5 - Purchase Order Pagination
 
-The next development task is Purchase Order Search. P2 must reuse the existing Purchase Order listing/query architecture and must not introduce unrelated Purchasing or authorization scope.
+The next development task is Purchase Order Pagination. P5 must reuse the existing shared paging infrastructure and the current Purchase Order listing/query architecture. It must not introduce unrelated Purchasing or authorization scope.
 
 Sprint 7 Additional Reporting remains complete and unchanged.
 
@@ -584,7 +587,7 @@ Business Modules
 
 Purchasing
 
-- Purchase Order search, filtering, sorting, and pagination
+- Purchase Order pagination
 - Inventory synchronization during Purchase Order receiving
 
 Platform
@@ -798,5 +801,30 @@ Verified behavior:
 
 Runtime/browser verification was completed successfully by the project owner after the P3 implementation.
 
-P4 - Purchase Order Sorting has not been implemented.
+# Sprint 8 - P4 Purchase Order Sorting
+
+**Status: Complete and verified**
+
+P4 adds server-side Purchase Order sorting using the established shared sorting conventions and the existing Purchase Order listing/query architecture.
+
+Confirmed sort fields:
+- Purchase Order ID
+- Supplier
+- Order Date
+- Status
+- Total Amount
+
+Verified behavior:
+- Ascending sorting works for all supported fields.
+- Descending sorting works for all supported fields.
+- Sorting integrates with the existing Purchase Order search and filters.
+- Sorting state is preserved through applicable Purchase Order navigation and workflow actions.
+- Sorting remains server-side in the repository query.
+- Existing authorization behavior remains intact.
+- No unrelated Purchase Order behavior was changed.
+- Purchase Order pagination was not introduced as part of P4.
+
+Runtime/browser verification was completed successfully by the project owner after the P4 implementation.
+
+Next task: **P5 - Purchase Order Pagination**.
 

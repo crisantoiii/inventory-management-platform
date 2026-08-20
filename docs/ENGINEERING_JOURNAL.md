@@ -2774,3 +2774,71 @@ P3 documentation was synchronized after implementation verification. The current
 P3 - Purchase Order Filtering is complete and verified.
 
 Next task: **P4 - Purchase Order Sorting**.
+
+
+# Sprint 8 - P4 Purchase Order Sorting
+
+**Date:** 2026-08-20
+
+## Objective
+
+Extend the existing Purchase Order listing with server-side sorting while preserving the P2 Search, P3 Filtering, and established Purchasing architecture.
+
+## Confirmed Sort Fields
+
+Source inspection confirmed the following supported Purchase Order sort fields:
+
+- Purchase Order ID
+- Supplier
+- Order Date
+- Status
+- Total Amount
+
+## Implementation
+
+The Purchase Order listing now passes `SortBy` and `Descending` through the existing request/handler/repository flow. The repository applies the selected ordering server-side using `PurchaseOrderSortFields`.
+
+The Presentation layer exposes sortable headers and preserves the active sorting state through applicable Purchase Order navigation and workflow actions. Existing Search and Filtering parameters remain part of the request when sorting is applied.
+
+A dedicated `PurchaseOrderSortFields` shared class was used to follow the project's established sorting convention. No separate sorting architecture was introduced.
+
+## Verification
+
+The project owner completed runtime/browser verification successfully. Verified behavior includes:
+
+- Ascending sorting for each supported field
+- Descending sorting for each supported field
+- Sorting combined with existing Search
+- Sorting combined with existing Filters
+- Sorting state preservation through applicable Purchase Order navigation and workflow actions
+- Existing Purchase Order workflow behavior
+- Existing authorization boundaries
+- No unrelated Purchasing behavior changes
+
+Purchase Order pagination was intentionally not implemented as part of P4.
+
+## Architecture Validation
+
+The implementation continues to follow:
+
+```text
+Purchase Order Razor Page
+        ↓
+GetPurchaseOrdersHandler
+        ↓
+IPurchaseOrderRepository
+        ↓
+PurchaseOrderRepository
+        ↓
+EF Core Query
+        ↓
+Database
+```
+
+Sorting remains server-side and composes with the existing query pipeline rather than introducing client-side ordering or a parallel feature-specific mechanism.
+
+## Outcome
+
+P4 - Purchase Order Sorting is complete and verified.
+
+Next task: **P5 - Purchase Order Pagination**.
