@@ -1,4 +1,4 @@
-﻿using InventoryPlatform.Domain.Enums;
+using InventoryPlatform.Domain.Enums;
 
 namespace InventoryPlatform.Application.Features.Purchasing.GetPurchaseOrders;
 
@@ -11,4 +11,8 @@ public sealed record GetPurchaseOrdersRequest
     public DateOnly? ToDate { get; init; }
 
     public PurchaseOrderStatus? Status { get; init; }
+
+    public string? SortBy { get; init; }
+
+    public bool Descending { get; init; }
 }

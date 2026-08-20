@@ -1,5 +1,6 @@
-﻿using InventoryPlatform.Application.Features.Purchasing.GetPurchaseOrders;
+using InventoryPlatform.Application.Features.Purchasing.GetPurchaseOrders;
 using InventoryPlatform.Domain.Enums;
+using InventoryPlatform.Shared.Sorting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -30,6 +31,40 @@ public class IndexModel : PageModel
     [BindProperty(SupportsGet = true)]
     public PurchaseOrderStatus? Status { get; set; }
 
+    [BindProperty(SupportsGet = true)]
+    public string? SortBy { get; set; }
+
+    [BindProperty(SupportsGet = true)]
+    public bool Descending { get; set; }
+
+    public string GetSortUrl(string sortBy)
+    {
+        var descending = string.Equals(SortBy, sortBy, StringComparison.OrdinalIgnoreCase)
+            ? !Descending
+            : false;
+
+        return Url.Page(
+            "./Index",
+            values: new
+            {
+                Search,
+                FromDate,
+                ToDate,
+                Status,
+                SortBy = sortBy,
+                Descending = descending
+            }) ?? string.Empty;
+    }
+
+    public static class SortFields
+    {
+        public const string Id = PurchaseOrderSortFields.Id;
+        public const string Supplier = PurchaseOrderSortFields.Supplier;
+        public const string OrderDate = PurchaseOrderSortFields.OrderDate;
+        public const string Status = PurchaseOrderSortFields.Status;
+        public const string TotalAmount = PurchaseOrderSortFields.TotalAmount;
+    }
+
     public IReadOnlyList<SelectListItem> StatusOptions =>
         new List<SelectListItem>
         {
@@ -51,7 +86,9 @@ public class IndexModel : PageModel
                 Search = Search,
                 FromDate = FromDate,
                 ToDate = ToDate,
-                Status = Status
+                Status = Status,
+                SortBy = SortBy,
+                Descending = Descending
             },
             cancellationToken);
 

@@ -1,4 +1,4 @@
-﻿using InventoryPlatform.Application.Interfaces.Persistence;
+using InventoryPlatform.Application.Interfaces.Persistence;
 using InventoryPlatform.Shared.Results;
 
 namespace InventoryPlatform.Application.Features.Purchasing.GetPurchaseOrders;
@@ -23,6 +23,8 @@ public sealed class GetPurchaseOrdersHandler
                 request.FromDate,
                 request.ToDate,
                 request.Status,
+                request.SortBy,
+                request.Descending,
                 cancellationToken);
 
         var response = new GetPurchaseOrdersResponse(

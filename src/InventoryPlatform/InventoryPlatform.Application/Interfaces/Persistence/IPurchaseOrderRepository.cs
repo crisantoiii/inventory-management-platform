@@ -1,4 +1,4 @@
-﻿using InventoryPlatform.Domain.Entities;
+using InventoryPlatform.Domain.Entities;
 using InventoryPlatform.Domain.Enums;
 
 namespace InventoryPlatform.Application.Interfaces.Persistence;
@@ -11,5 +11,7 @@ public interface IPurchaseOrderRepository
         DateOnly? fromDate = null,
         DateOnly? toDate = null,
         PurchaseOrderStatus? status = null,
+        string? sortBy = null,
+        bool descending = false,
         CancellationToken cancellationToken = default);
 }

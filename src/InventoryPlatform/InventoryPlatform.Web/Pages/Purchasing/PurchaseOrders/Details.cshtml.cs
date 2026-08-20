@@ -1,4 +1,4 @@
-﻿using InventoryPlatform.Application.Features.Purchasing.ApprovePurchaseOrder;
+using InventoryPlatform.Application.Features.Purchasing.ApprovePurchaseOrder;
 using InventoryPlatform.Application.Features.Purchasing.GetPurchaseOrder;
 using InventoryPlatform.Application.Features.Purchasing.ReceivePurchaseOrder;
 using InventoryPlatform.Application.Features.Purchasing.SubmitPurchaseOrder;
@@ -40,6 +40,12 @@ public class DetailsModel : PageModel
 
     [BindProperty(SupportsGet = true)]
     public PurchaseOrderStatus? Status { get; set; }
+
+    [BindProperty(SupportsGet = true)]
+    public string? SortBy { get; set; }
+
+    [BindProperty(SupportsGet = true)]
+    public bool Descending { get; set; }
 
     public async Task<IActionResult> OnGetAsync(
         int id,
@@ -93,7 +99,7 @@ public class DetailsModel : PageModel
 
         return RedirectToPage(
             "./Details",
-            new { id = result.Value.Id, search = Search, fromDate = FromDate, toDate = ToDate, status = Status });
+            new { id = result.Value.Id, search = Search, fromDate = FromDate, toDate = ToDate, status = Status, sortBy = SortBy, descending = Descending });
     }
 
     public async Task<IActionResult> OnPostApproveAsync(
@@ -130,7 +136,7 @@ public class DetailsModel : PageModel
 
         return RedirectToPage(
             "./Details",
-            new { id = result.Value.Id, search = Search, fromDate = FromDate, toDate = ToDate, status = Status });
+            new { id = result.Value.Id, search = Search, fromDate = FromDate, toDate = ToDate, status = Status, sortBy = SortBy, descending = Descending });
     }
 
     public async Task<IActionResult> OnPostReceiveAsync(
@@ -172,6 +178,6 @@ public class DetailsModel : PageModel
 
         return RedirectToPage(
             "./Details",
-            new { id = result.Value.PurchaseOrderId, search = Search, fromDate = FromDate, toDate = ToDate, status = Status });
+            new { id = result.Value.PurchaseOrderId, search = Search, fromDate = FromDate, toDate = ToDate, status = Status, sortBy = SortBy, descending = Descending });
     }
 }

@@ -1,4 +1,4 @@
-﻿@page
+@page
 @model InventoryPlatform.Web.Pages.Purchasing.PurchaseOrders.IndexModel
 
 @{
@@ -103,11 +103,56 @@
                     <table class="table table-hover align-middle mb-0">
                         <thead>
                             <tr>
-                                <th>ID</th>
-                                <th>Supplier</th>
-                                <th>Order Date</th>
-                                <th>Status</th>
-                                <th class="text-end">Total</th>
+                                <th>
+                                    <a href="@Model.GetSortUrl(IndexModel.SortFields.Id)"
+                                       class="text-decoration-none">
+                                        ID
+                                        @if (Model.SortBy == IndexModel.SortFields.Id)
+                                        {
+                                            <span aria-hidden="true">@(Model.Descending ? "↓" : "↑")</span>
+                                        }
+                                    </a>
+                                </th>
+                                <th>
+                                    <a href="@Model.GetSortUrl(IndexModel.SortFields.Supplier)"
+                                       class="text-decoration-none">
+                                        Supplier
+                                        @if (Model.SortBy == IndexModel.SortFields.Supplier)
+                                        {
+                                            <span aria-hidden="true">@(Model.Descending ? "↓" : "↑")</span>
+                                        }
+                                    </a>
+                                </th>
+                                <th>
+                                    <a href="@Model.GetSortUrl(IndexModel.SortFields.OrderDate)"
+                                       class="text-decoration-none">
+                                        Order Date
+                                        @if (Model.SortBy == IndexModel.SortFields.OrderDate)
+                                        {
+                                            <span aria-hidden="true">@(Model.Descending ? "↓" : "↑")</span>
+                                        }
+                                    </a>
+                                </th>
+                                <th>
+                                    <a href="@Model.GetSortUrl(IndexModel.SortFields.Status)"
+                                       class="text-decoration-none">
+                                        Status
+                                        @if (Model.SortBy == IndexModel.SortFields.Status)
+                                        {
+                                            <span aria-hidden="true">@(Model.Descending ? "↓" : "↑")</span>
+                                        }
+                                    </a>
+                                </th>
+                                <th class="text-end">
+                                    <a href="@Model.GetSortUrl(IndexModel.SortFields.TotalAmount)"
+                                       class="text-decoration-none">
+                                        Total
+                                        @if (Model.SortBy == IndexModel.SortFields.TotalAmount)
+                                        {
+                                            <span aria-hidden="true">@(Model.Descending ? "↓" : "↑")</span>
+                                        }
+                                    </a>
+                                </th>
                                 <th class="text-end">Actions</th>
                             </tr>
                         </thead>
@@ -145,6 +190,8 @@
                                            asp-route-fromDate="@Model.FromDate"
                                            asp-route-toDate="@Model.ToDate"
                                            asp-route-status="@Model.Status"
+                                           asp-route-sortBy="@Model.SortBy"
+                                           asp-route-descending="@Model.Descending"
                                            class="btn btn-sm btn-outline-primary">
                                             Details
                                         </a>

@@ -1,7 +1,8 @@
-﻿using InventoryPlatform.Application.Interfaces.Persistence;
+using InventoryPlatform.Application.Interfaces.Persistence;
 using InventoryPlatform.Domain.Entities;
 using InventoryPlatform.Domain.Enums;
 using InventoryPlatform.Infrastructure.Persistence.Context;
+using InventoryPlatform.Shared.Sorting;
 using Microsoft.EntityFrameworkCore;
 
 namespace InventoryPlatform.Infrastructure.Persistence.Repositories;
@@ -34,6 +35,8 @@ public sealed class PurchaseOrderRepository
         DateOnly? fromDate = null,
         DateOnly? toDate = null,
         PurchaseOrderStatus? status = null,
+        string? sortBy = null,
+        bool descending = false,
         CancellationToken cancellationToken = default)
     {
         IQueryable<PurchaseOrder> query = Context.PurchaseOrders
@@ -76,6 +79,44 @@ public sealed class PurchaseOrderRepository
                 po => po.Status == status.Value);
         }
 
-        return await query.ToListAsync(cancellationToken);
+        var orderedQuery = ApplySorting(
+            query,
+            sortBy,
+            descending);
+
+        return await orderedQuery.ToListAsync(cancellationToken);
+    }
+
+    private static IOrderedQueryable<PurchaseOrder> ApplySorting(
+        IQueryable<PurchaseOrder> query,
+        string? sortBy,
+        bool descending)
+    {
+        return sortBy switch
+        {
+            PurchaseOrderSortFields.Id => descending
+                ? query.OrderByDescending(po => po.Id)
+                : query.OrderBy(po => po.Id),
+
+            PurchaseOrderSortFields.Supplier => descending
+                ? query.OrderByDescending(po => po.Supplier.Name)
+                : query.OrderBy(po => po.Supplier.Name),
+
+            PurchaseOrderSortFields.OrderDate => descending
+                ? query.OrderByDescending(po => po.OrderDate)
+                : query.OrderBy(po => po.OrderDate),
+
+            PurchaseOrderSortFields.Status => descending
+                ? query.OrderByDescending(po => po.Status)
+                : query.OrderBy(po => po.Status),
+
+            PurchaseOrderSortFields.TotalAmount => descending
+                ? query.OrderByDescending(po => po.Items.Sum(item => item.Quantity * item.UnitCost))
+                : query.OrderBy(po => po.Items.Sum(item => item.Quantity * item.UnitCost)),
+
+            _ => query
+                .OrderByDescending(po => po.OrderDate)
+                .ThenByDescending(po => po.Id)
+        };
     }
 }
