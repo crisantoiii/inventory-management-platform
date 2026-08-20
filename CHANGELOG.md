@@ -52,7 +52,21 @@ No Dynamic Capability-Based Authorization implementation was introduced during S
 - Preserved the existing Purchase Order persistence model; no database migration was required.
 - Runtime/browser verification confirmed multi-item Purchase Order creation and the existing downstream Purchasing workflow.
 
-P2 - Purchase Order Search remains the next Sprint 8 task.
+P2 - Purchase Order Search is complete and verified.
+
+#### P3 - Purchase Order Filtering
+
+- Added server-side Purchase Order From Date filtering.
+- Added server-side Purchase Order To Date filtering.
+- Added server-side Purchase Order Status filtering.
+- Preserved existing Purchase Order Search behavior.
+- Enabled combined Search + filter behavior.
+- Preserved applicable filter state through existing Purchase Order navigation.
+- Preserved existing empty-result behavior.
+- Preserved existing authorization boundaries.
+- Runtime/browser verification was completed successfully by the project owner.
+
+P4 - Purchase Order Sorting is the next Sprint 8 task.
 
 ---
 

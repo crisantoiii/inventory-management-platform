@@ -3,7 +3,7 @@
 **Sprint:** Sprint 8 - Purchasing Enhancements  
 **Repository/Branch:** `feature/purchasing_enhancements`  
 **Baseline Date:** 2026-08-19  
-**Status:** P0 complete; P1 - Multiple Purchase Order Item Management complete and runtime/browser verified
+**Status:** P0-P3 complete and runtime/browser verified; P4 - Purchase Order Sorting is next
 
 ---
 
@@ -367,507 +367,78 @@ Verified behavior:
 
 Runtime/browser verification was completed successfully by the project owner.
 
-The next task is **P3 - Purchase Order Filtering, Sorting, and Pagination**.
+The next task is **P4 - Purchase Order Sorting**.
 
-### P3 - Purchase Order Filtering, Sorting, and Pagination
+### P3 - Purchase Order Filtering
 
-Extend Purchase Order listing with reusable server-side:
+**Status: Complete and verified**
 
-- Filtering
-- Sorting
-- Pagination
+P3 extends Purchase Order listing with confirmed server-side filters:
 
-Existing shared infrastructure must be reused where applicable.
+- From Date
+- To Date
+- Purchase Order Status
 
-### P4 - Inventory Integration During Receiving
-
-Connect verified Purchase Order receiving behavior to inventory updates.
-
-Required behavior must be derived from the actual Domain model, Inventory Transaction model, persistence implementation, and existing receiving workflow.
-
-Inventory updates must preserve:
-
-- Domain invariants
-- Transactional consistency
-- Existing inventory quantity rules
-- Inventory transaction history
-- Purchase Order receiving state transitions
-
-### P5 - Purchasing User Experience Improvements
-
-Address verified usability gaps discovered during P1-P4.
-
-Examples may include:
-
-- Clearer item-entry behavior
-- Better validation feedback
-- Better workflow feedback
-- Consistent pagination/filter state
-- Better receiving presentation
-
-Only issues demonstrated by actual source or browser verification are in scope.
-
-### P6 - Purchasing Regression and Integration Verification
-
-Perform comprehensive Purchasing verification after implementation.
-
-Verification must cover:
-
-- Existing Purchase Order creation
-- Multi-item behavior
-- Search
-- Filtering
-- Sorting
-- Pagination
-- Submission
-- Approval
-- Partial receiving
-- Final receiving
-- Inventory synchronization
-- Domain validation
-- Failure behavior
-- Existing authorization boundaries
-- Regression of unrelated core modules
-
-### P7 - Final Purchasing Completion Verification
-
-Perform final project-level verification for the Purchasing Enhancements scope.
-
-Required:
-
-- Build verification
-- Runtime verification
-- Browser/manual verification
-- Database behavior verification
-- Review of generated database changes, if any
-- Git diff inspection
-- Confirmation that no unrelated files changed
-- Confirmation that Dynamic Capability-Based Authorization was not introduced
-- Documentation synchronization readiness
-
-P7 is the completion gate for the Purchasing Enhancements implementation scope.
-
----
-
-## 10. Documentation Task Sequence D1-D4
-
-### D1 - Planning and Scope Documentation
-
-Maintain the Sprint 8 Planning Baseline and ensure that the documented task sequence matches the approved scope.
-
-### D2 - Feature Documentation Synchronization
-
-After verified implementation, synchronize applicable:
-
-- `PROJECT_STATUS.md`
-- `FEATURES.md`
-- `ROADMAP.md`
-
-Documentation must describe verified behavior rather than planned behavior.
-
-### D3 - Engineering and Design Documentation
-
-Synchronize applicable:
-
-- `docs/ENGINEERING_JOURNAL.md`
-- `docs/DESIGN_DECISIONS.md`
-- Purchasing-specific retrospective or technical documentation
-
-Only decisions and behavior supported by actual implementation should be recorded as completed.
-
-### D4 - Final Documentation Validation
-
-Before Sprint 8 handoff:
-
-- Compare documentation against source
-- Compare documentation against verified runtime behavior
-- Remove stale Sprint 7 statements where they conflict with Sprint 8 state
-- Confirm task completion status
-- Confirm no future feature is incorrectly marked complete
-- Confirm branch/repository information is accurate
-- Confirm verification statements are evidence-based
-
-Documentation commits remain separate from implementation commits.
-
----
-
-## 11. Dependencies
-
-Primary dependencies are:
-
-```text
-P0
- |
- +--> P1
- |
- +--> P2
- |
- +--> P3
- |
- +--> P4
- |
- +--> P5
- |
- +--> P6
- |
- +--> P7
-```
-
-More specifically:
-
-- P1 depends on actual PurchaseOrder and PurchaseOrderItem domain behavior.
-- P2 depends on the actual Purchase Order persistence/read model.
-- P3 depends on shared paging/filtering/sorting infrastructure and the Purchase Order query shape.
-- P4 depends on the existing receiving workflow and inventory transaction rules.
-- P5 depends on issues discovered during verified implementation.
-- P6 depends on P1-P5 completion.
-- P7 depends on P6 completion and documentation readiness.
-- D2-D4 depend on verified implementation behavior.
-
-Dynamic Capability-Based Authorization is not a dependency for Purchasing Enhancements.
-
----
-
-## 12. Risks
-
-### Domain Workflow Risk
-
-Changes to Purchase Order item or receiving behavior may affect existing aggregate invariants.
-
-**Control:** inspect and reuse existing domain methods before modifying behavior.
-
-### Inventory Consistency Risk
-
-Receiving changes can affect both Purchase Order state and inventory state.
-
-**Control:** verify transactional behavior and existing Unit of Work/persistence boundaries.
-
-### Query Translation Risk
-
-Search, filtering, sorting, and pagination may produce EF Core translation issues.
-
-**Control:** validate queries through actual database execution.
-
-### Regression Risk
-
-Purchasing enhancements may affect existing Purchase Order workflows.
-
-**Control:** repeat the complete existing workflow during browser/manual verification.
-
-### Scope Creep Risk
-
-Purchasing work can naturally expand into authorization, sales, audit, or broader inventory features.
-
-**Control:** enforce the locked Sprint 8 priority and explicit non-scope.
-
-### Documentation Drift Risk
-
-Planning documents may become stale after implementation.
-
-**Control:** documentation is synchronized only after behavior is verified.
-
-### Architectural Duplication Risk
-
-New feature-specific abstractions may duplicate existing infrastructure.
-
-**Control:** inspect existing shared patterns first and apply the Rule of Three.
-
----
-
-## 13. Acceptance Criteria
-
-Sprint 8 Purchasing Enhancements are accepted only when:
-
-- The implementation is on `feature/purchasing_enhancements`.
-- Sprint 7 historical work remains unchanged.
-- Existing Purchasing workflow behavior remains valid.
-- Multiple Purchase Order item management works according to the verified requirements.
-- Purchase Order search works according to verified source fields.
-- Purchase Order filtering works according to verified requirements.
-- Purchase Order sorting works according to verified requirements.
-- Purchase Order pagination works using the established paging infrastructure where applicable.
-- Receiving correctly updates inventory according to the verified domain rules.
-- Inventory transaction history remains correct.
-- Domain validation remains authoritative.
+Acceptance/verification result:
+- Confirmed filters work correctly.
+- Multiple filters work together.
+- Existing P2 search integrates with filtering.
+- Empty results behave correctly.
+- Applicable filter state is preserved.
 - Existing authorization behavior remains intact.
-- No Dynamic Capability-Based Authorization implementation is introduced.
-- No unrelated features are implemented.
-- `dotnet restore` succeeds.
-- `dotnet build` succeeds.
-- Applicable runtime/database verification succeeds.
-- Browser/manual verification succeeds for the implemented workflow.
-- Git diff contains only intended changes.
-- Implementation and documentation commits are separate.
-- Documentation matches verified source and behavior.
-- Final Git state is clean or contains only explicitly documented intentional changes.
+- No unrelated behavior was changed.
 
----
+Runtime/browser verification was completed successfully by the project owner.
 
-## 14. Verification Strategy
+P4 - Purchase Order Sorting is the next task.
 
-Verification follows the established project workflow.
+### P4 - Purchase Order Sorting
 
-### Source Verification
+Extend Purchase Order listing with server-side sorting using the established shared sorting patterns. Do not begin until P3 documentation and implementation commits are complete.
 
-- Inspect exact source paths before coding.
-- Inspect related Domain, Application, Infrastructure, Web, and Shared components.
-- Inspect existing tests and verification mechanisms if present.
 
-### Build Verification
 
-Run as applicable:
+## 23. P3 - Purchase Order Filtering
 
-```text
-dotnet restore
-dotnet build
-```
+P3 is complete and runtime/browser verified.
 
-Tests must also be run when the actual repository contains applicable automated tests.
+The Purchase Order listing now supports the confirmed server-side filters:
 
-### Browser Verification
+- From Date
+- To Date
+- Purchase Order Status
 
-Verify actual application behavior using persisted database data.
+The implementation preserves P2 search and allows search and filtering to operate together.
 
-Purchasing verification should include:
-
-- Purchase Order listing
-- Purchase Order creation
-- Multiple items
-- Search
-- Filtering
-- Sorting
-- Pagination
-- Details
-- Submission
-- Approval
-- Partial receiving
-- Final receiving
-- Inventory update
-- Success feedback
-- Validation failures
-- No-result behavior
-- Existing authorization boundaries
-
-### Database Verification
-
-Where inventory integration is implemented:
-
-- Confirm Purchase Order receiving state.
-- Confirm Product quantity.
-- Confirm Inventory Transaction creation.
-- Confirm no duplicate inventory update.
-- Confirm partial receiving behavior.
-- Confirm final receiving behavior.
-
-### Regression Verification
-
-Existing core modules and Sprint 7 reporting must remain operational.
-
-No verification claim may be made unless the verification was actually performed.
-
----
-
-## 15. Commit Strategy
-
-Implementation and documentation commits remain separate.
-
-### Planning Baseline
-
-```text
-docs: establish sprint 8 planning baseline
-```
-
-This is the first Sprint 8 documentation commit.
-
-### Implementation
-
-Each implementation task should use a focused feature commit, for example:
-
-```text
-feat(purchasing): ...
-```
-
-The exact message must reflect the actual completed implementation.
-
-### Documentation
-
-Documentation must use a separate commit, for example:
-
-```text
-docs: update purchasing enhancements status
-```
-
-The exact message must reflect the actual documentation changes.
-
-Do not combine implementation and documentation changes in one commit.
-
----
-
-## 16. ZIP and Manual-Patch Packaging Rules
-
-When source files are handed off for review:
-
-- Use ZIP for multiple files.
-- Preserve the repository-relative directory structure.
-- Do not include unnecessary build artifacts such as `bin/` or `obj/`.
-- Do not include unrelated generated files.
-- Keep implementation handoff ZIPs separate from documentation handoff ZIPs when both are provided.
-
-Manual-review patches must be packaged separately as a patch ZIP.
-
-A manual patch ZIP must:
-
-- Contain only the intended patch/diff material.
-- Clearly identify the source and target paths.
-- Preserve enough context for manual review.
-- Not be mixed with unrelated documentation or generated artifacts.
-
----
-
-## 17. Documentation Synchronization Rules
-
-Documentation is authoritative only after it has been validated against actual source and behavior.
-
-Rules:
-
-1. Do not mark planned work as completed before verification.
-2. Do not claim browser verification without performing it.
-3. Do not claim build success without running the build.
-4. Do not claim database behavior without executing the relevant workflow.
-5. Keep Sprint 7 historical documentation intact except for necessary cross-sprint status references.
-6. Update Sprint 8 documentation after verified behavior, not before.
-7. Keep implementation and documentation commits separate.
-8. Remove stale status statements when they conflict with verified current state.
-9. Preserve architectural decision history.
-10. Record important deviations from established patterns and their justification.
-
----
-
-## 18. Sprint 8 Completion Criteria
-
-Sprint 8 Purchasing Enhancements is complete only when all of the following are true:
-
-- P0-P7 are complete.
-- D1-D4 are complete.
-- Purchasing Enhancements are implemented and verified.
-- Existing Purchasing workflows remain operational.
-- Inventory integration is verified where applicable.
-- Regression verification passes.
-- Build verification passes.
-- Browser/manual verification passes.
-- Documentation is synchronized and validated.
-- Implementation and documentation commits are separate.
-- Git working tree is clean or the remaining state is explicitly documented.
-- A Sprint 8 save point is created.
-- A final handoff identifies the completed scope, verification evidence, commits, documentation state, and next Sprint 8 priority.
-
-The next priority after Purchasing Enhancements is Dynamic Capability-Based Authorization, but it must not begin automatically from this planning baseline.
-
----
-
-## 19. P0/P1 Handoff State
-
-P0 - Actual Purchasing Source/Documentation Baseline is complete. The actual source baseline was inspected and the documented Purchasing core workflow was reconciled against the implementation.
-
-P1 - Multiple Purchase Order Item Management is also complete and runtime/browser verified. The Create Purchase Order workflow now supports multiple item rows while preserving the existing Application, Domain, Infrastructure, and persistence boundaries.
-
-P2 - Purchase Order Search is complete and runtime/browser verified. P3 - Purchase Order Filtering, Sorting, and Pagination remains the next task. Dynamic Capability-Based Authorization remains outside the current Purchasing Enhancements scope.
-
-P2 is complete and verified.
-
-The next task is:
-
-**P3 - Purchase Order Filtering, Sorting, and Pagination**
-
-
-## 20. P0 - Actual Purchasing Source Baseline
-
-P0 inspected the actual Sprint 8 source and documentation baseline. The existing Purchasing vertical slice was confirmed as implemented across Domain, Application, Infrastructure, and Web.
-
-Confirmed current Purchasing behavior:
-
-- Purchase Order creation
-- Purchase Order listing
-- Purchase Order details
-- Submit
-- Approve
-- Partial receiving
-- Final receiving
-- Completed state
-- Supplier and product validation
-- Purchase Order item domain validation
-- Existing repository and Unit of Work persistence
-- Existing EF Core Purchase Order and Purchase Order Item mappings
-
-Current Purchasing limitations confirmed by source:
-
-- Purchase Order Create previously rendered only one item row.
-- Purchase Order search is implemented and verified under P2.
-- Purchase Order filtering is not implemented.
-- Purchase Order sorting is not implemented.
-- Purchase Order pagination is not implemented.
-- Purchase Order receiving does not currently synchronize inventory.
-- Dynamic Capability-Based Authorization is not part of Purchasing Enhancements.
-
-The supplied source snapshot did not contain `.git` metadata, so branch status, working-tree status, and commit history were not asserted from the ZIP.
-
-The source snapshot also could not be built in the inspection environment because the .NET CLI was unavailable. Runtime verification was subsequently completed against the updated application by the project owner.
-
-## 21. P1 - Multiple Purchase Order Item Management
-
-P1 is complete. The Purchase Order Create page now supports multiple item rows while preserving the existing Purchasing architecture and Application/Domain contracts.
-
-Implemented behavior:
-
-- Add multiple Purchase Order item rows.
-- Remove individual item rows.
-- Preserve indexed Product, Quantity, and Unit Cost bindings.
-- Preserve existing validation behavior.
-- Preserve the existing Create Purchase Order handler.
-- Preserve the existing `PurchaseOrder.AddItem()` domain operation.
-- Preserve the existing Purchase Order persistence model.
-- Preserve the existing Details page, Submit, Approve, and Receiving workflow.
-
-Runtime/browser verification was completed successfully. Multi-item Purchase Order creation and the existing downstream Purchasing workflow were confirmed working.
-
-No database migration was required for P1.
-No Dynamic Capability-Based Authorization changes were introduced.
-No P2-P6 implementation was started.
-
-### P1 Acceptance Result
+### P3 Acceptance Result
 
 **Status: COMPLETE**
 
-P1 acceptance criteria were satisfied through source inspection and successful runtime/browser verification.
+Verified by the project owner through runtime/browser testing.
 
-The next task is **P2 - Purchase Order Search**.
+Verified:
+- Individual filters
+- Combined filters
+- Search + filter interaction
+- Empty-result behavior
+- Applicable filter-state preservation
+- Existing authorization boundaries
+- No unrelated Purchase Order behavior changes
 
-## 22. P1 Documentation Audit
+P4 - Purchase Order Sorting remains unimplemented and is the next task.
 
-P1 documentation synchronization was reviewed against the actual source and verified runtime behavior.
+### P3 Documentation Audit
 
-### Updated
+The following current-state documentation was synchronized with the verified P3 behavior:
 
 - `PROJECT_STATUS.md`
+- `docs/FEATURES.md`
 - `ROADMAP.md`
 - `README.md`
 - `CHANGELOG.md`
-- `docs/FEATURES.md`
 - `docs/ENGINEERING_JOURNAL.md`
 - `docs/retrospectives/SPRINT_08_PLANNING_BASELINE.md`
-- `docs/retrospectives/SPRINT_04_APPLICATION.md` - historical cross-reference only
 
-### Reviewed and Preserved
+Historical Sprint 7 documentation remains unchanged.
 
-- `ARCHITECTURE.md` - no architectural change introduced by P1
-- `docs/ARCHITECTURE_REVIEW.md` - no new architecture boundary required
-- `docs/DESIGN_DECISIONS.md` - no new design decision required
-- `CODE_STYLE.md` - no project-wide style rule changed
-- `CONTRIBUTING.md` - no contribution workflow changed
-
-### Historical Sprint Documentation Preserved
-
-Sprint 1, Sprint 2, Sprint 3, Sprint 5, Sprint 6, and Sprint 7 retrospective documents were reviewed for P1 impact and left unchanged where their statements remain historically accurate. Sprint 7 reporting documentation remains the historical baseline and was not modified.
-
-Documentation status is therefore synchronized for P1 without rewriting historical records or introducing unsupported assumptions.
-
+No Dynamic Capability-Based Authorization documentation was marked as implemented.

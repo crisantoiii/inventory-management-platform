@@ -55,7 +55,48 @@ Completed:
 - Excel Export
 - PDF Export
 
-Sprint 8 Purchasing Enhancements is now active. P0 and P1 are complete, and P2 - Purchase Order Search is the next task.
+Sprint 8 Purchasing Enhancements is now active. P0, P1, P2, and P3 are complete and verified. P4 - Purchase Order Sorting is the next task.
+
+---
+
+# Sprint 8 - Purchasing Enhancements
+
+## Completed
+
+- P0 - Actual Purchasing Source/Documentation Baseline
+- P1 - Multiple Purchase Order Item Management
+- P2 - Purchase Order Search
+- P3 - Purchase Order Filtering
+
+### P3 - Purchase Order Filtering
+
+Verified filters:
+- From Date
+- To Date
+- Purchase Order Status
+
+Verified:
+- Individual filters
+- Combined filters
+- Search + filter interaction
+- Empty-result behavior
+- Applicable filter-state preservation
+- Existing authorization behavior
+- No unrelated Purchasing behavior changed
+
+Runtime/browser verification was completed successfully by the project owner.
+
+## Next
+
+- P4 - Purchase Order Sorting
+
+## Later
+
+- Purchase Order Pagination
+- Inventory Integration During Receiving
+- Additional Purchasing User Experience Improvements
+
+Dynamic Capability-Based Authorization remains outside the current Purchasing implementation scope and must not begin automatically.
 
 ---
 
@@ -431,4 +472,4 @@ The project owner completed runtime/browser verification successfully after impl
 
 No P3-P6 functionality was implemented as part of P2.
 
-**Next task:** P3 - Purchase Order Filtering, Sorting, and Pagination.
+**Next task:** P4 - Purchase Order Sorting.
