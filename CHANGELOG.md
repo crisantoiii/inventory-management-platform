@@ -75,7 +75,7 @@ P2 - Purchase Order Search is complete and verified.
 - Preserved applicable sorting state through Purchase Order navigation and workflow actions.
 - Runtime/browser verification was completed successfully by the project owner.
 
-P5 - Purchase Order Pagination is the next Sprint 8 task.
+P5 - Purchase Order Pagination is complete and verified. P6 - Inventory Synchronization During Receiving is the next task.
 
 ---
 
@@ -89,6 +89,16 @@ The implementation extends the existing ASP.NET Core Identity integration throug
 
 
 ### Changed
+
+#### P5 - Purchase Order Pagination
+
+- Added server-side pagination to the Purchase Order listing.
+- Reused the existing shared paging infrastructure and `PageNum` / `PageSize` conventions.
+- Preserved search, Purchase Order filtering, sorting, and page-size state across pagination navigation.
+- Added Previous, numbered-page, and Next navigation with first/last page boundary handling.
+- Verified page navigation with `PageSize=1`, including page 5 and active-page/result changes.
+- No P6 functionality was introduced.
+
 
 #### Additional Reporting
 

@@ -58,7 +58,7 @@ The first Reporting vertical slice has also been implemented through Inventory V
 | Unit Management | ✅ Complete |
 | Inventory Transactions | ✅ Complete |
 | Architecture Sprint | ✅ Complete |
-| Purchasing | 🟨 Core Workflow + Sprint 8 P1-P4 Enhancements |
+| Purchasing | 🟨 Core Workflow + Sprint 8 P1-P5 Enhancements |
 | Reporting | ✅ Sprint 7 Additional Reporting Complete |
 
 ## Current Implementation
@@ -79,6 +79,7 @@ Completed modules:
 - ✅ Purchase Order Search (P2)
 - ✅ Purchase Order Filtering (P3)
 - ✅ Purchase Order Sorting (P4)
+- ✅ Purchase Order Pagination (P5)
 - ✅ Reporting
   - ✅ Inventory Valuation
   - ✅ Purchase History
@@ -1024,4 +1025,20 @@ Verified behavior:
 
 Runtime/browser verification was completed successfully by the project owner.
 
-P5 - Purchase Order Pagination is the next Purchasing Enhancements task.
+P6 - Inventory Synchronization During Receiving is the next Purchasing Enhancements task.
+
+### Purchase Order Pagination - P5
+
+P5 adds server-side pagination to the Purchase Order listing using the established shared paging infrastructure.
+
+- Page parameter convention: `PageNum`
+- Page size convention: `PageSize`
+- Previous / numbered-page / Next navigation
+- First and last page boundary handling
+- Pagination compatible with search
+- Pagination compatible with date/status filtering
+- Pagination compatible with sorting
+- Pagination state preservation across navigation
+- Empty-result behavior remains within the existing Purchase Order listing flow
+
+The pagination implementation is server-side and preserves the existing Purchase Order query architecture.

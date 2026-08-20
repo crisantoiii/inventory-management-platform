@@ -2767,7 +2767,7 @@ Verified behavior includes:
 
 ## Documentation Result
 
-P3 documentation was synchronized after implementation verification. The current-state documentation records P3 as complete and identifies P4 - Purchase Order Sorting as the next task.
+P3 documentation was synchronized after implementation verification. The current-state documentation records P3 as complete.
 
 ## Outcome
 
@@ -2842,3 +2842,64 @@ Sorting remains server-side and composes with the existing query pipeline rather
 P4 - Purchase Order Sorting is complete and verified.
 
 Next task: **P5 - Purchase Order Pagination**.
+
+
+# Sprint 8 - P5 Purchase Order Pagination
+
+**Task:** P5 - Purchase Order Pagination  
+**Status:** Complete and verified  
+**Date:** 2026-08-21
+
+## Objective
+
+Add server-side pagination to the Purchase Order listing while preserving the existing Purchase Order search, filtering, and sorting behavior.
+
+## Implementation
+
+The Purchase Order list now uses the existing shared paging infrastructure and the project's established `PageNum` / `PageSize` conventions.
+
+Pagination links explicitly preserve:
+- Search
+- Status
+- PageNum
+- PageSize
+- SortBy
+- Descending
+
+The listing applies pagination server-side after the existing Purchase Order query conditions and sorting.
+
+## Verification
+
+Browser/manual verification was completed successfully after correcting the route parameter to the existing `PageNum` convention.
+
+The verified scenario used `PageSize=1` and navigated to page 5. The browser URL showed `PageNum=5&PageSize=1&Descending=False`, page 5 was active, and a different Purchase Order was displayed.
+
+Boundary behavior was implemented through the existing `TotalPages` value and Previous/Next checks.
+
+## Issue Corrected During Implementation
+
+The initial implementation used `Page` instead of the actual project convention `PageNum`. This was corrected before final verification. A separate issue involving Purchase Order status binding to the shared product status filter was also corrected without changing unrelated application behavior.
+
+## Scope Control
+
+P5 did not introduce:
+- P6 Inventory Synchronization During Receiving
+- Dynamic Capability-Based Authorization
+- Sales
+- Audit / Activity Logging
+- Bulk Import / Export
+- Barcode / QR
+
+## Commit / Documentation
+
+The implementation was committed separately using the required message:
+
+`feat(purchasing): add purchase order pagination`
+
+Documentation is being synchronized separately from the implementation commit.
+
+## Outcome
+
+**P5 - Purchase Order Pagination: COMPLETE AND VERIFIED**
+
+Next task: **P6 - Inventory Synchronization During Receiving**.

@@ -3,7 +3,7 @@
 **Sprint:** Sprint 8 - Purchasing Enhancements  
 **Repository/Branch:** `feature/purchasing_enhancements`  
 **Baseline Date:** 2026-08-19  
-**Status:** P0-P4 complete and runtime/browser verified; P5 - Purchase Order Pagination is next
+**Status:** P0-P5 complete and runtime/browser verified; P6 - Inventory Synchronization During Receiving is next
 
 ---
 
@@ -409,9 +409,28 @@ Ascending and descending sorting were runtime/browser verified. Sorting integrat
 
 ### P5 - Purchase Order Pagination
 
-**Next task**
+**Status: Complete and verified**
 
 Extend Purchase Order listing with server-side pagination using the established shared paging infrastructure while preserving Search, Filtering, and Sorting behavior.
+
+Confirmed behavior:
+- Existing `PageNum` page parameter convention is preserved.
+- Existing `PageSize` convention is preserved.
+- Previous, numbered-page, and Next navigation work.
+- Pagination changes the server-side result set rather than only the visual active-page state.
+- Search, status/date filtering, sorting, and page-size state are preserved through pagination navigation.
+- Empty/no-result behavior remains consistent with the existing Purchase Order listing.
+- Existing authorization boundaries remain unchanged.
+
+Browser verification was completed successfully using `PageSize=1`; navigation to `PageNum=5` displayed page 5 as active and returned a different Purchase Order from page 1.
+
+The implementation was committed separately using:
+
+```text
+feat(purchasing): add purchase order pagination
+```
+
+The initial implementation correction from `Page` to the project's actual `PageNum` convention is documented in the P5 retrospective.
 
 
 
@@ -444,7 +463,9 @@ Verified:
 
 P4 - Purchase Order Sorting is complete and runtime/browser verified.
 
-P5 - Purchase Order Pagination is the next task.
+P5 - Purchase Order Pagination is complete and verified.
+
+P6 - Inventory Synchronization During Receiving is the next task.
 
 ### P3 Documentation Audit
 
@@ -479,4 +500,6 @@ Both ascending and descending directions were verified. Sorting integrates with 
 
 Current-state documentation was synchronized after verification. Historical Sprint 7 documentation remains unchanged.
 
-P5 - Purchase Order Pagination is the next task.
+P5 - Purchase Order Pagination is complete and verified.
+
+P6 - Inventory Synchronization During Receiving is the next task.

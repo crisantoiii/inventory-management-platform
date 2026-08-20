@@ -58,7 +58,7 @@ The focus is not only on implementing business features but also on applying pro
 - ✅ Authentication & Authorization
 - ✅ User Management
 - ✅ Account Management
-- 🟨 Purchasing (Core Workflow + Sprint 8 P1-P4 Enhancements)
+- 🟨 Purchasing (Core Workflow + Sprint 8 P1-P5 Enhancements)
 - ✅ Reporting (Sprint 7 Additional Reporting Complete and Verified)
 
 ## Latest Release
@@ -84,6 +84,7 @@ The focus is not only on implementing business features but also on applying pro
 - Sprint 8 P2 Purchase Order Search
 - Sprint 8 P3 Purchase Order Filtering (From Date, To Date, Status)
 - Sprint 8 P4 Purchase Order Sorting (ID, Supplier, Order Date, Status, Total Amount)
+- Sprint 8 P5 Purchase Order Pagination (PageNum, PageSize, state-preserving navigation)
 - Existing report filters preserved during export
 - Existing report sorting preserved during export
 - Full filtered result set exported without UI pagination limits
@@ -818,7 +819,7 @@ Development Tools
 | Authentication & Authorization | ✅ Complete |
 | User Management | ✅ Complete |
 | Account Management | ✅ Complete |
-| Purchasing | 🟨 Core Workflow + Sprint 8 P1-P4 Enhancements |
+| Purchasing | 🟨 Core Workflow + Sprint 8 P1-P5 Enhancements |
 | Reporting | ✅ Sprint 7 Additional Reporting Complete and Verified |
 
 ---
@@ -848,6 +849,7 @@ Development Tools
 - P2 Purchase Order Search - Complete
 - P3 Purchase Order Filtering - Complete
 - P4 Purchase Order Sorting - Complete
+- P5 Purchase Order Pagination - Complete
 
 ## Next
 

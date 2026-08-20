@@ -1852,4 +1852,41 @@ This preserves consistency with existing feature sorting, keeps query work datab
 
 **Scope Boundary**
 
-P4 does not introduce Purchase Order pagination, inventory synchronization, Dynamic Capability-Based Authorization, or unrelated Purchasing changes. Pagination is the next task in Sprint 8.
+P4 did not introduce Purchase Order pagination, inventory synchronization, Dynamic Capability-Based Authorization, or unrelated Purchasing changes. Purchase Order pagination was implemented separately in P5 using the existing shared paging infrastructure.
+
+
+---
+
+# DD-030 - Purchase Order Pagination Uses Existing PageNum Convention
+
+**Status:** Accepted
+
+**Context**
+
+Sprint 8 P5 required server-side Purchase Order pagination while preserving the established shared paging infrastructure and the existing Purchase Order listing behavior.
+
+**Decision**
+
+Purchase Order pagination uses the project's existing `PageNum` and `PageSize` request conventions. Pagination links preserve the active Purchase Order search, filtering, and sorting state.
+
+The repository applies pagination after the existing query filters and sorting so that:
+
+```text
+Search / Filters
+    ↓
+Sorting
+    ↓
+Count
+    ↓
+Skip / Take
+    ↓
+Paged Result
+```
+
+**Rationale**
+
+Using the actual `PageNum` convention avoids introducing a parallel page parameter and keeps Purchase Order pagination consistent with the existing application conventions.
+
+**Scope Boundary**
+
+P5 is limited to Purchase Order pagination. It does not introduce Inventory Synchronization During Receiving, Dynamic Capability-Based Authorization, Sales, Audit / Activity Logging, Bulk Import / Export, Barcode / QR, or unrelated Purchasing changes.
