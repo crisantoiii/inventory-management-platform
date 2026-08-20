@@ -1,7 +1,8 @@
-using InventoryPlatform.Application.Features.Purchasing.ApprovePurchaseOrder;
+﻿using InventoryPlatform.Application.Features.Purchasing.ApprovePurchaseOrder;
 using InventoryPlatform.Application.Features.Purchasing.GetPurchaseOrder;
 using InventoryPlatform.Application.Features.Purchasing.ReceivePurchaseOrder;
 using InventoryPlatform.Application.Features.Purchasing.SubmitPurchaseOrder;
+using InventoryPlatform.Domain.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -30,6 +31,15 @@ public class DetailsModel : PageModel
 
     [BindProperty(SupportsGet = true)]
     public string Search { get; set; } = string.Empty;
+
+    [BindProperty(SupportsGet = true)]
+    public DateOnly? FromDate { get; set; }
+
+    [BindProperty(SupportsGet = true)]
+    public DateOnly? ToDate { get; set; }
+
+    [BindProperty(SupportsGet = true)]
+    public PurchaseOrderStatus? Status { get; set; }
 
     public async Task<IActionResult> OnGetAsync(
         int id,
@@ -83,7 +93,7 @@ public class DetailsModel : PageModel
 
         return RedirectToPage(
             "./Details",
-            new { id = result.Value.Id, search = Search });
+            new { id = result.Value.Id, search = Search, fromDate = FromDate, toDate = ToDate, status = Status });
     }
 
     public async Task<IActionResult> OnPostApproveAsync(
@@ -120,7 +130,7 @@ public class DetailsModel : PageModel
 
         return RedirectToPage(
             "./Details",
-            new { id = result.Value.Id, search = Search });
+            new { id = result.Value.Id, search = Search, fromDate = FromDate, toDate = ToDate, status = Status });
     }
 
     public async Task<IActionResult> OnPostReceiveAsync(
@@ -162,6 +172,6 @@ public class DetailsModel : PageModel
 
         return RedirectToPage(
             "./Details",
-            new { id = result.Value.PurchaseOrderId, search = Search });
+            new { id = result.Value.PurchaseOrderId, search = Search, fromDate = FromDate, toDate = ToDate, status = Status });
     }
 }

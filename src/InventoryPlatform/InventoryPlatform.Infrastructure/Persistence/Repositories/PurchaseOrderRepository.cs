@@ -1,5 +1,6 @@
-using InventoryPlatform.Application.Interfaces.Persistence;
+﻿using InventoryPlatform.Application.Interfaces.Persistence;
 using InventoryPlatform.Domain.Entities;
+using InventoryPlatform.Domain.Enums;
 using InventoryPlatform.Infrastructure.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 
@@ -30,6 +31,9 @@ public sealed class PurchaseOrderRepository
 
     public async Task<IReadOnlyList<PurchaseOrder>> GetPurchaseOrdersAsync(
         string search = "",
+        DateOnly? fromDate = null,
+        DateOnly? toDate = null,
+        PurchaseOrderStatus? status = null,
         CancellationToken cancellationToken = default)
     {
         IQueryable<PurchaseOrder> query = Context.PurchaseOrders
@@ -52,6 +56,24 @@ public sealed class PurchaseOrderRepository
                 query = query.Where(po =>
                     po.Supplier.Name.Contains(search));
             }
+        }
+
+        if (fromDate.HasValue)
+        {
+            query = query.Where(
+                po => po.OrderDate >= fromDate.Value);
+        }
+
+        if (toDate.HasValue)
+        {
+            query = query.Where(
+                po => po.OrderDate <= toDate.Value);
+        }
+
+        if (status.HasValue)
+        {
+            query = query.Where(
+                po => po.Status == status.Value);
         }
 
         return await query.ToListAsync(cancellationToken);
