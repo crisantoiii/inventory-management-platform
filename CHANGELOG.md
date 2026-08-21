@@ -4,7 +4,7 @@
 
 ### Release State
 
-Sprint 7 Additional Reporting is complete and verified. The changes are prepared for the v1.4.0 release tag.
+Sprint 7 Additional Reporting is complete and released as v1.4.0. Sprint 8 Purchasing Enhancements P0-P7 are complete and verified and remain unreleased.
 
 ### Sprint 7 — Additional Reporting
 
@@ -90,7 +90,19 @@ P2 - Purchase Order Search is complete and verified.
 - Source-level verification confirms repeated receiving cannot exceed the ordered quantity because the existing Domain invariant remains authoritative.
 - Runtime/browser verification was completed successfully by the project owner, including valid full and partial receiving, inventory quantity updates, StockIn transaction creation, invalid/over-receiving rejection, repeated receiving safety, authorization preservation, and receiving workflow preservation.
 
-Next task: **D1 - Documentation Synchronization**.
+#### P7 — Integrated Purchasing Verification
+
+- Completed integrated regression verification across Purchase Order creation, multiple items, listing, search, date/status filtering, sorting, pagination, details, Submit, Approve, Receive, and inventory synchronization.
+- Verified existing authorization boundaries, empty-result behavior, and relevant failure/recovery behavior.
+- Corrected an in-scope pagination regression so `FromDate` and `ToDate` remain preserved during pagination.
+- Runtime/browser re-verification confirmed the corrected pagination behavior.
+- No Dynamic Capability-Based Authorization or unrelated Purchasing feature was introduced.
+
+#### D1 — Documentation Synchronization
+
+- Synchronized current-state documentation with verified Sprint 8 P0-P7 behavior.
+- Confirmed the documentation boundary between the released v1.4.0 reporting work and unreleased Sprint 8 Purchasing Enhancements.
+- Next task: D2 — Design Decision Synchronization.
 
 ---
 
@@ -123,52 +135,11 @@ The implementation extends the existing ASP.NET Core Identity integration throug
 - Added server-side pagination.
 - Added server-side sorting.
 
-### Architecture
+### Development State
 
-- Finalized the direction for Dynamic Capability-Based
-  Authorization.
-- Defined the User → Group → Capability model.
-- Established capabilities as atomic application actions.
-- Established groups as reusable capability collections.
-- Established that authorization and Domain state validation
-  remain separate concerns.
-- Deferred authorization implementation until Additional
-  Reporting work is completed.
-
-### Development Sequence
-
-Current priority:
-
-```text
-Additional Reporting
-        ↓
-Dynamic Capability-Based Authorization
-        ↓
-Purchasing Workflow Authorization
-```
-
-The new authorization architecture does not block the current
-Additional Reporting implementation.
-
-
-This preserves the existing historical releases such as v1.3.0 rather than incorrectly assigning today's design decision to a released version. The current changelog correctly identifies v1.3.0 as the completed Account Management release. :contentReference[oaicite:6]{index=6}
-
----
-
-# One correction to our previous plan
-
-After looking at the actual documentation, I would **not add a new numbered roadmap phase for authorization immediately**.
-
-Your roadmap's numbered phases currently represent historical development milestones:
-
-```text
-v1.0 Purchasing Application
-v1.1 Purchasing Presentation
-v1.2 Reporting
-v1.3 Account Management
-```
-
-The Dynamic Capability-Based Authorization decision is currently architecture planning, not a completed milestone.
+- Sprint 8 Purchasing Enhancements P0-P7 are complete and verified.
+- D1 Documentation Synchronization is complete.
+- D2 Design Decision Synchronization is the next task.
 
 ---
 

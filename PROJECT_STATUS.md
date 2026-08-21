@@ -89,8 +89,8 @@ Verified:
 
 - **Completed Modules:** 10
 - **Architecture Status:** Validated
-- **Current Milestone:** Sprint 8 — P7 Integrated Purchasing Verification — Complete and Verified
-- **Next Milestone:** Sprint 8 — D1 Documentation Synchronization
+- **Current Milestone:** Sprint 8 — D1 Documentation Synchronization — Complete
+- **Next Milestone:** Sprint 8 — D2 Design Decision Synchronization
 
 ---
 
@@ -552,47 +552,32 @@ Completed in Sprint 8:
 - P4 - Purchase Order Sorting
 - P5 - Purchase Order Pagination
 - P6 - Inventory Synchronization During Receiving
+- P7 - Integrated Purchasing Verification
 
-P1, P2, P3, P4, P5, and P6 were runtime/browser verified successfully. The Purchase Order workflow now supports multiple item rows, search, filtering, sorting, pagination, and inventory synchronization while preserving the existing Purchasing architecture and downstream workflow.
+P1, P2, P3, P4, P5, P6, and P7 were runtime/browser verified successfully. The Purchase Order workflow now supports multiple item rows, search, filtering, sorting, pagination, and inventory synchronization while preserving the existing Purchasing architecture and downstream workflow.
 
-# Next Milestone
+# D1 - Documentation Synchronization
 
-## P6 - Inventory Synchronization During Receiving
+**Status: Complete**
 
-**Status: Complete and verified**
+Current-state documentation was synchronized with the verified Sprint 8 Purchasing behavior through P7.
 
-P6 synchronizes Product inventory and InventoryTransaction history with the existing Purchase Order receiving workflow.
+Validated documentation updates include:
+- Sprint 8 P0-P7 completion state
+- P7 integrated verification scope and result
+- Pagination date-filter state preservation correction
+- Current Purchasing scope and future priority boundaries
+- D2 as the next task
 
-Verified source behavior:
-- Purchase Order Domain receiving rules remain the authority for status and received-quantity invariants.
-- The receiving handler loads the Product through the existing Product repository.
-- A valid receipt increases Product `QuantityOnHand` through `Product.IncreaseStock()`.
-- A corresponding `InventoryTransaction` is recorded as `StockIn` with the Purchase Order reference.
-- Purchase Order state, Product inventory, and the inventory transaction are persisted through the same `SaveChangesAsync` boundary.
-- Repeated receiving remains bounded by the existing Purchase Order Domain rule preventing received quantity from exceeding ordered quantity.
-- Existing receiving authorization and Razor Page workflow were not changed.
-
-The project owner completed runtime/browser verification successfully in the actual development environment. Verified behavior includes valid full and partial receiving, inventory quantity updates, StockIn transaction creation, Domain rejection of invalid/over-receiving scenarios, repeated receiving safety, preservation of authorization, and preservation of the existing receiving workflow.
-
-Build verification was not performed in the supplied documentation-review environment because the environment does not contain the `dotnet` CLI. This does not invalidate the completed runtime/manual verification.
-
-P6 implementation changes are intended to be committed separately from documentation changes using:
-
-`feat(purchasing): synchronize inventory on receiving`
-
-Next task: **D1 - Documentation Synchronization**.
+No implementation behavior was changed as part of D1.
 
 # Known Limitations
 
-Current version does not yet include:
+Current development scope does not yet include:
 
 Business Modules
 
 - Sales Orders
-
-Purchasing
-
-- Purchase Order pagination
 
 Platform
 
@@ -869,4 +854,4 @@ The P7 implementation fix is intentionally kept separate from documentation chan
 
 **P7 result:** Complete and verified.
 
-**Next task:** **D1 - Documentation Synchronization**.
+**Next task:** **D2 - Design Decision Synchronization**.

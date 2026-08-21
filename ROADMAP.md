@@ -92,7 +92,15 @@ Runtime/browser verification was completed successfully by the project owner.
 
 ## Next
 
-- D1 - Documentation Synchronization
+- D2 - Design Decision Synchronization
+
+## D1 - Documentation Synchronization
+
+**Status: Complete**
+
+Current-state documentation now reflects the verified Sprint 8 Purchasing sequence through P7, including the integrated verification result and the corrected pagination date-filter state preservation.
+
+No implementation behavior was changed during D1.
 
 ## Later
 - Additional Purchasing User Experience Improvements
@@ -420,7 +428,7 @@ Future enhancements may include:
 | v1.1.0 | Purchasing Presentation Layer ✅ |
 | v1.2.0 | Reporting — Inventory Valuation ✅ |
 | v1.3.0 | Account Management ✅ |
-| v1.4.0 | Additional Reporting & Exports — Ready for Release |
+| v1.4.0 | Additional Reporting & Exports — Released |
 | v1.5.0 | Sprint 8 Purchasing Enhancements ⏳ |
 | v1.6.0 | Sales Module ⏳ |
 | v2.0.0 | REST API & Blazor ⏳ |
@@ -473,4 +481,4 @@ The project owner completed runtime/browser verification successfully after impl
 
 No P3-P6 functionality was implemented as part of P2.
 
-**Next task:** D1 - Documentation Synchronization.
+D1 documentation synchronization was completed after the Sprint 8 P7 verification.

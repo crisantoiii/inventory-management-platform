@@ -81,12 +81,6 @@ The focus is not only on implementing business features but also on applying pro
 
 - Excel Export for all seven reports
 - PDF Export for all seven reports
-- Sprint 8 P2 Purchase Order Search
-- Sprint 8 P3 Purchase Order Filtering (From Date, To Date, Status)
-- Sprint 8 P4 Purchase Order Sorting (ID, Supplier, Order Date, Status, Total Amount)
-- Sprint 8 P5 Purchase Order Pagination (PageNum, PageSize, state-preserving navigation)
-- Sprint 8 P6 Inventory Synchronization During Receiving
-- Sprint 8 P7 Integrated Purchasing Verification
 - Existing report filters preserved during export
 - Existing report sorting preserved during export
 - Full filtered result set exported without UI pagination limits
@@ -104,6 +98,23 @@ The focus is not only on implementing business features but also on applying pro
 - Final project-wide verification completed
 
 The release preserves the established read-oriented Reporting architecture and isolates PDF generation in the Web layer using QuestPDF.
+
+### Current Development — Sprint 8 Purchasing Enhancements
+
+Sprint 8 Purchasing Enhancements P0-P7 are complete and verified on the active Purchasing development work.
+
+Completed:
+- P1 — Multiple Purchase Order Item Management
+- P2 — Purchase Order Search
+- P3 — Purchase Order Filtering
+- P4 — Purchase Order Sorting
+- P5 — Purchase Order Pagination
+- P6 — Inventory Synchronization During Receiving
+- P7 — Integrated Purchasing Verification
+
+P7 verified the complete Purchasing workflow and corrected an in-scope pagination regression so active `FromDate` and `ToDate` filters are preserved during pagination. No Dynamic Capability-Based Authorization implementation was introduced during Purchasing work.
+
+**Next task:** D2 — Design Decision Synchronization.
 
 ---
 
@@ -821,7 +832,7 @@ Development Tools
 | Authentication & Authorization | ✅ Complete |
 | User Management | ✅ Complete |
 | Account Management | ✅ Complete |
-| Purchasing | 🟨 Core Workflow + Sprint 8 P1-P6 Enhancements |
+| Purchasing | 🟨 Core Workflow + Sprint 8 P1-P7 Enhancements |
 | Reporting | ✅ Sprint 7 Additional Reporting Complete and Verified |
 
 ---
@@ -857,7 +868,8 @@ Development Tools
 
 ## Next
 
-- D1 Documentation Synchronization
+- D1 Documentation Synchronization - Complete
+- D2 Design Decision Synchronization - Next
 
 ## Future
 

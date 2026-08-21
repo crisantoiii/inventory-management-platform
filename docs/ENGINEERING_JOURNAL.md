@@ -2997,6 +2997,52 @@ No Dynamic Capability-Based Authorization implementation was introduced during P
 
 **P7 - Integrated Purchasing Verification: COMPLETE AND VERIFIED**
 
-The Purchasing enhancement sequence P0-P7 is complete. The next task is:
+The Purchasing enhancement sequence P0-P7 is complete.
+
+A dedicated documentation synchronization task follows to reconcile current-state documentation with the verified behavior.
 
 **D1 - Documentation Synchronization**
+
+
+---
+
+# Sprint 8 - D1 Documentation Synchronization
+
+**Date:** 2026-08-21  
+**Status:** Complete
+
+## Objective
+
+Synchronize current-state documentation with the verified Sprint 8 Purchasing behavior through P7 without changing implementation behavior.
+
+## Documentation Scope
+
+The following documents were reviewed and synchronized:
+
+- `PROJECT_STATUS.md`
+- `ROADMAP.md`
+- `docs/FEATURES.md`
+- `CHANGELOG.md`
+- `docs/ENGINEERING_JOURNAL.md`
+- `README.md`
+
+## Synchronization Result
+
+The documentation now records:
+
+- Sprint 8 Purchasing Enhancements P0-P7 as complete and verified.
+- P7 integrated verification across the complete Purchasing workflow.
+- The in-scope pagination regression involving `FromDate` and `ToDate` and its verified correction.
+- The boundary between the released v1.4.0 Reporting release and the unreleased Sprint 8 Purchasing work.
+- Dynamic Capability-Based Authorization as outside the Purchasing implementation scope.
+- D2 - Design Decision Synchronization as the next task.
+
+No unverified Purchasing behavior was added to the current-state documentation.
+
+## Outcome
+
+**D1 - Documentation Synchronization: COMPLETE**
+
+The next task is:
+
+**D2 - Design Decision Synchronization**
