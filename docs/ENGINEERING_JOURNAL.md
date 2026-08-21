@@ -22,6 +22,14 @@ Rather than documenting daily work, it captures important architectural decision
 
 ---
 
+# Current Release State
+
+**Current Version:** v1.5.0 - Sprint 8 Purchasing Enhancements
+
+Sprint 8 Purchasing Enhancements P0-P7, D1 Documentation Synchronization, D2 Design Decision Synchronization, D3 Final Sprint 8 Retrospective, and D4 Final Documentation Validation are complete. Sprint 8 is closed and the v1.5.0 release is the current project milestone.
+
+The next development activity is a separate Next Sprint Planning process. Dynamic Capability-Based Authorization remains the next locked priority. No implementation work begins automatically from this closure.
+
 # Milestone Timeline
 
 | Milestone | Focus |
@@ -2675,3 +2683,446 @@ Sprint 7 Additional Reporting has completed final project-wide verification succ
 No in-scope implementation defects were discovered during final verification.
 
 The existing Reporting architecture remains unchanged, with export generation isolated in the Web layer and existing report queries and DTOs reused as the source of report data.
+
+
+---
+
+# Sprint 8 - P1 Multiple Purchase Order Item Management
+
+**Date:** 2026-08-19
+
+## Objective
+
+Extend the existing Purchase Order Create workflow to support multiple Purchase Order items without redesigning the established Purchasing architecture.
+
+## Implementation
+
+The Create Purchase Order Razor Page was updated to manage a dynamic collection of item rows. Users can add and remove item rows while retaining the existing Product, Quantity, and Unit Cost model binding. The existing Application handler, PurchaseOrder aggregate, repository, EF Core mappings, and database schema were preserved.
+
+The implementation intentionally did not introduce Purchase Order search, filtering, sorting, pagination, inventory synchronization, or Dynamic Capability-Based Authorization. Those remain separate Sprint 8 tasks.
+
+## Verification
+
+Source inspection confirmed the multi-item collection is passed through the existing Create Purchase Order flow. Runtime/browser verification was completed successfully and confirmed that multiple Purchase Order items can be created and the existing downstream Purchasing workflow continues to function.
+
+## Result
+
+P1 - Multiple Purchase Order Item Management is complete. No database migration was required.
+
+Next task: **P2 - Purchase Order Search**.
+
+### P1 Documentation Synchronization
+
+P1 documentation was reconciled after runtime verification. Current-state documents were updated to record multi-item Purchase Order creation, while historical Sprint documentation was preserved and cross-referenced where necessary.
+
+## Sprint 8 - P2 Purchase Order Search
+
+**Status: Complete and verified**
+
+P2 implements server-side Purchase Order search using the existing Purchase Order listing/query architecture.
+
+Verified behavior:
+- Search by Purchase Order ID.
+- Search by Supplier Name.
+- Empty or whitespace-only search returns the normal unfiltered list.
+- No-match searches return the correct empty result state.
+- Search state is preserved through the applicable Purchase Order navigation.
+- Existing authorization behavior remains intact.
+- Existing Purchase Order list behavior outside search remains unchanged.
+
+The project owner completed runtime/browser verification successfully after implementation.
+
+No P3-P6 functionality was implemented as part of P2.
+
+
+---
+
+# Sprint 8 - P3 Purchase Order Filtering
+
+**Date:** 2026-08-20
+
+## Objective
+
+Extend the existing Purchase Order listing with the confirmed server-side filtering scope while preserving the P2 Purchase Order Search implementation and established Purchasing architecture.
+
+## Confirmed Filters
+
+- From Date
+- To Date
+- Purchase Order Status
+
+## Implementation
+
+The Purchase Order listing was extended so that the confirmed filters are applied server-side through the existing Purchase Order query/repository flow.
+
+The implementation preserves the existing search behavior and allows search and filtering to be combined. No separate filtering architecture was introduced.
+
+No Purchase Order sorting, pagination, inventory synchronization, or Dynamic Capability-Based Authorization implementation was introduced as part of P3.
+
+## Verification
+
+The project owner completed runtime/browser verification successfully and confirmed that the implemented P3 functions work correctly.
+
+Verified behavior includes:
+
+- Individual Purchase Order filters
+- Multiple filters used together
+- Search combined with filtering
+- Empty-result behavior
+- Applicable filter-state preservation
+- Existing Purchase Order workflow behavior
+- Existing authorization boundaries
+
+## Documentation Result
+
+P3 documentation was synchronized after implementation verification. The current-state documentation records P3 as complete.
+
+## Outcome
+
+P3 - Purchase Order Filtering is complete and verified.
+
+Next task: **P4 - Purchase Order Sorting**.
+
+
+# Sprint 8 - P4 Purchase Order Sorting
+
+**Date:** 2026-08-20
+
+## Objective
+
+Extend the existing Purchase Order listing with server-side sorting while preserving the P2 Search, P3 Filtering, and established Purchasing architecture.
+
+## Confirmed Sort Fields
+
+Source inspection confirmed the following supported Purchase Order sort fields:
+
+- Purchase Order ID
+- Supplier
+- Order Date
+- Status
+- Total Amount
+
+## Implementation
+
+The Purchase Order listing now passes `SortBy` and `Descending` through the existing request/handler/repository flow. The repository applies the selected ordering server-side using `PurchaseOrderSortFields`.
+
+The Presentation layer exposes sortable headers and preserves the active sorting state through applicable Purchase Order navigation and workflow actions. Existing Search and Filtering parameters remain part of the request when sorting is applied.
+
+A dedicated `PurchaseOrderSortFields` shared class was used to follow the project's established sorting convention. No separate sorting architecture was introduced.
+
+## Verification
+
+The project owner completed runtime/browser verification successfully. Verified behavior includes:
+
+- Ascending sorting for each supported field
+- Descending sorting for each supported field
+- Sorting combined with existing Search
+- Sorting combined with existing Filters
+- Sorting state preservation through applicable Purchase Order navigation and workflow actions
+- Existing Purchase Order workflow behavior
+- Existing authorization boundaries
+- No unrelated Purchasing behavior changes
+
+Purchase Order pagination was intentionally not implemented as part of P4.
+
+## Architecture Validation
+
+The implementation continues to follow:
+
+```text
+Purchase Order Razor Page
+        ↓
+GetPurchaseOrdersHandler
+        ↓
+IPurchaseOrderRepository
+        ↓
+PurchaseOrderRepository
+        ↓
+EF Core Query
+        ↓
+Database
+```
+
+Sorting remains server-side and composes with the existing query pipeline rather than introducing client-side ordering or a parallel feature-specific mechanism.
+
+## Outcome
+
+P4 - Purchase Order Sorting is complete and verified.
+
+Next task: **P5 - Purchase Order Pagination**.
+
+
+# Sprint 8 - P5 Purchase Order Pagination
+
+**Task:** P5 - Purchase Order Pagination  
+**Status:** Complete and verified  
+**Date:** 2026-08-21
+
+## Objective
+
+Add server-side pagination to the Purchase Order listing while preserving the existing Purchase Order search, filtering, and sorting behavior.
+
+## Implementation
+
+The Purchase Order list now uses the existing shared paging infrastructure and the project's established `PageNum` / `PageSize` conventions.
+
+Pagination links explicitly preserve:
+- Search
+- Status
+- PageNum
+- PageSize
+- SortBy
+- Descending
+
+The listing applies pagination server-side after the existing Purchase Order query conditions and sorting.
+
+## Verification
+
+Browser/manual verification was completed successfully after correcting the route parameter to the existing `PageNum` convention.
+
+The verified scenario used `PageSize=1` and navigated to page 5. The browser URL showed `PageNum=5&PageSize=1&Descending=False`, page 5 was active, and a different Purchase Order was displayed.
+
+Boundary behavior was implemented through the existing `TotalPages` value and Previous/Next checks.
+
+## Issue Corrected During Implementation
+
+The initial implementation used `Page` instead of the actual project convention `PageNum`. This was corrected before final verification. A separate issue involving Purchase Order status binding to the shared product status filter was also corrected without changing unrelated application behavior.
+
+## Scope Control
+
+P5 did not introduce:
+- P6 Inventory Synchronization During Receiving
+- Dynamic Capability-Based Authorization
+- Sales
+- Audit / Activity Logging
+- Bulk Import / Export
+- Barcode / QR
+
+## Commit / Documentation
+
+The implementation was committed separately using the required message:
+
+`feat(purchasing): add purchase order pagination`
+
+Documentation is being synchronized separately from the implementation commit.
+
+## Outcome
+
+**P5 - Purchase Order Pagination: COMPLETE AND VERIFIED**
+
+Next task: **P7 - Integrated Purchasing Verification**.
+
+## Sprint 8 P6 - Inventory Synchronization During Receiving
+
+P6 extends the existing Purchase Order receiving vertical slice so that a valid receipt updates inventory without bypassing the established Domain model.
+
+### Source Findings
+
+- `PurchaseOrder.Receive()` already enforced Approved/Receiving status, item existence, positive quantity, and the maximum received quantity.
+- `Product.IncreaseStock()` is the existing Domain operation for stock-in behavior.
+- `InventoryTransaction` is the existing persistence model for inventory movement history.
+- `CreateInventoryTransactionHandler` established the existing pattern of changing Product stock, creating an InventoryTransaction, and saving through `IUnitOfWork`.
+- `PurchaseOrderRepository.GetByIdAsync()` loads the Purchase Order aggregate and its items/products as tracked entities.
+- There was no explicit transaction boundary in the receiving handler; the existing Unit of Work `SaveChangesAsync()` is the persistence boundary.
+
+### Implementation
+
+`ReceivePurchaseOrderHandler` now:
+
+1. Loads the Purchase Order through the existing repository.
+2. Loads the Product through the existing Product repository.
+3. Calls `PurchaseOrder.Receive()` so the existing Domain invariants remain authoritative.
+4. Calls `Product.IncreaseStock()` for the received quantity.
+5. Creates a `StockIn` `InventoryTransaction` using `PO-{PurchaseOrderId}` as the reference.
+6. Saves the Purchase Order state, Product stock change, and transaction through the same Unit of Work save boundary.
+
+### Repeated Receiving
+
+Repeated receiving is not treated as an idempotent HTTP operation because the existing workflow supports legitimate partial receipts. Instead, the existing Domain invariant remains the safety boundary: cumulative received quantity cannot exceed the ordered quantity. A repeated request that would exceed the remaining quantity is rejected by the Domain model before persistence.
+
+### Scope Control
+
+No inventory redesign, new authorization model, new database migration, or Presentation workflow redesign was introduced. Existing authorization and Purchase Order receiving flow remain unchanged.
+
+### Verification State
+
+Source inspection confirms the implementation preserves the existing Domain invariants and persistence pattern. The project owner then completed runtime/browser verification in the actual development environment. Verified behavior includes valid full and partial receiving, correct Product quantity updates, corresponding StockIn InventoryTransactions, rejection of invalid and over-receiving operations without inventory changes, safe repeated receiving, preserved authorization, and preservation of the existing receiving workflow. A solution build was not performed in the documentation-review environment because the environment does not contain the `dotnet` CLI.
+
+
+
+---
+
+# Sprint 8 - P7 Integrated Purchasing Verification
+
+**Date:** 2026-08-21
+
+## Objective
+
+Perform integrated regression verification of the complete Purchasing workflow after the Sprint 8 P1-P6 enhancements, without adding unrelated features.
+
+## Verification Scope
+
+The integrated verification covered:
+
+- Purchase Order creation
+- Multiple Purchase Order items
+- Purchase Order listing
+- Search
+- From/To date filtering
+- Status filtering
+- Sorting
+- Pagination
+- Details
+- Submit
+- Approve
+- Receive
+- Inventory synchronization
+- Existing authorization
+- Empty-result behavior
+- Relevant failure/recovery behavior
+
+## Defect Discovered
+
+Integrated verification identified an in-scope regression in Purchase Order pagination. Pagination links preserved search, status, page size, and sorting state but did not preserve the active `FromDate` and `ToDate` values.
+
+This meant a user could apply a date range, navigate to another page, and unintentionally lose the date filter.
+
+## Correction
+
+The Purchase Order listing pagination links were corrected to preserve both `FromDate` and `ToDate` using the actual Purchase Order PageModel properties and existing query-state conventions.
+
+No new pagination architecture was introduced and no unrelated feature behavior was changed.
+
+## Verification Result
+
+The corrected implementation was runtime/browser tested by the project owner and confirmed working.
+
+The integrated Purchasing workflow is now verified with pagination retaining the active search, status, date-filter, page-size, and sorting state.
+
+No Dynamic Capability-Based Authorization implementation was introduced during P7.
+
+## Outcome
+
+**P7 - Integrated Purchasing Verification: COMPLETE AND VERIFIED**
+
+The Purchasing enhancement sequence P0-P7 is complete.
+
+A dedicated documentation synchronization task follows to reconcile current-state documentation with the verified behavior.
+
+**D1 - Documentation Synchronization**
+
+
+---
+
+# Sprint 8 - D1 Documentation Synchronization
+
+**Date:** 2026-08-21  
+**Status:** Complete
+
+## Objective
+
+Synchronize current-state documentation with the verified Sprint 8 Purchasing behavior through P7 without changing implementation behavior.
+
+## Documentation Scope
+
+The following documents were reviewed and synchronized:
+
+- `PROJECT_STATUS.md`
+- `ROADMAP.md`
+- `docs/FEATURES.md`
+- `CHANGELOG.md`
+- `docs/ENGINEERING_JOURNAL.md`
+- `README.md`
+
+## Synchronization Result
+
+The documentation now records:
+
+- Sprint 8 Purchasing Enhancements P0-P7 as complete and verified.
+- P7 integrated verification across the complete Purchasing workflow.
+- The in-scope pagination regression involving `FromDate` and `ToDate` and its verified correction.
+- The boundary between the released v1.4.0 Reporting release and the unreleased Sprint 8 Purchasing work.
+- Dynamic Capability-Based Authorization as outside the Purchasing implementation scope.
+- D2 - Design Decision Synchronization as the next task.
+
+No unverified Purchasing behavior was added to the current-state documentation.
+
+## Outcome
+
+**D1 - Documentation Synchronization: COMPLETE**
+
+The next task is:
+
+**D2 - Design Decision Synchronization**
+
+
+---
+
+# Sprint 8 - D4 Final Documentation Validation
+
+**Date:** 2026-08-21  
+**Status:** Complete
+
+## Objective
+
+Perform the final documentation consistency audit after D1, D2, and D3, using the available source snapshot, verified Purchasing behavior recorded through P7, the Sprint 8 Planning Baseline, and the Final Sprint 8 Retrospective as the source of truth.
+
+## Validation Scope
+
+Reviewed:
+
+- `PROJECT_STATUS.md`
+- `ROADMAP.md`
+- `docs/FEATURES.md`
+- `CHANGELOG.md`
+- `README.md`
+- `docs/DESIGN_DECISIONS.md`
+- `docs/ENGINEERING_JOURNAL.md`
+- `docs/retrospectives/SPRINT_08_PLANNING_BASELINE.md`
+- `docs/retrospectives/SPRINT_08_PURCHASING_ENHANCEMENTS.md`
+
+Source inspection also confirmed the implemented Purchasing vertical slice and the absence of Dynamic Capability-Based Authorization source artifacts.
+
+## Validation Result
+
+The final documentation state now confirms:
+
+- Sprint 7 Additional Reporting remains closed and released as v1.4.0.
+- Sprint 8 Purchasing Enhancements P0-P7 are complete and verified but remain unreleased.
+- D1 Documentation Synchronization is complete.
+- D2 Design Decision Synchronization is complete.
+- D3 Final Sprint 8 Retrospective is complete.
+- D4 Final Documentation Validation is complete.
+- No future-priority feature is marked complete.
+- The validated Purchase Order receiving architecture remains consistent with DD-035.
+- The P7 pagination regression and correction are consistently recorded.
+- No unverified Purchasing behavior was added.
+- The locked future priority order remains unchanged.
+
+## Documentation Corrections
+
+Corrected stale current-state references that still identified D2 as the next task. Current-state documents now identify Sprint 8 final save point / sprint closure as the next action.
+
+Historical task retrospectives and the final Sprint 8 retrospective were not rewritten to erase their historical next-task sequencing.
+
+## Verification Limitations
+
+The supplied source snapshot does not contain `.git`, so branch, working-tree status, commit hashes, and commit history cannot be independently verified from this archive.
+
+The documentation-review environment does not contain the `dotnet` CLI, so a fresh restore/build was not independently executed during D4. P7 runtime/browser verification remains based on the recorded project-owner verification and source/documentation inspection in the snapshot.
+
+## Outcome
+
+**D4 - Final Documentation Validation: COMPLETE**
+
+The repository snapshot was documentation-consistent and ready for the Sprint 8 final save point / sprint closure. No new feature work was started.
+
+# Sprint 8 - Final Closure State
+
+**Status:** Complete and Closed
+
+Sprint 8 Purchasing Enhancements P0-P7, D1 Documentation Synchronization, D2 Design Decision Synchronization, D3 Final Sprint 8 Retrospective, and D4 Final Documentation Validation are complete. The final Sprint 8 save point has been established.
+
+The next development activity is a separate Sprint Planning process. Dynamic Capability-Based Authorization remains the next locked priority, but no implementation work begins automatically from this closure.
+
+Historical Sprint 8 planning and task records remain preserved as historical records and are not rewritten to remove their original sequencing.

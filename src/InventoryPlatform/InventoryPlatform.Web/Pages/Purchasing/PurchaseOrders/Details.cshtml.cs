@@ -2,6 +2,7 @@ using InventoryPlatform.Application.Features.Purchasing.ApprovePurchaseOrder;
 using InventoryPlatform.Application.Features.Purchasing.GetPurchaseOrder;
 using InventoryPlatform.Application.Features.Purchasing.ReceivePurchaseOrder;
 using InventoryPlatform.Application.Features.Purchasing.SubmitPurchaseOrder;
+using InventoryPlatform.Domain.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -27,6 +28,24 @@ public class DetailsModel : PageModel
     }
 
     public GetPurchaseOrderResponse? PurchaseOrder { get; private set; }
+
+    [BindProperty(SupportsGet = true)]
+    public string Search { get; set; } = string.Empty;
+
+    [BindProperty(SupportsGet = true)]
+    public DateOnly? FromDate { get; set; }
+
+    [BindProperty(SupportsGet = true)]
+    public DateOnly? ToDate { get; set; }
+
+    [BindProperty(SupportsGet = true)]
+    public PurchaseOrderStatus? Status { get; set; }
+
+    [BindProperty(SupportsGet = true)]
+    public string? SortBy { get; set; }
+
+    [BindProperty(SupportsGet = true)]
+    public bool Descending { get; set; }
 
     public async Task<IActionResult> OnGetAsync(
         int id,
@@ -80,7 +99,7 @@ public class DetailsModel : PageModel
 
         return RedirectToPage(
             "./Details",
-            new { id = result.Value.Id });
+            new { id = result.Value.Id, search = Search, fromDate = FromDate, toDate = ToDate, status = Status, sortBy = SortBy, descending = Descending });
     }
 
     public async Task<IActionResult> OnPostApproveAsync(
@@ -117,7 +136,7 @@ public class DetailsModel : PageModel
 
         return RedirectToPage(
             "./Details",
-            new { id = result.Value.Id });
+            new { id = result.Value.Id, search = Search, fromDate = FromDate, toDate = ToDate, status = Status, sortBy = SortBy, descending = Descending });
     }
 
     public async Task<IActionResult> OnPostReceiveAsync(
@@ -159,6 +178,6 @@ public class DetailsModel : PageModel
 
         return RedirectToPage(
             "./Details",
-            new { id = result.Value.PurchaseOrderId });
+            new { id = result.Value.PurchaseOrderId, search = Search, fromDate = FromDate, toDate = ToDate, status = Status, sortBy = SortBy, descending = Descending });
     }
 }

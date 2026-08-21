@@ -2,11 +2,113 @@
 
 ## [Unreleased]
 
-### Release State
+### Development State
 
-Sprint 7 Additional Reporting is complete and verified. The changes are prepared for the v1.4.0 release tag.
+Sprint 8 Purchasing Enhancements was released as v1.5.0 and is complete and closed. The next development activity is Next Sprint Planning. No future-priority feature is marked complete.
 
-### Sprint 7 — Additional Reporting
+### Next Locked Priority
+
+1. Dynamic Capability-Based Authorization
+2. Sales Module
+3. Audit / Activity Logging
+4. Bulk Import / Export
+5. Barcode / QR
+
+## [v1.5.0] - 2026-08-21
+
+### Release Summary
+
+Sprint 8 Purchasing Enhancements is complete, verified, documented, and closed. This release includes the complete P0-P7 Purchasing enhancement sequence and D1-D4 documentation and closure work.
+
+### Purchasing Enhancements
+
+**Status: Complete and Closed**
+
+Sprint 8 delivered and verified the complete Purchasing enhancement scope P0-P7. D1-D4 documentation and closure tasks are complete. No future-priority feature was implemented during Sprint 8.
+
+#### P1 — Multiple Purchase Order Item Management
+
+- Extended the Purchase Order Create UI to support multiple item rows.
+- Added dynamic item-row add/remove behavior.
+- Preserved the existing Product, Quantity, and Unit Cost model binding.
+- Preserved the existing Application handler and `PurchaseOrder.AddItem()` domain operation.
+- Preserved the existing Purchase Order persistence model; no database migration was required.
+- Runtime/browser verification confirmed multi-item Purchase Order creation and the existing downstream Purchasing workflow.
+
+P2 - Purchase Order Search is complete and verified.
+
+#### P3 - Purchase Order Filtering
+
+- Added server-side Purchase Order From Date filtering.
+- Added server-side Purchase Order To Date filtering.
+- Added server-side Purchase Order Status filtering.
+- Preserved existing Purchase Order Search behavior.
+- Enabled combined Search + filter behavior.
+- Preserved applicable filter state through existing Purchase Order navigation.
+- Preserved existing empty-result behavior.
+- Preserved existing authorization boundaries.
+- Runtime/browser verification was completed successfully by the project owner.
+
+#### P4 - Purchase Order Sorting
+
+- Added server-side Purchase Order sorting using the established shared sorting conventions.
+- Added supported sorting for Purchase Order ID, Supplier, Order Date, Status, and Total Amount.
+- Added ascending and descending sorting behavior.
+- Preserved existing Purchase Order Search and Filtering behavior when sorting is applied.
+- Preserved applicable sorting state through Purchase Order navigation and workflow actions.
+- Runtime/browser verification was completed successfully by the project owner.
+
+#### P5 - Purchase Order Pagination
+
+- Added server-side Purchase Order pagination using the existing `PageNum` / `PageSize` conventions.
+- Preserved search, filtering, sorting, and page-size state.
+- Browser verification confirmed page-index/result-set behavior with `PageSize=1`.
+
+#### P6 - Inventory Synchronization During Receiving
+
+- Synchronized Purchase Order receiving with Product `QuantityOnHand`.
+- Added a `StockIn` InventoryTransaction for each valid receiving operation using the Purchase Order reference.
+- Preserved the existing Purchase Order Domain receiving invariants and workflow.
+- Persisted Purchase Order state, Product stock, and inventory transaction through the same Unit of Work save boundary.
+- Source-level verification confirms repeated receiving cannot exceed the ordered quantity because the existing Domain invariant remains authoritative.
+- Runtime/browser verification was completed successfully by the project owner, including valid full and partial receiving, inventory quantity updates, StockIn transaction creation, invalid/over-receiving rejection, repeated receiving safety, authorization preservation, and receiving workflow preservation.
+
+#### P7 — Integrated Purchasing Verification
+
+- Completed integrated regression verification across Purchase Order creation, multiple items, listing, search, date/status filtering, sorting, pagination, details, Submit, Approve, Receive, and inventory synchronization.
+- Verified existing authorization boundaries, empty-result behavior, and relevant failure/recovery behavior.
+- Corrected an in-scope pagination regression so `FromDate` and `ToDate` remain preserved during pagination.
+- Runtime/browser re-verification confirmed the corrected pagination behavior.
+- No Dynamic Capability-Based Authorization or unrelated Purchasing feature was introduced.
+
+#### D1 — Documentation Synchronization
+
+- Synchronized current-state documentation with verified Sprint 8 P0-P7 behavior.
+- Confirmed the documentation boundary between the released v1.4.0 reporting work and the completed v1.5.0 Purchasing Enhancements.
+
+#### D2 — Design Decision Synchronization
+
+- Recorded the validated Application-layer coordination / Domain-owned invariant decision for Purchase Order receiving and inventory synchronization.
+
+#### D3 — Final Sprint 8 Retrospective
+
+- Recorded the final Sprint 8 outcome, deviations, lessons learned, limitations, and locked future priority boundaries.
+
+#### D4 — Final Documentation Validation
+
+- Completed the final consistency audit against the available source snapshot, verified behavior recorded by P7, Sprint 8 planning baseline, D2 design decision record, and final retrospective.
+- Corrected stale D1/D2 next-task references in current-state documentation.
+- Confirmed Sprint 7 remains historical/released at v1.4.0 and Sprint 8 Purchasing Enhancements are released as v1.5.0.
+- Confirmed no future-priority feature is marked complete.
+- Sprint 8 final save point and sprint closure are complete.
+
+## [v1.4.0] - 2026-08-18
+
+### Release Summary
+
+Sprint 7 Additional Reporting and Exports is complete, verified, and released.
+
+### Additional Reporting
 
 Sprint 7 Additional Reporting is complete and has passed final project-wide verification.
 
@@ -41,8 +143,6 @@ Sprint 7 Additional Reporting is complete and has passed final project-wide veri
 
 No Dynamic Capability-Based Authorization implementation was introduced during Sprint 7.
 
----
-
 ## [v1.3.0] - 2026-08-13
 
 ### Release Summary
@@ -54,6 +154,16 @@ The implementation extends the existing ASP.NET Core Identity integration throug
 
 ### Changed
 
+#### P5 - Purchase Order Pagination
+
+- Added server-side pagination to the Purchase Order listing.
+- Reused the existing shared paging infrastructure and `PageNum` / `PageSize` conventions.
+- Preserved search, Purchase Order filtering, sorting, and page-size state across pagination navigation.
+- Added Previous, numbered-page, and Next navigation with first/last page boundary handling.
+- Verified page navigation with `PageSize=1`, including page 5 and active-page/result changes.
+- No P6 functionality was introduced.
+
+
 #### Additional Reporting
 
 - Completed Purchase History reporting.
@@ -62,52 +172,14 @@ The implementation extends the existing ASP.NET Core Identity integration throug
 - Added server-side pagination.
 - Added server-side sorting.
 
-### Architecture
+### Development State
 
-- Finalized the direction for Dynamic Capability-Based
-  Authorization.
-- Defined the User → Group → Capability model.
-- Established capabilities as atomic application actions.
-- Established groups as reusable capability collections.
-- Established that authorization and Domain state validation
-  remain separate concerns.
-- Deferred authorization implementation until Additional
-  Reporting work is completed.
-
-### Development Sequence
-
-Current priority:
-
-```text
-Additional Reporting
-        ↓
-Dynamic Capability-Based Authorization
-        ↓
-Purchasing Workflow Authorization
-```
-
-The new authorization architecture does not block the current
-Additional Reporting implementation.
-
-
-This preserves the existing historical releases such as v1.3.0 rather than incorrectly assigning today's design decision to a released version. The current changelog correctly identifies v1.3.0 as the completed Account Management release. :contentReference[oaicite:6]{index=6}
-
----
-
-# One correction to our previous plan
-
-After looking at the actual documentation, I would **not add a new numbered roadmap phase for authorization immediately**.
-
-Your roadmap's numbered phases currently represent historical development milestones:
-
-```text
-v1.0 Purchasing Application
-v1.1 Purchasing Presentation
-v1.2 Reporting
-v1.3 Account Management
-```
-
-The Dynamic Capability-Based Authorization decision is currently architecture planning, not a completed milestone.
+- Sprint 8 Purchasing Enhancements P0-P7 are complete and verified.
+- D1 Documentation Synchronization is complete.
+- D2 Design Decision Synchronization is complete.
+- D3 Final Sprint 8 Retrospective is complete.
+- D4 Final Documentation Validation is complete.
+- Sprint 8 is ready for its final save point / sprint closure.
 
 ---
 

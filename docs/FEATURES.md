@@ -39,7 +39,7 @@ Outcome:
 - ✅ No structural redesign required
 - ✅ Ready for workflow-driven business modules
 
-The Purchasing Presentation Layer is now complete and has been verified through an end-to-end browser workflow using persisted database records.
+The Purchasing Presentation Layer is complete and has been verified through an end-to-end browser workflow using persisted database records. Sprint 8 P1-P7 extended and verified the Purchase Order workflow, including multiple items, search, filtering, sorting, pagination, receiving, and inventory synchronization.
 
 The first Reporting vertical slice has also been implemented through Inventory Valuation and verified using actual persisted database records.
 
@@ -58,7 +58,7 @@ The first Reporting vertical slice has also been implemented through Inventory V
 | Unit Management | ✅ Complete |
 | Inventory Transactions | ✅ Complete |
 | Architecture Sprint | ✅ Complete |
-| Purchasing | 🟨 Core Workflow Complete |
+| Purchasing | ✅ Core Workflow + Sprint 8 P1-P7 Enhancements Complete |
 | Reporting | ✅ Sprint 7 Additional Reporting Complete |
 
 ## Current Implementation
@@ -76,6 +76,12 @@ Completed modules:
 - ✅ User Management
 - ✅ Purchasing Application Layer
 - ✅ Purchasing Presentation Layer
+- ✅ Purchase Order Search (P2)
+- ✅ Purchase Order Filtering (P3)
+- ✅ Purchase Order Sorting (P4)
+- ✅ Purchase Order Pagination (P5)
+- ✅ Inventory Synchronization During Receiving (P6)
+- ✅ Integrated Purchasing Verification (P7)
 - ✅ Reporting
   - ✅ Inventory Valuation
   - ✅ Purchase History
@@ -363,6 +369,23 @@ Completed
 - Received quantity must be greater than zero.
 
 ---
+
+## P6 - Inventory Synchronization During Receiving
+
+**Status: Complete and verified**
+
+Receiving now synchronizes the existing Purchasing workflow with inventory:
+
+- Valid Purchase Order receiving increases the Product `QuantityOnHand`.
+- A corresponding `StockIn` InventoryTransaction is recorded with a Purchase Order reference.
+- Purchase Order received quantity and status continue to be controlled by the existing Domain rules.
+- Received quantity cannot exceed ordered quantity.
+- Purchase Order state, Product stock, and the InventoryTransaction are persisted through the same Unit of Work save boundary.
+- Existing receiving authorization and Presentation workflow remain unchanged.
+
+The implementation does not redesign inventory behavior or introduce a separate receiving inventory architecture.
+
+Runtime/browser verification was completed successfully by the project owner. Valid full and partial receiving updated Product stock correctly, corresponding StockIn movements were recorded, invalid and over-receiving scenarios were rejected without inventory changes, and existing authorization and receiving workflow behavior remained intact.
 
 ## Reporting
 
@@ -922,12 +945,6 @@ Engineering practices include:
 
 Remaining work:
 
-- Multiple Purchase Order Item Management
-- Purchase Order Search
-- Purchase Order Filtering
-- Purchase Order Sorting
-- Purchase Order Pagination
-- Inventory Integration During Receiving
 - Additional User Experience Improvements
 
 ## Reporting
@@ -964,3 +981,101 @@ Verified:
 - Existing authorization boundaries
 
 No Dynamic Capability-Based Authorization was introduced.
+
+### Purchase Order Search - P2
+
+**Status: Complete and verified**
+
+P2 implements server-side Purchase Order search using the existing Purchase Order listing/query architecture.
+
+Verified behavior:
+- Search by Purchase Order ID.
+- Search by Supplier Name.
+- Empty or whitespace-only search returns the normal unfiltered list.
+- No-match searches return the correct empty result state.
+- Search state is preserved through the applicable Purchase Order navigation.
+- Existing authorization behavior remains intact.
+- Existing Purchase Order list behavior outside search remains unchanged.
+
+The project owner completed runtime/browser verification successfully after implementation.
+
+### Purchase Order Filtering - P3
+
+**Status: Complete and verified**
+
+P3 adds confirmed server-side Purchase Order filters:
+
+- From Date
+- To Date
+- Purchase Order Status
+
+Verified behavior:
+- Individual filters work correctly.
+- Multiple filters can be combined.
+- Existing Purchase Order search works together with filtering.
+- Empty filter combinations return the existing no-results state correctly.
+- Filter state is preserved where applicable.
+- Existing authorization and unrelated Purchase Order behavior remain unchanged.
+
+Runtime/browser verification was completed successfully by the project owner.
+
+### Purchase Order Sorting - P4
+
+**Status: Complete and verified**
+
+P4 adds server-side Purchase Order sorting using the established shared sorting conventions.
+
+Supported sort fields:
+- Purchase Order ID
+- Supplier
+- Order Date
+- Status
+- Total Amount
+
+Verified behavior:
+- Ascending and descending sorting work for all supported fields.
+- Sorting integrates with Purchase Order search and filtering.
+- Sorting state is preserved through applicable Purchase Order navigation and workflow actions.
+- Sorting is executed server-side.
+- Existing authorization and unrelated Purchase Order behavior remain unchanged.
+
+Runtime/browser verification was completed successfully by the project owner.
+
+P6 - Inventory Synchronization During Receiving is complete and verified.
+
+### Integrated Purchasing Verification - P7
+
+**Status: Complete and verified**
+
+P7 completed the integrated Purchasing regression pass across the full workflow from Create through Receive.
+
+Verified areas include:
+- Multiple Purchase Order items
+- List, search, date/status filtering, sorting, and pagination
+- Details, Submit, Approve, and Receive
+- Inventory synchronization during receiving
+- Existing authorization boundaries
+- Empty-result behavior
+- Relevant failure/recovery behavior
+
+During verification, an in-scope pagination regression was found: pagination links did not preserve `FromDate` and `ToDate`. The Purchase Order listing was corrected so pagination preserves the active date filters together with search, status, page size, and sorting state. The corrected behavior was runtime/browser tested successfully by the project owner.
+
+No Dynamic Capability-Based Authorization implementation was introduced.
+
+D1, D2, D3, and D4 documentation tasks are complete. Sprint 8 is closed and released as v1.5.0. The next development activity is Next Sprint Planning.
+
+### Purchase Order Pagination - P5
+
+P5 adds server-side pagination to the Purchase Order listing using the established shared paging infrastructure.
+
+- Page parameter convention: `PageNum`
+- Page size convention: `PageSize`
+- Previous / numbered-page / Next navigation
+- First and last page boundary handling
+- Pagination compatible with search
+- Pagination compatible with date/status filtering
+- Pagination compatible with sorting
+- Pagination state preservation across navigation
+- Empty-result behavior remains within the existing Purchase Order listing flow
+
+The pagination implementation is server-side and preserves the existing Purchase Order query architecture.

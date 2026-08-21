@@ -1822,3 +1822,104 @@ Verified:
 
 The implementation remains independent of the future Dynamic Capability-Based Authorization architecture.
 
+
+
+# DD-029 - Purchase Order Sorting Uses Shared Server-Side Sorting
+
+**Status:** Accepted
+
+**Context**
+
+Sprint 8 P4 required Purchase Order sorting without introducing a separate sorting architecture. The existing platform already uses shared sorting conventions across feature areas.
+
+**Decision**
+
+Purchase Order listing sorting uses the existing shared sorting pattern through `PurchaseOrderSortFields`, the Purchase Order request `SortBy`/`Descending` values, and server-side repository ordering.
+
+The confirmed supported fields are:
+
+- `Id`
+- `Supplier`
+- `OrderDate`
+- `Status`
+- `TotalAmount`
+
+Both ascending and descending ordering are supported. Sorting is applied in the Purchase Order query before the result is returned to the Presentation layer.
+
+**Rationale**
+
+This preserves consistency with existing feature sorting, keeps query work database-side, and avoids duplicating sorting abstractions. It also allows Purchase Order sorting to compose with the existing Search and Filtering behavior.
+
+**Scope Boundary**
+
+P4 did not introduce Purchase Order pagination, inventory synchronization, Dynamic Capability-Based Authorization, or unrelated Purchasing changes. Purchase Order pagination was implemented separately in P5 using the existing shared paging infrastructure.
+
+
+---
+
+# DD-030 - Purchase Order Pagination Uses Existing PageNum Convention
+
+**Status:** Accepted
+
+**Context**
+
+Sprint 8 P5 required server-side Purchase Order pagination while preserving the established shared paging infrastructure and the existing Purchase Order listing behavior.
+
+**Decision**
+
+Purchase Order pagination uses the project's existing `PageNum` and `PageSize` request conventions. Pagination links preserve the active Purchase Order search, status filtering, date filtering (`FromDate` / `ToDate`), and sorting state.
+
+P7 integrated verification confirmed that the final navigation state preserves the active date filters as well as search, status, page size, and sorting state.
+
+The repository applies pagination after the existing query filters and sorting so that:
+
+```text
+Search / Filters
+    ↓
+Sorting
+    ↓
+Count
+    ↓
+Skip / Take
+    ↓
+Paged Result
+```
+
+**Rationale**
+
+Using the actual `PageNum` convention avoids introducing a parallel page parameter and keeps Purchase Order pagination consistent with the existing application conventions.
+
+**Scope Boundary**
+
+P5 is limited to Purchase Order pagination. It does not introduce Inventory Synchronization During Receiving, Dynamic Capability-Based Authorization, Sales, Audit / Activity Logging, Bulk Import / Export, Barcode / QR, or unrelated Purchasing changes.
+
+
+## DD-035 - Purchase Order Receiving Synchronizes Inventory Through Existing Domain Operations
+
+**Status:** Accepted
+
+### Context
+
+Purchasing receiving must update inventory consistently with the Purchase Order receiving workflow without introducing a separate inventory synchronization subsystem.
+
+### Decision
+
+The receiving workflow is coordinated by the Application layer while preserving existing Domain responsibilities. `PurchaseOrder.Receive()` remains authoritative for Purchase Order receiving state and invariants. `Product.IncreaseStock()` remains authoritative for product stock changes, and an `InventoryTransaction` with `StockIn` movement records the resulting inventory movement. Persistence continues through the existing Unit of Work boundary.
+
+### Rationale
+
+This keeps business invariants in the Domain, avoids duplicating inventory behavior in the Application layer, and reuses the established persistence architecture. It also keeps receiving and inventory synchronization within the same application workflow rather than introducing a parallel synchronization mechanism.
+
+### Alternatives Rejected
+
+- A separate inventory synchronization service or subsystem was not introduced because the existing Application/Domain/Infrastructure boundaries are sufficient.
+- Direct persistence of stock changes outside the established Domain operations was rejected because it would bypass existing business invariants.
+- A new transaction boundary was rejected because the existing Unit of Work provides the required persistence boundary.
+
+### Verification
+
+The decision was validated during Sprint 8 P6 - Inventory Synchronization During Receiving and subsequently regression-verified during P7 - Integrated Purchasing Verification. The verified workflow covers Purchase Order receiving, Product stock synchronization, creation of the corresponding `StockIn` inventory transaction, authorization, and relevant recovery behavior.
+
+### Scope
+
+This decision applies to Purchase Order receiving and its inventory synchronization. It does not introduce or define the later Dynamic Capability-Based Authorization architecture or any unrelated Sprint 8 feature.

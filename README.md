@@ -42,9 +42,9 @@ The focus is not only on implementing business features but also on applying pro
 
 ## Project Status
 
-**Current Version:** v1.4.0 - Additional Reporting & Exports
+**Current Version:** v1.5.0 - Purchasing Enhancements
 
-**Current Development Status:** Sprint 7 Additional Reporting — Complete and Verified
+**Current Development Status:** Sprint 8 Purchasing Enhancements — Complete, Verified, Documented, and Closed
 
 ## Completed Modules
 
@@ -58,12 +58,12 @@ The focus is not only on implementing business features but also on applying pro
 - ✅ Authentication & Authorization
 - ✅ User Management
 - ✅ Account Management
-- 🟨 Purchasing (Core Workflow Complete)
+- ✅ Purchasing (Core Workflow + Sprint 8 P1-P7 Enhancements Complete)
 - ✅ Reporting (Sprint 7 Additional Reporting Complete and Verified)
 
 ## Latest Release
 
-## v1.4.0 - Additional Reporting & Exports
+## v1.5.0 - Purchasing Enhancements
 
 ### Highlights
 
@@ -98,6 +98,49 @@ The focus is not only on implementing business features but also on applying pro
 - Final project-wide verification completed
 
 The release preserves the established read-oriented Reporting architecture and isolates PDF generation in the Web layer using QuestPDF.
+
+### v1.5.0 Release Highlights
+
+Sprint 8 Purchasing Enhancements is complete, verified, documented, and closed.
+
+#### Purchasing
+
+- Multiple Purchase Order Item Management
+- Purchase Order Search
+- Purchase Order Filtering
+- Purchase Order Sorting
+- Purchase Order Pagination
+- Inventory Synchronization During Receiving
+- Integrated Purchasing Verification
+
+#### Verification and Documentation
+
+- P1-P7 Purchasing scope completed and verified
+- D1 Documentation Synchronization completed
+- D2 Design Decision Synchronization completed
+- D3 Final Sprint 8 Retrospective completed
+- D4 Final Documentation Validation completed
+- Sprint 8 final save point established
+- No future-priority feature implemented during Sprint 8
+
+The v1.5.0 release preserves the established Purchasing architecture and records Sprint 8 as the current completed milestone.
+
+### Current Development — Sprint 8 Purchasing Enhancements
+
+Sprint 8 Purchasing Enhancements P0-P7 are complete, verified, documented, and closed.
+
+Completed:
+- P1 — Multiple Purchase Order Item Management
+- P2 — Purchase Order Search
+- P3 — Purchase Order Filtering
+- P4 — Purchase Order Sorting
+- P5 — Purchase Order Pagination
+- P6 — Inventory Synchronization During Receiving
+- P7 — Integrated Purchasing Verification
+
+P7 verified the complete Purchasing workflow and corrected an in-scope pagination regression so active `FromDate` and `ToDate` filters are preserved during pagination. No Dynamic Capability-Based Authorization implementation was introduced during Purchasing work.
+
+D1 - Documentation Synchronization, D2 - Design Decision Synchronization, D3 - Final Sprint 8 Retrospective, and D4 - Final Documentation Validation are complete. The Sprint 8 final save point has been established. The next development activity is planning for the next sprint; no new feature work is started by this closure.
 
 ---
 
@@ -340,6 +383,8 @@ The long-term goal is to evolve this project into a complete inventory managemen
 
 - ✅ Purchase Order Listing
 - ✅ Purchase Order Creation
+- ✅ Multiple Purchase Order Item Creation
+- ✅ Dynamic Item Add/Remove in Create UI
 - ✅ Purchase Order Details
 - ✅ Supplier Selection
 - ✅ Product Selection
@@ -813,7 +858,7 @@ Development Tools
 | Authentication & Authorization | ✅ Complete |
 | User Management | ✅ Complete |
 | Account Management | ✅ Complete |
-| Purchasing | 🟨 Core Workflow Complete |
+| Purchasing | ✅ Core Workflow + Sprint 8 P1-P7 Enhancements Complete |
 | Reporting | ✅ Sprint 7 Additional Reporting Complete and Verified |
 
 ---
@@ -838,20 +883,34 @@ Development Tools
 
 ## Current
 
-- v1.4.0 - Additional Reporting & Exports
+- Sprint 8 - Purchasing Enhancements
+- P1 Multiple Purchase Order Item Management - Complete
+- P2 Purchase Order Search - Complete
+- P3 Purchase Order Filtering - Complete
+- P4 Purchase Order Sorting - Complete
+- P5 Purchase Order Pagination - Complete
+- P6 Inventory Synchronization During Receiving - Complete and verified
+- P7 Integrated Purchasing Verification - Complete and verified
 
-## Next
+## Sprint 8 Closure State
 
-- Sprint Planning for the next development sprint
+- P0-P7 Purchasing Enhancements - Complete and verified
+- D1 Documentation Synchronization - Complete
+- D2 Design Decision Synchronization - Complete
+- D3 Final Sprint 8 Retrospective - Complete
+- D4 Final Documentation Validation - Complete
+- Final Sprint 8 save point - Established
+
+Sprint 8 is closed. The next development activity is a new Sprint Planning process. Dynamic Capability-Based Authorization remains the next locked priority, but implementation does not begin automatically from this closure.
 
 ## Future
 
-- Purchasing Enhancements
+- Additional Purchasing User Experience Improvements
+- Dynamic Capability-Based Authorization
 - Sales
-- Additional Reporting Modules
-- Excel Export
-- PDF Export
 - Audit Logging
+- Bulk Import / Export
+- Barcode / QR
 
 ---
 

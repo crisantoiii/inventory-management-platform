@@ -431,9 +431,9 @@ Inventory synchronization should be addressed only after the required business b
 
 ### Multiple Purchase Order Items in Create UI
 
-The Application contract supports multiple Purchase Order items, while the current Presentation implementation starts with a single item row.
+The Application contract supports multiple Purchase Order items, while the Presentation implementation at the time of Sprint 4 used a single item row.
 
-Dynamic item management can be added as a future Presentation enhancement.
+Dynamic item management was subsequently implemented in Sprint 8 P1 - Multiple Purchase Order Item Management. The Sprint 4 limitation is retained here as historical context and is no longer a current-state limitation.
 
 ---
 

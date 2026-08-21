@@ -55,7 +55,66 @@ Completed:
 - Excel Export
 - PDF Export
 
-The next development milestone will be selected through the next Sprint Planning process.
+Sprint 8 Purchasing Enhancements is complete and closed. P0, P1, P2, P3, P4, P5, P6, and P7 are complete and runtime/browser verified. P7 completed the integrated Purchasing regression pass and corrected one in-scope pagination state-preservation defect.
+
+---
+
+# Sprint 8 - Purchasing Enhancements
+
+## Completed
+
+- P0 - Actual Purchasing Source/Documentation Baseline
+- P1 - Multiple Purchase Order Item Management
+- P2 - Purchase Order Search
+- P3 - Purchase Order Filtering
+- P4 - Purchase Order Sorting
+- P5 - Purchase Order Pagination
+- P6 - Inventory Synchronization During Receiving - Complete and verified
+- P7 - Integrated Purchasing Verification - Complete and verified
+
+### P3 - Purchase Order Filtering
+
+Verified filters:
+- From Date
+- To Date
+- Purchase Order Status
+
+Verified:
+- Individual filters
+- Combined filters
+- Search + filter interaction
+- Empty-result behavior
+- Applicable filter-state preservation
+- Existing authorization behavior
+- No unrelated Purchasing behavior changed
+
+Runtime/browser verification was completed successfully by the project owner.
+
+## Final Sprint 8 State
+
+- D1 - Documentation Synchronization - Complete
+- D2 - Design Decision Synchronization - Complete
+- D3 - Final Sprint 8 Retrospective - Complete
+- D4 - Final Documentation Validation - Complete
+
+The Sprint 8 final save point has been established. No new feature work begins from this roadmap state; the next activity is Next Sprint Planning.
+
+## Next Sprint Planning
+
+Sprint 8 is closed. The next locked priority is Dynamic Capability-Based Authorization. Its implementation requires a separate Sprint Planning process and must not begin automatically from this closure.
+
+## D1 - Documentation Synchronization
+
+**Status: Complete**
+
+Current-state documentation now reflects the verified Sprint 8 Purchasing sequence through P7, including the integrated verification result and the corrected pagination date-filter state preservation.
+
+No implementation behavior was changed during D1.
+
+## Later
+- Additional Purchasing User Experience Improvements
+
+Dynamic Capability-Based Authorization remains outside the completed Purchasing implementation scope. It is the next locked priority after Sprint 8 closure and must not be started automatically as part of this handoff.
 
 ---
 
@@ -166,7 +225,6 @@ Remaining:
 
 - Inventory Integration
 - Supplier Purchase History
-- Multiple Purchase Order Item Management
 - Purchase Order Search
 - Purchase Order Filtering
 - Purchase Order Sorting
@@ -379,8 +437,9 @@ Future enhancements may include:
 | v1.1.0 | Purchasing Presentation Layer ✅ |
 | v1.2.0 | Reporting — Inventory Valuation ✅ |
 | v1.3.0 | Account Management ✅ |
-| v1.4.0 | Additional Reporting & Exports — Ready for Release |
-| v1.5.0 | Sales Module ⏳ |
+| v1.4.0 | Additional Reporting & Exports — Released |
+| v1.5.0 | Sprint 8 Purchasing Enhancements — Released |
+| v1.6.0 | Sales Module ⏳ |
 | v2.0.0 | REST API & Blazor ⏳ |
 
 ---
@@ -411,3 +470,24 @@ The architecture should evolve through reuse rather than introducing module-spec
 ## Sprint 7 Final Verification
 
 - [x] Final Project-wide Verification
+
+### P2 - Purchase Order Search - Complete
+
+**Status: Complete and verified**
+
+P2 implements server-side Purchase Order search using the existing Purchase Order listing/query architecture.
+
+Verified behavior:
+- Search by Purchase Order ID.
+- Search by Supplier Name.
+- Empty or whitespace-only search returns the normal unfiltered list.
+- No-match searches return the correct empty result state.
+- Search state is preserved through the applicable Purchase Order navigation.
+- Existing authorization behavior remains intact.
+- Existing Purchase Order list behavior outside search remains unchanged.
+
+The project owner completed runtime/browser verification successfully after implementation.
+
+No P3-P6 functionality was implemented as part of P2.
+
+D1 documentation synchronization was completed after the Sprint 8 P7 verification.

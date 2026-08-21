@@ -170,6 +170,8 @@ The review confirmed that:
 - Presentation workflows continue to respect Application and Infrastructure boundaries.
 - No structural architectural redesign was required.
 
+Sprint 8 P7 further validated the Purchasing vertical slice through integrated regression testing of Create, multi-item creation, listing, Search, Filtering, Sorting, Pagination, Details, Submit, Approve, Receive, inventory synchronization, authorization, empty-result behavior, and relevant failure/recovery behavior. The verification found and corrected a Presentation-layer pagination state-preservation defect without requiring architectural redesign.
+
 Sprint 7 further validated the architecture through seven read-oriented reporting workflows and Web-layer Excel/PDF export writers. The reporting and export implementation reused the established Application, DTO/read-model, repository, and EF Core patterns without structural redesign.
 
 The current architecture is suitable for continued expansion into:

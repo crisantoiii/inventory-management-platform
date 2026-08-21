@@ -26,17 +26,43 @@ Account Management
 
 # Project Status
 
-**Current Version:** v1.4.0
+**Current Version:** v1.5.0
 
-**Next Release:** Sprint 8 — To be determined through Sprint Planning
+**Latest Release:** v1.5.0 — Sprint 8 Purchasing Enhancements
 
-**Project Status:** Active Development
+**Project Status:** Sprint 8 Complete and Closed - Ready for Next Sprint Planning
 
 **Last Updated:** August 2026
 
 # Latest Release
 
-## v1.4.0 - Additional Reporting & Exports
+## v1.5.0 - Sprint 8 Purchasing Enhancements
+
+Released: August 2026
+
+Completed:
+
+- Multiple Purchase Order Item Management
+- Purchase Order Search
+- Purchase Order Filtering
+- Purchase Order Sorting
+- Purchase Order Pagination
+- Inventory Synchronization During Receiving
+- Integrated Purchasing Verification
+- D1-D4 Sprint 8 documentation and closure
+
+Verified:
+
+- Complete Purchasing workflow from creation through receiving
+- Search, date/status filtering, sorting, and pagination
+- Inventory synchronization and StockIn transaction creation
+- Existing authorization boundaries
+- Relevant empty-result and failure/recovery behavior
+- Pagination state preservation after the P7 correction
+
+---
+
+## v1.4.0 - Additional Reporting & Exports (Previous Release)
 
 Released: August 2026
 
@@ -89,8 +115,8 @@ Verified:
 
 - **Completed Modules:** 10
 - **Architecture Status:** Validated
-- **Current Milestone:** Sprint 7 Additional Reporting — Complete
-- **Next Milestone:** Sprint 8 Planning
+- **Current Milestone:** Sprint 8 — Purchasing Enhancements + D1-D4 — Complete
+- **Next Milestone:** Next Sprint Planning
 
 ---
 
@@ -131,7 +157,7 @@ The architecture has been validated and is considered stable for future business
 | Dashboard | ✅ Complete | 100% |
 | Authentication & Authorization |  ✅ Complete | 100% |
 | User Management | ✅ Complete | 100% |
-| Purchasing | 🟨 Core Workflow Complete | Partial |
+| Purchasing | ✅ Core Workflow + Sprint 8 Purchasing Enhancements | 100% |
 | Reporting | ✅ Additional Reporting Complete | 100% |
 | Account Management | ✅ Complete | 100% |
 
@@ -316,6 +342,8 @@ The architecture has been validated and is considered stable for future business
 - ✅ Received Quantity Display
 - ✅ Remaining Quantity Display
 - ✅ Calculated Purchase Order Total
+- ✅ Multiple Purchase Order Item Creation
+- ✅ Dynamic Item Add/Remove in Create UI
 - ✅ Client-side Validation
 - ✅ Domain Validation
 - ✅ Success Messages
@@ -539,60 +567,43 @@ Final verification covered normal application regression, reporting workflows, e
 
 # Current Focus
 
-Sprint 7 Additional Reporting is complete, verified, and documented.
+Sprint 8 Purchasing Enhancements is complete and closed. P0 - Actual Purchasing Source/Documentation Baseline through P7 - Integrated Purchasing Verification are complete and verified. P7 completed the integrated Purchasing regression pass and corrected one in-scope pagination state-preservation defect.
 
-Completed:
+Completed in Sprint 8:
 
-- Inventory Valuation
-- Purchase History
-- Supplier Purchase Analysis
-- Stock Movement
-- Low Stock Report
-- Inventory Movement Report
-- Product Reports
-- Excel Export
-- PDF Export
-- Final project-wide verification
+- P0 - Actual Purchasing Source/Documentation Baseline
+- P1 - Multiple Purchase Order Item Management
+- P2 - Purchase Order Search
+- P3 - Purchase Order Filtering
+- P4 - Purchase Order Sorting
+- P5 - Purchase Order Pagination
+- P6 - Inventory Synchronization During Receiving
+- P7 - Integrated Purchasing Verification
 
-Verification included empty-database behavior, explicit query failure and recovery, authorization regression, and final solution build verification.
+P1, P2, P3, P4, P5, P6, and P7 were runtime/browser verified successfully. The Purchase Order workflow now supports multiple item rows, search, filtering, sorting, pagination, and inventory synchronization while preserving the existing Purchasing architecture and downstream workflow.
 
-# Next Milestone
+# D1 - Documentation Synchronization
 
-## Sprint 8 Planning
+**Status: Complete**
 
-The next development scope will be established through the Sprint Planning process.
+Current-state documentation was synchronized with the verified Sprint 8 Purchasing behavior through P7.
 
-Sprint 7 Additional Reporting is complete and no Sprint 7 implementation work remains.
+Validated documentation updates include:
+- Sprint 8 P0-P7 completion state
+- P7 integrated verification scope and result
+- Pagination date-filter state preservation correction
+- Current Purchasing scope and future priority boundaries
+- D4 final documentation validation and sprint-closure readiness
 
-The following reporting capabilities are already complete:
-
-- Inventory Valuation
-- Purchase History
-- Supplier Purchase Analysis
-- Stock Movement
-- Low Stock Report
-- Inventory Movement Report
-- Product Reports
-- Excel Export
-- PDF Export
-
-Sprint 7 final verification is complete.
-
-Dynamic Capability-Based Authorization remains a future architectural direction. Its implementation will be considered through a separate Sprint Planning process and was not part of Sprint 7.
+No implementation behavior was changed as part of D1.
 
 # Known Limitations
 
-Current version does not yet include:
+Current development scope does not yet include:
 
 Business Modules
 
 - Sales Orders
-
-Purchasing
-
-- Multiple Purchase Order item management in the Create UI
-- Purchase Order search, filtering, sorting, and pagination
-- Inventory synchronization during Purchase Order receiving
 
 Platform
 
@@ -651,7 +662,7 @@ Database
 
 without structural redesign.
 
-The Purchasing module is now ready for future enhancements while the platform remains in active development.
+The Purchasing module is complete for the current roadmap scope. Future enhancements remain subject to the next Sprint Planning process.
 
 Sprint 5 introduced the first Reporting vertical slice through Inventory Valuation.
 
@@ -717,21 +728,26 @@ The architecture has now been validated through:
 
 ## Current Focus
 
-### Sprint 7 — Additional Reporting
+### Sprint 8 — Purchasing Enhancements
 
-Product Reports, Excel Export, and PDF Export are complete and browser-verified.
+Sprint 8 Purchasing Enhancements P0-P7 are complete, verified, documented, and closed. D1-D4 are also complete.
 
-Completed:
+The current project state is a completed v1.5.0 milestone. The next development activity is a separate Next Sprint Planning process. Dynamic Capability-Based Authorization remains the next locked priority, but implementation does not begin automatically from this closure.
 
-- Inventory Valuation
-- Purchase History
-- Supplier Purchase Analysis
-- Stock Movement
-- Low Stock Report
-- Inventory Movement Report
-- Product Reports
-- Excel Export
-- PDF Export
+### Completed Sprint 8 Scope
+
+- P0 - Actual Purchasing Source/Documentation Baseline
+- P1 - Multiple Purchase Order Item Management
+- P2 - Purchase Order Search
+- P3 - Purchase Order Filtering
+- P4 - Purchase Order Sorting
+- P5 - Purchase Order Pagination
+- P6 - Inventory Synchronization During Receiving
+- P7 - Integrated Purchasing Verification
+- D1 - Documentation Synchronization
+- D2 - Design Decision Synchronization
+- D3 - Final Sprint 8 Retrospective
+- D4 - Final Documentation Validation
 
 ### Final Project-wide Verification
 
@@ -766,3 +782,112 @@ Verified:
 No in-scope implementation defects were discovered during final verification.
 
 Dynamic Capability-Based Authorization was not implemented as part of Sprint 7.
+
+## Sprint 8 - P2 Purchase Order Search
+
+**Status: Complete and verified**
+
+P2 implements server-side Purchase Order search using the existing Purchase Order listing/query architecture.
+
+Verified behavior:
+- Search by Purchase Order ID.
+- Search by Supplier Name.
+- Empty or whitespace-only search returns the normal unfiltered list.
+- No-match searches return the correct empty result state.
+- Search state is preserved through the applicable Purchase Order navigation.
+- Existing authorization behavior remains intact.
+- Existing Purchase Order list behavior outside search remains unchanged.
+
+The project owner completed runtime/browser verification successfully after implementation.
+
+No P3-P6 functionality was implemented as part of P2.
+
+---
+
+# Sprint 8 - P3 Purchase Order Filtering
+
+**Status: Complete and verified**
+
+P3 extends the existing Purchase Order listing with server-side filtering while preserving the P2 search behavior and established Purchasing architecture.
+
+Implemented filters:
+- From Date
+- To Date
+- Purchase Order Status
+
+Verified behavior:
+- Each confirmed filter works correctly.
+- Multiple filters can be combined.
+- Search and filtering work together.
+- Empty-result combinations display the existing no-results behavior correctly.
+- Filter state is preserved where applicable through the existing Purchase Order navigation.
+- Existing authorization behavior remains intact.
+- No unrelated Purchase Order behavior was changed.
+
+Runtime/browser verification was completed successfully by the project owner after the P3 implementation.
+
+# Sprint 8 - P4 Purchase Order Sorting
+
+**Status: Complete and verified**
+
+P4 adds server-side Purchase Order sorting using the established shared sorting conventions and the existing Purchase Order listing/query architecture.
+
+Confirmed sort fields:
+- Purchase Order ID
+- Supplier
+- Order Date
+- Status
+- Total Amount
+
+Verified behavior:
+- Ascending sorting works for all supported fields.
+- Descending sorting works for all supported fields.
+- Sorting integrates with the existing Purchase Order search and filters.
+- Sorting state is preserved through applicable Purchase Order navigation and workflow actions.
+- Sorting remains server-side in the repository query.
+- Existing authorization behavior remains intact.
+- No unrelated Purchase Order behavior was changed.
+- Purchase Order pagination was not introduced as part of P4.
+
+Runtime/browser verification was completed successfully by the project owner after the P4 implementation.
+
+Next task: **P6 - Inventory Synchronization During Receiving**.
+
+
+
+---
+
+# Sprint 8 - P7 Integrated Purchasing Verification
+
+**Status:** Complete and verified
+
+P7 performed the integrated Purchasing regression verification across the complete workflow:
+
+- Create Purchase Order
+- Multiple Purchase Order items
+- Purchase Order listing
+- Search
+- From/To date filtering
+- Status filtering
+- Sorting
+- Pagination
+- Details
+- Submit
+- Approve
+- Receive
+- Inventory synchronization
+- Authorization
+- Empty-result behavior
+- Relevant failure/recovery behavior
+
+During integrated verification, one in-scope regression was identified in Purchase Order pagination: pagination links did not preserve the active `FromDate` and `ToDate` values. The defect was corrected in the Purchase Order listing Razor Page. Pagination now preserves the active search, status, date-filter, page-size, and sorting state through Previous, numbered-page, and Next navigation.
+
+The corrected implementation was runtime/browser tested by the project owner and confirmed working.
+
+No Dynamic Capability-Based Authorization implementation was introduced, and no unrelated Purchasing feature was added.
+
+The P7 implementation fix is intentionally kept separate from documentation changes. Documentation is synchronized in the dedicated P7 documentation update.
+
+**P7 result:** Complete and verified.
+
+D1 - Documentation Synchronization, D2 - Design Decision Synchronization, D3 - Final Sprint 8 Retrospective, and D4 - Final Documentation Validation are complete. The Sprint 8 final save point has been established. The next development activity is Next Sprint Planning.
