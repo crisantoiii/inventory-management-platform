@@ -1892,3 +1892,34 @@ Using the actual `PageNum` convention avoids introducing a parallel page paramet
 **Scope Boundary**
 
 P5 is limited to Purchase Order pagination. It does not introduce Inventory Synchronization During Receiving, Dynamic Capability-Based Authorization, Sales, Audit / Activity Logging, Bulk Import / Export, Barcode / QR, or unrelated Purchasing changes.
+
+
+## DD-035 - Purchase Order Receiving Synchronizes Inventory Through Existing Domain Operations
+
+**Status:** Accepted
+
+### Context
+
+Purchasing receiving must update inventory consistently with the Purchase Order receiving workflow without introducing a separate inventory synchronization subsystem.
+
+### Decision
+
+The receiving workflow is coordinated by the Application layer while preserving existing Domain responsibilities. `PurchaseOrder.Receive()` remains authoritative for Purchase Order receiving state and invariants. `Product.IncreaseStock()` remains authoritative for product stock changes, and an `InventoryTransaction` with `StockIn` movement records the resulting inventory movement. Persistence continues through the existing Unit of Work boundary.
+
+### Rationale
+
+This keeps business invariants in the Domain, avoids duplicating inventory behavior in the Application layer, and reuses the established persistence architecture. It also keeps receiving and inventory synchronization within the same application workflow rather than introducing a parallel synchronization mechanism.
+
+### Alternatives Rejected
+
+- A separate inventory synchronization service or subsystem was not introduced because the existing Application/Domain/Infrastructure boundaries are sufficient.
+- Direct persistence of stock changes outside the established Domain operations was rejected because it would bypass existing business invariants.
+- A new transaction boundary was rejected because the existing Unit of Work provides the required persistence boundary.
+
+### Verification
+
+The decision was validated during Sprint 8 P6 - Inventory Synchronization During Receiving and subsequently regression-verified during P7 - Integrated Purchasing Verification. The verified workflow covers Purchase Order receiving, Product stock synchronization, creation of the corresponding `StockIn` inventory transaction, authorization, and relevant recovery behavior.
+
+### Scope
+
+This decision applies to Purchase Order receiving and its inventory synchronization. It does not introduce or define the later Dynamic Capability-Based Authorization architecture or any unrelated Sprint 8 feature.
