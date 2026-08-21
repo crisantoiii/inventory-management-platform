@@ -2940,3 +2940,63 @@ No inventory redesign, new authorization model, new database migration, or Prese
 
 Source inspection confirms the implementation preserves the existing Domain invariants and persistence pattern. The project owner then completed runtime/browser verification in the actual development environment. Verified behavior includes valid full and partial receiving, correct Product quantity updates, corresponding StockIn InventoryTransactions, rejection of invalid and over-receiving operations without inventory changes, safe repeated receiving, preserved authorization, and preservation of the existing receiving workflow. A solution build was not performed in the documentation-review environment because the environment does not contain the `dotnet` CLI.
 
+
+
+---
+
+# Sprint 8 - P7 Integrated Purchasing Verification
+
+**Date:** 2026-08-21
+
+## Objective
+
+Perform integrated regression verification of the complete Purchasing workflow after the Sprint 8 P1-P6 enhancements, without adding unrelated features.
+
+## Verification Scope
+
+The integrated verification covered:
+
+- Purchase Order creation
+- Multiple Purchase Order items
+- Purchase Order listing
+- Search
+- From/To date filtering
+- Status filtering
+- Sorting
+- Pagination
+- Details
+- Submit
+- Approve
+- Receive
+- Inventory synchronization
+- Existing authorization
+- Empty-result behavior
+- Relevant failure/recovery behavior
+
+## Defect Discovered
+
+Integrated verification identified an in-scope regression in Purchase Order pagination. Pagination links preserved search, status, page size, and sorting state but did not preserve the active `FromDate` and `ToDate` values.
+
+This meant a user could apply a date range, navigate to another page, and unintentionally lose the date filter.
+
+## Correction
+
+The Purchase Order listing pagination links were corrected to preserve both `FromDate` and `ToDate` using the actual Purchase Order PageModel properties and existing query-state conventions.
+
+No new pagination architecture was introduced and no unrelated feature behavior was changed.
+
+## Verification Result
+
+The corrected implementation was runtime/browser tested by the project owner and confirmed working.
+
+The integrated Purchasing workflow is now verified with pagination retaining the active search, status, date-filter, page-size, and sorting state.
+
+No Dynamic Capability-Based Authorization implementation was introduced during P7.
+
+## Outcome
+
+**P7 - Integrated Purchasing Verification: COMPLETE AND VERIFIED**
+
+The Purchasing enhancement sequence P0-P7 is complete. The next task is:
+
+**D1 - Documentation Synchronization**

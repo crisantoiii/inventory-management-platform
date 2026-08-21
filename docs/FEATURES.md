@@ -58,7 +58,7 @@ The first Reporting vertical slice has also been implemented through Inventory V
 | Unit Management | ✅ Complete |
 | Inventory Transactions | ✅ Complete |
 | Architecture Sprint | ✅ Complete |
-| Purchasing | 🟨 Core Workflow + Sprint 8 P1-P6 Enhancements |
+| Purchasing | 🟨 Core Workflow + Sprint 8 P1-P7 Enhancements |
 | Reporting | ✅ Sprint 7 Additional Reporting Complete |
 
 ## Current Implementation
@@ -944,9 +944,6 @@ Engineering practices include:
 
 Remaining work:
 
-- Purchase Order Sorting
-- Purchase Order Pagination
-- Inventory Integration During Receiving
 - Additional User Experience Improvements
 
 ## Reporting
@@ -1045,7 +1042,26 @@ Runtime/browser verification was completed successfully by the project owner.
 
 P6 - Inventory Synchronization During Receiving is complete and verified.
 
-P7 - Integrated Purchasing Verification is the next Purchasing Enhancements task.
+### Integrated Purchasing Verification - P7
+
+**Status: Complete and verified**
+
+P7 completed the integrated Purchasing regression pass across the full workflow from Create through Receive.
+
+Verified areas include:
+- Multiple Purchase Order items
+- List, search, date/status filtering, sorting, and pagination
+- Details, Submit, Approve, and Receive
+- Inventory synchronization during receiving
+- Existing authorization boundaries
+- Empty-result behavior
+- Relevant failure/recovery behavior
+
+During verification, an in-scope pagination regression was found: pagination links did not preserve `FromDate` and `ToDate`. The Purchase Order listing was corrected so pagination preserves the active date filters together with search, status, page size, and sorting state. The corrected behavior was runtime/browser tested successfully by the project owner.
+
+No Dynamic Capability-Based Authorization implementation was introduced.
+
+**Next task:** D1 - Documentation Synchronization.
 
 ### Purchase Order Pagination - P5
 

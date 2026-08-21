@@ -55,7 +55,7 @@ Completed:
 - Excel Export
 - PDF Export
 
-Sprint 8 Purchasing Enhancements is now active. P0, P1, P2, P3, P4, P5, and P6 are complete and runtime/browser verified. P7 - Integrated Purchasing Verification is next.
+Sprint 8 Purchasing Enhancements is now active. P0, P1, P2, P3, P4, P5, P6, and P7 are complete and runtime/browser verified. P7 completed the integrated Purchasing regression pass and corrected one in-scope pagination state-preservation defect.
 
 ---
 
@@ -70,6 +70,7 @@ Sprint 8 Purchasing Enhancements is now active. P0, P1, P2, P3, P4, P5, and P6 a
 - P4 - Purchase Order Sorting
 - P5 - Purchase Order Pagination
 - P6 - Inventory Synchronization During Receiving - Complete and verified
+- P7 - Integrated Purchasing Verification - Complete and verified
 
 ### P3 - Purchase Order Filtering
 
@@ -91,7 +92,7 @@ Runtime/browser verification was completed successfully by the project owner.
 
 ## Next
 
-- P7 - Integrated Purchasing Verification
+- D1 - Documentation Synchronization
 
 ## Later
 - Additional Purchasing User Experience Improvements
@@ -472,4 +473,4 @@ The project owner completed runtime/browser verification successfully after impl
 
 No P3-P6 functionality was implemented as part of P2.
 
-**Next task:** P6 - Inventory Synchronization During Receiving.
+**Next task:** D1 - Documentation Synchronization.

@@ -1867,7 +1867,9 @@ Sprint 8 P5 required server-side Purchase Order pagination while preserving the 
 
 **Decision**
 
-Purchase Order pagination uses the project's existing `PageNum` and `PageSize` request conventions. Pagination links preserve the active Purchase Order search, filtering, and sorting state.
+Purchase Order pagination uses the project's existing `PageNum` and `PageSize` request conventions. Pagination links preserve the active Purchase Order search, status filtering, date filtering (`FromDate` / `ToDate`), and sorting state.
+
+P7 integrated verification confirmed that the final navigation state preserves the active date filters as well as search, status, page size, and sorting state.
 
 The repository applies pagination after the existing query filters and sorting so that:
 

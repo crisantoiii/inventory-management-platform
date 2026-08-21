@@ -90,7 +90,7 @@ P2 - Purchase Order Search is complete and verified.
 - Source-level verification confirms repeated receiving cannot exceed the ordered quantity because the existing Domain invariant remains authoritative.
 - Runtime/browser verification was completed successfully by the project owner, including valid full and partial receiving, inventory quantity updates, StockIn transaction creation, invalid/over-receiving rejection, repeated receiving safety, authorization preservation, and receiving workflow preservation.
 
-Next task: **P7 - Integrated Purchasing Verification**.
+Next task: **D1 - Documentation Synchronization**.
 
 ---
 

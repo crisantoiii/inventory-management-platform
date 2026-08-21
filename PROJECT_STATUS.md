@@ -89,8 +89,8 @@ Verified:
 
 - **Completed Modules:** 10
 - **Architecture Status:** Validated
-- **Current Milestone:** Sprint 8 — P6 Inventory Synchronization During Receiving — Complete and Verified
-- **Next Milestone:** Sprint 8 — P7 Integrated Purchasing Verification
+- **Current Milestone:** Sprint 8 — P7 Integrated Purchasing Verification — Complete and Verified
+- **Next Milestone:** Sprint 8 — D1 Documentation Synchronization
 
 ---
 
@@ -541,7 +541,7 @@ Final verification covered normal application regression, reporting workflows, e
 
 # Current Focus
 
-Sprint 8 Purchasing Enhancements is now active. P0 - Actual Purchasing Source/Documentation Baseline through P6 - Inventory Synchronization During Receiving are complete and verified. P7 - Integrated Purchasing Verification is next.
+Sprint 8 Purchasing Enhancements is now active. P0 - Actual Purchasing Source/Documentation Baseline through P7 - Integrated Purchasing Verification are complete and verified. P7 completed the integrated Purchasing regression pass and corrected one in-scope pagination state-preservation defect.
 
 Completed in Sprint 8:
 
@@ -580,7 +580,7 @@ P6 implementation changes are intended to be committed separately from documenta
 
 `feat(purchasing): synchronize inventory on receiving`
 
-Next task: **P7 - Integrated Purchasing Verification**.
+Next task: **D1 - Documentation Synchronization**.
 
 # Known Limitations
 
@@ -832,3 +832,41 @@ Runtime/browser verification was completed successfully by the project owner aft
 
 Next task: **P6 - Inventory Synchronization During Receiving**.
 
+
+
+---
+
+# Sprint 8 - P7 Integrated Purchasing Verification
+
+**Status:** Complete and verified
+
+P7 performed the integrated Purchasing regression verification across the complete workflow:
+
+- Create Purchase Order
+- Multiple Purchase Order items
+- Purchase Order listing
+- Search
+- From/To date filtering
+- Status filtering
+- Sorting
+- Pagination
+- Details
+- Submit
+- Approve
+- Receive
+- Inventory synchronization
+- Authorization
+- Empty-result behavior
+- Relevant failure/recovery behavior
+
+During integrated verification, one in-scope regression was identified in Purchase Order pagination: pagination links did not preserve the active `FromDate` and `ToDate` values. The defect was corrected in the Purchase Order listing Razor Page. Pagination now preserves the active search, status, date-filter, page-size, and sorting state through Previous, numbered-page, and Next navigation.
+
+The corrected implementation was runtime/browser tested by the project owner and confirmed working.
+
+No Dynamic Capability-Based Authorization implementation was introduced, and no unrelated Purchasing feature was added.
+
+The P7 implementation fix is intentionally kept separate from documentation changes. Documentation is synchronized in the dedicated P7 documentation update.
+
+**P7 result:** Complete and verified.
+
+**Next task:** **D1 - Documentation Synchronization**.
