@@ -55,7 +55,7 @@ Completed:
 - Excel Export
 - PDF Export
 
-Sprint 8 Purchasing Enhancements is now active. P0, P1, P2, P3, P4, P5, P6, and P7 are complete and runtime/browser verified. P7 completed the integrated Purchasing regression pass and corrected one in-scope pagination state-preservation defect.
+Sprint 8 Purchasing Enhancements is complete and closed. P0, P1, P2, P3, P4, P5, P6, and P7 are complete and runtime/browser verified. P7 completed the integrated Purchasing regression pass and corrected one in-scope pagination state-preservation defect.
 
 ---
 
@@ -97,7 +97,11 @@ Runtime/browser verification was completed successfully by the project owner.
 - D3 - Final Sprint 8 Retrospective - Complete
 - D4 - Final Documentation Validation - Complete
 
-The next action is the Sprint 8 final save point / sprint closure. No new feature work begins from this roadmap state.
+The Sprint 8 final save point has been established. No new feature work begins from this roadmap state; the next activity is Next Sprint Planning.
+
+## Next Sprint Planning
+
+Sprint 8 is closed. The next locked priority is Dynamic Capability-Based Authorization. Its implementation requires a separate Sprint Planning process and must not begin automatically from this closure.
 
 ## D1 - Documentation Synchronization
 
@@ -434,7 +438,7 @@ Future enhancements may include:
 | v1.2.0 | Reporting — Inventory Valuation ✅ |
 | v1.3.0 | Account Management ✅ |
 | v1.4.0 | Additional Reporting & Exports — Released |
-| v1.5.0 | Sprint 8 Purchasing Enhancements ⏳ |
+| v1.5.0 | Sprint 8 Purchasing Enhancements — Released |
 | v1.6.0 | Sales Module ⏳ |
 | v2.0.0 | REST API & Blazor ⏳ |
 

@@ -2,46 +2,29 @@
 
 ## [Unreleased]
 
-### Release State
+### Development State
 
-Sprint 7 Additional Reporting is complete and released as v1.4.0. Sprint 8 Purchasing Enhancements P0-P7 are complete and verified and remain unreleased.
+Sprint 8 Purchasing Enhancements was released as v1.5.0 and is complete and closed. The next development activity is Next Sprint Planning. No future-priority feature is marked complete.
 
-### Sprint 7 — Additional Reporting
+### Next Locked Priority
 
-Sprint 7 Additional Reporting is complete and has passed final project-wide verification.
+1. Dynamic Capability-Based Authorization
+2. Sales Module
+3. Audit / Activity Logging
+4. Bulk Import / Export
+5. Barcode / QR
 
-#### Completed Reporting
+## [v1.5.0] - 2026-08-21
 
-- Inventory Valuation
-- Purchase History
-- Supplier Purchase Analysis
-- Stock Movement
-- Low Stock Report
-- Inventory Movement Report
-- Product Reports
+### Release Summary
 
-#### Completed Exports
+Sprint 8 Purchasing Enhancements is complete, verified, documented, and closed. This release includes the complete P0-P7 Purchasing enhancement sequence and D1-D4 documentation and closure work.
 
-- Excel Export for all seven completed reports
-- PDF Export for all seven completed reports using QuestPDF
+### Purchasing Enhancements
 
-#### Final Verification
+**Status: Complete and Closed**
 
-- Authentication, Account Management, and 2FA regression
-- Product, Category, Supplier, and Customer management regression
-- Purchase Orders and Inventory operations regression
-- Reporting filters, sorting, pagination, navigation, and no-result behavior
-- Full filtered dataset export verification
-- Multi-page PDF verification
-- Inventory Valuation Total Inventory Value verification
-- Empty database verification
-- Explicit query-failure and database recovery verification
-- Existing authorization and Access Denied behavior verification
-- `dotnet restore` and `dotnet build` verification
-
-No Dynamic Capability-Based Authorization implementation was introduced during Sprint 7.
-
-### Sprint 8 — Purchasing Enhancements
+Sprint 8 delivered and verified the complete Purchasing enhancement scope P0-P7. D1-D4 documentation and closure tasks are complete. No future-priority feature was implemented during Sprint 8.
 
 #### P1 — Multiple Purchase Order Item Management
 
@@ -101,7 +84,7 @@ P2 - Purchase Order Search is complete and verified.
 #### D1 — Documentation Synchronization
 
 - Synchronized current-state documentation with verified Sprint 8 P0-P7 behavior.
-- Confirmed the documentation boundary between the released v1.4.0 reporting work and unreleased Sprint 8 Purchasing Enhancements.
+- Confirmed the documentation boundary between the released v1.4.0 reporting work and the completed v1.5.0 Purchasing Enhancements.
 
 #### D2 — Design Decision Synchronization
 
@@ -115,9 +98,50 @@ P2 - Purchase Order Search is complete and verified.
 
 - Completed the final consistency audit against the available source snapshot, verified behavior recorded by P7, Sprint 8 planning baseline, D2 design decision record, and final retrospective.
 - Corrected stale D1/D2 next-task references in current-state documentation.
-- Confirmed Sprint 7 remains historical/released at v1.4.0 and Sprint 8 Purchasing Enhancements remain unreleased.
+- Confirmed Sprint 7 remains historical/released at v1.4.0 and Sprint 8 Purchasing Enhancements are released as v1.5.0.
 - Confirmed no future-priority feature is marked complete.
-- Sprint 8 is ready for its final save point / sprint closure.
+- Sprint 8 final save point and sprint closure are complete.
+
+## [v1.4.0] - 2026-08-18
+
+### Release Summary
+
+Sprint 7 Additional Reporting and Exports is complete, verified, and released.
+
+### Additional Reporting
+
+Sprint 7 Additional Reporting is complete and has passed final project-wide verification.
+
+#### Completed Reporting
+
+- Inventory Valuation
+- Purchase History
+- Supplier Purchase Analysis
+- Stock Movement
+- Low Stock Report
+- Inventory Movement Report
+- Product Reports
+
+#### Completed Exports
+
+- Excel Export for all seven completed reports
+- PDF Export for all seven completed reports using QuestPDF
+
+#### Final Verification
+
+- Authentication, Account Management, and 2FA regression
+- Product, Category, Supplier, and Customer management regression
+- Purchase Orders and Inventory operations regression
+- Reporting filters, sorting, pagination, navigation, and no-result behavior
+- Full filtered dataset export verification
+- Multi-page PDF verification
+- Inventory Valuation Total Inventory Value verification
+- Empty database verification
+- Explicit query-failure and database recovery verification
+- Existing authorization and Access Denied behavior verification
+- `dotnet restore` and `dotnet build` verification
+
+No Dynamic Capability-Based Authorization implementation was introduced during Sprint 7.
 
 ## [v1.3.0] - 2026-08-13
 

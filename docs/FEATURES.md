@@ -39,7 +39,7 @@ Outcome:
 - ✅ No structural redesign required
 - ✅ Ready for workflow-driven business modules
 
-The Purchasing Presentation Layer is now complete and has been verified through an end-to-end browser workflow using persisted database records. Sprint 8 P1 extended the Purchase Order Create workflow to support multiple item rows and was runtime/browser verified.
+The Purchasing Presentation Layer is complete and has been verified through an end-to-end browser workflow using persisted database records. Sprint 8 P1-P7 extended and verified the Purchase Order workflow, including multiple items, search, filtering, sorting, pagination, receiving, and inventory synchronization.
 
 The first Reporting vertical slice has also been implemented through Inventory Valuation and verified using actual persisted database records.
 
@@ -58,7 +58,7 @@ The first Reporting vertical slice has also been implemented through Inventory V
 | Unit Management | ✅ Complete |
 | Inventory Transactions | ✅ Complete |
 | Architecture Sprint | ✅ Complete |
-| Purchasing | 🟨 Core Workflow + Sprint 8 P1-P7 Enhancements |
+| Purchasing | ✅ Core Workflow + Sprint 8 P1-P7 Enhancements Complete |
 | Reporting | ✅ Sprint 7 Additional Reporting Complete |
 
 ## Current Implementation
@@ -1062,7 +1062,7 @@ During verification, an in-scope pagination regression was found: pagination lin
 
 No Dynamic Capability-Based Authorization implementation was introduced.
 
-D1, D2, D3, and D4 documentation tasks are complete. Final Sprint 8 save point / sprint closure is the next action.
+D1, D2, D3, and D4 documentation tasks are complete. Sprint 8 is closed and released as v1.5.0. The next development activity is Next Sprint Planning.
 
 ### Purchase Order Pagination - P5
 

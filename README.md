@@ -42,9 +42,9 @@ The focus is not only on implementing business features but also on applying pro
 
 ## Project Status
 
-**Current Version:** v1.4.0 - Additional Reporting & Exports
+**Current Version:** v1.5.0 - Purchasing Enhancements
 
-**Current Development Status:** Sprint 8 Purchasing Enhancements — P7 Integrated Purchasing Verification Complete and Verified
+**Current Development Status:** Sprint 8 Purchasing Enhancements — Complete, Verified, Documented, and Closed
 
 ## Completed Modules
 
@@ -58,12 +58,12 @@ The focus is not only on implementing business features but also on applying pro
 - ✅ Authentication & Authorization
 - ✅ User Management
 - ✅ Account Management
-- 🟨 Purchasing (Core Workflow + Sprint 8 P1-P7 Enhancements)
+- ✅ Purchasing (Core Workflow + Sprint 8 P1-P7 Enhancements Complete)
 - ✅ Reporting (Sprint 7 Additional Reporting Complete and Verified)
 
 ## Latest Release
 
-## v1.4.0 - Additional Reporting & Exports
+## v1.5.0 - Purchasing Enhancements
 
 ### Highlights
 
@@ -99,9 +99,35 @@ The focus is not only on implementing business features but also on applying pro
 
 The release preserves the established read-oriented Reporting architecture and isolates PDF generation in the Web layer using QuestPDF.
 
+### v1.5.0 Release Highlights
+
+Sprint 8 Purchasing Enhancements is complete, verified, documented, and closed.
+
+#### Purchasing
+
+- Multiple Purchase Order Item Management
+- Purchase Order Search
+- Purchase Order Filtering
+- Purchase Order Sorting
+- Purchase Order Pagination
+- Inventory Synchronization During Receiving
+- Integrated Purchasing Verification
+
+#### Verification and Documentation
+
+- P1-P7 Purchasing scope completed and verified
+- D1 Documentation Synchronization completed
+- D2 Design Decision Synchronization completed
+- D3 Final Sprint 8 Retrospective completed
+- D4 Final Documentation Validation completed
+- Sprint 8 final save point established
+- No future-priority feature implemented during Sprint 8
+
+The v1.5.0 release preserves the established Purchasing architecture and records Sprint 8 as the current completed milestone.
+
 ### Current Development — Sprint 8 Purchasing Enhancements
 
-Sprint 8 Purchasing Enhancements P0-P7 are complete and verified on the active Purchasing development work.
+Sprint 8 Purchasing Enhancements P0-P7 are complete, verified, documented, and closed.
 
 Completed:
 - P1 — Multiple Purchase Order Item Management
@@ -114,7 +140,7 @@ Completed:
 
 P7 verified the complete Purchasing workflow and corrected an in-scope pagination regression so active `FromDate` and `ToDate` filters are preserved during pagination. No Dynamic Capability-Based Authorization implementation was introduced during Purchasing work.
 
-D1 - Documentation Synchronization, D2 - Design Decision Synchronization, D3 - Final Sprint 8 Retrospective, and D4 - Final Documentation Validation are complete. The next action is the Sprint 8 final save point / sprint closure.
+D1 - Documentation Synchronization, D2 - Design Decision Synchronization, D3 - Final Sprint 8 Retrospective, and D4 - Final Documentation Validation are complete. The Sprint 8 final save point has been established. The next development activity is planning for the next sprint; no new feature work is started by this closure.
 
 ---
 
@@ -832,7 +858,7 @@ Development Tools
 | Authentication & Authorization | ✅ Complete |
 | User Management | ✅ Complete |
 | Account Management | ✅ Complete |
-| Purchasing | 🟨 Core Workflow + Sprint 8 P1-P7 Enhancements |
+| Purchasing | ✅ Core Workflow + Sprint 8 P1-P7 Enhancements Complete |
 | Reporting | ✅ Sprint 7 Additional Reporting Complete and Verified |
 
 ---
@@ -868,12 +894,14 @@ Development Tools
 
 ## Sprint 8 Closure State
 
+- P0-P7 Purchasing Enhancements - Complete and verified
 - D1 Documentation Synchronization - Complete
 - D2 Design Decision Synchronization - Complete
 - D3 Final Sprint 8 Retrospective - Complete
 - D4 Final Documentation Validation - Complete
+- Final Sprint 8 save point - Established
 
-The next action is the Sprint 8 final save point / sprint closure.
+Sprint 8 is closed. The next development activity is a new Sprint Planning process. Dynamic Capability-Based Authorization remains the next locked priority, but implementation does not begin automatically from this closure.
 
 ## Future
 

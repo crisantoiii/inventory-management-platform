@@ -22,6 +22,14 @@ Rather than documenting daily work, it captures important architectural decision
 
 ---
 
+# Current Release State
+
+**Current Version:** v1.5.0 - Sprint 8 Purchasing Enhancements
+
+Sprint 8 Purchasing Enhancements P0-P7, D1 Documentation Synchronization, D2 Design Decision Synchronization, D3 Final Sprint 8 Retrospective, and D4 Final Documentation Validation are complete. Sprint 8 is closed and the v1.5.0 release is the current project milestone.
+
+The next development activity is a separate Next Sprint Planning process. Dynamic Capability-Based Authorization remains the next locked priority. No implementation work begins automatically from this closure.
+
 # Milestone Timeline
 
 | Milestone | Focus |
@@ -3107,4 +3115,14 @@ The documentation-review environment does not contain the `dotnet` CLI, so a fre
 
 **D4 - Final Documentation Validation: COMPLETE**
 
-The repository snapshot is documentation-consistent and ready for the Sprint 8 final save point / sprint closure. No new feature work was started.
+The repository snapshot was documentation-consistent and ready for the Sprint 8 final save point / sprint closure. No new feature work was started.
+
+# Sprint 8 - Final Closure State
+
+**Status:** Complete and Closed
+
+Sprint 8 Purchasing Enhancements P0-P7, D1 Documentation Synchronization, D2 Design Decision Synchronization, D3 Final Sprint 8 Retrospective, and D4 Final Documentation Validation are complete. The final Sprint 8 save point has been established.
+
+The next development activity is a separate Sprint Planning process. Dynamic Capability-Based Authorization remains the next locked priority, but no implementation work begins automatically from this closure.
+
+Historical Sprint 8 planning and task records remain preserved as historical records and are not rewritten to remove their original sequencing.
