@@ -3,7 +3,7 @@
 **Sprint:** Sprint 8 - Purchasing Enhancements  
 **Repository/Branch:** `feature/purchasing_enhancements`  
 **Baseline Date:** 2026-08-19  
-**Status:** P0-P5 complete and runtime/browser verified; P6 - Inventory Synchronization During Receiving is next
+**Status:** P0-P6 complete and runtime/browser verified; P7 - Integrated Purchasing Verification is next
 
 ---
 
@@ -465,7 +465,21 @@ P4 - Purchase Order Sorting is complete and runtime/browser verified.
 
 P5 - Purchase Order Pagination is complete and verified.
 
-P6 - Inventory Synchronization During Receiving is the next task.
+### P6 - Inventory Synchronization During Receiving
+
+**Status: Complete and verified**
+
+P6 synchronizes Product inventory and InventoryTransaction history with the existing Purchase Order receiving workflow without bypassing the established Domain rules. Valid full and partial receiving updates Product inventory by the received quantity and records a corresponding `StockIn` transaction using the Purchase Order reference. Invalid and over-receiving operations remain rejected by the existing Domain invariants without inventory changes. The existing receiving authorization and workflow remain unchanged.
+
+Runtime/browser verification was completed successfully by the project owner.
+
+The P6 implementation was committed separately from documentation using the planned commit message:
+
+```text
+feat(purchasing): synchronize inventory on receiving
+```
+
+P7 - Integrated Purchasing Verification is the next task.
 
 ### P3 Documentation Audit
 
@@ -502,4 +516,6 @@ Current-state documentation was synchronized after verification. Historical Spri
 
 P5 - Purchase Order Pagination is complete and verified.
 
-P6 - Inventory Synchronization During Receiving is the next task.
+P6 - Inventory Synchronization During Receiving is complete and runtime/browser verified.
+
+P7 - Integrated Purchasing Verification is the next task.

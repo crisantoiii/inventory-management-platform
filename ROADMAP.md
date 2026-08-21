@@ -55,7 +55,7 @@ Completed:
 - Excel Export
 - PDF Export
 
-Sprint 8 Purchasing Enhancements is now active. P0, P1, P2, P3, P4, and P5 are complete and verified. P6 - Inventory Synchronization During Receiving is the next task.
+Sprint 8 Purchasing Enhancements is now active. P0, P1, P2, P3, P4, P5, and P6 are complete and runtime/browser verified. P7 - Integrated Purchasing Verification is next.
 
 ---
 
@@ -69,6 +69,7 @@ Sprint 8 Purchasing Enhancements is now active. P0, P1, P2, P3, P4, and P5 are c
 - P3 - Purchase Order Filtering
 - P4 - Purchase Order Sorting
 - P5 - Purchase Order Pagination
+- P6 - Inventory Synchronization During Receiving - Complete and verified
 
 ### P3 - Purchase Order Filtering
 
@@ -90,11 +91,9 @@ Runtime/browser verification was completed successfully by the project owner.
 
 ## Next
 
-- P6 - Inventory Synchronization During Receiving
+- P7 - Integrated Purchasing Verification
 
 ## Later
-
-- Inventory Integration During Receiving
 - Additional Purchasing User Experience Improvements
 
 Dynamic Capability-Based Authorization remains outside the current Purchasing implementation scope and must not begin automatically.

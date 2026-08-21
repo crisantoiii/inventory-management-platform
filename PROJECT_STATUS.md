@@ -89,8 +89,8 @@ Verified:
 
 - **Completed Modules:** 10
 - **Architecture Status:** Validated
-- **Current Milestone:** Sprint 8 — P4 Purchase Order Sorting — Complete
-- **Next Milestone:** Sprint 8 — P5 Purchase Order Pagination
+- **Current Milestone:** Sprint 8 — P6 Inventory Synchronization During Receiving — Complete and Verified
+- **Next Milestone:** Sprint 8 — P7 Integrated Purchasing Verification
 
 ---
 
@@ -541,7 +541,7 @@ Final verification covered normal application regression, reporting workflows, e
 
 # Current Focus
 
-Sprint 8 Purchasing Enhancements is now active. P0 - Actual Purchasing Source/Documentation Baseline through P5 - Purchase Order Pagination are complete and verified.
+Sprint 8 Purchasing Enhancements is now active. P0 - Actual Purchasing Source/Documentation Baseline through P6 - Inventory Synchronization During Receiving are complete and verified. P7 - Integrated Purchasing Verification is next.
 
 Completed in Sprint 8:
 
@@ -551,30 +551,36 @@ Completed in Sprint 8:
 - P3 - Purchase Order Filtering
 - P4 - Purchase Order Sorting
 - P5 - Purchase Order Pagination
+- P6 - Inventory Synchronization During Receiving
 
-P1, P2, P3, and P4 were runtime/browser verified successfully. The Purchase Order workflow now supports multiple item rows, search, filtering, and sorting while preserving the existing Purchasing architecture and downstream workflow.
+P1, P2, P3, P4, P5, and P6 were runtime/browser verified successfully. The Purchase Order workflow now supports multiple item rows, search, filtering, sorting, pagination, and inventory synchronization while preserving the existing Purchasing architecture and downstream workflow.
 
 # Next Milestone
 
-## P5 - Purchase Order Pagination
+## P6 - Inventory Synchronization During Receiving
 
-P5 adds server-side pagination to the Purchase Order listing using the existing shared paging infrastructure and the established `PageNum` / `PageSize` conventions.
+**Status: Complete and verified**
 
-Verified behavior:
-- Page navigation updates the displayed Purchase Order result set.
-- Current page state is reflected by the active pagination item.
-- Previous and Next navigation respect the first and last page boundaries.
-- Search and Purchase Order filters remain compatible with pagination.
-- Existing sorting state remains compatible with pagination.
-- Page size is preserved across pagination links.
-- Pagination uses the existing server-side query flow rather than client-side slicing.
-- Existing Purchase Order listing behavior remains intact.
+P6 synchronizes Product inventory and InventoryTransaction history with the existing Purchase Order receiving workflow.
 
-Runtime/browser verification was completed successfully after the final `PageNum` route-parameter correction. The verified manual scenario used `PageSize=1` and navigated to page 5, confirming that the active page and displayed Purchase Order changed together.
+Verified source behavior:
+- Purchase Order Domain receiving rules remain the authority for status and received-quantity invariants.
+- The receiving handler loads the Product through the existing Product repository.
+- A valid receipt increases Product `QuantityOnHand` through `Product.IncreaseStock()`.
+- A corresponding `InventoryTransaction` is recorded as `StockIn` with the Purchase Order reference.
+- Purchase Order state, Product inventory, and the inventory transaction are persisted through the same `SaveChangesAsync` boundary.
+- Repeated receiving remains bounded by the existing Purchase Order Domain rule preventing received quantity from exceeding ordered quantity.
+- Existing receiving authorization and Razor Page workflow were not changed.
 
-P5 implementation was committed separately from documentation as required by the sprint workflow.
+The project owner completed runtime/browser verification successfully in the actual development environment. Verified behavior includes valid full and partial receiving, inventory quantity updates, StockIn transaction creation, Domain rejection of invalid/over-receiving scenarios, repeated receiving safety, preservation of authorization, and preservation of the existing receiving workflow.
 
-Next task: **P6 - Inventory Synchronization During Receiving**.
+Build verification was not performed in the supplied documentation-review environment because the environment does not contain the `dotnet` CLI. This does not invalidate the completed runtime/manual verification.
+
+P6 implementation changes are intended to be committed separately from documentation changes using:
+
+`feat(purchasing): synchronize inventory on receiving`
+
+Next task: **P7 - Integrated Purchasing Verification**.
 
 # Known Limitations
 
@@ -587,7 +593,6 @@ Business Modules
 Purchasing
 
 - Purchase Order pagination
-- Inventory synchronization during Purchase Order receiving
 
 Platform
 

@@ -58,7 +58,7 @@ The first Reporting vertical slice has also been implemented through Inventory V
 | Unit Management | ✅ Complete |
 | Inventory Transactions | ✅ Complete |
 | Architecture Sprint | ✅ Complete |
-| Purchasing | 🟨 Core Workflow + Sprint 8 P1-P5 Enhancements |
+| Purchasing | 🟨 Core Workflow + Sprint 8 P1-P6 Enhancements |
 | Reporting | ✅ Sprint 7 Additional Reporting Complete |
 
 ## Current Implementation
@@ -80,6 +80,7 @@ Completed modules:
 - ✅ Purchase Order Filtering (P3)
 - ✅ Purchase Order Sorting (P4)
 - ✅ Purchase Order Pagination (P5)
+- ✅ Inventory Synchronization During Receiving (P6)
 - ✅ Reporting
   - ✅ Inventory Valuation
   - ✅ Purchase History
@@ -367,6 +368,23 @@ Completed
 - Received quantity must be greater than zero.
 
 ---
+
+## P6 - Inventory Synchronization During Receiving
+
+**Status: Complete and verified**
+
+Receiving now synchronizes the existing Purchasing workflow with inventory:
+
+- Valid Purchase Order receiving increases the Product `QuantityOnHand`.
+- A corresponding `StockIn` InventoryTransaction is recorded with a Purchase Order reference.
+- Purchase Order received quantity and status continue to be controlled by the existing Domain rules.
+- Received quantity cannot exceed ordered quantity.
+- Purchase Order state, Product stock, and the InventoryTransaction are persisted through the same Unit of Work save boundary.
+- Existing receiving authorization and Presentation workflow remain unchanged.
+
+The implementation does not redesign inventory behavior or introduce a separate receiving inventory architecture.
+
+Runtime/browser verification was completed successfully by the project owner. Valid full and partial receiving updated Product stock correctly, corresponding StockIn movements were recorded, invalid and over-receiving scenarios were rejected without inventory changes, and existing authorization and receiving workflow behavior remained intact.
 
 ## Reporting
 
@@ -1025,7 +1043,9 @@ Verified behavior:
 
 Runtime/browser verification was completed successfully by the project owner.
 
-P6 - Inventory Synchronization During Receiving is the next Purchasing Enhancements task.
+P6 - Inventory Synchronization During Receiving is complete and verified.
+
+P7 - Integrated Purchasing Verification is the next Purchasing Enhancements task.
 
 ### Purchase Order Pagination - P5
 

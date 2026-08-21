@@ -2902,4 +2902,41 @@ Documentation is being synchronized separately from the implementation commit.
 
 **P5 - Purchase Order Pagination: COMPLETE AND VERIFIED**
 
-Next task: **P6 - Inventory Synchronization During Receiving**.
+Next task: **P7 - Integrated Purchasing Verification**.
+
+## Sprint 8 P6 - Inventory Synchronization During Receiving
+
+P6 extends the existing Purchase Order receiving vertical slice so that a valid receipt updates inventory without bypassing the established Domain model.
+
+### Source Findings
+
+- `PurchaseOrder.Receive()` already enforced Approved/Receiving status, item existence, positive quantity, and the maximum received quantity.
+- `Product.IncreaseStock()` is the existing Domain operation for stock-in behavior.
+- `InventoryTransaction` is the existing persistence model for inventory movement history.
+- `CreateInventoryTransactionHandler` established the existing pattern of changing Product stock, creating an InventoryTransaction, and saving through `IUnitOfWork`.
+- `PurchaseOrderRepository.GetByIdAsync()` loads the Purchase Order aggregate and its items/products as tracked entities.
+- There was no explicit transaction boundary in the receiving handler; the existing Unit of Work `SaveChangesAsync()` is the persistence boundary.
+
+### Implementation
+
+`ReceivePurchaseOrderHandler` now:
+
+1. Loads the Purchase Order through the existing repository.
+2. Loads the Product through the existing Product repository.
+3. Calls `PurchaseOrder.Receive()` so the existing Domain invariants remain authoritative.
+4. Calls `Product.IncreaseStock()` for the received quantity.
+5. Creates a `StockIn` `InventoryTransaction` using `PO-{PurchaseOrderId}` as the reference.
+6. Saves the Purchase Order state, Product stock change, and transaction through the same Unit of Work save boundary.
+
+### Repeated Receiving
+
+Repeated receiving is not treated as an idempotent HTTP operation because the existing workflow supports legitimate partial receipts. Instead, the existing Domain invariant remains the safety boundary: cumulative received quantity cannot exceed the ordered quantity. A repeated request that would exceed the remaining quantity is rejected by the Domain model before persistence.
+
+### Scope Control
+
+No inventory redesign, new authorization model, new database migration, or Presentation workflow redesign was introduced. Existing authorization and Purchase Order receiving flow remain unchanged.
+
+### Verification State
+
+Source inspection confirms the implementation preserves the existing Domain invariants and persistence pattern. The project owner then completed runtime/browser verification in the actual development environment. Verified behavior includes valid full and partial receiving, correct Product quantity updates, corresponding StockIn InventoryTransactions, rejection of invalid and over-receiving operations without inventory changes, safe repeated receiving, preserved authorization, and preservation of the existing receiving workflow. A solution build was not performed in the documentation-review environment because the environment does not contain the `dotnet` CLI.
+
