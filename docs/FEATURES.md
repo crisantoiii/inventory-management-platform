@@ -1062,7 +1062,7 @@ During verification, an in-scope pagination regression was found: pagination lin
 
 No Dynamic Capability-Based Authorization implementation was introduced.
 
-**Next task:** D2 - Design Decision Synchronization.
+D1, D2, D3, and D4 documentation tasks are complete. Final Sprint 8 save point / sprint closure is the next action.
 
 ### Purchase Order Pagination - P5
 

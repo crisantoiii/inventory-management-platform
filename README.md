@@ -114,7 +114,7 @@ Completed:
 
 P7 verified the complete Purchasing workflow and corrected an in-scope pagination regression so active `FromDate` and `ToDate` filters are preserved during pagination. No Dynamic Capability-Based Authorization implementation was introduced during Purchasing work.
 
-**Next task:** D2 — Design Decision Synchronization.
+D1 - Documentation Synchronization, D2 - Design Decision Synchronization, D3 - Final Sprint 8 Retrospective, and D4 - Final Documentation Validation are complete. The next action is the Sprint 8 final save point / sprint closure.
 
 ---
 
@@ -866,10 +866,14 @@ Development Tools
 - P6 Inventory Synchronization During Receiving - Complete and verified
 - P7 Integrated Purchasing Verification - Complete and verified
 
-## Next
+## Sprint 8 Closure State
 
 - D1 Documentation Synchronization - Complete
-- D2 Design Decision Synchronization - Next
+- D2 Design Decision Synchronization - Complete
+- D3 Final Sprint 8 Retrospective - Complete
+- D4 Final Documentation Validation - Complete
+
+The next action is the Sprint 8 final save point / sprint closure.
 
 ## Future
 

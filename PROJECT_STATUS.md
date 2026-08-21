@@ -567,7 +567,7 @@ Validated documentation updates include:
 - P7 integrated verification scope and result
 - Pagination date-filter state preservation correction
 - Current Purchasing scope and future priority boundaries
-- D2 as the next task
+- D4 final documentation validation and sprint-closure readiness
 
 No implementation behavior was changed as part of D1.
 
@@ -854,4 +854,4 @@ The P7 implementation fix is intentionally kept separate from documentation chan
 
 **P7 result:** Complete and verified.
 
-**Next task:** **D2 - Design Decision Synchronization**.
+D1 - Documentation Synchronization, D2 - Design Decision Synchronization, D3 - Final Sprint 8 Retrospective, and D4 - Final Documentation Validation are complete. The next action is the Sprint 8 final save point / sprint closure.

@@ -90,9 +90,14 @@ Verified:
 
 Runtime/browser verification was completed successfully by the project owner.
 
-## Next
+## Final Sprint 8 State
 
-- D2 - Design Decision Synchronization
+- D1 - Documentation Synchronization - Complete
+- D2 - Design Decision Synchronization - Complete
+- D3 - Final Sprint 8 Retrospective - Complete
+- D4 - Final Documentation Validation - Complete
+
+The next action is the Sprint 8 final save point / sprint closure. No new feature work begins from this roadmap state.
 
 ## D1 - Documentation Synchronization
 
@@ -105,7 +110,7 @@ No implementation behavior was changed during D1.
 ## Later
 - Additional Purchasing User Experience Improvements
 
-Dynamic Capability-Based Authorization remains outside the current Purchasing implementation scope and must not begin automatically.
+Dynamic Capability-Based Authorization remains outside the completed Purchasing implementation scope. It is the next locked priority after Sprint 8 closure and must not be started automatically as part of this handoff.
 
 ---
 

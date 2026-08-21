@@ -3046,3 +3046,65 @@ No unverified Purchasing behavior was added to the current-state documentation.
 The next task is:
 
 **D2 - Design Decision Synchronization**
+
+
+---
+
+# Sprint 8 - D4 Final Documentation Validation
+
+**Date:** 2026-08-21  
+**Status:** Complete
+
+## Objective
+
+Perform the final documentation consistency audit after D1, D2, and D3, using the available source snapshot, verified Purchasing behavior recorded through P7, the Sprint 8 Planning Baseline, and the Final Sprint 8 Retrospective as the source of truth.
+
+## Validation Scope
+
+Reviewed:
+
+- `PROJECT_STATUS.md`
+- `ROADMAP.md`
+- `docs/FEATURES.md`
+- `CHANGELOG.md`
+- `README.md`
+- `docs/DESIGN_DECISIONS.md`
+- `docs/ENGINEERING_JOURNAL.md`
+- `docs/retrospectives/SPRINT_08_PLANNING_BASELINE.md`
+- `docs/retrospectives/SPRINT_08_PURCHASING_ENHANCEMENTS.md`
+
+Source inspection also confirmed the implemented Purchasing vertical slice and the absence of Dynamic Capability-Based Authorization source artifacts.
+
+## Validation Result
+
+The final documentation state now confirms:
+
+- Sprint 7 Additional Reporting remains closed and released as v1.4.0.
+- Sprint 8 Purchasing Enhancements P0-P7 are complete and verified but remain unreleased.
+- D1 Documentation Synchronization is complete.
+- D2 Design Decision Synchronization is complete.
+- D3 Final Sprint 8 Retrospective is complete.
+- D4 Final Documentation Validation is complete.
+- No future-priority feature is marked complete.
+- The validated Purchase Order receiving architecture remains consistent with DD-035.
+- The P7 pagination regression and correction are consistently recorded.
+- No unverified Purchasing behavior was added.
+- The locked future priority order remains unchanged.
+
+## Documentation Corrections
+
+Corrected stale current-state references that still identified D2 as the next task. Current-state documents now identify Sprint 8 final save point / sprint closure as the next action.
+
+Historical task retrospectives and the final Sprint 8 retrospective were not rewritten to erase their historical next-task sequencing.
+
+## Verification Limitations
+
+The supplied source snapshot does not contain `.git`, so branch, working-tree status, commit hashes, and commit history cannot be independently verified from this archive.
+
+The documentation-review environment does not contain the `dotnet` CLI, so a fresh restore/build was not independently executed during D4. P7 runtime/browser verification remains based on the recorded project-owner verification and source/documentation inspection in the snapshot.
+
+## Outcome
+
+**D4 - Final Documentation Validation: COMPLETE**
+
+The repository snapshot is documentation-consistent and ready for the Sprint 8 final save point / sprint closure. No new feature work was started.

@@ -102,9 +102,22 @@ P2 - Purchase Order Search is complete and verified.
 
 - Synchronized current-state documentation with verified Sprint 8 P0-P7 behavior.
 - Confirmed the documentation boundary between the released v1.4.0 reporting work and unreleased Sprint 8 Purchasing Enhancements.
-- Next task: D2 — Design Decision Synchronization.
 
----
+#### D2 — Design Decision Synchronization
+
+- Recorded the validated Application-layer coordination / Domain-owned invariant decision for Purchase Order receiving and inventory synchronization.
+
+#### D3 — Final Sprint 8 Retrospective
+
+- Recorded the final Sprint 8 outcome, deviations, lessons learned, limitations, and locked future priority boundaries.
+
+#### D4 — Final Documentation Validation
+
+- Completed the final consistency audit against the available source snapshot, verified behavior recorded by P7, Sprint 8 planning baseline, D2 design decision record, and final retrospective.
+- Corrected stale D1/D2 next-task references in current-state documentation.
+- Confirmed Sprint 7 remains historical/released at v1.4.0 and Sprint 8 Purchasing Enhancements remain unreleased.
+- Confirmed no future-priority feature is marked complete.
+- Sprint 8 is ready for its final save point / sprint closure.
 
 ## [v1.3.0] - 2026-08-13
 
@@ -139,7 +152,10 @@ The implementation extends the existing ASP.NET Core Identity integration throug
 
 - Sprint 8 Purchasing Enhancements P0-P7 are complete and verified.
 - D1 Documentation Synchronization is complete.
-- D2 Design Decision Synchronization is the next task.
+- D2 Design Decision Synchronization is complete.
+- D3 Final Sprint 8 Retrospective is complete.
+- D4 Final Documentation Validation is complete.
+- Sprint 8 is ready for its final save point / sprint closure.
 
 ---
 
