@@ -32,28 +32,24 @@
     <form method="get" class="row g-2 mb-4">
         <div class="col-md-4">
             <label for="search" class="form-label">Search purchase orders</label>
-            <input id="search"
-                   name="Search"
-                   value="@Model.Search"
+            <input asp-for="@Model.Search"
                    class="form-control"
                    placeholder="Search by purchase order ID or supplier"
                    autocomplete="off" />
         </div>
 
         <div class="col-md-2">
-            <label for="fromDate" class="form-label">From date</label>
-            <input id="fromDate"
-                   name="FromDate"
-                   value="@Model.FromDate?.ToString("yyyy-MM-dd")"
+            <label for="FromDate" class="form-label">From date</label>
+            <input asp-for="FromDate"
+                   asp-format="{0:yyyy-MM-dd}"
                    type="date"
                    class="form-control" />
         </div>
 
         <div class="col-md-2">
-            <label for="toDate" class="form-label">To date</label>
-            <input id="toDate"
-                   name="ToDate"
-                   value="@Model.ToDate?.ToString("yyyy-MM-dd")"
+            <label for="ToDate" class="form-label">To date</label>
+            <input asp-for="ToDate"
+                   asp-format="{0:yyyy-MM-dd}"
                    type="date"
                    class="form-control" />
         </div>
@@ -213,7 +209,9 @@
                            asp-page="./Index"
                            asp-route-Search="@Model.Search"
                            asp-route-Status="@Model.Status"
-                           asp-route-PageNum="@(Model.PageNum - 1)"
+                           asp-route-PageNum="@(Model.PageNum - 1)"                  
+                           asp-route-FromDate="@Model.FromDate?.ToString("yyyy-MM-dd")"
+                           asp-route-ToDate="@Model.ToDate?.ToString("yyyy-MM-dd")"
                            asp-route-PageSize="@Model.PageSize"
                            asp-route-SortBy="@Model.SortBy"
                            asp-route-Descending="@Model.Descending">
@@ -232,7 +230,9 @@
                            asp-page="./Index"
                            asp-route-Search="@Model.Search"
                            asp-route-Status="@Model.Status"
-                           asp-route-PageNum="@pageNumber"
+                           asp-route-PageNum="@pageNumber"                    
+                           asp-route-FromDate="@Model.FromDate?.ToString("yyyy-MM-dd")"
+                           asp-route-ToDate="@Model.ToDate?.ToString("yyyy-MM-dd")"
                            asp-route-PageSize="@Model.PageSize"
                            asp-route-SortBy="@Model.SortBy"
                            asp-route-Descending="@Model.Descending">
@@ -246,7 +246,9 @@
                        asp-page="./Index"
                        asp-route-Search="@Model.Search"
                        asp-route-Status="@Model.Status"
-                       asp-route-PageNum="@(Model.PageNum + 1)"
+                       asp-route-PageNum="@(Model.PageNum + 1)"                      
+                       asp-route-FromDate="@Model.FromDate?.ToString("yyyy-MM-dd")"
+                       asp-route-ToDate="@Model.ToDate?.ToString("yyyy-MM-dd")"
                        asp-route-PageSize="@Model.PageSize"
                        asp-route-SortBy="@Model.SortBy"
                        asp-route-Descending="@Model.Descending">
