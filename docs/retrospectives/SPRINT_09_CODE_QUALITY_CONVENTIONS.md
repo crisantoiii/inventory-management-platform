@@ -449,3 +449,15 @@ No code commit is applicable to T02.
 T02 defines and locks the evidence-based Sprint 9 conventions.
 
 Later Sprint 9 tasks must implement only their assigned workstream, re-inspect the affected source, preserve the locked boundaries above, perform actual verification, and stop.
+
+## 16. T03 Implementation - Razor Form Binding Normalization
+
+T03 applies the locked Razor form convention to the two concrete reporting candidates identified by T01 and confirmed by T02:
+
+- `Reports/PurchaseHistory/Index.cshtml`
+- `Reports/SupplierPurchaseAnalysis/Index.cshtml`
+
+The report filter forms now use `asp-for` for the existing `Search`, `FromDate`, `ToDate`, and `Status` PageModel properties. Date fields retain an explicit `yyyy-MM-dd` format for the HTML date-input contract, while status options retain the existing enum values and empty `All` option.
+
+The refactor is limited to the Razor form representation. Existing query parameter names, handler signatures, export links, sorting, pagination, and application request construction are unchanged.
+
