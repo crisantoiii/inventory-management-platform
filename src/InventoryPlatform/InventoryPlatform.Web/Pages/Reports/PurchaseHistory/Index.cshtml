@@ -1,5 +1,6 @@
 ﻿@page
 @model InventoryPlatform.Web.Pages.Reports.PurchaseHistory.IndexModel
+@using InventoryPlatform.Domain.Enums
 
 @{
     ViewData["Title"] = "Purchase History";
@@ -42,60 +43,49 @@
             <div class="row g-3">
 
                 <div class="col-md-4">
-                    <label for="search" class="form-label">
+                    <label asp-for="Search" class="form-label">
                         Search
                     </label>
 
-                    <input type="text"
-                           id="search"
-                           name="search"
-                           value="@Model.Search"
+                    <input asp-for="Search"
                            class="form-control"
                            placeholder="PO ID or supplier" />
                 </div>
 
                 <div class="col-md-2">
-                    <label for="fromDate" class="form-label">
+                    <label asp-for="FromDate" class="form-label">
                         From Date
                     </label>
 
-                    <input type="date"
-                           id="fromDate"
-                           name="fromDate"
-                           value="@Model.FromDate?.ToString("yyyy-MM-dd")"
+                    <input asp-for="FromDate"
+                           asp-format="{0:yyyy-MM-dd}"
+                           type="date"
                            class="form-control" />
                 </div>
 
                 <div class="col-md-2">
-                    <label for="toDate" class="form-label">
+                    <label asp-for="ToDate" class="form-label">
                         To Date
                     </label>
 
-                    <input type="date"
-                           id="toDate"
-                           name="toDate"
-                           value="@Model.ToDate?.ToString("yyyy-MM-dd")"
+                    <input asp-for="ToDate"
+                           asp-format="{0:yyyy-MM-dd}"
+                           type="date"
                            class="form-control" />
                 </div>
 
                 <div class="col-md-2">
-                    <label for="status" class="form-label">
+                    <label asp-for="Status" class="form-label">
                         Status
                     </label>
 
-                    <select id="status"
-                            name="status"
+                    <select asp-for="Status"
                             class="form-select">
-
                         <option value="">All</option>
 
-                        @foreach (var status in Enum.GetValues<
-                            InventoryPlatform.Domain.Enums.PurchaseOrderStatus>())
+                        @foreach (var status in Enum.GetValues<PurchaseOrderStatus>())
                         {
-                            <option value="@status"
-                                    selected="@(Model.Status == status.ToString())">
-                                @status
-                            </option>
+                            <option value="@status">@status</option>
                         }
                     </select>
                 </div>

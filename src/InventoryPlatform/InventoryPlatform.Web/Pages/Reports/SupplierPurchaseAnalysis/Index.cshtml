@@ -35,48 +35,36 @@
 
 <form method="get" class="row g-3 mb-4">
     <div class="col-md-3">
-        <label class="form-label" for="search">Supplier</label>
-        <input class="form-control"
-               id="search"
-               name="search"
-               value="@Model.Search"
+        <label asp-for="Search" class="form-label">Supplier</label>
+        <input asp-for="Search"
+               class="form-control"
                placeholder="Search supplier" />
     </div>
 
     <div class="col-md-2">
-        <label class="form-label" for="fromDate">From date</label>
-        <input class="form-control"
-               id="fromDate"
+        <label asp-for="FromDate" class="form-label">From date</label>
+        <input asp-for="FromDate"
+               asp-format="{0:yyyy-MM-dd}"
                type="date"
-               name="fromDate"
-               value="@Model.FromDate?.ToString("yyyy-MM-dd")" />
+               class="form-control" />
     </div>
 
     <div class="col-md-2">
-        <label class="form-label" for="toDate">To date</label>
-        <input class="form-control"
-               id="toDate"
+        <label asp-for="ToDate" class="form-label">To date</label>
+        <input asp-for="ToDate"
+               asp-format="{0:yyyy-MM-dd}"
                type="date"
-               name="toDate"
-               value="@Model.ToDate?.ToString("yyyy-MM-dd")" />
+               class="form-control" />
     </div>
 
     <div class="col-md-2">
-        <label class="form-label" for="status">Status</label>
-        <select class="form-select" id="status" name="status">
+        <label asp-for="Status" class="form-label">Status</label>
+        <select asp-for="Status" class="form-select">
             <option value="">All</option>
 
             @foreach (var status in Enum.GetValues<PurchaseOrderStatus>())
             {
-                <option value="@status"
-                        selected="@(string.Equals(
-                                                Model.Status,
-                                                status.ToString(),
-                                                StringComparison.OrdinalIgnoreCase)
-                                                ? "selected"
-                                                : null)">
-                    @status
-                </option>
+                <option value="@status">@status</option>
             }
         </select>
     </div>
