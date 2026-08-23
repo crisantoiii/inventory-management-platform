@@ -45,7 +45,7 @@ public sealed class LowStockRepository : ILowStockRepository
             queryRequest);
 
         var items = await orderedQuery
-            .Skip((queryRequest.Page - 1) * queryRequest.PageSize)
+            .Skip((queryRequest.PageNum - 1) * queryRequest.PageSize)
             .Take(queryRequest.PageSize)
             .Select(x => new LowStockDto(
                 x.Id,
@@ -58,7 +58,7 @@ public sealed class LowStockRepository : ILowStockRepository
         return new PagedResult<LowStockDto>
         {
             Items = items,
-            Page = queryRequest.Page,
+            Page = queryRequest.PageNum,
             PageSize = queryRequest.PageSize,
             TotalCount = totalCount
         };

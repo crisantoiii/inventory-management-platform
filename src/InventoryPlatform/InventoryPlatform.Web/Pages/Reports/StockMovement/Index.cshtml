@@ -44,6 +44,7 @@
         <div class="col-md-2">
             <label asp-for="FromDate" class="form-label">From</label>
             <input asp-for="FromDate"
+                   asp-format="{0:yyyy-MM-dd}"
                    type="date"
                    class="form-control" />
         </div>
@@ -51,6 +52,7 @@
         <div class="col-md-2">
             <label asp-for="ToDate" class="form-label">To</label>
             <input asp-for="ToDate"
+                   asp-format="{0:yyyy-MM-dd}"
                    type="date"
                    class="form-control" />
         </div>
@@ -91,10 +93,10 @@
                         <th>
                             <a asp-page="./Index"
                                asp-route-Search="@Model.Search"
-                               asp-route-FromDate="@Model.FromDate"
-                               asp-route-ToDate="@Model.ToDate"
+                               asp-route-FromDate="@Model.FromDate?.ToString("yyyy-MM-dd")"
+                               asp-route-ToDate="@Model.ToDate?.ToString("yyyy-MM-dd")"
                                asp-route-TransactionType="@Model.TransactionType"
-                               asp-route-Page="1"
+                               asp-route-PageNum="1"
                                asp-route-PageSize="@Model.PageSize"
                                asp-route-SortBy="TransactionDateUtc"
                                asp-route-Descending="@(Model.SortBy == StockMovementSortFields.TransactionDateUtc && !Model.Descending)">
@@ -105,10 +107,10 @@
                         <th>
                             <a asp-page="./Index"
                                asp-route-Search="@Model.Search"
-                               asp-route-FromDate="@Model.FromDate"
-                               asp-route-ToDate="@Model.ToDate"
+                               asp-route-FromDate="@Model.FromDate?.ToString("yyyy-MM-dd")"
+                               asp-route-ToDate="@Model.ToDate?.ToString("yyyy-MM-dd")"
                                asp-route-TransactionType="@Model.TransactionType"
-                               asp-route-Page="1"
+                               asp-route-PageNum="1"
                                asp-route-PageSize="@Model.PageSize"
                                asp-route-SortBy="ProductName"
                                asp-route-Descending="@(Model.SortBy == StockMovementSortFields.ProductName && !Model.Descending)">
@@ -121,10 +123,10 @@
                         <th>
                             <a asp-page="./Index"
                                asp-route-Search="@Model.Search"
-                               asp-route-FromDate="@Model.FromDate"
-                               asp-route-ToDate="@Model.ToDate"
+                               asp-route-FromDate="@Model.FromDate?.ToString("yyyy-MM-dd")"
+                               asp-route-ToDate="@Model.ToDate?.ToString("yyyy-MM-dd")"
                                asp-route-TransactionType="@Model.TransactionType"
-                               asp-route-Page="1"
+                               asp-route-PageNum="1"
                                asp-route-PageSize="@Model.PageSize"
                                asp-route-SortBy="TransactionType"
                                asp-route-Descending="@(Model.SortBy == StockMovementSortFields.TransactionType && !Model.Descending)">
@@ -135,10 +137,10 @@
                         <th>
                             <a asp-page="./Index"
                                asp-route-Search="@Model.Search"
-                               asp-route-FromDate="@Model.FromDate"
-                               asp-route-ToDate="@Model.ToDate"
+                               asp-route-FromDate="@Model.FromDate?.ToString("yyyy-MM-dd")"
+                               asp-route-ToDate="@Model.ToDate?.ToString("yyyy-MM-dd")"
                                asp-route-TransactionType="@Model.TransactionType"
-                               asp-route-Page="1"
+                               asp-route-PageNum="1"
                                asp-route-PageSize="@Model.PageSize"
                                asp-route-SortBy="Quantity"
                                asp-route-Descending="@(Model.SortBy == StockMovementSortFields.Quantity && !Model.Descending)">

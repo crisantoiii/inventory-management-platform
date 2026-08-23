@@ -76,14 +76,14 @@ public sealed class InventoryTransactionRepository
         var orderedQuery = ApplySorting(query, request);
 
         var items = await orderedQuery
-            .Skip((request.Page - 1) * request.PageSize)
+            .Skip((request.PageNum - 1) * request.PageSize)
             .Take(request.PageSize)
             .ToListAsync(cancellationToken);
 
         return new PagedResult<InventoryTransaction>
         {
             Items = items,
-            Page = request.Page,
+            Page = request.PageNum,
             PageSize = request.PageSize,
             TotalCount = totalCount
         };

@@ -20,7 +20,7 @@ public sealed class GetPurchaseOrdersHandler
     {
         var query = new PagedQuery
         {
-            Page = request.Page,
+            PageNum = request.PageNum,
             PageSize = request.PageSize,
             Search = request.Search,
             SortBy = request.SortBy,

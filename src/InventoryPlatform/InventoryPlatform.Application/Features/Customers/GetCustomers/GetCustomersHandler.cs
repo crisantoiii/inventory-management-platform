@@ -21,7 +21,7 @@ public sealed class GetCustomersHandler
         var query = new PagedQuery
         {
             Search = request.Search,
-            Page = request.Page,
+            PageNum = request.PageNum,
             PageSize = request.PageSize,
             SortBy = request.SortBy,
             Descending = request.Descending,

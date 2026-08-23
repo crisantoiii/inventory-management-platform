@@ -7,13 +7,13 @@ public abstract record PagedRequest
     private const int DefaultPageSize = 10;
     private const int MaxPageSize = 100;
 
-    private int _page = 1;
+    private int _pageNum = 1;
     private int _pageSize = DefaultPageSize;
 
-    public int Page
+    public int PageNum
     {
-        get => _page;
-        init => _page = value < 1 ? 1 : value;
+        get => _pageNum;
+        init => _pageNum = value < 1 ? 1 : value;
     }
 
     public int PageSize

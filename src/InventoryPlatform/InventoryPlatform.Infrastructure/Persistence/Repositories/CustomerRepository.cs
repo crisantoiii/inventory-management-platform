@@ -80,14 +80,14 @@ public sealed class CustomerRepository
         var orderedQuery = ApplySorting(query, request);
 
         var items = await orderedQuery
-            .Skip((request.Page - 1) * request.PageSize)
+            .Skip((request.PageNum - 1) * request.PageSize)
             .Take(request.PageSize)
             .ToListAsync(cancellationToken);
 
         return new PagedResult<Customer>
         {
             Items = items,
-            Page = request.Page,
+            Page = request.PageNum,
             PageSize = request.PageSize,
             TotalCount = totalCount
         };

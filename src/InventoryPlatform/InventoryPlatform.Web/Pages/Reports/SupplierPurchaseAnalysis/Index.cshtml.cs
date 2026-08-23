@@ -46,8 +46,8 @@ public class IndexModel : PageModel
         string? status,
         string? sortBy,
         bool descending = false,
-        [FromQuery(Name = "currentPage")] int currentPage = 1,
-        [FromQuery(Name = "pageSize")] int pageSize = 10,
+        [FromQuery(Name = "PageNum")] int pageNum = 1,
+        [FromQuery(Name = "PageSize")] int pageSize = 10,
         CancellationToken cancellationToken = default)
     {
         Search = search;
@@ -76,7 +76,7 @@ public class IndexModel : PageModel
             PurchaseOrderStatus = purchaseOrderStatus,
             SortBy = sortBy,
             Descending = descending,
-            Page = currentPage,
+            PageNum = pageNum,
             PageSize = pageSize
         };
 

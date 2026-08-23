@@ -276,7 +276,7 @@ public sealed class IdentityService : IIdentityService
         var orderedQuery = ApplySorting(query, request);
 
         var users = await orderedQuery
-            .Skip((request.Page - 1) * request.PageSize)
+            .Skip((request.PageNum - 1) * request.PageSize)
             .Take(request.PageSize)
             .ToListAsync(cancellationToken);
 
@@ -321,7 +321,7 @@ public sealed class IdentityService : IIdentityService
         return new PagedResult<GetUsersResponse>
         {
             Items = items,
-            Page = request.Page,
+            Page = request.PageNum,
             PageSize = request.PageSize,
             TotalCount = totalCount
         };

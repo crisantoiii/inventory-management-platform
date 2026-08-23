@@ -32,7 +32,7 @@ public sealed class GetLowStockHandler
     {
         var query = request.Query with
         {
-            Page = 1,
+            PageNum = 1,
             PageSize = int.MaxValue
         };
 

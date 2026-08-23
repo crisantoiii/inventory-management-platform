@@ -80,7 +80,7 @@ else
                        asp-route-Descending="@(Model.Filter.SortBy == InventoryTransactionSortFields.TransactionDateUtc && !Model.Filter.Descending)"
                        asp-route-Search="@Model.Filter.Search"
                        asp-route-Status="@Model.Filter.Status"
-                       asp-route-Page="1">
+                       asp-route-PageNum="1">
                         Date
                     </a>
                 </th>
@@ -90,7 +90,7 @@ else
                        asp-route-Descending="@(Model.Filter.SortBy == InventoryTransactionSortFields.ProductName && !Model.Filter.Descending)"
                        asp-route-Search="@Model.Filter.Search"
                        asp-route-Status="@Model.Filter.Status"
-                       asp-route-Page="1">
+                       asp-route-PageNum="1">
                         Product
                     </a>
                 </th>
@@ -103,7 +103,7 @@ else
                        asp-route-Descending="@(Model.Filter.SortBy == InventoryTransactionSortFields.TransactionType && !Model.Filter.Descending)"
                        asp-route-Search="@Model.Filter.Search"
                        asp-route-Status="@Model.Filter.Status"
-                       asp-route-Page="1">
+                       asp-route-PageNum="1">
                         Transaction
                     </a>
                 </th>
@@ -113,7 +113,7 @@ else
                        asp-route-Descending="@(Model.Filter.SortBy == InventoryTransactionSortFields.Quantity && !Model.Filter.Descending)"
                        asp-route-Search="@Model.Filter.Search"
                        asp-route-Status="@Model.Filter.Status"
-                       asp-route-Page="1">
+                       asp-route-PageNum="1">
                         Quantity
                     </a>
                 </th>
@@ -177,7 +177,7 @@ else
 
                             <a asp-page="Details"
                                asp-route-id="@inventoryTransaction.Id"
-                               asp-route-Page="@Model.Filter.Page"
+                               asp-route-PageNum="@Model.Filter.PageNum"
                                asp-route-Search="@Model.Filter.Search"
                                asp-route-Status="@Model.Filter.Status"
                                asp-route-SortBy="@Model.Filter.SortBy"
