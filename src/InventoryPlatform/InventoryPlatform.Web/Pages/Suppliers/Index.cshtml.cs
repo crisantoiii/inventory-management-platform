@@ -45,13 +45,11 @@ public class IndexModel : PageModel
         }
     ];
 
-    public async Task OnGetAsync(
-        [FromQuery(Name = "PageNum")] int pageNum = 1)
+    public async Task OnGetAsync()
     {
         ViewData["Title"] = "Suppliers";
 
-        var result = await _handler.HandleAsync(
-            Filter with { PageNum = pageNum });
+        var result = await _handler.HandleAsync(Filter);
 
         if (result.IsSuccess && result.Value is not null)
         {
