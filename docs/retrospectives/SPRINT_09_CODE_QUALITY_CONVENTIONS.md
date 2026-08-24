@@ -450,14 +450,179 @@ T02 defines and locks the evidence-based Sprint 9 conventions.
 
 Later Sprint 9 tasks must implement only their assigned workstream, re-inspect the affected source, preserve the locked boundaries above, perform actual verification, and stop.
 
-## 16. T03 Implementation - Razor Form Binding Normalization
+## 18. T03 Implementation - Razor Form Binding Normalization
 
-T03 applies the locked Razor form convention to the two concrete reporting candidates identified by T01 and confirmed by T02:
+T03 applied the locked Razor form convention to the two concrete reporting candidates identified by T01/T02:
 
-- `Reports/PurchaseHistory/Index.cshtml`
-- `Reports/SupplierPurchaseAnalysis/Index.cshtml`
+- `Pages/Reports/PurchaseHistory/Index.cshtml`
+- `Pages/Reports/SupplierPurchaseAnalysis/Index.cshtml`
 
-The report filter forms now use `asp-for` for the existing `Search`, `FromDate`, `ToDate`, and `Status` PageModel properties. Date fields retain an explicit `yyyy-MM-dd` format for the HTML date-input contract, while status options retain the existing enum values and empty `All` option.
+The report filter forms use `asp-for` for the existing PageModel properties:
 
-The refactor is limited to the Razor form representation. Existing query parameter names, handler signatures, export links, sorting, pagination, and application request construction are unchanged.
+- `Search`
+- `FromDate`
+- `ToDate`
+- `Status`
+
+Date inputs retain the HTML date-input format requirement through the existing `yyyy-MM-dd` formatting. Status selection retains the existing Purchase Order status values and the `All` option.
+
+The change is limited to the Razor form representation. Existing report request properties and report behavior remain the responsibility of the existing PageModel/Application boundary.
+
+## 19. T04 Implementation - Razor Route & Query Navigation Normalization
+
+T04 reviewed the concrete navigation candidates identified by T01/T02.
+
+The current source confirms that Purchase Order sorting and pagination navigation are represented directly in Razor using `asp-page` and `asp-route-*` values.
+
+The previous server-side URL helper methods:
+
+- `GetSortUrl(...)`
+- `GetPageUrl(...)`
+
+are no longer present in `Pages/Purchasing/PurchaseOrders/Index.cshtml.cs`.
+
+The Purchase Order Razor page now carries the active query state through explicit route values, including:
+
+- `Search`
+- `FromDate`
+- `ToDate`
+- `Status`
+- `SortBy`
+- `Descending`
+- `PageNum`
+- `PageSize`
+
+The established UI paging convention remains `PageNum`.
+
+### T04 scope boundary
+
+The current source still contains a hard-coded Dashboard refresh URL:
+
+```html
+<a href="/Dashboard" ...>
+```
+
+Therefore the Dashboard hard-coded URL candidate identified by T01 remains present in the current source and is not recorded here as successfully normalized.
+
+The `_Layout.cshtml` `href="#"` UI trigger remains outside application-navigation normalization.
+
+## 20. T04 Verification
+
+Source verification confirms:
+
+- Purchase Order sorting navigation uses `asp-route-*`.
+- Purchase Order pagination navigation uses `asp-route-*`.
+- Purchase Order navigation preserves the active search, date, status, sorting, page-size, and `PageNum` state.
+- The previous `GetSortUrl(...)` and `GetPageUrl(...)` methods are absent from the current Purchase Order PageModel.
+- Dashboard still contains the identified `/Dashboard` hard-coded URL.
+
+No build, browser, or automated-test result is claimed in this documentation unless actually performed.
+
+## 21. T05 Request Binding Consolidation
+
+T05 reviewed PageModel handler parameters, `[BindProperty]`, `[FromQuery]`, query binding, and Application Request classes.
+
+The consolidation was limited to accidental duplication where an Application Request already represented the complete HTTP GET input.
+
+The following list PageModels now bind the complete Application Request from query state and pass that request directly to the Application handler:
+
+- `Pages/Products/Index.cshtml.cs`
+- `Pages/Categories/Index.cshtml.cs`
+- `Pages/Suppliers/Index.cshtml.cs`
+- `Pages/Customers/Index.cshtml.cs`
+- `Pages/Units/Index.cshtml.cs`
+- `Pages/InventoryTransactions/Index.cshtml.cs`
+- `Pages/Administrator/Users/Index.cshtml.cs`
+
+The affected Application Requests inherit the existing `PagedRequest`, whose paging property remains `PageNum`.
+
+### Consolidated boundary
+
+The affected flow is:
+
+```text
+HTTP query
+    ↓
+[FromQuery] Application Request
+    ↓
+Application Handler
+```
+
+The previous duplication of binding `PageNum` separately as a handler parameter and then copying it into the same request was removed.
+
+The Application Request remains the use-case contract.
+
+### T05 non-targets
+
+T05 did not:
+
+- impose `[FromQuery]` universally
+- convert all `[BindProperty]` usage
+- convert all handler parameters into Request models
+- rename Application/backend paging properties
+- collapse `PagedRequest` and `PagedQuery`
+- alter intentional external-to-Application property mappings
+- normalize binding solely for stylistic consistency
+
+Purchase Order `Status` handling remains a distinct mapping because the external query name and Application Request property have different responsibilities.
+
+## 22. T05 Verification
+
+Source verification confirms that the seven affected list PageModels use the request object as the query-bound input and no longer bind `PageNum` again as a separate handler parameter.
+
+The existing request models retain their defaults and existing paging inheritance.
+
+The consolidation preserves the existing request boundary for:
+
+- filtering
+- sorting
+- pagination
+- query-string state
+
+The T05 verification requirement also covers exports and query compatibility. No claim of browser/export execution is made here unless actually performed.
+
+No automated test project/source is present in the supplied repository.
+
+No build, migration, browser, or automated-test result is claimed from the documentation/source inspection environment.
+
+## 23. Cumulative Sprint 9 Documentation Status
+
+The conventions document now records the evidence-based baseline and the completed/observed implementation history through T05.
+
+The locked architectural rules remain:
+
+1. Prefer `asp-for` for appropriate Razor form binding.
+2. Prefer `asp-route-*` for direct Razor navigation and query state.
+3. Do not impose `[FromQuery]` universally.
+4. Do not convert all `[BindProperty]` usage.
+5. Do not convert all handler parameters into Request models.
+6. Use `PageNum` for the Razor/UI paging boundary.
+7. Preserve distinct Application Request and persistence/query responsibilities.
+8. Apply the Rule-of-Three before introducing shared abstractions.
+9. Preserve filtering, sorting, pagination, exports, validation, accessibility, and query contracts.
+10. Do not expand Sprint 9 into unrelated architectural redesign.
+
+The current source remains the source of truth for subsequent Sprint 9 tasks.
+
+## 24. T05 Commit Messages
+
+Code:
+
+```text
+refactor(web): consolidate request binding
+```
+
+Documentation:
+
+```text
+docs: document request binding conventions
+```
+
+Documentation and code changes remain separate commits according to the Sprint 9 workflow.
+
+## 25. Stop Rule
+
+T05 is limited to request-binding consolidation.
+
+Subsequent Sprint 9 tasks must begin from their own task prompt and current repository/source ZIP, re-inspect the relevant documentation and source, preserve the locked conventions above, perform only their assigned scope, report actual verification, and stop.
 

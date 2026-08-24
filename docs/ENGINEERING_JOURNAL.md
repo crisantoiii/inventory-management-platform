@@ -30,6 +30,30 @@ Sprint 8 Purchasing Enhancements P0-P7, D1 Documentation Synchronization, D2 Des
 
 The next development activity is a separate Next Sprint Planning process. Dynamic Capability-Based Authorization remains the next locked priority. No implementation work begins automatically from this closure.
 
+# Sprint 9 - T05 Request Binding Consolidation
+
+## Summary
+
+Consolidated accidental HTTP-boundary duplication in list PageModels where an existing Application Request already represented the complete query-bound use-case input.
+
+The affected list pages now bind the Application Request once and pass it directly to the Application handler. Separate `PageNum` handler parameters were removed where they duplicated the same query value already represented by the request model.
+
+The change preserves the established distinction between:
+
+```text
+Razor/UI request binding
+        ↓
+Application Request
+        ↓
+Repository/query representation
+```
+
+No blanket `[FromQuery]` or `[BindProperty]` normalization was introduced, and reporting request shapes were not collapsed merely for similarity.
+
+## Outcome
+
+The request-binding convention is now documented: when a PageModel already has a complete bindable Application Request, the request should be the single representation of that HTTP query state. Separate parameters remain appropriate when they represent a distinct HTTP contract or an intentional external-name-to-Application mapping.
+
 # Milestone Timeline
 
 | Milestone | Focus |
