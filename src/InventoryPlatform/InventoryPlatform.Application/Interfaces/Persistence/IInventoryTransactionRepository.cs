@@ -1,14 +1,10 @@
-﻿using InventoryPlatform.Application.Interfaces.Persistence;
+using InventoryPlatform.Application.Interfaces.Persistence;
 using InventoryPlatform.Domain.Entities;
 using InventoryPlatform.Shared.Paging;
 
 public interface IInventoryTransactionRepository
     : IRepository<InventoryTransaction>
 {
-    Task AddAsync(
-        InventoryTransaction transaction,
-        CancellationToken cancellationToken = default);
-
     Task<InventoryTransaction?> GetByIdAsync(
         int id,
         CancellationToken cancellationToken = default);
