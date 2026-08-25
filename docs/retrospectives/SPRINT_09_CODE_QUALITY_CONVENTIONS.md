@@ -625,4 +625,46 @@ Documentation and code changes remain separate commits according to the Sprint 9
 T05 is limited to request-binding consolidation.
 
 Subsequent Sprint 9 tasks must begin from their own task prompt and current repository/source ZIP, re-inspect the relevant documentation and source, preserve the locked conventions above, perform only their assigned scope, report actual verification, and stop.
+## 26. T06 Application Request Redundancy Review
 
+T06 reviewed Application Request/Response/Handler patterns for concrete redundancy identified by the Sprint 9 baseline and verified against the current source.
+
+### Verified redundancy removed
+
+`IInventoryTransactionRepository` inherited `AddAsync` from `IRepository<InventoryTransaction>` but redeclared the same method signature. The inherited contract already provides the required repository capability, so the interface declaration was redundant. The duplicate declaration was removed.
+
+The concrete `InventoryTransactionRepository.AddAsync` implementation remains because it provides the inherited repository implementation and does not duplicate an interface contract.
+
+### Application request construction assessment
+
+T05 already consolidated accidental HTTP-boundary duplication by binding the complete Application Request where that request represented the complete GET input. T06 reviewed the remaining Application request construction exposed by T05.
+
+Purchase History and Supplier Purchase Analysis currently have similarly shaped but feature-specific Application Request types. Their matching properties are not sufficient evidence of redundancy: each request is the independent use-case input contract for a different Application handler/repository workflow. They therefore remain separate.
+
+The handlers also map the paging/search/sort portion of those requests into `PagedQuery`. This remains a meaningful Application Request -> repository query boundary and was not collapsed. `PagedRequest` and `PagedQuery` remain distinct for the same reason.
+
+The repeated page/export request construction and status parsing in the two report PageModels was reviewed but not extracted. The task does not provide sufficient evidence that a new shared abstraction would represent a single architectural responsibility rather than hide feature-specific HTTP/Application behavior.
+
+### T06 decision
+
+Only the verified inherited `AddAsync` redeclaration was removed. No Application Request types, `PagedRequest`, `PagedQuery`, handlers, or report request construction were consolidated merely for structural similarity.
+
+### T06 Commit Messages
+
+Code:
+
+```text
+refactor(application): reduce verified request redundancy
+```
+
+Documentation:
+
+```text
+docs: document application request conventions
+```
+
+Documentation and code changes remain separate commits according to the Sprint 9 workflow.
+
+### T06 Stop Rule
+
+T06 is limited to verified Application Request/Handler/repository contract redundancy. No broad request-model redesign, paging abstraction consolidation, or unrelated refactoring is authorized by this task.

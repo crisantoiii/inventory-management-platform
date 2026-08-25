@@ -3150,3 +3150,9 @@ Sprint 8 Purchasing Enhancements P0-P7, D1 Documentation Synchronization, D2 Des
 The next development activity is a separate Sprint Planning process. Dynamic Capability-Based Authorization remains the next locked priority, but no implementation work begins automatically from this closure.
 
 Historical Sprint 8 planning and task records remain preserved as historical records and are not rewritten to remove their original sequencing.
+## Sprint 9 - T06 Application Request Redundancy Review
+
+Reviewed Application Request/Response/Handler patterns and the known repository redundancy candidate against the current source. Removed the duplicate `AddAsync` declaration from `IInventoryTransactionRepository` because the method is already inherited from `IRepository<InventoryTransaction>`.
+
+Reviewed T05 request construction findings. Purchase History and Supplier Purchase Analysis retain separate Application Request types because they represent distinct use-case contracts. `PagedRequest -> PagedQuery` mapping also remains because the Application request and repository query serve distinct responsibilities. Repeated report PageModel request construction was reviewed but no helper was introduced because the evidence did not justify a new shared abstraction under the Rule-of-Three.
+
