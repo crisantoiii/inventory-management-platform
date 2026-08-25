@@ -668,3 +668,97 @@ Documentation and code changes remain separate commits according to the Sprint 9
 ### T06 Stop Rule
 
 T06 is limited to verified Application Request/Handler/repository contract redundancy. No broad request-model redesign, paging abstraction consolidation, or unrelated refactoring is authorized by this task.
+
+## 27. T07 Infrastructure Query Signature Cleanup
+
+T07 reviewed Infrastructure repository/query contracts identified by the Sprint 9 baseline and re-inspected against the current source.
+
+### Verified query-signature assessment
+
+The repository query methods already use `PagedQuery` for the shared paging, search, and sorting responsibilities:
+
+```text
+PagedQuery
+    - PageNum
+    - PageSize
+    - Search
+    - SortBy
+    - Descending
+```
+
+The report repositories additionally accept only their feature-specific filters, such as date ranges, Purchase Order status, or transaction type. These parameters are not duplicates of the `PagedQuery` responsibilities and were retained.
+
+No repository signature was found to repeat `PageNum`, `PageSize`, `Search`, `SortBy`, or `Descending` as separate parameters alongside `PagedQuery`. No filter parameter was removed because the current source did not prove that any of those filters were already represented by the query object with the same responsibility.
+
+The existing Application Request -> `PagedQuery` -> repository query boundary remains intentional and was preserved.
+
+### Verified Purchase Order repository naming inconsistency
+
+`IPurchaseOrderRepository` is an entity repository extending `IRepository<PurchaseOrder>`, and its paged entity-list capability was named:
+
+```csharp
+GetPurchaseOrdersAsync(...)
+```
+
+The established entity-list repository convention uses `GetPagedAsync(...)` for the same type of paged entity retrieval, including:
+
+- `IProductRepository`
+- `ICategoryRepository`
+- `ISupplierRepository`
+- `ICustomerRepository`
+- `IUnitRepository`
+- `IInventoryTransactionRepository`
+
+The Purchase Order method therefore represented a concrete naming inconsistency without requiring a change in responsibility or query shape.
+
+The method was renamed consistently to:
+
+```csharp
+GetPagedAsync(...)
+```
+
+in:
+
+- `IPurchaseOrderRepository`
+- `PurchaseOrderRepository`
+- `GetPurchaseOrdersHandler`
+
+The parameters and behavior remain unchanged:
+
+- `PagedQuery`
+- `FromDate`
+- `ToDate`
+- `PurchaseOrderStatus`
+- `CancellationToken`
+
+No filtering, sorting, pagination, projection, or security behavior was changed.
+
+### T07 non-targets
+
+T07 did not:
+
+- introduce a generic query abstraction
+- merge feature-specific report repositories
+- collapse read-model/report query boundaries
+- remove meaningful date/status/transaction filters
+- collapse `PagedRequest` and `PagedQuery`
+- alter the Application Request -> repository query transformation
+- change repository behavior merely to make parameter names visually identical
+- change feature-specific report method names
+
+### T07 verification
+
+Source inspection after the change confirms:
+
+- `GetPurchaseOrdersAsync` is no longer referenced.
+- `IPurchaseOrderRepository` exposes `GetPagedAsync(...)`.
+- `PurchaseOrderRepository` implements `GetPagedAsync(...)`.
+- `GetPurchaseOrdersHandler` calls `GetPagedAsync(...)`.
+- Other entity-list repositories already use `GetPagedAsync(...)`.
+- Report repository signatures retain only `PagedQuery` plus their distinct feature filters.
+- Cancellation tokens remain part of all reviewed asynchronous repository signatures.
+
+No automated test project/source is present in the supplied repository.
+
+Build verification must be based only on an actual build performed for this task.
+
