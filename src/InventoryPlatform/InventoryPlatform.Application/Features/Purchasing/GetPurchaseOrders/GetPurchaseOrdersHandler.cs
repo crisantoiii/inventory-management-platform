@@ -28,7 +28,7 @@ public sealed class GetPurchaseOrdersHandler
         };
 
         var purchaseOrders = await _purchaseOrderRepository
-            .GetPurchaseOrdersAsync(
+            .GetPagedAsync(
                 query,
                 request.FromDate,
                 request.ToDate,

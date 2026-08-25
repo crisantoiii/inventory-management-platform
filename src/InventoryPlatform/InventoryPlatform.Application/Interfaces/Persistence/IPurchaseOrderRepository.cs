@@ -7,7 +7,7 @@ namespace InventoryPlatform.Application.Interfaces.Persistence;
 public interface IPurchaseOrderRepository
     : IRepository<PurchaseOrder>
 {
-    Task<PagedResult<PurchaseOrder>> GetPurchaseOrdersAsync(
+    Task<PagedResult<PurchaseOrder>> GetPagedAsync(
         PagedQuery query,
         DateOnly? fromDate = null,
         DateOnly? toDate = null,

@@ -31,7 +31,7 @@ public sealed class PurchaseOrderRepository
                 cancellationToken);
     }
 
-    public async Task<PagedResult<PurchaseOrder>> GetPurchaseOrdersAsync(
+    public async Task<PagedResult<PurchaseOrder>> GetPagedAsync(
         PagedQuery query,
         DateOnly? fromDate = null,
         DateOnly? toDate = null,
