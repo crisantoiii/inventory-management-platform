@@ -31,8 +31,9 @@
 
     <form method="get" class="row g-2 mb-4">
         <div class="col-md-4">
-            <label for="search" class="form-label">Search purchase orders</label>
-            <input name="Search"
+            <label for="Search" class="form-label">Search purchase orders</label>
+            <input id="Search"
+                   name="Search"
                    value="@Model.Request.Search"
                    class="form-control"
                    placeholder="Search by purchase order ID or supplier"
@@ -41,7 +42,8 @@
 
         <div class="col-md-2">
             <label for="FromDate" class="form-label">From date</label>
-            <input name="FromDate"
+            <input id="FromDate"
+                   name="FromDate"
                    value="@Model.Request.FromDate?.ToString("yyyy-MM-dd")"
                    type="date"
                    class="form-control" />
@@ -49,19 +51,19 @@
 
         <div class="col-md-2">
             <label for="ToDate" class="form-label">To date</label>
-            <input name="ToDate"
+            <input id="ToDate"
+                   name="ToDate"
                    value="@Model.Request.ToDate?.ToString("yyyy-MM-dd")"
                    type="date"
                    class="form-control" />
         </div>
 
         <div class="col-md-2">
-            <label for="status" class="form-label">Status</label>
-            <select name="Status"
-                    class="form-select"
-                    asp-items="Model.StatusOptions">
-                <option value="">All statuses</option>
-                @foreach (var option in Model.StatusOptions.Skip(1))
+            <label for="Status" class="form-label">Status</label>
+            <select id="Status"
+                    name="Status"
+                    class="form-select">
+                @foreach (var option in Model.StatusOptions)
                 {
                     <option value="@option.Value"
                             selected="@(Model.Request.PurchaseOrderStatus?.ToString() == option.Value)">
@@ -237,6 +239,7 @@
                                            asp-route-SortBy="@Model.Request.SortBy"
                                            asp-route-Descending="@Model.Request.Descending"
                                            asp-route-PageNum="@Model.Request.PageNum"
+                                            asp-route-PageSize="@Model.Request.PageSize"
                                            class="btn btn-sm btn-outline-primary">
                                             Details
                                         </a>
