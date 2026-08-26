@@ -44,7 +44,7 @@ The focus is not only on implementing business features but also on applying pro
 
 **Current Version:** v1.5.0 - Purchasing Enhancements
 
-**Current Development Status:** Sprint 8 Purchasing Enhancements — Complete, Verified, Documented, and Closed
+**Current Development Status:** Sprint 9 ASP.NET Core Code Quality & Consistency — T03-T10 Complete; T11 Documentation Synchronization
 
 ## Completed Modules
 
@@ -125,7 +125,7 @@ Sprint 8 Purchasing Enhancements is complete, verified, documented, and closed.
 
 The v1.5.0 release preserves the established Purchasing architecture and records Sprint 8 as the current completed milestone.
 
-### Current Development — Sprint 8 Purchasing Enhancements
+### Historical Sprint 8 Closure
 
 Sprint 8 Purchasing Enhancements P0-P7 are complete, verified, documented, and closed.
 
@@ -198,6 +198,39 @@ The first Reporting vertical slice was implemented without requiring structural 
 - ✅ Architecture approved for future module expansion
 
 The completed Purchasing, Reporting, and Account Management vertical slices further validated that the existing architecture can support CRUD-oriented modules, workflow-driven business processes, read-oriented reporting, and self-service account security workflows without requiring structural redesign.
+
+## Sprint 9 - ASP.NET Core Code Quality & Consistency
+
+Sprint 9 is a controlled code-quality and consistency workstream. It does not introduce a new business module or redesign the platform architecture.
+
+### Completed implementation work
+
+- T03 - normalized the Purchase History and Supplier Purchase Analysis filter forms to use `asp-for`.
+- T04 - normalized Purchase Order sorting and pagination navigation to Razor `asp-route-*` values and removed the former `GetSortUrl(...)` / `GetPageUrl(...)` helpers.
+- T05 - consolidated accidental HTTP-boundary duplication by binding the complete Application Request on seven list PageModels.
+- T06 - removed a duplicate inherited `AddAsync(...)` declaration from `IInventoryTransactionRepository`.
+- T07 - verified repository query signatures without removing meaningful feature-specific filters or shared `PagedQuery` responsibilities.
+- T08 - removed the duplicate inherited `GetByIdAsync(...)` declaration from `IInventoryTransactionRepository` and confirmed the existing Clean Architecture boundaries remain intentional.
+- T09 - corrected seven list-page pagination links from manual `?Page=...` URLs to `asp-route-PageNum` while preserving existing route state.
+- T10 - corrected Purchase Order Details pagination context preservation, duplicate Status option rendering, and missing filter label/control IDs.
+
+### Locked Sprint 9 conventions
+
+- Use `asp-for` for appropriate Razor form binding and labels.
+- Prefer `asp-route-*` for direct Razor navigation and query state.
+- Use `PageNum` as the Razor/UI paging property and query parameter.
+- Preserve meaningful HTTP Request -> Application Request -> Repository Query boundaries.
+- Apply the Rule-of-Three before introducing shared helpers or abstractions.
+- Do not normalize `[FromQuery]`, `[BindProperty]`, or handler-parameter binding merely for visual consistency.
+- Keep direct Infrastructure DTO projections where they represent the existing read-model responsibility.
+
+### Verification state
+
+Source-level verification was completed through T10. The supplied verification environment does not contain the `dotnet` CLI, so no successful build or runtime/browser result is claimed for Sprint 9. No automated test project/source is present in the supplied repository.
+
+T10 source verification confirms the corrected Purchase Order state-preservation behavior, Razor form conventions, route-tag-helper navigation, `PageNum` pagination links, and the seven T09 pagination corrections.
+
+Sprint 9 introduced no unrelated business capability or structural architectural redesign. Dynamic Capability-Based Authorization remains outside Sprint 9 scope and is not implemented.
 
 ---
 
@@ -901,7 +934,7 @@ Development Tools
 - D4 Final Documentation Validation - Complete
 - Final Sprint 8 save point - Established
 
-Sprint 8 is closed. The next development activity is a new Sprint Planning process. Dynamic Capability-Based Authorization remains the next locked priority, but implementation does not begin automatically from this closure.
+Sprint 8 is closed. It remains the v1.5.0 release baseline. Dynamic Capability-Based Authorization remains the next locked feature priority after the current Sprint 9 code-quality workstream.
 
 ## Future
 

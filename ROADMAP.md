@@ -99,9 +99,42 @@ Runtime/browser verification was completed successfully by the project owner.
 
 The Sprint 8 final save point has been established. No new feature work begins from this roadmap state; the next activity is Next Sprint Planning.
 
+## Sprint 9 - ASP.NET Core Code Quality & Consistency
+
+**Status:** T03-T10 complete; T11 documentation synchronization
+
+Sprint 9 is a bounded consistency workstream rather than a feature-module release.
+
+Completed implementation scope:
+
+- Razor `asp-for` normalization for Purchase History and Supplier Purchase Analysis.
+- Purchase Order sorting/pagination navigation normalization to `asp-route-*`.
+- Request-binding consolidation for seven core list PageModels.
+- Removal of redundant inherited repository interface declarations.
+- Repository query-signature validation without collapsing meaningful feature-specific filters.
+- Seven `PageNum` pagination-link corrections.
+- Purchase Order Details pagination context preservation.
+- Purchase Order Status option de-duplication and filter label/control association corrections.
+
+Verified conventions:
+
+- `PageNum` is the canonical Razor/UI paging property and query parameter.
+- `asp-for` is preferred where appropriate for Razor form binding and labels.
+- `asp-route-*` is preferred for direct Razor navigation and query state.
+- Application Request -> `PagedQuery` / repository boundaries remain when they have distinct responsibilities.
+- Rule-of-Three is applied before introducing reusable helpers or abstractions.
+
+Verification limitation:
+
+- Source-level verification is complete through T10.
+- The supplied environment has no `dotnet` CLI, so no successful Sprint 9 build or runtime/browser verification is claimed.
+- No automated test project/source is present in the repository.
+
+Sprint 9 did not introduce unrelated business capabilities or structural architectural redesign.
+
 ## Next Sprint Planning
 
-Sprint 8 is closed. The next locked priority is Dynamic Capability-Based Authorization. Its implementation requires a separate Sprint Planning process and must not begin automatically from this closure.
+Sprint 8 is closed, and Sprint 9 is the current code-quality workstream. The next locked feature priority after Sprint 9 is Dynamic Capability-Based Authorization. Its implementation requires a separate Sprint Planning process and must not begin automatically from this closure.
 
 ## D1 - Documentation Synchronization
 
@@ -119,6 +152,34 @@ Dynamic Capability-Based Authorization remains outside the completed Purchasing 
 ---
 
 # Current Release
+
+## Version 1.5.0 - Sprint 8 Purchasing Enhancements
+
+### Completed
+
+- Multiple Purchase Order Item Management
+- Purchase Order Search
+- Purchase Order Filtering
+- Purchase Order Sorting
+- Purchase Order Pagination
+- Inventory Synchronization During Receiving
+- Integrated Purchasing Verification
+- D1-D4 Sprint 8 documentation and closure
+
+### Verification
+
+- Complete Purchasing workflow from creation through receiving
+- Search, date/status filtering, sorting, and pagination
+- Inventory synchronization and StockIn transaction creation
+- Existing authorization boundaries
+- Relevant empty-result and failure/recovery behavior
+- Pagination state preservation after the P7 correction
+
+Sprint 8 is closed. Sprint 9 is the current code-quality workstream and does not change the release version.
+
+---
+
+# Historical Release
 
 ## Version 1.4.0 – Additional Reporting & Exports
 
@@ -208,7 +269,7 @@ Objectives
 
 # Phase 5 — Purchasing Module
 
-Status: 🟨 Core Workflow Complete
+Status: ✅ Complete
 
 Completed:
 
@@ -220,11 +281,7 @@ Completed:
 - Purchase Order Completion
 - Purchasing Presentation Layer
 - End-to-End Workflow Validation
-
-Remaining:
-
 - Inventory Integration
-- Supplier Purchase History
 - Purchase Order Search
 - Purchase Order Filtering
 - Purchase Order Sorting
@@ -439,7 +496,7 @@ Future enhancements may include:
 | v1.3.0 | Account Management ✅ |
 | v1.4.0 | Additional Reporting & Exports — Released |
 | v1.5.0 | Sprint 8 Purchasing Enhancements — Released |
-| v1.6.0 | Sales Module ⏳ |
+| v1.6.0 | Dynamic Capability-Based Authorization ⏳ |
 | v2.0.0 | REST API & Blazor ⏳ |
 
 ---

@@ -3203,3 +3203,58 @@ Static source verification confirms the affected pagination links no longer use 
 Code: `fix: resolve sprint 9 regression defects`
 
 Docs: `docs: record sprint 9 automated verification results`
+
+
+---
+
+# Sprint 9 - T11 Documentation Synchronization
+
+**Date:** 2026-08-27  
+**Status:** Complete
+
+T11 synchronized the current-state documentation against the supplied repository/source ZIP and the verified T03-T10 Sprint 9 records.
+
+## Documentation synchronized
+
+- `README.md`
+- `PROJECT_STATUS.md`
+- `ROADMAP.md`
+- `CHANGELOG.md`
+- `ARCHITECTURE.md`
+- `docs/FEATURES.md`
+- `docs/DESIGN_DECISIONS.md`
+- `docs/ENGINEERING_JOURNAL.md`
+- `docs/ARCHITECTURE_REVIEW.md`
+- Sprint 9 retrospective/verification records
+
+## Verified implementation recorded
+
+The documentation now records only the Sprint 9 changes present in the source:
+
+- Razor `asp-for` normalization for two reporting filter forms.
+- Purchase Order `asp-route-*` sorting/pagination navigation.
+- Application Request binding consolidation on seven list PageModels.
+- Removal of redundant inherited `AddAsync(...)` and `GetByIdAsync(...)` repository interface declarations.
+- Seven `asp-route-PageNum` pagination corrections.
+- Purchase Order Details pagination/filter/sort state preservation.
+- Purchase Order Status option de-duplication and explicit filter control IDs.
+
+## Verified conventions recorded
+
+- `PageNum` is the canonical Razor/UI paging property and query parameter.
+- `asp-for` is preferred for appropriate Razor form binding and labels.
+- `asp-route-*` is preferred for direct Razor navigation/query state.
+- Meaningful HTTP Request -> Application Request -> Repository Query boundaries remain valid.
+- Rule-of-Three governs new reusable abstractions.
+- Direct DTO projections and feature-specific report filters remain valid where they have distinct responsibilities.
+
+## Verification result
+
+Source-level verification is complete through T10/T11. The repository contains no automated test project/source, and the available environment does not contain the `dotnet` CLI. Therefore the synchronized documentation makes no successful build, runtime, or browser claim for Sprint 9.
+
+T10 remains the recorded browser/manual verification boundary: source-level verification was completed, but runtime/browser verification was blocked by the environment.
+
+## Scope result
+
+No unrelated business capability or structural architectural redesign was identified in the reviewed Sprint 9 implementation. Dynamic Capability-Based Authorization remains outside Sprint 9 scope and is not implemented.
+

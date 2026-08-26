@@ -30,7 +30,7 @@ Account Management
 
 **Latest Release:** v1.5.0 — Sprint 8 Purchasing Enhancements
 
-**Project Status:** Sprint 8 Complete and Closed - Ready for Next Sprint Planning
+**Project Status:** Sprint 9 Code Quality & Consistency - T03-T10 Complete; T11 Documentation Synchronization
 
 **Last Updated:** August 2026
 
@@ -108,6 +108,8 @@ Verified:
 - ✅ v1.1.0 - Purchasing Presentation Layer
 - ✅ v1.2.0 - Reporting: Inventory Valuation
 - ✅ v1.3.0 - Account Management
+- ✅ v1.4.0 - Additional Reporting & Exports
+- ✅ v1.5.0 - Sprint 8 Purchasing Enhancements
 
 ---
 
@@ -115,8 +117,34 @@ Verified:
 
 - **Completed Modules:** 10
 - **Architecture Status:** Validated
-- **Current Milestone:** Sprint 8 — Purchasing Enhancements + D1-D4 — Complete
-- **Next Milestone:** Next Sprint Planning
+- **Current Milestone:** Sprint 9 — ASP.NET Core Code Quality & Consistency
+- **Next Milestone:** Dynamic Capability-Based Authorization, after separate sprint planning
+
+---
+
+# Sprint 9 - ASP.NET Core Code Quality & Consistency
+
+**Status:** T03-T10 complete; T11 documentation synchronization
+
+Sprint 9 is a controlled code-quality and consistency workstream. The verified implementation changes are limited to Razor form binding, Razor route/query navigation, request-binding consolidation, repository contract redundancy cleanup, pagination consistency, and Purchase Order presentation/state corrections.
+
+### Verified implementation
+
+- Purchase History and Supplier Purchase Analysis use `asp-for` for report filters.
+- Purchase Order sorting and pagination use `asp-route-*`; the former server-side URL helpers are removed.
+- Seven core list PageModels bind their complete Application Request from query state without duplicate `PageNum` handler parameters.
+- `IInventoryTransactionRepository` no longer redeclares inherited `AddAsync(...)` or `GetByIdAsync(...)`.
+- Seven list pages use `asp-route-PageNum` for pagination and no longer use the identified manual `?Page=...` pagination pattern.
+- Purchase Order Details preserves `PageNum` and `PageSize` together with existing search/filter/sort state.
+- Purchase Order Status options are rendered once and filter labels have explicit matching control IDs.
+
+### Verification
+
+Source-level verification was completed through T10. The supplied environment does not contain the `dotnet` CLI, so no successful build or runtime/browser verification is claimed for Sprint 9. No automated test project/source is present in the repository.
+
+### Scope boundary
+
+No unrelated business capability or structural architectural redesign was introduced by the reviewed Sprint 9 work. Dynamic Capability-Based Authorization remains outside Sprint 9 and is not implemented.
 
 ---
 
@@ -890,4 +918,4 @@ The P7 implementation fix is intentionally kept separate from documentation chan
 
 **P7 result:** Complete and verified.
 
-D1 - Documentation Synchronization, D2 - Design Decision Synchronization, D3 - Final Sprint 8 Retrospective, and D4 - Final Documentation Validation are complete. The Sprint 8 final save point has been established. The next development activity is Next Sprint Planning.
+D1 - Documentation Synchronization, D2 - Design Decision Synchronization, D3 - Final Sprint 8 Retrospective, and D4 - Final Documentation Validation are complete. The Sprint 8 final save point has been established. The current development activity is Sprint 9 ASP.NET Core Code Quality & Consistency.

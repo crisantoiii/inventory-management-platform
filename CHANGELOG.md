@@ -2,17 +2,39 @@
 
 ## [Unreleased]
 
-### Development State
+### Sprint 9 - ASP.NET Core Code Quality & Consistency
 
-Sprint 8 Purchasing Enhancements was released as v1.5.0 and is complete and closed. The next development activity is Next Sprint Planning. No future-priority feature is marked complete.
+**Status:** T03-T10 implementation and verification complete; T11 documentation synchronization
 
-### Next Locked Priority
+#### Changed
 
-1. Dynamic Capability-Based Authorization
-2. Sales Module
-3. Audit / Activity Logging
-4. Bulk Import / Export
-5. Barcode / QR
+- Normalized report filter forms in Purchase History and Supplier Purchase Analysis to use `asp-for`.
+- Replaced Purchase Order sorting/pagination URL helper generation with Razor `asp-route-*` navigation.
+- Consolidated duplicate HTTP query binding on seven core list PageModels by binding the complete Application Request once.
+- Removed redundant inherited `AddAsync(...)` and `GetByIdAsync(...)` declarations from `IInventoryTransactionRepository`.
+- Corrected seven list-page pagination links to use `asp-route-PageNum`.
+- Preserved Purchase Order Details `PageNum` and `PageSize` state through Back and workflow redirects.
+- Removed duplicate Purchase Order Status option rendering and added explicit filter control IDs for label association.
+
+#### Verified Conventions
+
+- `PageNum` is the canonical Razor/UI paging property and query parameter.
+- `asp-for` is preferred for appropriate Razor form binding and labels.
+- `asp-route-*` is preferred for direct Razor navigation and query state.
+- Meaningful HTTP Request -> Application Request -> Repository Query boundaries are preserved.
+- Rule-of-Three governs shared helper/abstraction extraction.
+
+#### Verification
+
+- Source-level verification completed through T10.
+- No automated test project/source is present.
+- The supplied verification environment does not contain the `dotnet` CLI; therefore no successful build or runtime/browser result is claimed for Sprint 9.
+- No unrelated business capability or structural architectural redesign was introduced in the reviewed Sprint 9 scope.
+
+### Next Locked Feature Priority
+
+Dynamic Capability-Based Authorization remains outside Sprint 9 and is not implemented.
+
 
 ## [v1.5.0] - 2026-08-21
 
