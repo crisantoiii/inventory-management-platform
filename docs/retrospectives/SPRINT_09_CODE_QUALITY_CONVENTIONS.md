@@ -762,3 +762,34 @@ No automated test project/source is present in the supplied repository.
 
 Build verification must be based only on an actual build performed for this task.
 
+
+
+## Sprint 9 - T08 Cross-Layer Architecture & Redundancy Validation
+
+**Status:** Complete
+
+T08 performed a cross-layer validation of the T03-T07 changes across Domain, Application, Infrastructure, Web, and Shared. The review focused on accidental duplication, boundary inconsistencies, unintended collapse of HTTP -> Application -> Repository responsibilities, and the Rule-of-Three.
+
+### Verified defect and correction
+
+`IInventoryTransactionRepository` still redeclared `GetByIdAsync(...)` even though the contract is already inherited from `IRepository<InventoryTransaction>`. The duplicate declaration was removed. The Infrastructure implementation remains responsible for the inherited repository behavior.
+
+This is a contract-level redundancy correction only; no repository responsibility or behavior was changed.
+
+### Cross-layer boundary result
+
+The existing boundaries remain intentional and were preserved:
+
+- HTTP/Razor request binding -> Application Request
+- Application Request -> `PagedQuery` mapping
+- `PagedQuery` -> repository query
+- Repository -> Infrastructure/EF Core persistence
+- Feature-specific report filters remain distinct from common paging/search/sorting responsibilities
+
+`PagedRequest` and `PagedQuery` were not collapsed because they represent different architectural responsibilities. No new cross-layer abstraction was introduced.
+
+### Verification limitation
+
+Source inspection confirmed the duplicate `GetByIdAsync` declaration was removed and no additional cross-layer redundancy was justified. The supplied execution environment does not contain the `dotnet` CLI, so a fresh solution build could not be performed and no successful build is claimed.
+
+**T08 result: PASS - one verified cross-layer redundancy corrected; no further refactoring justified.**

@@ -3156,3 +3156,15 @@ Reviewed Application Request/Response/Handler patterns and the known repository 
 
 Reviewed T05 request construction findings. Purchase History and Supplier Purchase Analysis retain separate Application Request types because they represent distinct use-case contracts. `PagedRequest -> PagedQuery` mapping also remains because the Application request and repository query serve distinct responsibilities. Repeated report PageModel request construction was reviewed but no helper was introduced because the evidence did not justify a new shared abstraction under the Rule-of-Three.
 
+
+
+## Sprint 9 - T08 Cross-Layer Architecture & Redundancy Validation
+
+**Date:** 2026-08-26  
+**Status:** Complete
+
+T08 validated the T03-T07 changes across Domain, Application, Infrastructure, Web, and Shared against the Sprint 9 Rule-of-Three and Clean Architecture boundaries. One concrete redundancy was found: `IInventoryTransactionRepository` redeclared `GetByIdAsync(...)` even though it is inherited from `IRepository<InventoryTransaction>`. The duplicate declaration was removed without changing repository behavior.
+
+The review confirmed that `PagedRequest` -> `PagedQuery` mapping and feature-specific report filters remain meaningful architectural boundaries and should not be collapsed. No additional refactoring scope was justified.
+
+The source was inspected after the correction. A fresh build was not performed because the execution environment does not contain the `dotnet` CLI.
