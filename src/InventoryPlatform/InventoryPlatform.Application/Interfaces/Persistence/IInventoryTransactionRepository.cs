@@ -5,10 +5,6 @@ using InventoryPlatform.Shared.Paging;
 public interface IInventoryTransactionRepository
     : IRepository<InventoryTransaction>
 {
-    Task<InventoryTransaction?> GetByIdAsync(
-        int id,
-        CancellationToken cancellationToken = default);
-
     Task<PagedResult<InventoryTransaction>> GetPagedAsync(
         PagedQuery request,
         CancellationToken cancellationToken = default);
