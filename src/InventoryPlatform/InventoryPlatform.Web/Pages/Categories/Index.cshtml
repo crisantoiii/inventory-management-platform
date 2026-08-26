@@ -191,7 +191,12 @@ else
                 <li class="page-item">
 
                     <a class="page-link"
-                       href="?Page=@(Model.Categories.Page - 1)&Search=@Model.Filter.Search&Status=@Model.Filter.Status&SortBy=@Model.Filter.SortBy&Descending=@Model.Filter.Descending">
+                       asp-page="./Index"
+                       asp-route-PageNum="@(Model.Categories.Page - 1)"
+                       asp-route-Search="@Model.Filter.Search"
+                       asp-route-Status="@Model.Filter.Status"
+                       asp-route-SortBy="@Model.Filter.SortBy"
+                       asp-route-Descending="@Model.Filter.Descending">
                         Previous
                     </a>
 
@@ -202,7 +207,12 @@ else
             {
                 <li class="page-item @(i == Model.Categories.Page ? "active" : "")">
                     <a class="page-link"
-                       href="?Page=@i&Search=@Model.Filter.Search&Status=@Model.Filter.Status&SortBy=@Model.Filter.SortBy&Descending=@Model.Filter.Descending">
+                       asp-page="./Index"
+                       asp-route-PageNum="@i"
+                       asp-route-Search="@Model.Filter.Search"
+                       asp-route-Status="@Model.Filter.Status"
+                       asp-route-SortBy="@Model.Filter.SortBy"
+                       asp-route-Descending="@Model.Filter.Descending">
                         @i
                     </a>
 
@@ -214,7 +224,12 @@ else
                 <li class="page-item">
 
                     <a class="page-link"
-                       href="?Page=@(Model.Categories.Page + 1)&Search=@Model.Filter.Search&Status=@Model.Filter.Status&SortBy=@Model.Filter.SortBy&Descending=@Model.Filter.Descending">
+                       asp-page="./Index"
+                       asp-route-PageNum="@(Model.Categories.Page + 1)"
+                       asp-route-Search="@Model.Filter.Search"
+                       asp-route-Status="@Model.Filter.Status"
+                       asp-route-SortBy="@Model.Filter.SortBy"
+                       asp-route-Descending="@Model.Filter.Descending">
                         Next
                     </a>
 
