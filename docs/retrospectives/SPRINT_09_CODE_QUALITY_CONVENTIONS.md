@@ -793,3 +793,80 @@ The existing boundaries remain intentional and were preserved:
 Source inspection confirmed the duplicate `GetByIdAsync` declaration was removed and no additional cross-layer redundancy was justified. The supplied execution environment does not contain the `dotnet` CLI, so a fresh solution build could not be performed and no successful build is claimed.
 
 **T08 result: PASS - one verified cross-layer redundancy corrected; no further refactoring justified.**
+
+
+## Sprint 9 - T09 Build & Automated Regression Verification
+
+**Status:** Complete with environment limitation recorded
+
+T09 performed the required automated verification review against the current repository source. The task was limited to build/test execution and correction of actual Sprint 9 regression defects.
+
+### Automated test inventory
+
+No automated test project/source is present in the repository. No test coverage was invented or added as part of T09.
+
+### Build verification
+
+A solution build was attempted with:
+
+```text
+dotnet build InventoryPlatform.slnx --no-restore
+```
+
+The verification environment does not provide the `dotnet` CLI, so the build could not be executed successfully. No successful build result is claimed.
+
+### Verified Sprint 9 regression
+
+Seven Razor list pages still generated pagination links using manual `?Page=...` URLs while the Sprint 9 paging convention uses `PageNum`.
+
+Affected pages:
+
+- `Pages/Products/Index.cshtml`
+- `Pages/Categories/Index.cshtml`
+- `Pages/Suppliers/Index.cshtml`
+- `Pages/Customers/Index.cshtml`
+- `Pages/Units/Index.cshtml`
+- `Pages/InventoryTransactions/Index.cshtml`
+- `Pages/Administrator/Users/Index.cshtml`
+
+The pagination links were changed to Razor route tag helpers using:
+
+- `asp-page="./Index"`
+- `asp-route-PageNum`
+- `asp-route-Search`
+- `asp-route-Status`
+- `asp-route-SortBy`
+- `asp-route-Descending`
+
+This preserves filtering and sorting state while aligning pagination with the canonical `PageNum` request property.
+
+### Static regression verification
+
+Source-level verification after the correction confirms:
+
+- No manual `?Page=`, `?page=`, or `currentPage=` pagination URLs remain in the reviewed Razor source.
+- The affected PageModels continue to use the existing request-binding architecture.
+- `PageNum` remains the Application request paging property.
+- `PagedQuery` remains the infrastructure/query paging property.
+- Repository paging responsibilities remain unchanged.
+- Existing export handlers were not altered by T09.
+- No unrelated feature or architectural redesign was introduced.
+
+### Verification limitations
+
+Because the environment lacks the `dotnet` CLI and the repository contains no automated test project/source, the following could not be runtime-verified in this session:
+
+- successful compilation
+- automated test execution
+- browser behavior
+- runtime model binding
+- runtime validation
+- runtime repository query execution
+- runtime export generation
+- authentication/authorization smoke tests
+
+These limitations are recorded rather than represented as successful verification.
+
+### T09 result
+
+**PASS with environment limitation** - one concrete Sprint 9 pagination/navigation regression was corrected, static verification was completed, and unavailable build/test execution was explicitly recorded.

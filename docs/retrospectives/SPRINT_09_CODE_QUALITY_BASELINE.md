@@ -530,3 +530,31 @@ The baseline findings should be addressed through controlled workstreams rather 
 - parameter capitalization
 
 Each future task should remain bounded to its assigned workstream and must follow the Sprint 9 stop rule.
+
+
+## 18. T09 Automated Regression Verification Update
+
+T09 reviewed the repository for automated verification and performed source-level regression checks after the Sprint 9 consistency changes.
+
+### T09 findings
+
+- No automated test project/source is present in the repository.
+- A solution build could not be executed because the verification environment does not contain the `dotnet` CLI.
+- Seven Razor list pages contained manual `?Page=...` pagination URLs despite the Sprint 9 `PageNum` convention.
+- The pagination links were corrected to use Razor route tag helpers with `asp-route-PageNum` while preserving search, status, sort, and descending state.
+
+Affected pages:
+
+- Products
+- Categories
+- Suppliers
+- Customers
+- Units
+- Inventory Transactions
+- Administrator Users
+
+### T09 verification limitation
+
+No successful build, test, browser, runtime model-binding, repository-query, export, or authentication/authorization verification is claimed. The repository source was inspected and the pagination correction was statically verified.
+
+**T09 result: PASS with environment limitation.**

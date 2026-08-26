@@ -3168,3 +3168,38 @@ T08 validated the T03-T07 changes across Domain, Application, Infrastructure, We
 The review confirmed that `PagedRequest` -> `PagedQuery` mapping and feature-specific report filters remain meaningful architectural boundaries and should not be collapsed. No additional refactoring scope was justified.
 
 The source was inspected after the correction. A fresh build was not performed because the execution environment does not contain the `dotnet` CLI.
+
+
+## 2026-08-26 - T09 Build & Automated Regression Verification
+
+T09 performed the Sprint 9 automated verification pass against the current repository source.
+
+### Findings
+
+No automated test project/source exists in the repository. The solution build could not be executed because the available verification environment does not contain the `dotnet` CLI.
+
+Static inspection identified a concrete Sprint 9 regression: seven Razor list pages still generated pagination URLs using `?Page=...` while the canonical Application paging property is `PageNum`.
+
+### Correction
+
+Pagination links in the following pages were changed to Razor route tag helpers:
+
+- Products
+- Categories
+- Suppliers
+- Customers
+- Units
+- Inventory Transactions
+- Administrator Users
+
+The links now use `asp-route-PageNum` and preserve Search, Status, SortBy, and Descending route state.
+
+### Verification
+
+Static source verification confirms the affected pagination links no longer use the manual `?Page=...` pattern. No successful build, automated test, browser test, runtime binding/query/export test, or authentication/authorization smoke test is claimed because the required runtime tooling was unavailable.
+
+### Commit messages
+
+Code: `fix: resolve sprint 9 regression defects`
+
+Docs: `docs: record sprint 9 automated verification results`
