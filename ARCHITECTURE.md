@@ -894,7 +894,7 @@ Infrastructure / EF Core
 
 Where the HTTP request and Application Request already represent the same complete use-case input, the PageModel now binds the Application Request once. Where the Application Request and repository `PagedQuery` serve different responsibilities, that mapping remains.
 
-The `PageNum` convention is limited to the Razor/UI-facing paging representation. `PagedRequest` and `PagedQuery` remain distinct because they can serve different architectural responsibilities.
+The `PageNum` convention is canonical for the current Razor/UI-facing paging representation and is also used by the existing `PagedRequest` and `PagedQuery` shared paging contracts. `PagedRequest` and `PagedQuery` remain distinct because they can serve different architectural responsibilities.
 
 ## Rule-of-Three result
 

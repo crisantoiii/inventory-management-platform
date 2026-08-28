@@ -132,18 +132,18 @@ When a Razor Page's query parameters already correspond to an Application reques
 
 ### Razor/UI paging convention
 
-Use `PageNum` as the Razor-facing paging property and query parameter across paginated list/report pages. Application request models may continue to use `Page`; translate at the Razor/Application boundary rather than renaming backend properties solely for UI consistency.
+Use `PageNum` as the Razor-facing paging property and query parameter across paginated list/report pages. Keep `PageNum` in shared `PagedRequest` and `PagedQuery` contracts where those existing types already use it; do not rename backend properties solely for UI consistency.
 
 When an Application request is already the correct HTTP-bound request shape, prefer binding that request directly. Keep a separate PageModel/query representation when the Application request intentionally contains a repository-facing `PagedQuery` or otherwise represents a distinct Application boundary.
 
 
 ### Direct Application-request binding
 
-Do not introduce a custom model binder solely to translate a small number of Razor query-string names to Application request property names. Prefer direct binding to the Application request and perform minimal, explicit translation at the Razor Page handler boundary when the established public URL contract must be preserved (for example, `PageNum` to `Page`, or `Status` to `PurchaseOrderStatus`).
+Do not introduce a custom model binder solely to translate a small number of Razor query-string names to Application request property names. Prefer direct binding to the Application request and perform minimal, explicit translation at the Razor Page handler boundary when the established public URL contract must be preserved (for example, `Status` to `PurchaseOrderStatus`).
 
 ### Paging request contract
 
-`PagedRequest.PageNum` is the canonical paging property for Application request objects used by paginated UI queries. `PagedQuery.Page` remains the infrastructure/query property. Application handlers translate `request.PageNum` to `PagedQuery.Page` at the Application boundary.
+`PagedRequest.PageNum` and the existing `PagedQuery.PageNum` are the paging properties used by the current shared request/query contracts. `PageNum` is also the canonical Razor/UI paging property and query parameter. Keep the Application Request -> `PagedQuery` boundary where the two types have distinct responsibilities.
 
 Razor Pages that bind an Application request directly must emit top-level query parameter names (`Search`, `FromDate`, `ToDate`, `PageNum`, `PageSize`, etc.) rather than `Request.*`. Do not introduce a custom model binder solely for this translation.
 

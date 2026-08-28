@@ -101,7 +101,7 @@ The Sprint 8 final save point has been established. No new feature work begins f
 
 ## Sprint 9 - ASP.NET Core Code Quality & Consistency
 
-**Status:** T03-T10 complete; T11 documentation synchronization
+**Status:** T03-T13 complete; final documentation and architecture validation
 
 Sprint 9 is a bounded consistency workstream rather than a feature-module release.
 
@@ -126,7 +126,7 @@ Verified conventions:
 
 Verification limitation:
 
-- Source-level verification is complete through T10.
+- Source-level verification is complete through T13.
 - The supplied environment has no `dotnet` CLI, so no successful Sprint 9 build or runtime/browser verification is claimed.
 - No automated test project/source is present in the repository.
 

@@ -113,7 +113,7 @@ Dynamic Capability-Based Authorization remains outside Sprint 9 scope and is not
 
 ## 8. Documentation Result
 
-T11 is complete. Current-state documentation now distinguishes:
+T11 was complete at the time of that synchronization. T13 performed the final Sprint 9 validation and supersedes T11 as the final documentation gate. The current-state documentation distinguishes:
 
 - released v1.5.0 Sprint 8 functionality
 - active Sprint 9 code-quality implementation
