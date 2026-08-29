@@ -1923,3 +1923,82 @@ The decision was validated during Sprint 8 P6 - Inventory Synchronization During
 ### Scope
 
 This decision applies to Purchase Order receiving and its inventory synchronization. It does not introduce or define the later Dynamic Capability-Based Authorization architecture or any unrelated Sprint 8 feature.
+
+
+---
+
+# DD-036 - Sprint 9 Razor/UI Paging Convention
+
+**Status:** Accepted and implemented
+
+## Context
+
+Sprint 9 identified multiple UI-facing page-number names across Razor Pages, including `Page`, `PageNum`, `page`, and `currentPage`.
+
+## Decision
+
+Use `PageNum` as the canonical Razor/UI paging property and query parameter.
+
+This convention applies to the UI/Razor boundary. It does not require renaming Application or repository paging properties when those names represent distinct responsibilities.
+
+## Rationale
+
+`Page` is also a meaningful Razor Page boundary concept. `PageNum` makes the paging value explicit and avoids ambiguity at the UI boundary.
+
+## Verification
+
+T09 statically verified the affected pagination links use `asp-route-PageNum`. T10 re-inspected the Purchase Order and reporting pagination state.
+
+---
+
+# DD-037 - Sprint 9 Request-Binding Boundary
+
+**Status:** Accepted and implemented
+
+## Context
+
+Several core list PageModels duplicated query state by binding an Application Request and also passing individual paging parameters.
+
+## Decision
+
+When an Application Request already represents the complete HTTP GET input, bind that request once and pass it directly to the Application handler.
+
+Do not normalize all PageModels to one binding mechanism. `[FromQuery]`, `[BindProperty]`, and direct handler parameters remain valid when they represent the actual Razor boundary.
+
+## Rationale
+
+This removes accidental duplication without collapsing meaningful HTTP -> Application -> Repository responsibilities.
+
+## Verification
+
+T05 consolidated the seven identified core list PageModels. T08 confirmed that Application Request -> `PagedQuery` mapping remains meaningful where the two types have distinct responsibilities.
+
+---
+
+# DD-038 - Sprint 9 Rule-of-Three for Consistency Refactoring
+
+**Status:** Accepted and implemented
+
+## Context
+
+Sprint 9 reviewed repeated request construction, repository signatures, projections, and Razor patterns for possible abstraction.
+
+## Decision
+
+Introduce a shared abstraction only when the repeated responsibility is genuinely the same, independently reusable, and supported by the Rule-of-Three or equivalent evidence of established reuse.
+
+## Rationale
+
+The project should reduce meaningful duplication without hiding architectural boundaries or adding abstractions solely to reduce line count.
+
+## Verified outcomes
+
+- Redundant inherited repository declarations were removed.
+- `PagedRequest` and `PagedQuery` were retained.
+- Application Request -> repository query mapping was retained.
+- Feature-specific report filters were retained.
+- No generic report request helper was introduced.
+- Direct Infrastructure DTO projections were retained.
+
+T06-T08 provide the source-level verification for these decisions.
+

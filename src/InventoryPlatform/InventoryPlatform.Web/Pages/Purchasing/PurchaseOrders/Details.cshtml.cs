@@ -47,6 +47,12 @@ public class DetailsModel : PageModel
     [BindProperty(SupportsGet = true)]
     public bool Descending { get; set; }
 
+    [BindProperty(SupportsGet = true)]
+    public int PageNum { get; set; } = 1;
+
+    [BindProperty(SupportsGet = true)]
+    public int PageSize { get; set; } = 10;
+
     public async Task<IActionResult> OnGetAsync(
         int id,
         CancellationToken cancellationToken)
@@ -99,7 +105,18 @@ public class DetailsModel : PageModel
 
         return RedirectToPage(
             "./Details",
-            new { id = result.Value.Id, search = Search, fromDate = FromDate, toDate = ToDate, status = Status, sortBy = SortBy, descending = Descending });
+            new
+            {
+                id = result.Value.Id,
+                Search,
+                FromDate,
+                ToDate,
+                Status,
+                SortBy,
+                Descending,
+                PageNum,
+                PageSize
+            });
     }
 
     public async Task<IActionResult> OnPostApproveAsync(
@@ -136,7 +153,18 @@ public class DetailsModel : PageModel
 
         return RedirectToPage(
             "./Details",
-            new { id = result.Value.Id, search = Search, fromDate = FromDate, toDate = ToDate, status = Status, sortBy = SortBy, descending = Descending });
+            new
+            {
+                id = result.Value.Id,
+                Search,
+                FromDate,
+                ToDate,
+                Status,
+                SortBy,
+                Descending,
+                PageNum,
+                PageSize
+            });
     }
 
     public async Task<IActionResult> OnPostReceiveAsync(
@@ -178,6 +206,17 @@ public class DetailsModel : PageModel
 
         return RedirectToPage(
             "./Details",
-            new { id = result.Value.PurchaseOrderId, search = Search, fromDate = FromDate, toDate = ToDate, status = Status, sortBy = SortBy, descending = Descending });
+            new
+            {
+                id = result.Value.PurchaseOrderId,
+                Search,
+                FromDate,
+                ToDate,
+                Status,
+                SortBy,
+                Descending,
+                PageNum,
+                PageSize
+            });
     }
 }

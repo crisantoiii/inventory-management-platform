@@ -32,7 +32,7 @@ public sealed class GetProductReportsHandler
     {
         var query = request.Query with
         {
-            Page = 1,
+            PageNum = 1,
             PageSize = int.MaxValue
         };
 

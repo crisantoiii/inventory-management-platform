@@ -21,6 +21,23 @@ The platform currently provides business modules for:
 
 Shared infrastructure such as paging, filtering, sorting, the Result pattern, and Identity service abstractions are reused consistently across modules while maintaining a clear separation of concerns.
 
+# Sprint 9 - Code Quality & Consistency
+
+Sprint 9 improves consistency across existing features without adding a new business capability.
+
+Verified implementation changes:
+
+- Purchase History and Supplier Purchase Analysis report forms use `asp-for`.
+- Purchase Order sorting and pagination use Razor `asp-route-*` navigation.
+- Seven core list PageModels bind complete Application Requests without duplicate paging parameters.
+- `PageNum` is the standard Razor/UI paging property and query parameter.
+- Seven list-page pagination links use `asp-route-PageNum`.
+- Purchase Order Details preserves list pagination and filter/sort context.
+- Redundant inherited repository interface declarations were removed.
+- Purchase Order Status options are rendered once and filter labels are associated with explicit control IDs.
+
+These changes preserve existing feature behavior and the established Razor -> Application -> Infrastructure boundaries. They do not represent new business features.
+
 # Architecture Validation
 
 The project completed **Architecture Sprint 1** after implementing the foundational modules.
@@ -1062,7 +1079,7 @@ During verification, an in-scope pagination regression was found: pagination lin
 
 No Dynamic Capability-Based Authorization implementation was introduced.
 
-D1, D2, D3, and D4 documentation tasks are complete. Sprint 8 is closed and released as v1.5.0. The next development activity is Next Sprint Planning.
+Sprint 8 is closed and released as v1.5.0. Sprint 9 code-quality and consistency work is the current development workstream.
 
 ### Purchase Order Pagination - P5
 

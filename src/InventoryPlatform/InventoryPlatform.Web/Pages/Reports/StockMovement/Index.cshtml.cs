@@ -39,7 +39,7 @@ public sealed class IndexModel : PageModel
     public TransactionType? TransactionType { get; set; }
 
     [BindProperty(SupportsGet = true)]
-    public int Page { get; set; } = 1;
+    public int PageNum { get; set; } = 1;
 
     [BindProperty(SupportsGet = true)]
     public int PageSize { get; set; } = 10;
@@ -55,8 +55,8 @@ public sealed class IndexModel : PageModel
     public async Task<IActionResult> OnGetAsync(
         CancellationToken cancellationToken)
     {
-        if (Page < 1)
-            Page = 1;
+        if (PageNum < 1)
+            PageNum = 1;
 
         if (PageSize < 1)
             PageSize = 10;
@@ -64,7 +64,7 @@ public sealed class IndexModel : PageModel
         var query = new PagedQuery
         {
             Search = Search,
-            Page = Page,
+            PageNum = PageNum,
             PageSize = PageSize,
             SortBy = SortBy,
             Descending = Descending
@@ -100,7 +100,7 @@ public sealed class IndexModel : PageModel
         var query = new PagedQuery
         {
             Search = search,
-            Page = 1,
+            PageNum = 1,
             PageSize = int.MaxValue,
             SortBy = sortBy,
             Descending = descending
@@ -132,7 +132,7 @@ public sealed class IndexModel : PageModel
         string? search, DateOnly? fromDate, DateOnly? toDate, TransactionType? transactionType,
         string? sortBy, bool descending = false, CancellationToken cancellationToken = default)
     {
-        var query = new PagedQuery { Search = search, Page = 1, PageSize = int.MaxValue, SortBy = sortBy, Descending = descending };
+        var query = new PagedQuery { Search = search, PageNum = 1, PageSize = int.MaxValue, SortBy = sortBy, Descending = descending };
         var request = new GetStockMovementRequest(query, fromDate, toDate, transactionType);
         var result = await _handler.HandleExportAsync(request, cancellationToken);
         if (result.IsFailure) return BadRequest();

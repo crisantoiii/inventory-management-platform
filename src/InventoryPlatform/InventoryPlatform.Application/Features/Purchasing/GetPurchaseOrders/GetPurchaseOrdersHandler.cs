@@ -20,7 +20,7 @@ public sealed class GetPurchaseOrdersHandler
     {
         var query = new PagedQuery
         {
-            Page = request.Page,
+            PageNum = request.PageNum,
             PageSize = request.PageSize,
             Search = request.Search,
             SortBy = request.SortBy,
@@ -28,7 +28,7 @@ public sealed class GetPurchaseOrdersHandler
         };
 
         var purchaseOrders = await _purchaseOrderRepository
-            .GetPurchaseOrdersAsync(
+            .GetPagedAsync(
                 query,
                 request.FromDate,
                 request.ToDate,

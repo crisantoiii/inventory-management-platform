@@ -21,7 +21,7 @@ public sealed class GetPurchaseHistoryHandler
     {
         var query = new PagedQuery
         {
-            Page = request.Page,
+            PageNum = request.PageNum,
             PageSize = request.PageSize,
             Search = request.Search,
             SortBy = request.SortBy,
@@ -44,7 +44,7 @@ public sealed class GetPurchaseHistoryHandler
     {
         var query = new PagedQuery
         {
-            Page = 1,
+            PageNum = 1,
             PageSize = int.MaxValue,
             Search = request.Search,
             SortBy = request.SortBy,

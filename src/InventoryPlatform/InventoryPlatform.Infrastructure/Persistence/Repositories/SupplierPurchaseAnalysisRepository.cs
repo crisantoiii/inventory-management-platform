@@ -102,7 +102,7 @@ public sealed class SupplierPurchaseAnalysisRepository
             query);
 
         var rows = await orderedQuery
-            .Skip((query.Page - 1) * query.PageSize)
+            .Skip((query.PageNum - 1) * query.PageSize)
             .Take(query.PageSize)
             .ToListAsync(cancellationToken);
 
@@ -122,7 +122,7 @@ public sealed class SupplierPurchaseAnalysisRepository
         return new PagedResult<SupplierPurchaseAnalysisDto>
         {
             Items = items,
-            Page = query.Page,
+            Page = query.PageNum,
             PageSize = query.PageSize,
             TotalCount = totalCount
         };

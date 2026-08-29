@@ -36,7 +36,7 @@ public sealed class GetStockMovementHandler
     {
         var query = request.Query with
         {
-            Page = 1,
+            PageNum = 1,
             PageSize = int.MaxValue
         };
 

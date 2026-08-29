@@ -183,3 +183,55 @@ The current architecture is suitable for continued expansion into:
 - Additional account security capabilities
 
 while preserving the existing Clean Architecture, Vertical Slice Architecture, Rich Domain Model, repository, Identity abstraction, and Application handler patterns.
+
+
+---
+
+# Sprint 9 Architecture Review Update
+
+**Date:** 2026-08-27  
+**Status:** Complete - source-level validation
+
+Sprint 9 revalidated the existing architecture against the T03-T10 consistency changes.
+
+## Findings
+
+- Razor form normalization remained within the Presentation layer.
+- `asp-route-*` navigation changes remained within the Razor navigation boundary.
+- Application Request binding consolidation removed accidental HTTP-boundary duplication without collapsing Application or repository responsibilities.
+- `PagedRequest` -> `PagedQuery` mapping remains a meaningful boundary where the types serve different responsibilities.
+- Repository-specific report filters remain feature-specific responsibilities rather than duplicate paging/query fields.
+- Direct DTO projection remains an established Infrastructure read-model pattern.
+- The Rule-of-Three did not justify a generic report request helper or broad abstraction.
+- Redundant inherited repository declarations were removed without changing repository responsibilities.
+- No structural architectural redesign was introduced.
+
+## Verification limitation
+
+The supplied environment does not contain the `dotnet` CLI, and no automated test project/source is present. The Sprint 9 architecture review therefore claims source-level validation only and does not claim a successful build or runtime/browser verification.
+
+---
+
+# Sprint 9 T13 Final Documentation & Architecture Validation
+
+**Date:** 2026-08-28  
+**Status:** Complete - source/documentation validation
+
+T13 performed the final Sprint 9 consistency gate against the governing README, the current repository source, and the T03-T12 documentation/verification records available in the supplied repository snapshot.
+
+## Final validation result
+
+- Sprint 8 is consistently documented as closed and released as `v1.5.0`.
+- Sprint 9 remains limited to ASP.NET Core/Razor code-quality and consistency work; no new business capability is documented as part of Sprint 9.
+- `PageNum` is consistently represented in the current shared `PagedRequest`, `PagedQuery`, and Razor/UI paging implementations.
+- Dynamic Capability-Based Authorization is outside Sprint 9 and is not present as a dynamic capability implementation in the inspected source. Existing static authorization policies remain separate.
+- The reviewed implementation preserves the existing Clean Architecture and feature-first project boundaries.
+- Rule-of-Three decisions remain documented; deferred candidates are not represented as completed work.
+- Verification claims remain source-level only for Sprint 9 because the supplied environment does not contain the `dotnet` CLI/runtime and no automated test project/source is present.
+- No evidence of unrelated business capability or structural architectural redesign was identified in the reviewed source/documentation scope.
+
+## Documentation correction
+
+One actual documentation inconsistency was corrected during T13: `CODE_STYLE.md` incorrectly described `PagedQuery.Page` as the infrastructure paging property, while the current source defines `PagedQuery.PageNum`. The guidance now reflects the source-backed `PageNum` contract without collapsing the distinct Application Request -> `PagedQuery` responsibility boundary.
+
+Sprint 9 is complete at the source/documentation level, with the runtime verification limitation explicitly retained.

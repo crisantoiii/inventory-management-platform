@@ -71,7 +71,7 @@ public sealed class PurchaseHistoryRepository : IPurchaseHistoryRepository
             query);
 
         var items = await orderedQuery
-            .Skip((query.Page - 1) * query.PageSize)
+            .Skip((query.PageNum - 1) * query.PageSize)
             .Take(query.PageSize)
             .Select(po => new PurchaseHistoryDto(
                 po.Id,
@@ -91,7 +91,7 @@ public sealed class PurchaseHistoryRepository : IPurchaseHistoryRepository
         return new PagedResult<PurchaseHistoryDto>
         {
             Items = items,
-            Page = query.Page,
+            Page = query.PageNum,
             PageSize = query.PageSize,
             TotalCount = totalCount
         };

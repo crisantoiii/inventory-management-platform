@@ -31,7 +31,7 @@ public sealed class PurchaseOrderRepository
                 cancellationToken);
     }
 
-    public async Task<PagedResult<PurchaseOrder>> GetPurchaseOrdersAsync(
+    public async Task<PagedResult<PurchaseOrder>> GetPagedAsync(
         PagedQuery query,
         DateOnly? fromDate = null,
         DateOnly? toDate = null,
@@ -86,14 +86,14 @@ public sealed class PurchaseOrderRepository
             query);
 
         var items = await orderedQuery
-            .Skip((query.Page - 1) * query.PageSize)
+            .Skip((query.PageNum - 1) * query.PageSize)
             .Take(query.PageSize)
             .ToListAsync(cancellationToken);
 
         return new PagedResult<PurchaseOrder>
         {
             Items = items,
-            Page = query.Page,
+            Page = query.PageNum,
             PageSize = query.PageSize,
             TotalCount = totalCount
         };

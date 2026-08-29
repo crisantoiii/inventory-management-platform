@@ -87,7 +87,7 @@ else
                        asp-route-Descending="@(Model.Filter.SortBy == UnitSortFields.Code && !Model.Filter.Descending)"
                        asp-route-Search="@Model.Filter.Search"
                        asp-route-Status="@Model.Filter.Status"
-                       asp-route-Page="1">
+                       asp-route-PageNum="1">
                         Description
                     </a>
                 </th>
@@ -97,7 +97,7 @@ else
                        asp-route-Descending="@(Model.Filter.SortBy == UnitSortFields.Name && !Model.Filter.Descending)"
                        asp-route-Search="@Model.Filter.Search"
                        asp-route-Status="@Model.Filter.Status"
-                       asp-route-Page="1">
+                       asp-route-PageNum="1">
                         Name
                     </a>
                 </th>
@@ -107,7 +107,7 @@ else
                        asp-route-Descending="@(Model.Filter.SortBy == UnitSortFields.Symbol && !Model.Filter.Descending)"
                        asp-route-Search="@Model.Filter.Search"
                        asp-route-Status="@Model.Filter.Status"
-                       asp-route-Page="1">
+                       asp-route-PageNum="1">
                         Description
                     </a>
                 </th>
@@ -117,7 +117,7 @@ else
                        asp-route-Descending="@(Model.Filter.SortBy == UnitSortFields.IsActive && !Model.Filter.Descending)"
                        asp-route-Search="@Model.Filter.Search"
                        asp-route-Status="@Model.Filter.Status"
-                       asp-route-Page="1">
+                       asp-route-PageNum="1">
                         Status
                     </a>
                 </th>
@@ -145,7 +145,7 @@ else
 
                             <a asp-page="Details"
                                asp-route-id="@unit.Id"
-                               asp-route-Page="@Model.Filter.Page"
+                               asp-route-PageNum="@Model.Filter.PageNum"
                                asp-route-Search="@Model.Filter.Search"
                                asp-route-Status="@Model.Filter.Status"
                                asp-route-SortBy="@Model.Filter.SortBy"
@@ -202,7 +202,12 @@ else
                 <li class="page-item">
 
                     <a class="page-link"
-                       href="?Page=@(Model.Units.Page - 1)&Search=@Model.Filter.Search&Status=@Model.Filter.Status&SortBy=@Model.Filter.SortBy&Descending=@Model.Filter.Descending">
+                       asp-page="./Index"
+                       asp-route-PageNum="@(Model.Units.Page - 1)"
+                       asp-route-Search="@Model.Filter.Search"
+                       asp-route-Status="@Model.Filter.Status"
+                       asp-route-SortBy="@Model.Filter.SortBy"
+                       asp-route-Descending="@Model.Filter.Descending">
                         Previous
                     </a>
 
@@ -213,7 +218,12 @@ else
             {
                 <li class="page-item @(i == Model.Units.Page ? "active" : "")">
                     <a class="page-link"
-                       href="?Page=@i&Search=@Model.Filter.Search&Status=@Model.Filter.Status&SortBy=@Model.Filter.SortBy&Descending=@Model.Filter.Descending">
+                       asp-page="./Index"
+                       asp-route-PageNum="@i"
+                       asp-route-Search="@Model.Filter.Search"
+                       asp-route-Status="@Model.Filter.Status"
+                       asp-route-SortBy="@Model.Filter.SortBy"
+                       asp-route-Descending="@Model.Filter.Descending">
                         @i
                     </a>
 
@@ -225,7 +235,12 @@ else
                 <li class="page-item">
 
                     <a class="page-link"
-                       href="?Page=@(Model.Units.Page + 1)&Search=@Model.Filter.Search&Status=@Model.Filter.Status&SortBy=@Model.Filter.SortBy&Descending=@Model.Filter.Descending">
+                       asp-page="./Index"
+                       asp-route-PageNum="@(Model.Units.Page + 1)"
+                       asp-route-Search="@Model.Filter.Search"
+                       asp-route-Status="@Model.Filter.Status"
+                       asp-route-SortBy="@Model.Filter.SortBy"
+                       asp-route-Descending="@Model.Filter.Descending">
                         Next
                     </a>
 

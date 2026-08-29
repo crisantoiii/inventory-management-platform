@@ -17,12 +17,14 @@
         </div>
 
         <a asp-page="./Index"
-           asp-route-search="@Model.Search"
-           asp-route-fromDate="@Model.FromDate"
-           asp-route-toDate="@Model.ToDate"
-           asp-route-status="@Model.Status"
-           asp-route-sortBy="@Model.SortBy"
-           asp-route-descending="@Model.Descending"
+           asp-route-Search="@Model.Search"
+           asp-route-FromDate="@Model.FromDate?.ToString("yyyy-MM-dd")"
+           asp-route-ToDate="@Model.ToDate?.ToString("yyyy-MM-dd")"
+           asp-route-Status="@Model.Status"
+           asp-route-SortBy="@Model.SortBy"
+           asp-route-Descending="@Model.Descending"
+           asp-route-PageNum="@Model.PageNum"
+           asp-route-PageSize="@Model.PageSize"
            class="btn btn-outline-secondary">
             Back to Purchase Orders
         </a>
@@ -45,6 +47,8 @@
                         <input type="hidden" name="Status" value="@Model.Status" />
                         <input type="hidden" name="SortBy" value="@Model.SortBy" />
                         <input type="hidden" name="Descending" value="@Model.Descending" />
+                        <input type="hidden" name="PageNum" value="@Model.PageNum" />
+                        <input type="hidden" name="PageSize" value="@Model.PageSize" />
                         <button type="submit" class="btn btn-primary">
                             Submit Purchase Order
                         </button>
@@ -61,6 +65,8 @@
                         <input type="hidden" name="Status" value="@Model.Status" />
                         <input type="hidden" name="SortBy" value="@Model.SortBy" />
                         <input type="hidden" name="Descending" value="@Model.Descending" />
+                        <input type="hidden" name="PageNum" value="@Model.PageNum" />
+                        <input type="hidden" name="PageSize" value="@Model.PageSize" />
                         <button type="submit" class="btn btn-primary">
                             Approve Purchase Order
                         </button>
@@ -241,6 +247,12 @@
                                                     <input type="hidden"
                                                            name="Descending"
                                                            value="@Model.Descending" />
+                                                    <input type="hidden"
+                                                           name="PageNum"
+                                                           value="@Model.PageNum" />
+                                                    <input type="hidden"
+                                                           name="PageSize"
+                                                           value="@Model.PageSize" />
 
                                                     <input type="hidden"
                                                            name="productId"

@@ -57,7 +57,7 @@
                         <th>
                             <a asp-page="./Index"
                                asp-route-Search="@Model.Search"
-                               asp-route-Page="1"
+                               asp-route-PageNum="1"
                                asp-route-PageSize="@Model.PageSize"
                                asp-route-SortBy="@LowStockSortFields.ProductName"
                                asp-route-Descending="@(Model.SortBy == LowStockSortFields.ProductName && !Model.Descending)">
@@ -68,7 +68,7 @@
                         <th>
                             <a asp-page="./Index"
                                asp-route-Search="@Model.Search"
-                               asp-route-Page="1"
+                               asp-route-PageNum="1"
                                asp-route-PageSize="@Model.PageSize"
                                asp-route-SortBy="@LowStockSortFields.ProductSku"
                                asp-route-Descending="@(Model.SortBy == LowStockSortFields.ProductSku && !Model.Descending)">
@@ -81,7 +81,7 @@
                         <th>
                             <a asp-page="./Index"
                                asp-route-Search="@Model.Search"
-                               asp-route-Page="1"
+                               asp-route-PageNum="1"
                                asp-route-PageSize="@Model.PageSize"
                                asp-route-SortBy="@LowStockSortFields.QuantityOnHand"
                                asp-route-Descending="@(Model.SortBy == LowStockSortFields.QuantityOnHand && !Model.Descending)">

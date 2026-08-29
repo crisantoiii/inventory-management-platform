@@ -1,5 +1,6 @@
 ﻿@page
 @model InventoryPlatform.Web.Pages.Reports.PurchaseHistory.IndexModel
+@using InventoryPlatform.Domain.Enums
 
 @{
     ViewData["Title"] = "Purchase History";
@@ -15,23 +16,23 @@
         </div>
 
         <a asp-page-handler="ExportToExcel"
-           asp-route-search="@Model.Search"
-           asp-route-fromDate="@Model.FromDate?.ToString("yyyy-MM-dd")"
-           asp-route-toDate="@Model.ToDate?.ToString("yyyy-MM-dd")"
-           asp-route-status="@Model.Status"
-           asp-route-sortBy="@Model.SortBy"
-           asp-route-descending="@Model.Descending"
+           asp-route-Search="@Model.Search"
+           asp-route-FromDate="@Model.FromDate?.ToString("yyyy-MM-dd")"
+           asp-route-ToDate="@Model.ToDate?.ToString("yyyy-MM-dd")"
+           asp-route-Status="@Model.Status"
+           asp-route-SortBy="@Model.SortBy"
+           asp-route-Descending="@Model.Descending"
            class="btn btn-outline-success">
             Export to Excel
         </a>
 
         <a asp-page-handler="ExportToPdf"
-           asp-route-search="@Model.Search"
-           asp-route-fromDate="@Model.FromDate?.ToString("yyyy-MM-dd")"
-           asp-route-toDate="@Model.ToDate?.ToString("yyyy-MM-dd")"
-           asp-route-status="@Model.Status"
-           asp-route-sortBy="@Model.SortBy"
-           asp-route-descending="@Model.Descending"
+           asp-route-Search="@Model.Search"
+           asp-route-FromDate="@Model.FromDate?.ToString("yyyy-MM-dd")"
+           asp-route-ToDate="@Model.ToDate?.ToString("yyyy-MM-dd")"
+           asp-route-Status="@Model.Status"
+           asp-route-SortBy="@Model.SortBy"
+           asp-route-Descending="@Model.Descending"
            class="btn btn-outline-danger">
             Export to PDF
         </a>
@@ -42,60 +43,49 @@
             <div class="row g-3">
 
                 <div class="col-md-4">
-                    <label for="search" class="form-label">
+                    <label asp-for="Search" class="form-label">
                         Search
                     </label>
 
-                    <input type="text"
-                           id="search"
-                           name="search"
-                           value="@Model.Search"
+                    <input asp-for="Search"
                            class="form-control"
                            placeholder="PO ID or supplier" />
                 </div>
 
                 <div class="col-md-2">
-                    <label for="fromDate" class="form-label">
+                    <label asp-for="FromDate" class="form-label">
                         From Date
                     </label>
 
-                    <input type="date"
-                           id="fromDate"
-                           name="fromDate"
-                           value="@Model.FromDate?.ToString("yyyy-MM-dd")"
+                    <input asp-for="FromDate"
+                           asp-format="{0:yyyy-MM-dd}"
+                           type="date"
                            class="form-control" />
                 </div>
 
                 <div class="col-md-2">
-                    <label for="toDate" class="form-label">
+                    <label asp-for="ToDate" class="form-label">
                         To Date
                     </label>
 
-                    <input type="date"
-                           id="toDate"
-                           name="toDate"
-                           value="@Model.ToDate?.ToString("yyyy-MM-dd")"
+                    <input asp-for="ToDate"
+                           asp-format="{0:yyyy-MM-dd}"
+                           type="date"
                            class="form-control" />
                 </div>
 
                 <div class="col-md-2">
-                    <label for="status" class="form-label">
+                    <label asp-for="Status" class="form-label">
                         Status
                     </label>
 
-                    <select id="status"
-                            name="status"
+                    <select asp-for="Status"
                             class="form-select">
-
                         <option value="">All</option>
 
-                        @foreach (var status in Enum.GetValues<
-                            InventoryPlatform.Domain.Enums.PurchaseOrderStatus>())
+                        @foreach (var status in Enum.GetValues<PurchaseOrderStatus>())
                         {
-                            <option value="@status"
-                                    selected="@(Model.Status == status.ToString())">
-                                @status
-                            </option>
+                            <option value="@status">@status</option>
                         }
                     </select>
                 </div>
@@ -151,14 +141,14 @@
 
                                 <th>
                                     <a asp-page="./Index"
-                                       asp-route-search="@Model.Search"
-                                       asp-route-fromDate="@Model.FromDate?.ToString("yyyy-MM-dd")"
-                                       asp-route-toDate="@Model.ToDate?.ToString("yyyy-MM-dd")"
-                                       asp-route-status="@Model.Status"
-                                       asp-route-sortBy="Supplier"
-                                       asp-route-descending="@(Model.SortBy == "Supplier" ? !Model.Descending : false)"
-                                       asp-route-page="1"
-                                       asp-route-pageSize="@(Model.Result?.PageSize ?? 10)"
+                                       asp-route-Search="@Model.Search"
+                                       asp-route-FromDate="@Model.FromDate?.ToString("yyyy-MM-dd")"
+                                       asp-route-ToDate="@Model.ToDate?.ToString("yyyy-MM-dd")"
+                                       asp-route-Status="@Model.Status"
+                                       asp-route-SortBy="Supplier"
+                                       asp-route-Descending="@(Model.SortBy == "Supplier" ? !Model.Descending : false)"
+                                       asp-route-PageNum="1"
+                                       asp-route-PageSize="@(Model.Result?.PageSize ?? 10)"
                                        class="text-decoration-none">
                                         Supplier
 
@@ -171,14 +161,14 @@
 
                                 <th>
                                     <a asp-page="./Index"
-                                       asp-route-search="@Model.Search"
-                                       asp-route-fromDate="@Model.FromDate?.ToString("yyyy-MM-dd")"
-                                       asp-route-toDate="@Model.ToDate?.ToString("yyyy-MM-dd")"
-                                       asp-route-status="@Model.Status"
-                                       asp-route-sortBy="OrderDate"
-                                       asp-route-descending="@(Model.SortBy == "OrderDate" ? !Model.Descending : false)"
-                                       asp-route-page="1"
-                                       asp-route-pageSize="@(Model.Result?.PageSize ?? 10)"
+                                       asp-route-Search="@Model.Search"
+                                       asp-route-FromDate="@Model.FromDate?.ToString("yyyy-MM-dd")"
+                                       asp-route-ToDate="@Model.ToDate?.ToString("yyyy-MM-dd")"
+                                       asp-route-Status="@Model.Status"
+                                       asp-route-SortBy="OrderDate"
+                                       asp-route-Descending="@(Model.SortBy == "OrderDate" ? !Model.Descending : false)"
+                                       asp-route-PageNum="1"
+                                       asp-route-PageSize="@(Model.Result?.PageSize ?? 10)"
                                        class="text-decoration-none">
                                         Order Date
 
@@ -191,14 +181,14 @@
 
                                 <th>
                                     <a asp-page="./Index"
-                                       asp-route-search="@Model.Search"
-                                       asp-route-fromDate="@Model.FromDate?.ToString("yyyy-MM-dd")"
-                                       asp-route-toDate="@Model.ToDate?.ToString("yyyy-MM-dd")"
-                                       asp-route-status="@Model.Status"
-                                       asp-route-sortBy="Status"
-                                       asp-route-descending="@(Model.SortBy == "Status" ? !Model.Descending : false)"
-                                       asp-route-page="1"
-                                       asp-route-pageSize="@(Model.Result?.PageSize ?? 10)"
+                                       asp-route-Search="@Model.Search"
+                                       asp-route-FromDate="@Model.FromDate?.ToString("yyyy-MM-dd")"
+                                       asp-route-ToDate="@Model.ToDate?.ToString("yyyy-MM-dd")"
+                                       asp-route-Status="@Model.Status"
+                                       asp-route-SortBy="Status"
+                                       asp-route-Descending="@(Model.SortBy == "Status" ? !Model.Descending : false)"
+                                       asp-route-PageNum="1"
+                                       asp-route-PageSize="@(Model.Result?.PageSize ?? 10)"
                                        class="text-decoration-none">
                                         Status
 
@@ -211,14 +201,14 @@
 
                                 <th class="text-end">
                                     <a asp-page="./Index"
-                                       asp-route-search="@Model.Search"
-                                       asp-route-fromDate="@Model.FromDate?.ToString("yyyy-MM-dd")"
-                                       asp-route-toDate="@Model.ToDate?.ToString("yyyy-MM-dd")"
-                                       asp-route-status="@Model.Status"
-                                       asp-route-sortBy="TotalAmount"
-                                       asp-route-descending="@(Model.SortBy == "TotalAmount" ? !Model.Descending : false)"
-                                       asp-route-page="1"
-                                       asp-route-pageSize="@(Model.Result?.PageSize ?? 10)"
+                                       asp-route-Search="@Model.Search"
+                                       asp-route-FromDate="@Model.FromDate?.ToString("yyyy-MM-dd")"
+                                       asp-route-ToDate="@Model.ToDate?.ToString("yyyy-MM-dd")"
+                                       asp-route-Status="@Model.Status"
+                                       asp-route-SortBy="TotalAmount"
+                                       asp-route-Descending="@(Model.SortBy == "TotalAmount" ? !Model.Descending : false)"
+                                       asp-route-PageNum="1"
+                                       asp-route-PageSize="@(Model.Result?.PageSize ?? 10)"
                                        class="text-decoration-none">
                                         Total Amount
 
@@ -287,14 +277,14 @@
                         @if (Model.Result.HasPreviousPage)
                         {
                             <a asp-page="./Index"
-                               asp-route-search="@Model.Search"
-                               asp-route-fromDate="@Model.FromDate?.ToString("yyyy-MM-dd")"
-                               asp-route-toDate="@Model.ToDate?.ToString("yyyy-MM-dd")"
-                               asp-route-status="@Model.Status"
-                               asp-route-sortBy="@Model.SortBy"
-                               asp-route-descending="@Model.Descending"
-                               asp-route-page="@(Model.Result.Page - 1)"
-                               asp-route-pageSize="@Model.Result.PageSize"
+                               asp-route-Search="@Model.Search"
+                               asp-route-FromDate="@Model.FromDate?.ToString("yyyy-MM-dd")"
+                               asp-route-ToDate="@Model.ToDate?.ToString("yyyy-MM-dd")"
+                               asp-route-Status="@Model.Status"
+                               asp-route-SortBy="@Model.SortBy"
+                               asp-route-Descending="@Model.Descending"
+                               asp-route-PageNum="@(Model.Result.Page - 1)"
+                               asp-route-PageSize="@Model.Result.PageSize"
                                class="btn btn-outline-secondary">
                                 Previous
                             </a>
@@ -303,14 +293,14 @@
                         @if (Model.Result.HasNextPage)
                         {
                             <a asp-page="./Index"
-                               asp-route-search="@Model.Search"
-                               asp-route-fromDate="@Model.FromDate?.ToString("yyyy-MM-dd")"
-                               asp-route-toDate="@Model.ToDate?.ToString("yyyy-MM-dd")"
-                               asp-route-status="@Model.Status"
-                               asp-route-sortBy="@Model.SortBy"
-                               asp-route-descending="@Model.Descending"
-                               asp-route-page="@(Model.Result.Page + 1)"
-                               asp-route-pageSize="@Model.Result.PageSize"
+                               asp-route-Search="@Model.Search"
+                               asp-route-FromDate="@Model.FromDate?.ToString("yyyy-MM-dd")"
+                               asp-route-ToDate="@Model.ToDate?.ToString("yyyy-MM-dd")"
+                               asp-route-Status="@Model.Status"
+                               asp-route-SortBy="@Model.SortBy"
+                               asp-route-Descending="@Model.Descending"
+                               asp-route-PageNum="@(Model.Result.Page + 1)"
+                               asp-route-PageSize="@Model.Result.PageSize"
                                class="btn btn-outline-secondary">
                                 Next
                             </a>

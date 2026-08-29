@@ -26,50 +26,8 @@ public class IndexModel : PageModel
             TotalCount = 0
         };
 
-    [BindProperty(SupportsGet = true)]
-    public string Search { get; set; } = string.Empty;
-
-    [BindProperty(SupportsGet = true)]
-    public DateOnly? FromDate { get; set; }
-
-    [BindProperty(SupportsGet = true)]
-    public DateOnly? ToDate { get; set; }
-
-    [BindProperty(SupportsGet = true)]
-    public PurchaseOrderStatus? Status { get; set; }
-
-    [BindProperty(SupportsGet = true)]
-    public string? SortBy { get; set; }
-
-    [BindProperty(SupportsGet = true)]
-    public bool Descending { get; set; }
-
-    [BindProperty(SupportsGet = true)]
-    public int PageNum { get; set; } = 1;
-
-    [BindProperty(SupportsGet = true)]
-    public int PageSize { get; set; } = 10;
-
-    public string GetSortUrl(string sortBy)
-    {
-        var descending = string.Equals(SortBy, sortBy, StringComparison.OrdinalIgnoreCase)
-            ? !Descending
-            : false;
-
-        return Url.Page(
-            "./Index",
-            values: new
-            {
-                Search,
-                FromDate,
-                ToDate,
-                Status,
-                SortBy = sortBy,
-                Descending = descending,
-                Page = 1,
-                PageSize
-            }) ?? string.Empty;
-    }
+    [BindProperty(SupportsGet = true, Name = "")]
+    public GetPurchaseOrdersRequest Request { get; set; } = new();
 
     public static class SortFields
     {
@@ -92,38 +50,17 @@ public class IndexModel : PageModel
             new("Cancelled", nameof(PurchaseOrderStatus.Cancelled))
         };
 
-    public string GetPageUrl(int page)
-    {
-        return Url.Page(
-            "./Index",
-            values: new
-            {
-                Search,
-                FromDate,
-                ToDate,
-                Status,
-                SortBy,
-                Descending,
-                Page = page,
-                PageSize
-            }) ?? string.Empty;
-    }
-
     public async Task<IActionResult> OnGetAsync(
-        CancellationToken cancellationToken)
+        [FromQuery(Name = "Status")] PurchaseOrderStatus? status = null,
+        CancellationToken cancellationToken = default)
     {
+        Request = Request with
+        {
+            PurchaseOrderStatus = status
+        };
+
         var result = await _handler.HandleAsync(
-            new GetPurchaseOrdersRequest
-            {
-                Search = Search,
-                FromDate = FromDate,
-                ToDate = ToDate,
-                PurchaseOrderStatus = Status,
-                SortBy = SortBy,
-                Descending = Descending,
-                Page = PageNum,
-                PageSize = PageSize
-            },
+            Request,
             cancellationToken);
 
         if (result.IsFailure)

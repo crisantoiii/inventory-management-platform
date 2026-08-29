@@ -30,6 +30,30 @@ Sprint 8 Purchasing Enhancements P0-P7, D1 Documentation Synchronization, D2 Des
 
 The next development activity is a separate Next Sprint Planning process. Dynamic Capability-Based Authorization remains the next locked priority. No implementation work begins automatically from this closure.
 
+# Sprint 9 - T05 Request Binding Consolidation
+
+## Summary
+
+Consolidated accidental HTTP-boundary duplication in list PageModels where an existing Application Request already represented the complete query-bound use-case input.
+
+The affected list pages now bind the Application Request once and pass it directly to the Application handler. Separate `PageNum` handler parameters were removed where they duplicated the same query value already represented by the request model.
+
+The change preserves the established distinction between:
+
+```text
+Razor/UI request binding
+        ↓
+Application Request
+        ↓
+Repository/query representation
+```
+
+No blanket `[FromQuery]` or `[BindProperty]` normalization was introduced, and reporting request shapes were not collapsed merely for similarity.
+
+## Outcome
+
+The request-binding convention is now documented: when a PageModel already has a complete bindable Application Request, the request should be the single representation of that HTTP query state. Separate parameters remain appropriate when they represent a distinct HTTP contract or an intentional external-name-to-Application mapping.
+
 # Milestone Timeline
 
 | Milestone | Focus |
@@ -3126,3 +3150,128 @@ Sprint 8 Purchasing Enhancements P0-P7, D1 Documentation Synchronization, D2 Des
 The next development activity is a separate Sprint Planning process. Dynamic Capability-Based Authorization remains the next locked priority, but no implementation work begins automatically from this closure.
 
 Historical Sprint 8 planning and task records remain preserved as historical records and are not rewritten to remove their original sequencing.
+## Sprint 9 - T06 Application Request Redundancy Review
+
+Reviewed Application Request/Response/Handler patterns and the known repository redundancy candidate against the current source. Removed the duplicate `AddAsync` declaration from `IInventoryTransactionRepository` because the method is already inherited from `IRepository<InventoryTransaction>`.
+
+Reviewed T05 request construction findings. Purchase History and Supplier Purchase Analysis retain separate Application Request types because they represent distinct use-case contracts. `PagedRequest -> PagedQuery` mapping also remains because the Application request and repository query serve distinct responsibilities. Repeated report PageModel request construction was reviewed but no helper was introduced because the evidence did not justify a new shared abstraction under the Rule-of-Three.
+
+
+
+## Sprint 9 - T08 Cross-Layer Architecture & Redundancy Validation
+
+**Date:** 2026-08-26  
+**Status:** Complete
+
+T08 validated the T03-T07 changes across Domain, Application, Infrastructure, Web, and Shared against the Sprint 9 Rule-of-Three and Clean Architecture boundaries. One concrete redundancy was found: `IInventoryTransactionRepository` redeclared `GetByIdAsync(...)` even though it is inherited from `IRepository<InventoryTransaction>`. The duplicate declaration was removed without changing repository behavior.
+
+The review confirmed that `PagedRequest` -> `PagedQuery` mapping and feature-specific report filters remain meaningful architectural boundaries and should not be collapsed. No additional refactoring scope was justified.
+
+The source was inspected after the correction. A fresh build was not performed because the execution environment does not contain the `dotnet` CLI.
+
+
+## 2026-08-26 - T09 Build & Automated Regression Verification
+
+T09 performed the Sprint 9 automated verification pass against the current repository source.
+
+### Findings
+
+No automated test project/source exists in the repository. The solution build could not be executed because the available verification environment does not contain the `dotnet` CLI.
+
+Static inspection identified a concrete Sprint 9 regression: seven Razor list pages still generated pagination URLs using `?Page=...` while the canonical Application paging property is `PageNum`.
+
+### Correction
+
+Pagination links in the following pages were changed to Razor route tag helpers:
+
+- Products
+- Categories
+- Suppliers
+- Customers
+- Units
+- Inventory Transactions
+- Administrator Users
+
+The links now use `asp-route-PageNum` and preserve Search, Status, SortBy, and Descending route state.
+
+### Verification
+
+Static source verification confirms the affected pagination links no longer use the manual `?Page=...` pattern. No successful build, automated test, browser test, runtime binding/query/export test, or authentication/authorization smoke test is claimed because the required runtime tooling was unavailable.
+
+### Commit messages
+
+Code: `fix: resolve sprint 9 regression defects`
+
+Docs: `docs: record sprint 9 automated verification results`
+
+
+---
+
+# Sprint 9 - T11 Documentation Synchronization
+
+**Date:** 2026-08-27  
+**Status:** Complete
+
+T11 synchronized the current-state documentation against the supplied repository/source ZIP and the verified T03-T10 Sprint 9 records.
+
+## Documentation synchronized
+
+- `README.md`
+- `PROJECT_STATUS.md`
+- `ROADMAP.md`
+- `CHANGELOG.md`
+- `ARCHITECTURE.md`
+- `docs/FEATURES.md`
+- `docs/DESIGN_DECISIONS.md`
+- `docs/ENGINEERING_JOURNAL.md`
+- `docs/ARCHITECTURE_REVIEW.md`
+- Sprint 9 retrospective/verification records
+
+## Verified implementation recorded
+
+The documentation now records only the Sprint 9 changes present in the source:
+
+- Razor `asp-for` normalization for two reporting filter forms.
+- Purchase Order `asp-route-*` sorting/pagination navigation.
+- Application Request binding consolidation on seven list PageModels.
+- Removal of redundant inherited `AddAsync(...)` and `GetByIdAsync(...)` repository interface declarations.
+- Seven `asp-route-PageNum` pagination corrections.
+- Purchase Order Details pagination/filter/sort state preservation.
+- Purchase Order Status option de-duplication and explicit filter control IDs.
+
+## Verified conventions recorded
+
+- `PageNum` is the canonical Razor/UI paging property and query parameter.
+- `asp-for` is preferred for appropriate Razor form binding and labels.
+- `asp-route-*` is preferred for direct Razor navigation/query state.
+- Meaningful HTTP Request -> Application Request -> Repository Query boundaries remain valid.
+- Rule-of-Three governs new reusable abstractions.
+- Direct DTO projections and feature-specific report filters remain valid where they have distinct responsibilities.
+
+## Verification result
+
+Source-level verification is complete through T10/T11. The repository contains no automated test project/source, and the available environment does not contain the `dotnet` CLI. Therefore the synchronized documentation makes no successful build, runtime, or browser claim for Sprint 9.
+
+T10 remains the recorded browser/manual verification boundary: source-level verification was completed, but runtime/browser verification was blocked by the environment.
+
+## Scope result
+
+No unrelated business capability or structural architectural redesign was identified in the reviewed Sprint 9 implementation. Dynamic Capability-Based Authorization remains outside Sprint 9 scope and is not implemented.
+
+---
+
+# Sprint 9 - T13 Final Documentation & Architecture Validation
+
+**Date:** 2026-08-28
+
+T13 performed the final Sprint 9 consistency gate against the governing Sprint 9 README, the supplied current repository/source snapshot, and the available T03-T12 documentation and verification records.
+
+The final review confirmed that Sprint 8 remains closed at `v1.5.0`, Sprint 9 remains bounded to code-quality and consistency work, and Dynamic Capability-Based Authorization remains deferred to Sprint 10.
+
+The source confirms `PageNum` is used by the current shared `PagedRequest` and `PagedQuery` contracts and by the Razor/UI paging implementations. One stale documentation statement in `CODE_STYLE.md` incorrectly referred to `PagedQuery.Page`; this was corrected to match the actual `PagedQuery.PageNum` source contract.
+
+Clean Architecture boundaries remain intact, including meaningful HTTP Request -> Application Request -> Repository Query transformations. The Rule-of-Three remains the basis for retaining or deferring abstractions. No unrelated business capability or structural redesign was identified in the reviewed scope.
+
+Verification remains source-level only for Sprint 9. The supplied environment does not contain the `dotnet` CLI/runtime, and no automated test project/source is present, so T13 does not claim a successful build, runtime, browser, migration, or automated-test result.
+
+**T13 result:** Final documentation and architecture consistency gate complete.

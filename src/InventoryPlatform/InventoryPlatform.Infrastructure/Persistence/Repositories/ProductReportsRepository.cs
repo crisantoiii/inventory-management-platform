@@ -60,7 +60,7 @@ public sealed class ProductReportsRepository : IProductReportsRepository
             queryRequest);
 
         var items = await orderedQuery
-            .Skip((queryRequest.Page - 1) * queryRequest.PageSize)
+            .Skip((queryRequest.PageNum - 1) * queryRequest.PageSize)
             .Take(queryRequest.PageSize)
             .Select(x => new ProductReportDto(
                 x.Id,
@@ -77,7 +77,7 @@ public sealed class ProductReportsRepository : IProductReportsRepository
         return new PagedResult<ProductReportDto>
         {
             Items = items,
-            Page = queryRequest.Page,
+            Page = queryRequest.PageNum,
             PageSize = queryRequest.PageSize,
             TotalCount = totalCount
         };

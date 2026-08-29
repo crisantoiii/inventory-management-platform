@@ -86,7 +86,7 @@ else
                        asp-route-Descending="@(Model.Filter.SortBy == UserSortFields.UserName && !Model.Filter.Descending)"
                        asp-route-Search="@Model.Filter.Search"
                        asp-route-Status="@Model.Filter.Status"
-                       asp-route-Page="1">
+                       asp-route-PageNum="1">
                         Username
                     </a>
                 </th>
@@ -96,7 +96,7 @@ else
                        asp-route-Descending="@(Model.Filter.SortBy == UserSortFields.Email && !Model.Filter.Descending)"
                        asp-route-Search="@Model.Filter.Search"
                        asp-route-Status="@Model.Filter.Status"
-                       asp-route-Page="1">
+                       asp-route-PageNum="1">
                         Email
                     </a>
                 </th>
@@ -109,7 +109,7 @@ else
                        asp-route-Descending="@(Model.Filter.SortBy == UserSortFields.Lockout && !Model.Filter.Descending)"
                        asp-route-Search="@Model.Filter.Search"
                        asp-route-Status="@Model.Filter.Status"
-                       asp-route-Page="1">
+                       asp-route-PageNum="1">
                         Status
                     </a>
                 </th>
@@ -148,7 +148,7 @@ else
 
                             <a asp-page="Details"
                                asp-route-id="@user.Id"
-                               asp-route-Page="@Model.Filter.Page"
+                               asp-route-PageNum="@Model.Filter.PageNum"
                                asp-route-Search="@Model.Filter.Search"
                                asp-route-Status="@Model.Filter.Status"
                                asp-route-SortBy="@Model.Filter.SortBy"
@@ -222,7 +222,12 @@ else
                 <li class="page-item">
 
                     <a class="page-link"
-                       href="?Page=@(Model.Users.Page - 1)&Search=@Model.Filter.Search&Status=@Model.Filter.Status&SortBy=@Model.Filter.SortBy&Descending=@Model.Filter.Descending">
+                       asp-page="./Index"
+                       asp-route-PageNum="@(Model.Users.Page - 1)"
+                       asp-route-Search="@Model.Filter.Search"
+                       asp-route-Status="@Model.Filter.Status"
+                       asp-route-SortBy="@Model.Filter.SortBy"
+                       asp-route-Descending="@Model.Filter.Descending">
                         Previous
                     </a>
 
@@ -233,7 +238,12 @@ else
             {
                 <li class="page-item @(i == Model.Users.Page ? "active" : "")">
                     <a class="page-link"
-                       href="?Page=@i&Search=@Model.Filter.Search&Status=@Model.Filter.Status&SortBy=@Model.Filter.SortBy&Descending=@Model.Filter.Descending">
+                       asp-page="./Index"
+                       asp-route-PageNum="@i"
+                       asp-route-Search="@Model.Filter.Search"
+                       asp-route-Status="@Model.Filter.Status"
+                       asp-route-SortBy="@Model.Filter.SortBy"
+                       asp-route-Descending="@Model.Filter.Descending">
                         @i
                     </a>
 
@@ -245,7 +255,12 @@ else
                 <li class="page-item">
 
                     <a class="page-link"
-                       href="?Page=@(Model.Users.Page + 1)&Search=@Model.Filter.Search&Status=@Model.Filter.Status&SortBy=@Model.Filter.SortBy&Descending=@Model.Filter.Descending">
+                       asp-page="./Index"
+                       asp-route-PageNum="@(Model.Users.Page + 1)"
+                       asp-route-Search="@Model.Filter.Search"
+                       asp-route-Status="@Model.Filter.Status"
+                       asp-route-SortBy="@Model.Filter.SortBy"
+                       asp-route-Descending="@Model.Filter.Descending">
                         Next
                     </a>
 

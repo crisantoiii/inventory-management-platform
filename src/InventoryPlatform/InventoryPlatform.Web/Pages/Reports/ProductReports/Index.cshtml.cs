@@ -88,7 +88,7 @@ public sealed class IndexModel : PageModel
         {
             Search = Search,
             Status = Status,
-            Page = PageNum,
+            PageNum = PageNum,
             PageSize = PageSize,
             SortBy = SortBy,
             Descending = Descending
@@ -118,7 +118,7 @@ public sealed class IndexModel : PageModel
         {
             Search = search,
             Status = status,
-            Page = 1,
+            PageNum = 1,
             PageSize = int.MaxValue,
             SortBy = sortBy,
             Descending = descending
@@ -144,7 +144,7 @@ public sealed class IndexModel : PageModel
         string? search, ProductStatusFilter status = ProductStatusFilter.Active, string? sortBy = null,
         bool descending = false, CancellationToken cancellationToken = default)
     {
-        var query = new PagedQuery { Search = search, Status = status, Page = 1, PageSize = int.MaxValue, SortBy = sortBy, Descending = descending };
+        var query = new PagedQuery { Search = search, Status = status, PageNum = 1, PageSize = int.MaxValue, SortBy = sortBy, Descending = descending };
         var result = await _handler.HandleExportAsync(new GetProductReportsRequest(query), cancellationToken);
         if (result.IsFailure) return BadRequest();
         var bytes = _pdfReportWriter.CreateProductReports(result.Value ?? Array.Empty<ProductReportDto>());

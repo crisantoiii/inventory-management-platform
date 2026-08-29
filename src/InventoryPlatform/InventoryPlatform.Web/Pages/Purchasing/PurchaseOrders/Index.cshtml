@@ -31,8 +31,10 @@
 
     <form method="get" class="row g-2 mb-4">
         <div class="col-md-4">
-            <label for="search" class="form-label">Search purchase orders</label>
-            <input asp-for="@Model.Search"
+            <label for="Search" class="form-label">Search purchase orders</label>
+            <input id="Search"
+                   name="Search"
+                   value="@Model.Request.Search"
                    class="form-control"
                    placeholder="Search by purchase order ID or supplier"
                    autocomplete="off" />
@@ -40,25 +42,34 @@
 
         <div class="col-md-2">
             <label for="FromDate" class="form-label">From date</label>
-            <input asp-for="FromDate"
-                   asp-format="{0:yyyy-MM-dd}"
+            <input id="FromDate"
+                   name="FromDate"
+                   value="@Model.Request.FromDate?.ToString("yyyy-MM-dd")"
                    type="date"
                    class="form-control" />
         </div>
 
         <div class="col-md-2">
             <label for="ToDate" class="form-label">To date</label>
-            <input asp-for="ToDate"
-                   asp-format="{0:yyyy-MM-dd}"
+            <input id="ToDate"
+                   name="ToDate"
+                   value="@Model.Request.ToDate?.ToString("yyyy-MM-dd")"
                    type="date"
                    class="form-control" />
         </div>
 
         <div class="col-md-2">
-            <label for="status" class="form-label">Status</label>
-            <select asp-for="Status"
-                    class="form-select"
-                    asp-items="Model.StatusOptions">
+            <label for="Status" class="form-label">Status</label>
+            <select id="Status"
+                    name="Status"
+                    class="form-select">
+                @foreach (var option in Model.StatusOptions)
+                {
+                    <option value="@option.Value"
+                            selected="@(Model.Request.PurchaseOrderStatus?.ToString() == option.Value)">
+                        @option.Text
+                    </option>
+                }
             </select>
         </div>
 
@@ -69,10 +80,10 @@
                 </button>
             </div>
 
-            @if (!string.IsNullOrWhiteSpace(Model.Search) ||
-                 Model.FromDate.HasValue ||
-                 Model.ToDate.HasValue ||
-                 Model.Status.HasValue)
+            @if (!string.IsNullOrWhiteSpace(Model.Request.Search) ||
+                 Model.Request.FromDate.HasValue ||
+                 Model.Request.ToDate.HasValue ||
+                 Model.Request.PurchaseOrderStatus.HasValue)
             {
                 <div class="col-auto">
                     <a asp-page="./Index"
@@ -99,52 +110,92 @@
                         <thead>
                             <tr>
                                 <th>
-                                    <a href="@Model.GetSortUrl(IndexModel.SortFields.Id)"
+                                    <a asp-page="./Index"
+                                       asp-route-Search="@Model.Request.Search"
+                                       asp-route-FromDate="@Model.Request.FromDate?.ToString("yyyy-MM-dd")"
+                                       asp-route-ToDate="@Model.Request.ToDate?.ToString("yyyy-MM-dd")"
+                                       asp-route-Status="@Model.Request.PurchaseOrderStatus"
+                                       asp-route-SortBy="@IndexModel.SortFields.Id"
+                                       asp-route-Descending="@(Model.Request.SortBy == IndexModel.SortFields.Id ? !Model.Request.Descending : false)"
+                                       asp-route-PageNum="1"
+                                       asp-route-PageSize="@Model.Request.PageSize"
                                        class="text-decoration-none">
                                         ID
-                                        @if (Model.SortBy == IndexModel.SortFields.Id)
+                                        @if (Model.Request.SortBy == IndexModel.SortFields.Id)
                                         {
-                                            <span aria-hidden="true">@(Model.Descending ? "↓" : "↑")</span>
+                                            <span aria-hidden="true">@(Model.Request.Descending ? "↓" : "↑")</span>
                                         }
                                     </a>
                                 </th>
                                 <th>
-                                    <a href="@Model.GetSortUrl(IndexModel.SortFields.Supplier)"
+                                    <a asp-page="./Index"
+                                       asp-route-Search="@Model.Request.Search"
+                                       asp-route-FromDate="@Model.Request.FromDate?.ToString("yyyy-MM-dd")"
+                                       asp-route-ToDate="@Model.Request.ToDate?.ToString("yyyy-MM-dd")"
+                                       asp-route-Status="@Model.Request.PurchaseOrderStatus"
+                                       asp-route-SortBy="@IndexModel.SortFields.Supplier"
+                                       asp-route-Descending="@(Model.Request.SortBy == IndexModel.SortFields.Supplier ? !Model.Request.Descending : false)"
+                                       asp-route-PageNum="1"
+                                       asp-route-PageSize="@Model.Request.PageSize"
                                        class="text-decoration-none">
                                         Supplier
-                                        @if (Model.SortBy == IndexModel.SortFields.Supplier)
+                                        @if (Model.Request.SortBy == IndexModel.SortFields.Supplier)
                                         {
-                                            <span aria-hidden="true">@(Model.Descending ? "↓" : "↑")</span>
+                                            <span aria-hidden="true">@(Model.Request.Descending ? "↓" : "↑")</span>
                                         }
                                     </a>
                                 </th>
                                 <th>
-                                    <a href="@Model.GetSortUrl(IndexModel.SortFields.OrderDate)"
+                                    <a asp-page="./Index"
+                                       asp-route-Search="@Model.Request.Search"
+                                       asp-route-FromDate="@Model.Request.FromDate?.ToString("yyyy-MM-dd")"
+                                       asp-route-ToDate="@Model.Request.ToDate?.ToString("yyyy-MM-dd")"
+                                       asp-route-Status="@Model.Request.PurchaseOrderStatus"
+                                       asp-route-SortBy="@IndexModel.SortFields.OrderDate"
+                                       asp-route-Descending="@(Model.Request.SortBy == IndexModel.SortFields.OrderDate ? !Model.Request.Descending : false)"
+                                       asp-route-PageNum="1"
+                                       asp-route-PageSize="@Model.Request.PageSize"
                                        class="text-decoration-none">
                                         Order Date
-                                        @if (Model.SortBy == IndexModel.SortFields.OrderDate)
+                                        @if (Model.Request.SortBy == IndexModel.SortFields.OrderDate)
                                         {
-                                            <span aria-hidden="true">@(Model.Descending ? "↓" : "↑")</span>
+                                            <span aria-hidden="true">@(Model.Request.Descending ? "↓" : "↑")</span>
                                         }
                                     </a>
                                 </th>
                                 <th>
-                                    <a href="@Model.GetSortUrl(IndexModel.SortFields.Status)"
+                                    <a asp-page="./Index"
+                                       asp-route-Search="@Model.Request.Search"
+                                       asp-route-FromDate="@Model.Request.FromDate?.ToString("yyyy-MM-dd")"
+                                       asp-route-ToDate="@Model.Request.ToDate?.ToString("yyyy-MM-dd")"
+                                       asp-route-Status="@Model.Request.PurchaseOrderStatus"
+                                       asp-route-SortBy="@IndexModel.SortFields.Status"
+                                       asp-route-Descending="@(Model.Request.SortBy == IndexModel.SortFields.Status ? !Model.Request.Descending : false)"
+                                       asp-route-PageNum="1"
+                                       asp-route-PageSize="@Model.Request.PageSize"
                                        class="text-decoration-none">
                                         Status
-                                        @if (Model.SortBy == IndexModel.SortFields.Status)
+                                        @if (Model.Request.SortBy == IndexModel.SortFields.Status)
                                         {
-                                            <span aria-hidden="true">@(Model.Descending ? "↓" : "↑")</span>
+                                            <span aria-hidden="true">@(Model.Request.Descending ? "↓" : "↑")</span>
                                         }
                                     </a>
                                 </th>
                                 <th class="text-end">
-                                    <a href="@Model.GetSortUrl(IndexModel.SortFields.TotalAmount)"
+                                    <a asp-page="./Index"
+                                       asp-route-Search="@Model.Request.Search"
+                                       asp-route-FromDate="@Model.Request.FromDate?.ToString("yyyy-MM-dd")"
+                                       asp-route-ToDate="@Model.Request.ToDate?.ToString("yyyy-MM-dd")"
+                                       asp-route-Status="@Model.Request.PurchaseOrderStatus"
+                                       asp-route-SortBy="@IndexModel.SortFields.TotalAmount"
+                                       asp-route-Descending="@(Model.Request.SortBy == IndexModel.SortFields.TotalAmount ? !Model.Request.Descending : false)"
+                                       asp-route-PageNum="1"
+                                       asp-route-PageSize="@Model.Request.PageSize"
                                        class="text-decoration-none">
                                         Total
-                                        @if (Model.SortBy == IndexModel.SortFields.TotalAmount)
+                                        @if (Model.Request.SortBy == IndexModel.SortFields.TotalAmount)
                                         {
-                                            <span aria-hidden="true">@(Model.Descending ? "↓" : "↑")</span>
+                                            <span aria-hidden="true">@(Model.Request.Descending ? "↓" : "↑")</span>
                                         }
                                     </a>
                                 </th>
@@ -181,13 +232,14 @@
                                     <td class="text-end">
                                         <a asp-page="./Details"
                                            asp-route-id="@purchaseOrder.Id"
-                                           asp-route-search="@Model.Search"
-                                           asp-route-fromDate="@Model.FromDate"
-                                           asp-route-toDate="@Model.ToDate"
-                                           asp-route-status="@Model.Status"
-                                           asp-route-sortBy="@Model.SortBy"
-                                           asp-route-descending="@Model.Descending"
-                                           asp-route-page="@Model.PageNum"
+                                           asp-route-Search="@Model.Request.Search"
+                                           asp-route-FromDate="@Model.Request.FromDate"
+                                           asp-route-ToDate="@Model.Request.ToDate"
+                                           asp-route-Status="@Model.Request.PurchaseOrderStatus"
+                                           asp-route-SortBy="@Model.Request.SortBy"
+                                           asp-route-Descending="@Model.Request.Descending"
+                                           asp-route-PageNum="@Model.Request.PageNum"
+                                            asp-route-PageSize="@Model.Request.PageSize"
                                            class="btn btn-sm btn-outline-primary">
                                             Details
                                         </a>
@@ -202,19 +254,19 @@
 
         <nav aria-label="Purchase order pagination" class="mt-3">
             <ul class="pagination">
-                <li class="page-item @(Model.PageNum <= 1 ? "disabled" : "")">
-                    @if (Model.PageNum > 1)
+                <li class="page-item @(Model.Request.PageNum <= 1 ? "disabled" : "")">
+                    @if (Model.Request.PageNum > 1)
                     {
                         <a class="page-link"
                            asp-page="./Index"
-                           asp-route-Search="@Model.Search"
-                           asp-route-Status="@Model.Status"
-                           asp-route-PageNum="@(Model.PageNum - 1)"                  
-                           asp-route-FromDate="@Model.FromDate?.ToString("yyyy-MM-dd")"
-                           asp-route-ToDate="@Model.ToDate?.ToString("yyyy-MM-dd")"
-                           asp-route-PageSize="@Model.PageSize"
-                           asp-route-SortBy="@Model.SortBy"
-                           asp-route-Descending="@Model.Descending">
+                           asp-route-Search="@Model.Request.Search"
+                           asp-route-Status="@Model.Request.PurchaseOrderStatus"
+                           asp-route-PageNum="@(Model.Request.PageNum - 1)"                  
+                           asp-route-FromDate="@Model.Request.FromDate?.ToString("yyyy-MM-dd")"
+                           asp-route-ToDate="@Model.Request.ToDate?.ToString("yyyy-MM-dd")"
+                           asp-route-PageSize="@Model.Request.PageSize"
+                           asp-route-SortBy="@Model.Request.SortBy"
+                           asp-route-Descending="@Model.Request.Descending">
                             Previous
                         </a>
                     }
@@ -225,33 +277,33 @@
                 </li>
                 @for (var pageNumber = 1; pageNumber <= Model.PurchaseOrders.TotalPages; pageNumber++)
                 {
-                    <li class="page-item @(pageNumber == Model.PageNum ? "active" : "")">
+                    <li class="page-item @(pageNumber == Model.Request.PageNum ? "active" : "")">
                         <a class="page-link"
                            asp-page="./Index"
-                           asp-route-Search="@Model.Search"
-                           asp-route-Status="@Model.Status"
+                           asp-route-Search="@Model.Request.Search"
+                           asp-route-Status="@Model.Request.PurchaseOrderStatus"
                            asp-route-PageNum="@pageNumber"                    
-                           asp-route-FromDate="@Model.FromDate?.ToString("yyyy-MM-dd")"
-                           asp-route-ToDate="@Model.ToDate?.ToString("yyyy-MM-dd")"
-                           asp-route-PageSize="@Model.PageSize"
-                           asp-route-SortBy="@Model.SortBy"
-                           asp-route-Descending="@Model.Descending">
+                           asp-route-FromDate="@Model.Request.FromDate?.ToString("yyyy-MM-dd")"
+                           asp-route-ToDate="@Model.Request.ToDate?.ToString("yyyy-MM-dd")"
+                           asp-route-PageSize="@Model.Request.PageSize"
+                           asp-route-SortBy="@Model.Request.SortBy"
+                           asp-route-Descending="@Model.Request.Descending">
                             @pageNumber
                         </a>
                     </li>
                 }
 
-                <li class="page-item @(Model.PageNum >= Model.PurchaseOrders.TotalPages ? "disabled" : "")">
+                <li class="page-item @(Model.Request.PageNum >= Model.PurchaseOrders.TotalPages ? "disabled" : "")">
                     <a class="page-link"
                        asp-page="./Index"
-                       asp-route-Search="@Model.Search"
-                       asp-route-Status="@Model.Status"
-                       asp-route-PageNum="@(Model.PageNum + 1)"                      
-                       asp-route-FromDate="@Model.FromDate?.ToString("yyyy-MM-dd")"
-                       asp-route-ToDate="@Model.ToDate?.ToString("yyyy-MM-dd")"
-                       asp-route-PageSize="@Model.PageSize"
-                       asp-route-SortBy="@Model.SortBy"
-                       asp-route-Descending="@Model.Descending">
+                       asp-route-Search="@Model.Request.Search"
+                       asp-route-Status="@Model.Request.PurchaseOrderStatus"
+                       asp-route-PageNum="@(Model.Request.PageNum + 1)"                      
+                       asp-route-FromDate="@Model.Request.FromDate?.ToString("yyyy-MM-dd")"
+                       asp-route-ToDate="@Model.Request.ToDate?.ToString("yyyy-MM-dd")"
+                       asp-route-PageSize="@Model.Request.PageSize"
+                       asp-route-SortBy="@Model.Request.SortBy"
+                       asp-route-Descending="@Model.Request.Descending">
                         Next
                     </a>
                 </li>

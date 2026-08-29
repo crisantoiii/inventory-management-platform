@@ -53,7 +53,7 @@ public sealed class IndexModel : PageModel
         var query = new PagedQuery
         {
             Search = Search,
-            Page = PageNum,
+            PageNum = PageNum,
             PageSize = PageSize,
             SortBy = SortBy,
             Descending = Descending
@@ -81,7 +81,7 @@ public sealed class IndexModel : PageModel
         var query = new PagedQuery
         {
             Search = search,
-            Page = 1,
+            PageNum = 1,
             PageSize = int.MaxValue,
             SortBy = sortBy,
             Descending = descending
@@ -106,7 +106,7 @@ public sealed class IndexModel : PageModel
     public async Task<IActionResult> OnGetExportToPdfAsync(
         string? search, string? sortBy, bool descending = false, CancellationToken cancellationToken = default)
     {
-        var query = new PagedQuery { Search = search, Page = 1, PageSize = int.MaxValue, SortBy = sortBy, Descending = descending };
+        var query = new PagedQuery { Search = search, PageNum = 1, PageSize = int.MaxValue, SortBy = sortBy, Descending = descending };
         var result = await _handler.HandleExportAsync(new GetLowStockRequest(query), cancellationToken);
         if (result.IsFailure) return BadRequest();
         var bytes = _pdfReportWriter.CreateLowStock(result.Value ?? Array.Empty<LowStockDto>());

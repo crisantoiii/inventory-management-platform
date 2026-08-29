@@ -73,7 +73,7 @@ public sealed class StockMovementRepository : IStockMovementRepository
             queryRequest);
 
         var items = await orderedQuery
-            .Skip((queryRequest.Page - 1) * queryRequest.PageSize)
+            .Skip((queryRequest.PageNum - 1) * queryRequest.PageSize)
             .Take(queryRequest.PageSize)
             .Select(x => new StockMovementDto(
                 x.Id,
@@ -90,7 +90,7 @@ public sealed class StockMovementRepository : IStockMovementRepository
         return new PagedResult<StockMovementDto>
         {
             Items = items,
-            Page = queryRequest.Page,
+            Page = queryRequest.PageNum,
             PageSize = queryRequest.PageSize,
             TotalCount = totalCount
         };

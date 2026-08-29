@@ -34,7 +34,7 @@ public sealed class GetInventoryMovementHandler
     {
         var query = request.Query with
         {
-            Page = 1,
+            PageNum = 1,
             PageSize = int.MaxValue
         };
 

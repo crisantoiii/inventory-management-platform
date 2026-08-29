@@ -90,14 +90,14 @@ public sealed class ProductRepository
         var items = await orderedQuery
             .Include(p => p.Category)
             .Include(p => p.Unit)
-            .Skip((request.Page - 1) * request.PageSize)
+            .Skip((request.PageNum - 1) * request.PageSize)
             .Take(request.PageSize)
             .ToListAsync(cancellationToken);
 
         return new PagedResult<Product>
         {
             Items = items,
-            Page = request.Page,
+            Page = request.PageNum,
             PageSize = request.PageSize,
             TotalCount = totalCount
         };
