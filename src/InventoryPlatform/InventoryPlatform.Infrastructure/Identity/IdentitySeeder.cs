@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace InventoryPlatform.Infrastructure.Identity;
@@ -38,6 +38,10 @@ public static class IdentitySeeder
             IdentityConstants.DefaultViewer.Password,
             IdentityConstants.Roles.Viewer
              );
+
+        await AuthorizationSeeder.SeedAsync(
+            scope.ServiceProvider.GetRequiredService<
+                InventoryPlatform.Infrastructure.Persistence.Context.ApplicationDbContext>());
     }
 
     private static async Task SeedRolesAsync(
