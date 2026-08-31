@@ -1,4 +1,6 @@
 using FluentValidation;
+using InventoryPlatform.Application.Authorization;
+using InventoryPlatform.Application.Interfaces.Authorization;
 using InventoryPlatform.Application.Features.Account.ChangePassword;
 using InventoryPlatform.Application.Features.Account.ConfirmEmail;
 using InventoryPlatform.Application.Features.Account.DisableTwoFactor;
@@ -76,6 +78,8 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddApplication(
         this IServiceCollection services)
     {
+        services.AddScoped<ICapabilityAuthorizationService, CapabilityAuthorizationService>();
+
         
         services.AddScoped<CreateProductHandler>();
         services.AddScoped<GetProductHandler>();
