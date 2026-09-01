@@ -30,7 +30,7 @@ Account Management
 
 **Latest Release:** v1.5.0 — Sprint 8 Purchasing Enhancements
 
-**Project Status:** Sprint 9 Code Quality & Consistency - T03-T13 Complete; Final Documentation & Architecture Validation
+**Project Status:** Sprint 10 Dynamic Capability-Based Authorization — T01-T10 Complete
 
 **Last Updated:** August 2026
 
@@ -117,8 +117,8 @@ Verified:
 
 - **Completed Modules:** 10
 - **Architecture Status:** Validated
-- **Current Milestone:** Sprint 9 — ASP.NET Core Code Quality & Consistency
-- **Next Milestone:** Dynamic Capability-Based Authorization, after separate sprint planning
+- **Current Milestone:** Sprint 10 — Dynamic Capability-Based Authorization (T01-T10 Complete)
+- **Next Milestone:** Sprint 10 — T11 Authorization Administration
 
 ---
 
@@ -147,6 +147,89 @@ Source-level verification was completed through T13. The supplied environment do
 No unrelated business capability or structural architectural redesign was introduced by the reviewed Sprint 9 work. Dynamic Capability-Based Authorization remains outside Sprint 9 and is not implemented.
 
 ---
+
+# Sprint 10 - Dynamic Capability-Based Authorization (T01-T10)
+
+**Status:** T01-T10 complete.
+
+Sprint 10 introduces a dynamic, database-backed capability-based authorization model while preserving ASP.NET Core Identity authentication and maintaining backward compatibility.
+
+### Completed Sprint 10 Tasks
+
+- T01 — Authorization Model & Architecture Baseline
+- T02 — Capability and Group Domain Model
+- T03 — Application Authorization Abstractions
+- T04 — Authorization Persistence & EF Core Configuration
+- T05 — Capability/Group Seed Data & Identity Compatibility Mapping
+- T06 — Database Migration
+- T07 — Capability Authorization Service
+- T08 — ASP.NET Core Capability Authorization Handler
+- T09 — Purchasing Dynamic Authorization Integration
+- T10 — Existing Authorization Boundary Migration
+
+### T10 - Existing Authorization Boundary Migration
+
+**Status:** Complete
+
+Migrated the three remaining static role-based authorization policies (`Administrator`, `InventoryManagement`, `ViewInventory`) to capability-backed equivalents while preserving effective access behavior.
+
+Implemented changes:
+
+- Added `Administration.Access` capability to the seed data catalog (assigned to Administrator group via `CapabilityCatalog.All`)
+- Created `MultiCapabilityRequirement` and `MultiCapabilityAuthorizationHandler` for OR-composite capability authorization
+- Added OR-composite `AddCapabilityPolicy` overload to `CapabilityAuthorizationExtensions`
+- Replaced role-based policy registrations with capability-backed equivalents using same policy names
+- Replaced folder-level role conventions (`/Administration`, `/Inventory`) with policy-name references
+- Registered `MultiCapabilityAuthorizationHandler` in DI
+
+Configuration-level policy equivalence established through group-capability analysis; runtime authorization behavior not verified due to environment limitations.
+
+### T10 Files Changed
+
+- `Infrastructure/Identity/AuthorizationSeeder.cs` — Added `Administration.Access` capability
+- `Web/Authorization/MultiCapabilityRequirement.cs` — NEW: OR-composite requirement
+- `Web/Authorization/MultiCapabilityAuthorizationHandler.cs` — NEW: OR-composite handler
+- `Web/Authorization/CapabilityAuthorizationExtensions.cs` — Added OR-composite overload
+- `Web/Authorization/AuthorizationPolicies.cs` — Added capability constants
+- `Web/Extensions/ServiceCollectionExtensions.cs` — Replaced role-based policies + folder conventions
+
+### T10 Build Verification
+
+- Build: SUCCESS — 0 errors, 26 pre-existing warnings
+- No automated test project exists in the repository
+- Runtime/browser verification not performed (environment limitation)
+- No database migration required (seed data only)
+
+### Authorization Equivalence (Configuration-Level)
+
+- `Administrator` policy: `Administration.Access` capability (only Administrator group has it) — equivalent to `RequireRole("Administrator")`
+- `InventoryManagement` policy: OR-composite of 9 capabilities (Product.Create/Edit, Category.Create, Supplier.Create/Edit, Customer.Create/Edit, Unit.Edit, InventoryTransaction.Create) — equivalent to `RequireRole("Administrator", "InventoryManager")`
+- `ViewInventory` policy: OR-composite of 7 view capabilities (Dashboard.View, Product.View, Category.View, Unit.View, Customer.View, Supplier.View, InventoryTransaction.View) — equivalent to `RequireRole("Administrator", "InventoryManager", "Viewer")`
+
+### T10 Preservation
+
+- All 43 page-level `[Authorize(Policy = ...)]` attributes: UNCHANGED (reference same policy names)
+- All 46 Razor view `User.IsInRole` checks: UNCHANGED (deferred to T12)
+- EditStatus.cshtml.cs: UNCHANGED
+- PurchaseOrder authorization (T09): UNCHANGED
+- Single-capability `CapabilityRequirement`/`CapabilityAuthorizationHandler`: UNCHANGED
+
+### Deferred from T10
+
+- Razor `User.IsInRole` UI visibility checks (46 occurrences) — T12 scope
+- Categories/Edit.cshtml.cs missing `[Authorize]` — pre-existing, separate task
+- Suppliers/Create.cshtml.cs using overly broad `ViewInventory` policy — pre-existing, separate task
+
+### Remaining Sprint 10 Tasks
+
+- T11 — Authorization Administration
+- T12 — Razor Navigation & UI Capability Visibility
+- T13 — Integrated Authorization Verification
+- T14 — Documentation Synchronization & Architecture Validation
+- T15 — Sprint 10 Final Verification, Retrospective & Save Point
+
+---
+
 
 # Architecture Validation
 
@@ -595,7 +678,7 @@ Final verification covered normal application regression, reporting workflows, e
 
 # Current Focus
 
-Sprint 8 Purchasing Enhancements is complete and closed. P0 - Actual Purchasing Source/Documentation Baseline through P7 - Integrated Purchasing Verification are complete and verified. P7 completed the integrated Purchasing regression pass and corrected one in-scope pagination state-preservation defect.
+Sprint 10 Dynamic Capability-Based Authorization T01-T10 are complete. T10 (Existing Authorization Boundary Migration) migrated the three remaining static role-based policies to capability-backed equivalents. T11 (Authorization Administration) is the next task.
 
 Completed in Sprint 8:
 
@@ -756,11 +839,11 @@ The architecture has now been validated through:
 
 ## Current Focus
 
-### Sprint 8 — Purchasing Enhancements
+### Sprint 10 — Dynamic Capability-Based Authorization
 
-Sprint 8 Purchasing Enhancements P0-P7 are complete, verified, documented, and closed. D1-D4 are also complete.
+Sprint 10 Dynamic Capability-Based Authorization T01-T10 are complete. T10 (Existing Authorization Boundary Migration) migrated the remaining static role-based policies to capability-backed equivalents. T11 (Authorization Administration) is the next task.
 
-The current project state is a completed v1.5.0 milestone. The next development activity is a separate Next Sprint Planning process. Dynamic Capability-Based Authorization remains the next locked priority, but implementation does not begin automatically from this closure.
+Sprint 8 Purchasing Enhancements (v1.5.0) is complete and closed. Dynamic Capability-Based Authorization is now in active implementation (T01-T10 complete).
 
 ### Completed Sprint 8 Scope
 

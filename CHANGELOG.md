@@ -2,6 +2,31 @@
 
 ## [Unreleased]
 
+### Sprint 10 T10 - Existing Authorization Boundary Migration
+
+**Status:** Complete
+
+#### Changed
+
+- Added `Administration.Access` capability to the seed data catalog.
+- Created `MultiCapabilityRequirement` and `MultiCapabilityAuthorizationHandler` for OR-composite capability authorization.
+- Added OR-composite `AddCapabilityPolicy` overload to `CapabilityAuthorizationExtensions`.
+- Replaced `Administrator` role-based policy with single-capability `Administration.Access` policy.
+- Replaced `InventoryManagement` role-based policy with OR-composite of 9 capabilities.
+- Replaced `ViewInventory` role-based policy with OR-composite of 7 view capabilities.
+- Replaced `/Administration` and `/Inventory` folder-level role conventions with policy-name references.
+- Registered `MultiCapabilityAuthorizationHandler` in DI alongside existing `CapabilityAuthorizationHandler`.
+
+#### Verified
+
+- Build: SUCCESS — 0 errors, 26 pre-existing warnings
+- Configuration-level policy equivalence established through group-capability analysis; runtime authorization behavior not verified due to environment limitations.
+- All 43 page-level `[Authorize(Policy = ...)]` attributes unchanged (reference same policy names).
+- All 46 Razor view `User.IsInRole` checks unchanged (deferred to T12).
+- PurchaseOrder authorization (T09) unchanged.
+- No database migration required.
+
+
 ### Sprint 9 - ASP.NET Core Code Quality & Consistency
 
 **Status:** T03-T13 implementation/documentation work complete; final validation completed

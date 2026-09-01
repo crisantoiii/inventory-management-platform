@@ -30,6 +30,26 @@ Sprint 8 Purchasing Enhancements P0-P7, D1 Documentation Synchronization, D2 Des
 
 The next development activity is a separate Next Sprint Planning process. Dynamic Capability-Based Authorization remains the next locked priority. No implementation work begins automatically from this closure.
 
+# Sprint 10 - T10 Existing Authorization Boundary Migration
+
+## Summary
+
+Migrated the three remaining static role-based authorization policies (Administrator, InventoryManagement, ViewInventory) to capability-backed equivalents while preserving the same policy names.
+
+Added Administration.Access capability (new seed data). Created MultiCapabilityRequirement and MultiCapabilityAuthorizationHandler for OR-composite authorization. Replaced role-based RequireRole policy registrations with capability-backed AddCapabilityPolicy registrations. Replaced /Administration and /Inventory folder-level role conventions with policy-name references.
+
+All 43 page-level [Authorize(Policy = ...)] attributes required zero modification because the policy names remain unchanged. Only the internal policy registration changed.
+
+Configuration-level policy equivalence established through group-capability analysis; runtime authorization behavior not verified due to environment limitations.
+
+## Outcome
+
+The three static role-based authorization policies are now fully capability-backed. The authorization model for the entire application (except Razor UI visibility checks, deferred to T12) now resolves through the dynamic Group -> Capability infrastructure.
+
+Build: SUCCESS (0 errors, 26 pre-existing warnings).
+
+
+
 # Sprint 9 - T05 Request Binding Consolidation
 
 ## Summary

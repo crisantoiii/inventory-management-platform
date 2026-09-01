@@ -2002,3 +2002,37 @@ The project should reduce meaningful duplication without hiding architectural bo
 
 T06-T08 provide the source-level verification for these decisions.
 
+
+# DD-039 - Capability-Backed Policy Migration
+
+## Decision
+
+Migrate existing static role-based authorization policies (Administrator, InventoryManagement, ViewInventory) to capability-backed equivalents while preserving the same policy names and all existing [Authorize(Policy = ...)] attributes on page models.
+
+## Rationale
+
+The existing role-based policies (RequireRole) bind authorization to Identity roles, which are static. Dynamic capability-based authorization resolves permissions from the database via Groups and Capabilities, enabling runtime permission changes without code changes.
+
+By preserving the same policy names, all 43 page-level [Authorize] attributes require zero modification. Only the internal policy registration changes.
+
+## Implementation
+
+- Administrator policy: Single capability "Administration.Access" (only Administrator group has it)
+- InventoryManagement policy: OR-composite of 9 capabilities (create/edit across Products, Categories, Suppliers, Customers, Units, InventoryTransactions)
+- ViewInventory policy: OR-composite of 7 view capabilities
+
+OR-composite authorization uses MultiCapabilityRequirement + MultiCapabilityAuthorizationHandler, which evaluates capabilities in sequence and succeeds on the first match (TRUE OR semantics).
+
+## Alternatives Considered
+
+1. Deriving composite policies from the role's existing capability set in the seed catalog -- rejected because the InventoryManager capability set does not include Unit.Create, yet the role-based policy allows InventoryManager access to Unit Create pages.
+2. Creating separate policies for each individual capability -- rejected because the existing policy names are referenced by 43 page models and changing them would require mass page-model edits.
+
+## Outcome
+
+Accepted. Sprint 10 T10. Configuration-level policy equivalence established through group-capability analysis.
+
+## Verification
+
+Build: SUCCESS (0 errors, 26 pre-existing warnings). Runtime authorization behavior not verified due to environment limitations.
+
