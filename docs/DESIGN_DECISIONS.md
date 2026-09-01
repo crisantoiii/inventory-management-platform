@@ -2036,3 +2036,44 @@ Accepted. Sprint 10 T10. Configuration-level policy equivalence established thro
 
 Build: SUCCESS (0 errors, 26 pre-existing warnings). Runtime authorization behavior not verified due to environment limitations.
 
+
+
+## T12 - Razor UI Capability Visibility Migration
+
+### Decision
+
+Replace all `User.IsInRole(...)` role-based UI visibility checks in Razor views with capability-backed `IAuthorizationService.AuthorizeAsync(...)` calls using the existing authorization policies.
+
+### Approach
+
+Use a direct mapping strategy where each role-check pattern is replaced with the capability-backed policy that grants access to the same user groups:
+
+- `User.IsInRole("Administrator")` → `AuthorizationPolicies.Administrator` (single-cap: Administration.Access)
+- `User.IsInRole("Administrator") || User.IsInRole("InventoryManager")` → `AuthorizationPolicies.InventoryManagement` (OR-composite of 9 capabilities)
+
+### Pre-computation Pattern
+
+Authorization results are pre-computed once per page render in a `@{ }` block to avoid repeated authorization pipeline evaluations in loops:
+
+```cshtml
+@{
+    var canManage = (await AuthorizationService.AuthorizeAsync(
+        User, null, AuthorizationPolicies.InventoryManagement)).Succeeded;
+    var canAdmin = (await AuthorizationService.AuthorizeAsync(
+        User, null, AuthorizationPolicies.Administrator)).Succeeded;
+}
+```
+
+### Import Strategy
+
+- `AuthorizationPolicies` imported globally via `_ViewImports.cshtml` (project namespace, used by all affected files)
+- `IAuthorizationService` imported per-file via `@using Microsoft.AspNetCore.Authorization` (framework namespace, visible dependency)
+
+### Behavioral Equivalence
+
+For seeded users, the capability-backed checks produce identical UI visibility. For non-seeded users whose role and authorization-group memberships diverge, capability-backed authorization follows the authoritative capability model.
+
+### Justification
+
+T12 is a mechanism migration at the authorization architecture level. It does not introduce new policies, capabilities, handlers, persistence changes, or server-side authorization rules. It migrates Razor UI checks to the existing capability-backed authorization infrastructure.
+

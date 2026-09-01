@@ -27,6 +27,37 @@
 - No database migration required.
 
 
+
+### Sprint 10 T12 - Razor Navigation & Capability Visibility
+
+**Status:** Complete
+
+#### Changed
+
+- Replaced 45 `User.IsInRole(...)` role-based UI visibility checks across 14 Razor `.cshtml` files with capability-backed `IAuthorizationService.AuthorizeAsync(...)` calls.
+- Replaced admin navigation role check in `_Layout.cshtml` with capability-backed check.
+- Added `@using InventoryPlatform.Web.Authorization` to `_ViewImports.cshtml` for global access to `AuthorizationPolicies`.
+- Added per-file `@using Microsoft.AspNetCore.Authorization` for `IAuthorizationService` injection.
+- Removed `@using InventoryPlatform.Infrastructure.Identity` from all 14 affected files (no longer needed).
+- Pre-computed authorization boolean variables (`canManage`, `canAdmin`) in each affected Razor file to minimize per-request authorization evaluations.
+
+#### Verified
+
+- Build: SUCCESS — 0 errors, 20 pre-existing warnings.
+- Source verification: All 6 searches confirm correct migration.
+- 0 `User.IsInRole(...)` remain in targeted `.cshtml` files.
+- 1 dead-code `IsInRole` in `EditStatus.cshtml.cs` documented but unchanged.
+- All page-level `[Authorize(Policy = ...)]` attributes unchanged.
+- No Domain, Application, or Infrastructure files modified.
+- No database migration required.
+
+#### Deferred
+
+- `Categories/Edit.cshtml.cs` missing `[Authorize]` — pre-existing, separate task.
+- `Suppliers/Create.cshtml.cs` using overly broad `ViewInventory` policy — pre-existing, separate task.
+- `Units/Create.cshtml.cs` using `Administrator` policy — pre-existing, separate task.
+- `EditStatus.cshtml.cs` line 61 dead-code `IsInRole`.
+
 ### Sprint 9 - ASP.NET Core Code Quality & Consistency
 
 **Status:** T03-T13 implementation/documentation work complete; final validation completed

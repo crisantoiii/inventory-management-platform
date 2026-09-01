@@ -30,7 +30,7 @@ Account Management
 
 **Latest Release:** v1.5.0 — Sprint 8 Purchasing Enhancements
 
-**Project Status:** Sprint 10 Dynamic Capability-Based Authorization — T01-T11 Complete
+**Project Status:** Sprint 10 Dynamic Capability-Based Authorization — T01-T12 Complete
 
 **Last Updated:** August 2026
 
@@ -117,8 +117,8 @@ Verified:
 
 - **Completed Modules:** 10
 - **Architecture Status:** Validated
-- **Current Milestone:** Sprint 10 — Dynamic Capability-Based Authorization (T01-T11 Complete)
-- **Next Milestone:** Sprint 10 — T12 Razor Navigation & UI Capability Visibility
+- **Current Milestone:** Sprint 10 — Dynamic Capability-Based Authorization (T01-T12 Complete)
+- **Next Milestone:** Sprint 10 — T13 Integrated Authorization Verification
 
 ---
 
@@ -148,7 +148,7 @@ No unrelated business capability or structural architectural redesign was introd
 
 ---
 
-# Sprint 10 - Dynamic Capability-Based Authorization (T01-T10)
+# Sprint 10 - Dynamic Capability-Based Authorization (T01-T12)
 
 **Status:** T01-T10 complete.
 
@@ -166,6 +166,8 @@ Sprint 10 introduces a dynamic, database-backed capability-based authorization m
 - T08 — ASP.NET Core Capability Authorization Handler
 - T09 — Purchasing Dynamic Authorization Integration
 - T10 — Existing Authorization Boundary Migration
+- T11 — Authorization Administration
+- T12 — Razor Navigation & UI Capability Visibility
 
 ### T10 - Existing Authorization Boundary Migration
 
@@ -216,7 +218,7 @@ Configuration-level policy equivalence established through group-capability anal
 
 ### Deferred from T10
 
-- Razor `User.IsInRole` UI visibility checks (46 occurrences) — T12 scope
+- Razor `User.IsInRole` UI visibility checks (45 occurrences in 14 `.cshtml` files) — T12 COMPLETE
 - Categories/Edit.cshtml.cs missing `[Authorize]` — pre-existing, separate task
 - Suppliers/Create.cshtml.cs using overly broad `ViewInventory` policy — pre-existing, separate task
 
@@ -279,7 +281,6 @@ Implemented changes:
 
 ### Remaining Sprint 10 Tasks
 
-- T12 — Razor Navigation & UI Capability Visibility
 - T13 — Integrated Authorization Verification
 - T14 — Documentation Synchronization & Architecture Validation
 - T15 — Sprint 10 Final Verification, Retrospective & Save Point
@@ -897,7 +898,7 @@ The architecture has now been validated through:
 
 ### Sprint 10 — Dynamic Capability-Based Authorization
 
-Sprint 10 Dynamic Capability-Based Authorization T01-T11 are complete. T11 (Authorization Administration) added the minimum administration surface for managing authorization groups, capabilities, and user assignments. T12 (Razor Navigation & UI Capability Visibility) is the next task.
+Sprint 10 Dynamic Capability-Based Authorization T01-T12 are complete. T12 (Razor Navigation & UI Capability Visibility) migrated all 45 `User.IsInRole` UI visibility checks to capability-backed `IAuthorizationService.AuthorizeAsync` calls. T13 (Integrated Authorization Verification) is the next task.
 
 Sprint 8 Purchasing Enhancements (v1.5.0) is complete and closed. Dynamic Capability-Based Authorization is now in active implementation (T01-T10 complete).
 

@@ -67,6 +67,62 @@ Runtime/browser verification is deferred to T13.
 
 ---
 
+# Sprint 10 - T12 Razor Navigation & Capability Visibility
+
+## Summary
+
+Migrated all 45 `User.IsInRole(...)` role-based UI visibility checks across 14 Razor `.cshtml` files to capability-backed `IAuthorizationService.AuthorizeAsync(...)` calls using the policies established in T08/T10.
+
+## Implementation
+
+Each affected file received:
+1. `@using Microsoft.AspNetCore.Authorization` for `IAuthorizationService`
+2. `@inject IAuthorizationService AuthorizationService`
+3. Pre-computed boolean variables (`canManage`, `canAdmin`) to minimize per-request authorization evaluations
+4. Replacement of `User.IsInRole(IdentityConstants.Roles.*)` with pre-computed booleans
+5. Removal of `@using InventoryPlatform.Infrastructure.Identity` (no longer needed)
+
+`@using InventoryPlatform.Web.Authorization` was added to `_ViewImports.cshtml` for global access to `AuthorizationPolicies`.
+
+## Pattern
+
+```cshtml
+@inject IAuthorizationService AuthorizationService
+
+@{
+    var canManage = (await AuthorizationService.AuthorizeAsync(
+        User, null, AuthorizationPolicies.InventoryManagement)).Succeeded;
+    var canAdmin = (await AuthorizationService.AuthorizeAsync(
+        User, null, AuthorizationPolicies.Administrator)).Succeeded;
+}
+```
+
+## Behavioral Equivalence
+
+For the three seeded users (admin, manager, viewer), capability-backed checks produce identical UI visibility as the replaced role checks. This was proven through the seed data chain in `IdentitySeeder` and `AuthorizationSeeder`.
+
+For non-seeded users, capability-backed authorization follows authorization-group membership rather than Identity role membership. This is an intentional consequence of using the authoritative capability model.
+
+## Build
+
+Build: SUCCESS — 0 errors, 20 pre-existing warnings.
+
+## Source Verification
+
+Six searches confirmed correct migration:
+1. `User.IsInRole(` in `.cshtml` → 0 results
+2. `IsInRole(` in `.cs` → 1 result (dead code in EditStatus.cshtml.cs)
+3. `IdentityConstants.Roles` in `.cshtml` → 0 results
+4. `IAuthorizationService` in `.cshtml` → 14 files
+5. `AuthorizationPolicies.InventoryManagement` in `.cshtml` → 12 files
+6. `AuthorizationPolicies.Administrator` in `.cshtml` → 9 files
+
+## Outcome
+
+The Razor UI visibility layer is now fully capability-backed. All authorization checks in targeted Razor views resolve through the dynamic Group → Capability infrastructure. The migration preserves existing intended authorization behavior for synchronized users and follows the authoritative capability model for divergent cases.
+
+---
+
 # Sprint 10 - T10 Existing Authorization Boundary Migration
 
 ## Summary
