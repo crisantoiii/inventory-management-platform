@@ -1,0 +1,144 @@
+@page "{id:int}"
+@model InventoryPlatform.Web.Pages.Administrator.Groups.DetailsModel
+
+<h1>@ViewData["Title"]</h1>
+
+@if (!string.IsNullOrWhiteSpace(Model.SuccessMessage))
+{
+    <div class="alert alert-success alert-dismissible fade show"
+         role="alert">
+
+        @Model.SuccessMessage
+
+        <button type="button"
+                class="btn-close"
+                data-bs-dismiss="alert">
+        </button>
+    </div>
+}
+
+<div class="card mb-4">
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-3">Name</dt>
+            <dd class="col-sm-9">@Model.Group.Name</dd>
+
+            <dt class="col-sm-3">Capabilities</dt>
+            <dd class="col-sm-9">@Model.Group.Capabilities.Count</dd>
+
+            <dt class="col-sm-3">Users</dt>
+            <dd class="col-sm-9">@Model.Group.Users.Count</dd>
+        </dl>
+
+        <div class="mt-4">
+            <a asp-page="Index" id="backButton" class="btn btn-secondary">Back</a>
+
+            <a asp-page="Edit"
+               asp-route-id="@Model.Group.Id"
+               class="btn btn-primary">
+                Edit
+            </a>
+
+            <a asp-page="EditCapabilities"
+               asp-route-id="@Model.Group.Id"
+               class="btn btn-outline-info">
+                Manage Capabilities
+            </a>
+
+            <a asp-page="EditUsers"
+               asp-route-id="@Model.Group.Id"
+               class="btn btn-outline-info">
+                Manage Users
+            </a>
+        </div>
+    </div>
+</div>
+
+@if (Model.Group.Capabilities.Any())
+{
+    <h3>Assigned Capabilities</h3>
+    <table class="table table-sm">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Enabled</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var cap in Model.Group.Capabilities)
+            {
+                <tr>
+                    <td>@cap.Name</td>
+                    <td>
+                        @if (cap.IsEnabled)
+                        {
+                            <span class="badge bg-success">Yes</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger">No</span>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <div class="alert alert-info">
+        No capabilities assigned to this group.
+    </div>
+}
+
+@if (Model.Group.Users.Any())
+{
+    <h3>Assigned Users</h3>
+    <table class="table table-sm">
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>Email</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in Model.Group.Users)
+            {
+                <tr>
+                    <td>@user.UserName</td>
+                    <td>@user.Email</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <div class="alert alert-info">
+        No users assigned to this group.
+    </div>
+}
+
+@section Scripts {
+    <script>
+        const backButton = document.getElementById("backButton");
+
+        if (backButton) {
+            backButton.addEventListener("click", function (e) {
+                const referrer = document.referrer;
+                const currentHost = window.location.host;
+
+                if (referrer && referrer.includes(currentHost)) {
+                    const lowerReferrer = referrer.toLowerCase();
+
+                    if (lowerReferrer.includes("/create") || lowerReferrer.includes("/edit")) {
+                        return;
+                    }
+
+                    e.preventDefault();
+                    window.history.back();
+                }
+            });
+        }
+    </script>
+}

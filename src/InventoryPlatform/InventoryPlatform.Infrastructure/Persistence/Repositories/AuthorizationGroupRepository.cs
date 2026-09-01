@@ -33,4 +33,24 @@ public sealed class AuthorizationGroupRepository
             .Include(x => x.Capabilities)
             .ToListAsync(cancellationToken);
     }
+
+    public Task<AuthorizationGroup?> GetWithCapabilitiesAndUsersAsync(
+        int id,
+        CancellationToken cancellationToken = default)
+    {
+        return DbSet
+            .Include(x => x.Capabilities)
+            .Include(x => x.UserGroups)
+            .SingleOrDefaultAsync(x => x.Id == id, cancellationToken);
+    }
+
+    public async Task<IReadOnlyList<AuthorizationGroup>> GetAllWithDetailsAsync(
+        CancellationToken cancellationToken = default)
+    {
+        return await DbSet
+            .AsNoTracking()
+            .Include(x => x.Capabilities)
+            .Include(x => x.UserGroups)
+            .ToListAsync(cancellationToken);
+    }
 }

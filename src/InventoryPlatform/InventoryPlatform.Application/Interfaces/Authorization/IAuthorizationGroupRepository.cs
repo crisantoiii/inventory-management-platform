@@ -13,4 +13,11 @@ public interface IAuthorizationGroupRepository
     Task<IReadOnlyList<AuthorizationGroup>> GetForUserAsync(
         Guid userId,
         CancellationToken cancellationToken = default);
+
+    Task<AuthorizationGroup?> GetWithCapabilitiesAndUsersAsync(
+        int id,
+        CancellationToken cancellationToken = default);
+
+    Task<IReadOnlyList<AuthorizationGroup>> GetAllWithDetailsAsync(
+        CancellationToken cancellationToken = default);
 }

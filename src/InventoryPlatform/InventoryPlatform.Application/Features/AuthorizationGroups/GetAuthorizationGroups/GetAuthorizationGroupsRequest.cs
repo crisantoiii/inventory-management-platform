@@ -1,0 +1,3 @@
+namespace InventoryPlatform.Application.Features.AuthorizationGroups.GetAuthorizationGroups;
+
+public sealed record GetAuthorizationGroupsRequest;

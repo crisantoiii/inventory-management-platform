@@ -2,6 +2,7 @@
 using InventoryPlatform.Application.DTOs.Role;
 using InventoryPlatform.Application.Features.Users;
 using InventoryPlatform.Application.Features.Users.CreateUser;
+using InventoryPlatform.Application.Features.Users.GetAllUsers;
 using InventoryPlatform.Application.Features.Users.GetUser;
 using InventoryPlatform.Application.Features.Users.GetUsers;
 using InventoryPlatform.Application.Features.Users.ResetPassword;
@@ -390,6 +391,21 @@ public sealed class IdentityService : IIdentityService
         return query.Where(user =>
             (user.UserName != null && user.UserName.Contains(search)) ||
             (user.Email != null && user.Email.Contains(search)));
+    }
+
+    public async Task<IReadOnlyList<GetAllUsersResponse>> GetAllUsersAsync(
+        CancellationToken cancellationToken = default)
+    {
+        return await _context.Users
+            .AsNoTracking()
+            .OrderBy(u => u.UserName)
+            .Select(u => new GetAllUsersResponse
+            {
+                Id = u.Id,
+                UserName = u.UserName ?? string.Empty,
+                Email = u.Email ?? string.Empty
+            })
+            .ToListAsync(cancellationToken);
     }
 
     private static Result ToResult(
