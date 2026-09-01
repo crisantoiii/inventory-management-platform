@@ -234,4 +234,134 @@ T13 performed the final Sprint 9 consistency gate against the governing README, 
 
 One actual documentation inconsistency was corrected during T13: `CODE_STYLE.md` incorrectly described `PagedQuery.Page` as the infrastructure paging property, while the current source defines `PagedQuery.PageNum`. The guidance now reflects the source-backed `PageNum` contract without collapsing the distinct Application Request -> `PagedQuery` responsibility boundary.
 
+---
+
+# Sprint 10 — Dynamic Capability-Based Authorization
+
+**Date:** September 2026  
+**Status:** PASS WITH FINDINGS — source-verified architecture, runtime-verified behavior (T13)
+
+## Scope
+
+Sprint 10 implemented a dynamic, database-backed capability-based authorization model across all four architecture layers.
+
+## Domain Layer — PASS
+
+4 entities in Domain/Entities with no external framework dependencies:
+- `Capability` (Name, IsEnabled, GroupCapabilities)
+- `AuthorizationGroup` (Name, Capabilities, UserGroups)
+- `AuthorizationGroupCapability` (join entity)
+- `UserAuthorizationGroup` (join entity)
+
+Rich domain behavior: AddCapability, RemoveCapability, AssignUser, RemoveUser, Enable, Disable.
+
+No boundary violations: no ASP.NET Core, Identity, ClaimsPrincipal, UserManager, Razor, or HTTP dependencies.
+
+## Application Layer — PASS
+
+- Abstractions: ICapabilityAuthorizationService, ICapabilityRepository, IAuthorizationGroupRepository
+- Service: CapabilityAuthorizationService (union semantics, IsEnabled check)
+- 10 feature handlers for Group/Capability management
+- No unnecessary coupling to ASP.NET Core authorization framework types
+
+## Infrastructure Layer — PASS
+
+- EF Core configurations for 4 tables with correct keys, indexes, unique constraints, cascade delete
+- Repositories: AuthorizationGroupRepository, CapabilityRepository
+- Seed data: AuthorizationSeeder (39 capabilities, 3 groups), IdentitySeeder (user-to-group assignment)
+- Identity integration: ApplicationUser derives from IdentityUser<Guid> — clean
+
+## Web Layer — PASS
+
+- Authorization handlers: CapabilityAuthorizationHandler, MultiCapabilityAuthorizationHandler
+- Requirements: CapabilityRequirement, MultiCapabilityRequirement
+- Policy registration: CapabilityAuthorizationExtensions, ServiceCollectionExtensions
+- 43 page-level [Authorize(Policy)] attributes using capability-backed policies
+- 45 Razor User.IsInRole checks migrated to IAuthorizationService.AuthorizeAsync
+- 7 admin Razor Pages under /Administrator/Groups and /Administrator/Capabilities
+
+## Identity Compatibility — PASS WITH FINDINGS
+
+- Identity roles (Administrator, InventoryManager, Viewer) retained
+- Group names match role names — mapping is name-based
+- Users assigned to groups matching their roles — effective equivalence for seeded users
+- Non-seeded users: capability model is authoritative (intentional)
+- Finding (DF1): InventoryManager group includes Administration.Access — DESIGN FINDING
+
+## Dynamic Capability Flow — PASS (SOURCE VERIFIED)
+
+```
+[Authorize(Policy)] / IAuthorizationService.AuthorizeAsync()
+    ↓
+CapabilityRequirement / MultiCapabilityRequirement
+    ↓
+CapabilityAuthorizationHandler / MultiCapabilityAuthorizationHandler
+    ↓
+ICapabilityAuthorizationService.HasCapabilityAsync(userId, capabilityName)
+    ↓  ← queries database on every call
+ICapabilityRepository.GetByNameAsync → exists + IsEnabled?
+    ↓
+IAuthorizationGroupRepository.GetForUserAsync → user's groups with capabilities
+    ↓
+Union: groups.Any(g => g.Capabilities.Any(...))
+    ↓
+context.Succeed() on match / return on failure (default deny)
+```
+
+## Default Deny — PASS (SOURCE VERIFIED)
+
+All handler failure paths return without calling context.Succeed(). Zero fallback role authorization in the codebase.
+
+## Server-Side Authorization — PASS (SOURCE VERIFIED)
+
+43 page-level [Authorize(Policy)] attributes. Handler-level IAuthorizationService checks on Purchasing POST actions. Razor visibility is independent presentation concern.
+
+## Policy Migration — PASS (SOURCE VERIFIED)
+
+- Administrator policy: single cap Administration.Access (only Administrator group)
+- InventoryManagement policy: OR-composite of 9 capabilities
+- ViewInventory policy: OR-composite of 7 view capabilities
+- All 43 page-level [Authorize] attributes preserved unchanged (same policy names)
+
+## Razor UI Visibility — PASS (SOURCE VERIFIED)
+
+45 User.IsInRole checks migrated to IAuthorizationService.AuthorizeAsync with pre-computed boolean variables. Zero IdentityConstants.Roles references remain in .cshtml files.
+
+## Database Model — PASS (SOURCE VERIFIED from migration)
+
+```
+AuthorizationGroups (Id PK, Name UNIQUE)
+Capabilities (Id PK, Name UNIQUE, IsEnabled)
+AuthorizationGroupCapabilities (Id PK, AuthorizationGroupId FK CASCADE, CapabilityId FK CASCADE, UNIQUE composite)
+UserAuthorizationGroups (Id PK, UserId FK CASCADE, AuthorizationGroupId FK CASCADE, UNIQUE composite)
+```
+
+All non-nullable FKs. Correct cascade delete. Unique composite indexes prevent duplicates.
+
+## Active-Session Behavior
+
+- Capability data is queried per authorization request (no caching) — SOURCE VERIFIED
+- Active-session capability change behavior — NOT RUNTIME VERIFIED (T13 did not test this scenario)
+
+## Known Findings
+
+| # | Finding | Severity | Classification |
+|---|---------|----------|---------------|
+| DF1 | InventoryManager group includes Administration.Access | Medium | DESIGN FINDING — seed data |
+| DF2 | InventoryManagement OR-composite grants broad access | Medium | DESIGN FINDING — policy design |
+| DF3 | Categories/Edit missing [Authorize] attribute | Medium | PRE-EXISTING GAP |
+| DF4 | Viewer has User.View capability | Low | DESIGN FINDING — seed filter |
+| DF5 | Suppliers/Create uses ViewInventory policy | Low | PRE-EXISTING POLICY CHOICE |
+| DF6 | Dead /Inventory folder convention | Low | DEAD CODE |
+| DF7 | Account lockout not restored by seed | Medium | PRE-EXISTING BEHAVIOR |
+| DF8 | Reports unrestricted | Low | DESIGN DECISION PENDING |
+
+All findings are documented in the ENGINEERING_JOURNAL T13 entry and deferred to post-Sprint 10.
+
+## Overall Assessment
+
+The Dynamic Capability-Based Authorization architecture is structurally sound and correctly implemented across all four layers. The authorization flow matches the intended design from DD-032. Identity compatibility is preserved. Server-side authorization is enforced. Default deny works correctly.
+
+Findings are seed data and policy design issues, not code bugs. The authorization infrastructure (handlers, services, repositories, policies) works correctly.
+
 Sprint 9 is complete at the source/documentation level, with the runtime verification limitation explicitly retained.

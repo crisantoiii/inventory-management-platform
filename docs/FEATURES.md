@@ -77,6 +77,7 @@ The first Reporting vertical slice has also been implemented through Inventory V
 | Architecture Sprint | ✅ Complete |
 | Purchasing | ✅ Core Workflow + Sprint 8 P1-P7 Enhancements Complete |
 | Reporting | ✅ Sprint 7 Additional Reporting Complete |
+| Dynamic Capability-Based Authorization | ✅ Sprint 10 T01-T13 Complete |
 
 ## Current Implementation
 
@@ -912,8 +913,9 @@ Domain State Validation
 
 Status:
 
-- T01-T11 Complete
-- T12-T15 Remaining
+- T01-T13 Complete (source and runtime verified)
+- T14 Documentation Synchronization (complete)
+- T15 Final Verification & Retrospective (remaining)
 
 ### Authorization Administration (T11)
 
@@ -939,6 +941,77 @@ Pages:
 - `/Administrator/Capabilities` — View capability catalog
 
 All admin pages require `Administration.Access` capability.
+
+### Domain Model (T02)
+
+- ✅ Capability entity (Name, IsEnabled, GroupCapabilities)
+- ✅ AuthorizationGroup entity (Name, Capabilities, UserGroups)
+- ✅ AuthorizationGroupCapability join entity
+- ✅ UserAuthorizationGroup join entity
+- ✅ Rich domain behavior (AddCapability, RemoveCapability, AssignUser, RemoveUser, Enable, Disable)
+
+### Application Abstractions (T03)
+
+- ✅ ICapabilityAuthorizationService (HasCapabilityAsync)
+- ✅ ICapabilityRepository (GetByNameAsync)
+- ✅ IAuthorizationGroupRepository (GetForUserAsync, GetWithCapabilitiesAsync, GetWithCapabilitiesAndUsersAsync, GetAllWithDetailsAsync)
+- ✅ CapabilityAuthorizationService (union semantics, IsEnabled check)
+
+### Persistence & Migration (T04–T06)
+
+- ✅ EF Core configurations for 4 authorization tables
+- ✅ CreateAuthorizationSchema migration
+- ✅ Unique indexes on group name, capability name, and join-table composites
+- ✅ Cascade delete on all relationships
+
+### Seed Data (T05)
+
+- ✅ 39 capabilities (Resource.Action pattern)
+- ✅ 3 groups (Administrator, InventoryManager, Viewer)
+- ✅ Capability-to-group assignments per group
+- ✅ User-to-group assignments for 3 seeded users
+- ✅ Additive-only, idempotent seeding
+
+### Authorization Handlers (T08)
+
+- ✅ CapabilityRequirement + CapabilityAuthorizationHandler (single capability)
+- ✅ MultiCapabilityRequirement + MultiCapabilityAuthorizationHandler (OR-composite)
+- ✅ CapabilityAuthorizationExtensions (AddCapabilityPolicy)
+- ✅ Default deny on all failure paths
+
+### Policy Migration (T10)
+
+- ✅ Administrator policy → single cap Administration.Access
+- ✅ InventoryManagement policy → OR-composite of 9 capabilities
+- ✅ ViewInventory policy → OR-composite of 7 view capabilities
+- ✅ All 43 page-level [Authorize(Policy)] attributes preserved unchanged
+
+### Razor UI Visibility (T12)
+
+- ✅ 45 User.IsInRole checks migrated to IAuthorizationService.AuthorizeAsync
+- ✅ Pre-computed boolean variables for efficiency
+- ✅ Zero IdentityConstants.Roles references in .cshtml files
+
+### Runtime Verification (T13)
+
+- ✅ Build: SUCCESS (0 errors, 0 warnings)
+- ✅ Authentication: All 3 seeded users login
+- ✅ Unauthenticated access: 302 redirect to login
+- ✅ Administrator: All admin pages accessible (200)
+- ✅ Manager: All management pages accessible (200)
+- ✅ Viewer: View pages accessible (200), management denied (302)
+- ✅ Purchasing: Per-action capabilities verified (View, Create, Submit, Approve, Receive)
+- ✅ Reports: Accessible to all authenticated users (by design)
+- ✅ Database: 39 capabilities, 3 groups, 3 assignments verified
+- ✅ AccessDenied page renders correctly
+
+### Known Findings (Deferred)
+
+- InventoryManager group includes Administration.Access (seed data issue)
+- InventoryManagement OR-composite grants broad access via single capability
+- Categories/Edit missing [Authorize] attribute (pre-existing gap)
+- Viewer has User.View capability (seed filter includes all *.View)
+- Reports unrestricted (design decision pending)
 
 
 ## User Administration

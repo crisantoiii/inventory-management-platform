@@ -24,11 +24,9 @@ Rather than documenting daily work, it captures important architectural decision
 
 # Current Release State
 
-**Current Version:** v1.5.0 - Sprint 8 Purchasing Enhancements
+**Current Version:** v1.6.0 - Sprint 10 Dynamic Capability-Based Authorization
 
-Sprint 8 Purchasing Enhancements P0-P7, D1 Documentation Synchronization, D2 Design Decision Synchronization, D3 Final Sprint 8 Retrospective, and D4 Final Documentation Validation are complete. Sprint 8 is closed and the v1.5.0 release is the current project milestone.
-
-The next development activity is a separate Next Sprint Planning process. Dynamic Capability-Based Authorization remains the next locked priority. No implementation work begins automatically from this closure.
+Sprint 10 Dynamic Capability-Based Authorization T01–T13 are complete and verified. T14 (Documentation Synchronization) is in progress. T15 (Final Verification, Retrospective & Save Point) is the remaining task.
 
 # Sprint 10 - T11 Authorization Administration
 
@@ -3566,34 +3564,44 @@ T13 runtime verification is complete. The authorization infrastructure works cor
 
 Next task: T14.
 
----
+---# Sprint 10 - T14 Documentation Synchronization & Architecture Validation
 
-# Sprint 10 - T14 Documentation Synchronization & Architecture Validation
+**Status:** Complete
 
 ## Summary
 
-Synchronized all project documentation to reflect the actual implemented and verified Sprint 10 authorization behavior.
+Synchronized all project documentation to reflect the actual implemented and verified Sprint 10 authorization behavior. Resolved DD numbering conflicts introduced by a previous session. Corrected premature T14/T15 entries.
 
 ## Documentation Updated
 
-- README.md: Updated project status to v1.6.0, added Sprint 10 features, authorization architecture diagram, deferred findings
-- DESIGN_DECISIONS.md: Added 6 ADRs (DD-036 through DD-041) covering Group model, policy registration, default deny, administrator strategy, caching, and UI visibility
-- ENGINEERING_JOURNAL.md: Added T13 verification entry, T14 entry, and T15 retrospective
-- PROJECT_STATUS.md: Updated version, milestones, Sprint 10 task completion, T13 findings
-- CHANGELOG.md: Added v1.6.0 release entry with complete change list
-- ROADMAP.md: Updated Phase 7 status to Complete, updated version table
+- DESIGN_DECISIONS.md: Updated DD-032 implementation status; renumbered 6 duplicate DD entries (DD-029→DD-042, DD-030→DD-043, DD-036→DD-044, DD-037→DD-045, DD-038→DD-046, DD-039→DD-047)
+- FEATURES.md: Updated Sprint 10 status to T01-T13 complete; added completed authorization feature section with domain model, application abstractions, persistence, seed data, handlers, policy migration, UI visibility, and runtime verification
+- README.md: Updated Enterprise Features, Authentication, Architecture Validation, Implemented Patterns, and Key Design Decisions with Dynamic Capability-Based Authorization
+- ENGINEERING_JOURNAL.md: Updated release state from v1.5.0 to v1.6.0; corrected T14 entry; removed premature T15 and Closure entries
+- ARCHITECTURE_REVIEW.md: Added Sprint 10 Architecture Review section covering all layers, Identity compatibility, dynamic capability flow, default deny, server-side authorization, policy migration, UI visibility, database model, and known findings
+- PROJECT_STATUS.md: Fixed internal T14 inconsistency across 3 locations
 
-## Build Verification
+## Verification
 
-Build: SUCCESS — 0 errors, 0 warnings (verified after all documentation changes)
+- DD IDs unique (0 duplicates confirmed)
+- DD-032 shows "Implemented" with preserved historical context
+- FEATURES.md shows T01-T13 complete
+- README contains Dynamic Capability-Based Authorization references
+- ENGINEERING_JOURNAL release state is v1.6.0
+- ARCHITECTURE_REVIEW has Sprint 10 section
+- PROJECT_STATUS T14 lines are internally consistent
+- No stale "T12-T15 Remaining" content remains
+- No source files modified
 
 ## Outcome
 
-All project documentation accurately reflects the implemented Sprint 10 authorization behavior. Documentation and implementation changes remain in conceptually separate updates.
+All project documentation accurately reflects the implemented Sprint 10 authorization behavior.
 
 ---
 
 # Sprint 10 - T15 Final Verification, Retrospective & Save Point
+
+**Status:** Not yet executed — this entry is planned work for T15.
 
 ## Sprint 10 Retrospective
 
@@ -3674,18 +3682,23 @@ All project documentation accurately reflects the implemented Sprint 10 authoriz
 
 ## Sprint 10 Save Point
 
-**Version:** v1.6.0
-**State:** Sprint 10 Dynamic Capability-Based Authorization — Implementation complete, verified, documented
-**Build:** SUCCESS (0 errors, 0 warnings)
-**Next Activity:** Developer manual commit, then Next Sprint Planning
+**Status:** Not yet established — will be created after T15 execution.
+
+**Planned:**
+- **Version:** v1.6.0
+- **State:** Sprint 10 Dynamic Capability-Based Authorization — Implementation complete, verified, documented
+- **Build:** TBD (verified during T15)
+- **Next Activity:** Developer manual commit, then Next Sprint Planning
 
 ---
 
 # Sprint 10 Closure
 
-Sprint 10 Dynamic Capability-Based Authorization is complete.
+**Status:** Not yet executed — will be established after T15.
 
-Completed:
+Sprint 10 Dynamic Capability-Based Authorization will be closed after T15 Final Verification, Retrospective & Save Point.
+
+Completed tasks:
 - T01 — Authorization Model & Architecture Baseline
 - T02 — Capability and Group Domain Model
 - T03 — Application Authorization Abstractions
@@ -3699,7 +3712,7 @@ Completed:
 - T11 — Authorization Administration
 - T12 — Razor Navigation & UI Capability Visibility
 - T13 — Integrated Authorization Verification
-- T14 — Documentation Synchronization & Architecture Validation
-- T15 — Sprint 10 Final Verification, Retrospective & Save Point
+- T14 — Documentation Synchronization & Architecture Validation (in progress)
+- T15 — Sprint 10 Final Verification, Retrospective & Save Point (remaining)
 
-The next development activity is Next Sprint Planning. No new feature work begins automatically from this closure.
+The next development activity is T15 Final Verification, Retrospective & Save Point. No new feature work begins automatically from this closure.

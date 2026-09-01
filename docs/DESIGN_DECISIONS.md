@@ -1656,21 +1656,34 @@ Rejected because user authorization is an application/security concern, while Do
 
 ## Implementation Status
 
-Accepted as the future authorization architecture.
+**Original status:** Accepted as the future authorization architecture. Not yet implemented.
 
-Not yet implemented.
+**Implementation outcome (Sprint 10, T01–T13):** Implemented.
 
-Additional Reporting is complete for Sprint 7; the next implementation scope will be established through Sprint Planning.
+Implemented across Sprint 10:
+- Domain entities: Capability, AuthorizationGroup, AuthorizationGroupCapability, UserAuthorizationGroup
+- Application abstractions: ICapabilityAuthorizationService, ICapabilityRepository, IAuthorizationGroupRepository
+- Infrastructure persistence: EF Core configurations, repositories, seed data (39 capabilities, 3 groups)
+- Web integration: CapabilityRequirement, MultiCapabilityRequirement, authorization handlers, policy registration
+- Administration: 7 Razor Pages for Group CRUD, capability/user assignment, capability catalog
+- UI visibility: 45 Razor User.IsInRole checks migrated to IAuthorizationService.AuthorizeAsync
+
+**Runtime verification (T13):** Build success. Authentication for all 3 seeded users. Authorization boundaries verified for Administrator, Manager, and Viewer. Per-action Purchasing capabilities verified. Database state verified (39 capabilities, 3 groups, 3 assignments).
+
+**Not runtime verified:** Active-session capability change behavior. Seed re-idempotency across restart.
+
+See DD-044 through DD-047, DD-040, DD-041 for implementation-specific architectural decisions.
+See DD-039 for the static policy migration approach.
 
 ### Implementation Boundary
 
-The future capability model is an authorization model, not an authentication replacement.
+The capability model is an authorization model, not an authentication replacement.
 
-Authentication will continue to be responsible for establishing the user's identity.
+Authentication continues to be responsible for establishing the user's identity.
 
-Authorization will determine whether the authenticated user has the required capability to attempt an application action.
+Authorization determines whether the authenticated user has the required capability to attempt an application action.
 
-Domain business rules will determine whether the action is valid for the current business state.
+Domain business rules determine whether the action is valid for the current business state.
 
 ---
 

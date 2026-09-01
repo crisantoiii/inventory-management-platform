@@ -198,7 +198,14 @@ The first Reporting vertical slice was implemented without requiring structural 
 - ✅ Web layer validated
 - ✅ Architecture approved for future module expansion
 
-The completed Purchasing, Reporting, and Account Management vertical slices further validated that the existing architecture can support CRUD-oriented modules, workflow-driven business processes, read-oriented reporting, and self-service account security workflows without requiring structural redesign.
+Sprint 10 validated the architecture through the implementation of Dynamic Capability-Based Authorization across all four layers:
+
+- ✅ Domain layer: Authorization entities with rich domain behavior
+- ✅ Application layer: Authorization abstractions and feature handlers
+- ✅ Infrastructure layer: EF Core persistence, repositories, seed data
+- ✅ Web layer: ASP.NET Core authorization handlers, policy registration, Razor visibility
+
+The completed Purchasing, Reporting, Account Management, and Dynamic Capability-Based Authorization implementations further validated that the existing architecture can support CRUD-oriented modules, workflow-driven business processes, read-oriented reporting, self-service account security workflows, and dynamic capability-based authorization without requiring structural redesign.
 
 ## Sprint 9 - ASP.NET Core Code Quality & Consistency
 
@@ -280,6 +287,7 @@ The long-term goal is to evolve this project into a complete inventory managemen
 - ASP.NET Core Identity
 - Cookie Authentication
 - Role-based Authorization
+- Dynamic Capability-Based Authorization
 - User Management
 - Password Management
 - Self-Service Account Management
@@ -557,6 +565,7 @@ Final project-wide verification is complete, including application regression, r
 - ✅ Logout
 - ✅ Cookie Authentication
 - ✅ Role-based Authorization
+- ✅ Dynamic Capability-Based Authorization
 - ✅ ASP.NET Core Identity
 - ✅ Identity Cookie Authentication
 
@@ -777,6 +786,7 @@ No major architectural redesign was required.
 - Feature-based Architecture
 - ASP.NET Core Identity
 - Role-based Authorization
+- Dynamic Capability-Based Authorization
 - Dependency Injection Extensions
 - Thin PageModels
 - Thin Handlers
@@ -809,6 +819,9 @@ No major architectural redesign was required.
 - Purchase Order receiving is performed at the Purchase Order Item level.
 - Purchase Order totals remain calculated from Purchase Order items.
 - Client-side validation improves user experience while Domain validation remains authoritative.
+- Dynamic capability-based authorization resolves permissions from the database via Groups and Capabilities.
+- Authorization is enforced server-side through ASP.NET Core policies backed by capability requirements.
+- UI visibility is independently managed through capability-backed authorization service checks.
 
 ---
 
