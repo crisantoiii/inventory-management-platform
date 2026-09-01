@@ -2077,3 +2077,128 @@ For seeded users, the capability-backed checks produce identical UI visibility. 
 
 T12 is a mechanism migration at the authorization architecture level. It does not introduce new policies, capabilities, handlers, persistence changes, or server-side authorization rules. It migrates Razor UI checks to the existing capability-backed authorization infrastructure.
 
+---
+
+# DD-036 — Dynamic Capability-Based Authorization: Group Model
+
+**Status:** Implemented
+
+**Context**
+The platform needed a dynamic authorization model that evolved from existing Identity roles without requiring a complete authentication rewrite.
+
+**Decision**
+User → Group → Capability (Option A). Users belong to one or more AuthorizationGroups. Groups contain one or more Capabilities. Effective capabilities are the union of all capabilities across all enabled Groups.
+
+**Reason**
+Simplest model satisfying the requirements. Single join-table chain. No unnecessary indirection.
+
+**Rejected Alternatives**
+- User + Group parallel model (more complex)
+- Role → Group chain (unnecessary indirection)
+
+**Consequences**
+- AuthorizationGroupCapability and UserAuthorizationGroup join tables
+- EF Core cascade deletes on all relationships
+- Union semantics for multiple groups
+
+---
+
+# DD-037 — Dynamic Capability-Based Authorization: Policy Registration
+
+**Status:** Implemented
+
+**Context**
+ASP.NET Core authorization requires policies to be registered. The capability system needs dynamic database-backed resolution.
+
+**Decision**
+Static policy registration with capability-backed requirements. Policies are registered at startup via `AddCapabilityPolicy` extension method. Each policy wraps a CapabilityRequirement or MultiCapabilityRequirement. Resolution is dynamic (database query per request).
+
+**Reason**
+Simple, debuggable, sufficient for finite capability set. Standard ASP.NET Core pattern.
+
+**Rejected Alternatives**
+- Dynamic policy provider (IAuthorizationPolicyProvider) — unnecessary complexity
+- Application service called from PageModels — bypasses ASP.NET Core authorization middleware
+
+---
+
+# DD-038 — Dynamic Capability-Based Authorization: Default Deny
+
+**Status:** Implemented
+
+**Context**
+The authorization model must fail-closed. No accidental implicit allow.
+
+**Decision**
+Handler returns without calling `context.Succeed()` on any failure path. ASP.NET Core's default behavior denies access when no handler succeeds.
+
+**Evidence**
+All failure paths traced: not authenticated, empty userId, capability not found, capability disabled, no groups, no matching capability — all result in non-success. DB exceptions propagate as 500 errors (still denies access).
+
+**Consequences**
+- Zero fallback role authorization in the codebase
+- Database failures produce 500 instead of clean 403 (acceptable for portfolio scope)
+
+---
+
+# DD-039 — Dynamic Capability-Based Authorization: Administrator Strategy
+
+**Status:** Implemented
+
+**Context**
+Administrator access must not be accidentally lost during migration.
+
+**Decision**
+Hybrid: Identity role retained + Administrator Group with ALL capabilities + seed-based recovery on restart.
+
+**Mechanism**
+- IdentitySeeder seeds roles and assigns users to groups on every startup
+- AuthorizationSeeder creates missing capabilities, groups, and adds missing capabilities to groups
+- AssignUsersToGroupsAsync re-assigns seeded users to their groups if assignments are missing
+
+**Limitations (from T13)**
+- Seed does NOT clear account lockout state
+- Seed is additive-only for capabilities beyond the catalog
+- Seed does NOT restore Identity roles if removed (but roles are not used for authorization)
+
+---
+
+# DD-040 — Dynamic Capability-Based Authorization: Caching
+
+**Status:** Deferred
+
+**Context**
+Dynamic authorization requires database queries per request.
+
+**Decision**
+Defer caching. Two indexed queries per authorization check. Portfolio project scope does not demonstrate need.
+
+**Future Consideration**
+If performance issues arise, evaluate request-level or user-level caching with appropriate invalidation.
+
+---
+
+# DD-041 — Dynamic Capability-Based Authorization: UI Visibility
+
+**Status:** Implemented
+
+**Context**
+Razor views need to show/hide UI elements based on capabilities.
+
+**Decision**
+Use `IAuthorizationService.AuthorizeAsync(User, null, policyName)` in Razor views with pre-computed boolean variables. UI hiding is convenience only — server-side `[Authorize]` is the security boundary.
+
+**Pattern**
+```cshtml
+@{
+    var canManage = (await AuthorizationService.AuthorizeAsync(
+        User, null, AuthorizationPolicies.InventoryManagement)).Succeeded;
+}
+@if (canManage) { /* show create button */ }
+```
+
+**Consequences**
+- 14 Razor files migrated from `User.IsInRole` to `IAuthorizationService`
+- Zero `IdentityConstants.Roles` references in .cshtml files
+- Server-side authorization remains independent of UI visibility
+

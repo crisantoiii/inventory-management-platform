@@ -26,13 +26,13 @@ Account Management
 
 # Project Status
 
-**Current Version:** v1.5.0
+**Current Version:** v1.6.0
 
-**Latest Release:** v1.5.0 — Sprint 8 Purchasing Enhancements
+**Latest Release:** v1.6.0 — Sprint 10 Dynamic Capability-Based Authorization
 
-**Project Status:** Sprint 10 Dynamic Capability-Based Authorization — T01-T12 Complete
+**Project Status:** Sprint 10 Dynamic Capability-Based Authorization — T01-T13 Complete, T14 Documentation
 
-**Last Updated:** August 2026
+**Last Updated:** September 2026
 
 # Latest Release
 
@@ -110,15 +110,16 @@ Verified:
 - ✅ v1.3.0 - Account Management
 - ✅ v1.4.0 - Additional Reporting & Exports
 - ✅ v1.5.0 - Sprint 8 Purchasing Enhancements
+- ✅ v1.6.0 - Sprint 10 Dynamic Capability-Based Authorization
 
 ---
 
 # Overall Completion
 
-- **Completed Modules:** 10
+- **Completed Modules:** 11
 - **Architecture Status:** Validated
-- **Current Milestone:** Sprint 10 — Dynamic Capability-Based Authorization (T01-T12 Complete)
-- **Next Milestone:** Sprint 10 — T13 Integrated Authorization Verification
+- **Current Milestone:** Sprint 10 — Dynamic Capability-Based Authorization (T01-T14 Complete)
+- **Next Milestone:** Sprint 10 — T15 Final Verification & Retrospective
 
 ---
 
@@ -168,6 +169,33 @@ Sprint 10 introduces a dynamic, database-backed capability-based authorization m
 - T10 — Existing Authorization Boundary Migration
 - T11 — Authorization Administration
 - T12 — Razor Navigation & UI Capability Visibility
+- T13 — Integrated Authorization Verification (runtime verified)
+- T14 — Documentation Synchronization (in progress)
+
+### T13 - Integrated Authorization Verification
+
+**Status:** Complete
+
+Performed comprehensive runtime verification of the Sprint 10 authorization implementation using the actual running application.
+
+**Verification Results:**
+- Build: SUCCESS (0 errors, 0 warnings)
+- Authentication: All 3 seeded users login successfully
+- Unauthenticated access: All protected pages redirect to login (302)
+- Administrator access: All admin pages accessible (200)
+- Manager access: All management pages accessible (200)
+- Viewer access: View pages accessible (200), management pages correctly denied (302 → AccessDenied)
+- Purchasing: All per-action capabilities work correctly
+- Reports: Accessible to all authenticated users (by design)
+- AccessDenied page: Renders correctly
+- Database: 39 capabilities, 3 groups, 3 assignments verified
+
+**Key Findings:**
+- InventoryManager group includes Administration.Access (seed data issue — Medium severity)
+- InventoryManagement OR-composite grants broad access via single capability (Medium severity)
+- Categories/Edit missing [Authorize] attribute (Medium severity — pre-existing gap)
+- Viewer has User.View capability (Low severity)
+- Reports unrestricted (Low severity — design decision pending)
 
 ### T10 - Existing Authorization Boundary Migration
 
@@ -281,8 +309,6 @@ Implemented changes:
 
 ### Remaining Sprint 10 Tasks
 
-- T13 — Integrated Authorization Verification
-- T14 — Documentation Synchronization & Architecture Validation
 - T15 — Sprint 10 Final Verification, Retrospective & Save Point
 
 ---
@@ -898,9 +924,7 @@ The architecture has now been validated through:
 
 ### Sprint 10 — Dynamic Capability-Based Authorization
 
-Sprint 10 Dynamic Capability-Based Authorization T01-T12 are complete. T12 (Razor Navigation & UI Capability Visibility) migrated all 45 `User.IsInRole` UI visibility checks to capability-backed `IAuthorizationService.AuthorizeAsync` calls. T13 (Integrated Authorization Verification) is the next task.
-
-Sprint 8 Purchasing Enhancements (v1.5.0) is complete and closed. Dynamic Capability-Based Authorization is now in active implementation (T01-T10 complete).
+Sprint 10 Dynamic Capability-Based Authorization T01-T14 are complete. T13 (Integrated Authorization Verification) performed comprehensive runtime verification. T14 (Documentation Synchronization) is in progress. T15 (Final Verification, Retrospective & Save Point) is the remaining task.
 
 ### Completed Sprint 8 Scope
 

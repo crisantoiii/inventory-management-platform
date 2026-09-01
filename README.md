@@ -42,9 +42,9 @@ The focus is not only on implementing business features but also on applying pro
 
 ## Project Status
 
-**Current Version:** v1.5.0 - Purchasing Enhancements
+**Current Version:** v1.6.0 - Dynamic Capability-Based Authorization
 
-**Current Development Status:** Sprint 9 ASP.NET Core Code Quality & Consistency — T03-T13 Complete; Final Documentation & Architecture Validation
+**Current Development Status:** Sprint 10 Dynamic Capability-Based Authorization — T01-T13 Complete, T14 Documentation Synchronization
 
 ## Completed Modules
 
@@ -56,6 +56,7 @@ The focus is not only on implementing business features but also on applying pro
 - ✅ Inventory Transactions
 - ✅ Dashboard
 - ✅ Authentication & Authorization
+- ✅ Dynamic Capability-Based Authorization
 - ✅ User Management
 - ✅ Account Management
 - ✅ Purchasing (Core Workflow + Sprint 8 P1-P7 Enhancements Complete)
