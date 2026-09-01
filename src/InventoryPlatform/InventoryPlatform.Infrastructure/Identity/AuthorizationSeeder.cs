@@ -118,6 +118,7 @@ public static class AuthorizationSeeder
     {
         public static readonly IReadOnlyList<string> All =
         [
+            Administration.Access,
             Dashboard.View,
 
             Product.View,
@@ -190,6 +191,11 @@ public static class AuthorizationSeeder
                     name == Supplier.Create ||
                     name.StartsWith("PurchaseOrder.", StringComparison.Ordinal))
                 .ToArray();
+
+        private static class Administration
+        {
+            public const string Access = "Administration.Access";
+        }
 
         private static class Dashboard
         {
