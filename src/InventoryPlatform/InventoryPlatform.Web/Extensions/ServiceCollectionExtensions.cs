@@ -1,5 +1,6 @@
-﻿using InventoryPlatform.Infrastructure.Persistence.Context;
+using InventoryPlatform.Infrastructure.Persistence.Context;
 using InventoryPlatform.Web.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using LocalIdentity = InventoryPlatform.Infrastructure.Identity;
 using InventoryPlatform.Web.Reports.Excel;
@@ -31,6 +32,10 @@ public static class ServiceCollectionExtensions
         services.AddScoped<
             IUserClaimsPrincipalFactory<LocalIdentity.ApplicationUser>,
             ApplicationUserClaimsPrincipalFactory>();
+
+        services.AddScoped<
+            IAuthorizationHandler,
+            CapabilityAuthorizationHandler>();
 
         services.AddScoped<ExcelReportWriter>();
         services.AddScoped<PdfReportWriter>();
