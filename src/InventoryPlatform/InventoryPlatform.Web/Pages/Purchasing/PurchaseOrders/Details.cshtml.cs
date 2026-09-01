@@ -3,28 +3,34 @@ using InventoryPlatform.Application.Features.Purchasing.GetPurchaseOrder;
 using InventoryPlatform.Application.Features.Purchasing.ReceivePurchaseOrder;
 using InventoryPlatform.Application.Features.Purchasing.SubmitPurchaseOrder;
 using InventoryPlatform.Domain.Enums;
+using InventoryPlatform.Web.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace InventoryPlatform.Web.Pages.Purchasing.PurchaseOrders;
 
+[Authorize(Policy = AuthorizationPolicies.PurchaseOrder.ViewPolicy)]
 public class DetailsModel : PageModel
 {
     private readonly GetPurchaseOrderHandler _handler;
     private readonly SubmitPurchaseOrderHandler _submitHandler;
     private readonly ApprovePurchaseOrderHandler _approveHandler;
     private readonly ReceivePurchaseOrderHandler _receiveHandler;
+    private readonly IAuthorizationService _authorizationService;
 
     public DetailsModel(
         GetPurchaseOrderHandler handler,
         SubmitPurchaseOrderHandler submitHandler,
         ApprovePurchaseOrderHandler approveHandler,
-        ReceivePurchaseOrderHandler receiveHandler)
+        ReceivePurchaseOrderHandler receiveHandler,
+        IAuthorizationService authorizationService)
     {
         _handler = handler;
         _submitHandler = submitHandler;
         _approveHandler = approveHandler;
         _receiveHandler = receiveHandler;
+        _authorizationService = authorizationService;
     }
 
     public GetPurchaseOrderResponse? PurchaseOrder { get; private set; }
@@ -75,6 +81,17 @@ public class DetailsModel : PageModel
     int id,
     CancellationToken cancellationToken)
     {
+        var authResult = await _authorizationService.AuthorizeAsync(
+            User,
+            resource: null,
+            AuthorizationPolicies.ForCapability(
+                AuthorizationPolicies.PurchaseOrder.Submit));
+
+        if (!authResult.Succeeded)
+        {
+            return Forbid();
+        }
+
         var result = await _submitHandler.HandleAsync(
             new SubmitPurchaseOrderRequest(id),
             cancellationToken);
@@ -123,6 +140,17 @@ public class DetailsModel : PageModel
     int id,
     CancellationToken cancellationToken)
     {
+        var authResult = await _authorizationService.AuthorizeAsync(
+            User,
+            resource: null,
+            AuthorizationPolicies.ForCapability(
+                AuthorizationPolicies.PurchaseOrder.Approve));
+
+        if (!authResult.Succeeded)
+        {
+            return Forbid();
+        }
+
         var result = await _approveHandler.HandleAsync(
             new ApprovePurchaseOrderRequest(id),
             cancellationToken);
@@ -173,6 +201,17 @@ public class DetailsModel : PageModel
     decimal quantity,
     CancellationToken cancellationToken)
     {
+        var authResult = await _authorizationService.AuthorizeAsync(
+            User,
+            resource: null,
+            AuthorizationPolicies.ForCapability(
+                AuthorizationPolicies.PurchaseOrder.Receive));
+
+        if (!authResult.Succeeded)
+        {
+            return Forbid();
+        }
+
         var result = await _receiveHandler.HandleAsync(
             new ReceivePurchaseOrderRequest(
                 purchaseOrderId,

@@ -1,4 +1,7 @@
+using InventoryPlatform.Domain.Entities;
+using InventoryPlatform.Infrastructure.Persistence.Context;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace InventoryPlatform.Infrastructure.Identity;
@@ -39,9 +42,62 @@ public static class IdentitySeeder
             IdentityConstants.Roles.Viewer
              );
 
-        await AuthorizationSeeder.SeedAsync(
-            scope.ServiceProvider.GetRequiredService<
-                InventoryPlatform.Infrastructure.Persistence.Context.ApplicationDbContext>());
+        var context = scope.ServiceProvider
+            .GetRequiredService<ApplicationDbContext>();
+
+        await AuthorizationSeeder.SeedAsync(context);
+
+        await AssignUsersToGroupsAsync(userManager, context);
+    }
+
+    private static async Task AssignUsersToGroupsAsync(
+        UserManager<ApplicationUser> userManager,
+        ApplicationDbContext context)
+    {
+        var userGroupMappings = new (string Email, string GroupName)[]
+        {
+            (IdentityConstants.DefaultAdmin.Email, IdentityConstants.Roles.Administrator),
+            (IdentityConstants.DefaultManager.Email, IdentityConstants.Roles.InventoryManager),
+            (IdentityConstants.DefaultViewer.Email, IdentityConstants.Roles.Viewer)
+        };
+
+        var hasChanges = false;
+
+        foreach (var mapping in userGroupMappings)
+        {
+            var user = await userManager.FindByEmailAsync(mapping.Email);
+            if (user is null)
+            {
+                continue;
+            }
+
+            var group = await context.AuthorizationGroups
+                .Include(g => g.UserGroups)
+                .SingleOrDefaultAsync(g => g.Name == mapping.GroupName);
+
+            if (group is null)
+            {
+                continue;
+            }
+
+            var alreadyAssigned = await context.UserAuthorizationGroups
+                .AnyAsync(ug =>
+                    ug.UserId == user.Id &&
+                    ug.AuthorizationGroupId == group.Id);
+
+            if (alreadyAssigned)
+            {
+                continue;
+            }
+
+            group.AssignUser(user.Id);
+            hasChanges = true;
+        }
+
+        if (hasChanges)
+        {
+            await context.SaveChangesAsync();
+        }
     }
 
     private static async Task SeedRolesAsync(

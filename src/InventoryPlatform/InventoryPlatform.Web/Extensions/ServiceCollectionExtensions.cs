@@ -110,6 +110,26 @@ public static class ServiceCollectionExtensions
                         LocalIdentity.IdentityConstants.Roles.Administrator,
                         LocalIdentity.IdentityConstants.Roles.InventoryManager,
                         LocalIdentity.IdentityConstants.Roles.Viewer));
+
+            options.AddCapabilityPolicy(
+                AuthorizationPolicies.ForCapability(AuthorizationPolicies.PurchaseOrder.View),
+                AuthorizationPolicies.PurchaseOrder.View);
+
+            options.AddCapabilityPolicy(
+                AuthorizationPolicies.ForCapability(AuthorizationPolicies.PurchaseOrder.Create),
+                AuthorizationPolicies.PurchaseOrder.Create);
+
+            options.AddCapabilityPolicy(
+                AuthorizationPolicies.ForCapability(AuthorizationPolicies.PurchaseOrder.Submit),
+                AuthorizationPolicies.PurchaseOrder.Submit);
+
+            options.AddCapabilityPolicy(
+                AuthorizationPolicies.ForCapability(AuthorizationPolicies.PurchaseOrder.Approve),
+                AuthorizationPolicies.PurchaseOrder.Approve);
+
+            options.AddCapabilityPolicy(
+                AuthorizationPolicies.ForCapability(AuthorizationPolicies.PurchaseOrder.Receive),
+                AuthorizationPolicies.PurchaseOrder.Receive);
         });
 
         services.AddRazorPages();

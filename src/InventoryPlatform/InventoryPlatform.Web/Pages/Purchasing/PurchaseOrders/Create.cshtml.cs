@@ -1,12 +1,15 @@
 using InventoryPlatform.Application.Features.Products.GetProducts;
 using InventoryPlatform.Application.Features.Purchasing.CreatePurchaseOrder;
 using InventoryPlatform.Application.Features.Suppliers.GetSuppliers;
+using InventoryPlatform.Web.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace InventoryPlatform.Web.Pages.Purchasing.PurchaseOrders;
 
+[Authorize(Policy = AuthorizationPolicies.PurchaseOrder.CreatePolicy)]
 public class CreateModel : PageModel
 {
     private readonly CreatePurchaseOrderHandler _handler;

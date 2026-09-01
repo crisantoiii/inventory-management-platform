@@ -2,12 +2,15 @@ using InventoryPlatform.Application.Features.Purchasing.GetPurchaseOrders;
 using InventoryPlatform.Domain.Enums;
 using InventoryPlatform.Shared.Paging;
 using InventoryPlatform.Shared.Sorting;
+using InventoryPlatform.Web.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace InventoryPlatform.Web.Pages.Purchasing.PurchaseOrders;
 
+[Authorize(Policy = AuthorizationPolicies.PurchaseOrder.ViewPolicy)]
 public class IndexModel : PageModel
 {
     private readonly GetPurchaseOrdersHandler _handler;
