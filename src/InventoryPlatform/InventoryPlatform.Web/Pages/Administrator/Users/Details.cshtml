@@ -1,6 +1,12 @@
-﻿@page
+@page
 @model InventoryPlatform.Web.Pages.Administrator.Users.DetailsModel
-@using InventoryPlatform.Infrastructure.Identity;
+@using Microsoft.AspNetCore.Authorization
+
+@inject IAuthorizationService AuthorizationService
+
+@{
+    var canAdmin = (await AuthorizationService.AuthorizeAsync(User, null, AuthorizationPolicies.Administrator)).Succeeded;
+}
 
 <h1>@ViewData["Title"]</h1>
 
@@ -78,7 +84,7 @@
 
             <a asp-page="Index" id="backButton" class="btn btn-secondary">Back</a>
 
-            @if (User.IsInRole(IdentityConstants.Roles.Administrator))
+            @if (canAdmin)
             {
                 var isCurrentlyLocked = @Model.User.LockoutEnd is { } lockoutEnd &&
                              lockoutEnd > DateTimeOffset.UtcNow;

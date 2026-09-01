@@ -1,6 +1,12 @@
-﻿@page
+@page
 @model InventoryPlatform.Web.Pages.Units.DetailsModel
-@using InventoryPlatform.Infrastructure.Identity;
+@using Microsoft.AspNetCore.Authorization
+
+@inject IAuthorizationService AuthorizationService
+
+@{
+    var canManage = (await AuthorizationService.AuthorizeAsync(User, null, AuthorizationPolicies.InventoryManagement)).Succeeded;
+}
 
 <h1>@ViewData["Title"]</h1>
 
@@ -33,8 +39,7 @@
                 Back
             </a>
 
-            @if (User.IsInRole(IdentityConstants.Roles.Administrator) ||
-                User.IsInRole(IdentityConstants.Roles.InventoryManager))
+            @if (canManage)
             {
             <a asp-page="Edit"
                asp-route-id="@Model.Unit.Id"
