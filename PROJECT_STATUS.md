@@ -30,7 +30,7 @@ Account Management
 
 **Latest Release:** v1.5.0 — Sprint 8 Purchasing Enhancements
 
-**Project Status:** Sprint 10 Dynamic Capability-Based Authorization — T01-T10 Complete
+**Project Status:** Sprint 10 Dynamic Capability-Based Authorization — T01-T11 Complete
 
 **Last Updated:** August 2026
 
@@ -117,8 +117,8 @@ Verified:
 
 - **Completed Modules:** 10
 - **Architecture Status:** Validated
-- **Current Milestone:** Sprint 10 — Dynamic Capability-Based Authorization (T01-T10 Complete)
-- **Next Milestone:** Sprint 10 — T11 Authorization Administration
+- **Current Milestone:** Sprint 10 — Dynamic Capability-Based Authorization (T01-T11 Complete)
+- **Next Milestone:** Sprint 10 — T12 Razor Navigation & UI Capability Visibility
 
 ---
 
@@ -220,9 +220,65 @@ Configuration-level policy equivalence established through group-capability anal
 - Categories/Edit.cshtml.cs missing `[Authorize]` — pre-existing, separate task
 - Suppliers/Create.cshtml.cs using overly broad `ViewInventory` policy — pre-existing, separate task
 
+### T11 - Authorization Administration
+
+**Status:** Complete
+
+Added the minimum administration surface for managing dynamic authorization: group CRUD, capability assignment to groups, user assignment to groups, and a read-only capability catalog.
+
+Implemented changes:
+
+- Added `GetWithCapabilitiesAndUsersAsync` and `GetAllWithDetailsAsync` to `IAuthorizationGroupRepository`
+- Added `GetAllUsersAsync` to `IIdentityService`
+- Created `AuthorizationGroupErrors` error constants
+- Created `CapabilityOption` DTO for checkbox UI
+- Created 10 Application feature handlers (GetAuthorizationGroups, GetAuthorizationGroup, CreateAuthorizationGroup, UpdateAuthorizationGroup, DeleteAuthorizationGroup, ManageGroupCapabilities, ManageGroupUsers, GetCapabilities, GetAllUsers)
+- Implemented repository and identity service methods
+- Registered all handlers in Application DI
+- Created 7 Razor Pages under Administrator (Groups/Index, Create, Edit, Details, EditCapabilities, EditUsers; Capabilities/Index)
+- Updated navigation layout with Groups and Capabilities links
+
+### T11 Files Changed
+
+- `Application/Interfaces/Authorization/IAuthorizationGroupRepository.cs` — Added 2 methods
+- `Application/Interfaces/Identity/IIdentityService.cs` — Added 1 method
+- `Application/DependencyInjection/ServiceCollectionExtensions.cs` — Registered 9 new handlers
+- `Infrastructure/Persistence/Repositories/AuthorizationGroupRepository.cs` — Implemented 2 new methods
+- `Infrastructure/Identity/IdentityService.cs` — Implemented GetAllUsersAsync
+- `Web/Pages/Shared/_Layout.cshtml` — Added admin navigation links
+
+### T11 Files Added
+
+- `Application/Features/AuthorizationGroups/AuthorizationGroupErrors.cs`
+- `Application/Features/AuthorizationGroups/GetAuthorizationGroups/` (3 files)
+- `Application/Features/AuthorizationGroups/GetAuthorizationGroup/` (3 files)
+- `Application/Features/AuthorizationGroups/CreateAuthorizationGroup/` (4 files)
+- `Application/Features/AuthorizationGroups/UpdateAuthorizationGroup/` (3 files)
+- `Application/Features/AuthorizationGroups/DeleteAuthorizationGroup/` (2 files)
+- `Application/Features/AuthorizationGroups/ManageGroupCapabilities/` (2 files)
+- `Application/Features/AuthorizationGroups/ManageGroupUsers/` (2 files)
+- `Application/Features/Capabilities/GetCapabilities/` (2 files)
+- `Application/Features/Users/GetAllUsers/` (2 files)
+- `Application/DTOs/Authorization/CapabilityOption.cs`
+- `Web/Pages/Administrator/Groups/` (12 files)
+- `Web/Pages/Administrator/Capabilities/` (2 files)
+
+### T11 Build Verification
+
+- Build: SUCCESS — 0 errors, 20 pre-existing warnings
+- No automated test project exists in the repository
+- Runtime/browser verification deferred to T13
+- No database migration required
+
+### T11 Security
+
+- All admin pages secured with `[Authorize(Policy = AuthorizationPolicies.Administrator)]`
+- Delete safety: refuses group deletion when users are assigned
+- Seed-based recovery: application restart restores Administrator Group access if lockout occurs
+- Administrator lockout is HIGH impact / LOW probability with automatic recovery on restart
+
 ### Remaining Sprint 10 Tasks
 
-- T11 — Authorization Administration
 - T12 — Razor Navigation & UI Capability Visibility
 - T13 — Integrated Authorization Verification
 - T14 — Documentation Synchronization & Architecture Validation
@@ -841,7 +897,7 @@ The architecture has now been validated through:
 
 ### Sprint 10 — Dynamic Capability-Based Authorization
 
-Sprint 10 Dynamic Capability-Based Authorization T01-T10 are complete. T10 (Existing Authorization Boundary Migration) migrated the remaining static role-based policies to capability-backed equivalents. T11 (Authorization Administration) is the next task.
+Sprint 10 Dynamic Capability-Based Authorization T01-T11 are complete. T11 (Authorization Administration) added the minimum administration surface for managing authorization groups, capabilities, and user assignments. T12 (Razor Navigation & UI Capability Visibility) is the next task.
 
 Sprint 8 Purchasing Enhancements (v1.5.0) is complete and closed. Dynamic Capability-Based Authorization is now in active implementation (T01-T10 complete).
 

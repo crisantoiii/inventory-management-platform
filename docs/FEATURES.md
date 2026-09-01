@@ -892,12 +892,11 @@ Operation results are standardized using:
 - Two-Factor Authentication
 - Recovery Code Management
 
-## Planned Authorization
+## Dynamic Capability-Based Authorization
 
-The platform will evolve from the current Identity role/policy
-authorization model toward Dynamic Capability-Based Authorization.
+Sprint 10 introduces a dynamic, database-backed capability-based authorization model.
 
-Planned structure:
+Structure:
 
 ```text
 User
@@ -913,10 +912,33 @@ Domain State Validation
 
 Status:
 
-- Design finalized
-- Implementation not yet started
-- Additional Reporting is complete for Sprint 7
-- The next implementation scope will be established through Sprint Planning
+- T01-T11 Complete
+- T12-T15 Remaining
+
+### Authorization Administration (T11)
+
+**Status:** Complete
+
+Minimum administration surface for managing dynamic authorization:
+
+- ✅ Group Management (CRUD)
+- ✅ Group Capability Assignment (checkbox-based)
+- ✅ User Group Assignment (checkbox-based)
+- ✅ Capability Catalog Display (read-only)
+- ✅ Server-side Authorization Enforcement
+- ✅ Delete Safety (refuse if users assigned)
+
+Pages:
+
+- `/Administrator/Groups` — List all groups
+- `/Administrator/Groups/Create` — Create group
+- `/Administrator/Groups/Edit/{id}` — Edit group name
+- `/Administrator/Groups/Details/{id}` — View group details
+- `/Administrator/Groups/EditCapabilities/{id}` — Manage capabilities
+- `/Administrator/Groups/EditUsers/{id}` — Manage users
+- `/Administrator/Capabilities` — View capability catalog
+
+All admin pages require `Administration.Access` capability.
 
 
 ## User Administration

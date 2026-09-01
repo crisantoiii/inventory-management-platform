@@ -30,6 +30,43 @@ Sprint 8 Purchasing Enhancements P0-P7, D1 Documentation Synchronization, D2 Des
 
 The next development activity is a separate Next Sprint Planning process. Dynamic Capability-Based Authorization remains the next locked priority. No implementation work begins automatically from this closure.
 
+# Sprint 10 - T11 Authorization Administration
+
+## Summary
+
+Added the minimum administration surface for managing dynamic authorization: group CRUD, capability assignment to groups, user assignment to groups, and a read-only capability catalog.
+
+Implemented changes:
+
+- Added `GetWithCapabilitiesAndUsersAsync` and `GetAllWithDetailsAsync` to `IAuthorizationGroupRepository`
+- Added `GetAllUsersAsync` to `IIdentityService`
+- Created `AuthorizationGroupErrors` error constants
+- Created `CapabilityOption` DTO for checkbox UI
+- Created 10 Application feature handlers across AuthorizationGroups, Capabilities, and GetAllUsers features
+- Implemented repository and identity service methods
+- Registered all handlers in Application DI
+- Created 7 Razor Pages under Administrator (Groups/Index, Create, Edit, Details, EditCapabilities, EditUsers; Capabilities/Index)
+- Updated navigation layout with Groups and Capabilities links
+
+## Security
+
+- All admin pages secured with `[Authorize(Policy = AuthorizationPolicies.Administrator)]`
+- Delete safety: refuses group deletion when users are assigned
+- Seed-based recovery: application restart restores Administrator Group access if lockout occurs
+- Administrator lockout is HIGH impact / LOW probability with automatic recovery on restart
+
+## Build
+
+Build: SUCCESS — 0 errors, 20 pre-existing warnings.
+
+## Outcome
+
+The authorization administration surface is complete. Administrators can manage authorization groups, assign capabilities to groups, assign users to groups, and view the capability catalog. All operations are server-side enforced through the `Administration.Access` capability.
+
+Runtime/browser verification is deferred to T13.
+
+---
+
 # Sprint 10 - T10 Existing Authorization Boundary Migration
 
 ## Summary
