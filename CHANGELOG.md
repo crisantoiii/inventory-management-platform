@@ -17,7 +17,7 @@ Introduced a dynamic, database-backed capability-based authorization model while
 - Repositories: CapabilityRepository, AuthorizationGroupRepository
 - Migration: CreateAuthorizationSchema
 - Seeder: AuthorizationSeeder with CapabilityCatalog (39 capabilities, 3 groups)
-- Administration pages: Groups CRUD, EditCapabilities, EditUsers, Capabilities Index (7 pages)
+- Administration pages: Groups CRUD, EditCapabilities, EditUsers, Users CRUD, EditRoles, EditStatus, ResetPassword, Capabilities Index (14 pages)
 - 10 Application feature handlers for Group/Capability management
 - GetAllUsersHandler for user listing in group assignment
 - CapabilityAuthorizationExtensions for policy registration
@@ -25,8 +25,8 @@ Introduced a dynamic, database-backed capability-based authorization model while
 
 ### Changed
 
-- All 43 page-level [Authorize(Policy)] attributes migrated to capability-backed policies
-- All 14 Razor .cshtml files migrated from User.IsInRole to IAuthorizationService.AuthorizeAsync
+- All 50 page-level [Authorize(Policy)] attributes migrated to capability-backed policies
+- 21 Razor UI authorization checks via IAuthorizationService.AuthorizeAsync
 - Three static role-based policies replaced with capability-backed equivalents (same policy names)
 - _ViewImports.cshtml updated with @using InventoryPlatform.Web.Authorization
 
@@ -43,8 +43,8 @@ Introduced a dynamic, database-backed capability-based authorization model while
 - Authentication: All 3 seeded users login successfully
 - Unauthenticated access: All protected pages redirect to login (302)
 - Administrator access: All admin pages accessible (200)
-- Manager access: All management pages accessible (200)
-- Viewer access: View pages accessible (200), admin/management pages correctly denied (302 → AccessDenied)
+- Manager access: All management pages accessible (200) [NOTE: DF1 stale DB relationship - InventoryManager has Administration.Access in database]
+- Viewer access: View pages accessible (200), management create/edit pages accessible (200) [NOTE: DF2 stale DB relationship - Viewer has Supplier.Create in database]
 - Purchasing per-action capabilities: View, Create, Submit, Approve, Receive all verified
 - Reports: Accessible to all authenticated users (by design)
 - Database: 39 capabilities, 3 groups, 3 assignments verified
@@ -52,8 +52,8 @@ Introduced a dynamic, database-backed capability-based authorization model while
 
 ### Known Findings (Deferred)
 
-- InventoryManager group includes Administration.Access (seed data issue)
-- InventoryManagement OR-composite grants broad access via single capability
+- P1: InventoryManager group includes Administration.Access in persisted DB (code fix applied in Phase 21; DB relationship still present)
+- P1: Viewer has Supplier.Create in persisted DB, granting InventoryManagement access via OR-composite (stale DB relationship; current source filter corrected)
 - Categories/Edit missing [Authorize] attribute (pre-existing gap)
 - Viewer has User.View capability (seed filter includes all *.View)
 - Reports unrestricted (design decision pending)

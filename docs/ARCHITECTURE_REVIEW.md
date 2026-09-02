@@ -347,8 +347,8 @@ All non-nullable FKs. Correct cascade delete. Unique composite indexes prevent d
 
 | # | Finding | Severity | Classification |
 |---|---------|----------|---------------|
-| DF1 | InventoryManager group includes Administration.Access | Medium | DESIGN FINDING — seed data |
-| DF2 | InventoryManagement OR-composite grants broad access | Medium | DESIGN FINDING — policy design |
+| DF1 | InventoryManager has Administration.Access in persisted DB | P1 | SEVERITY UPGRADED by T15 — code fix applied, DB relationship still present |
+| DF2 | Viewer has Supplier.Create in persisted DB | P1 | SEVERITY UPGRADED by T15 — stale DB relationship |
 | DF3 | Categories/Edit missing [Authorize] attribute | Medium | PRE-EXISTING GAP |
 | DF4 | Viewer has User.View capability | Low | DESIGN FINDING — seed filter |
 | DF5 | Suppliers/Create uses ViewInventory policy | Low | PRE-EXISTING POLICY CHOICE |

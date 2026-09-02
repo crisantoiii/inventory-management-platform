@@ -448,7 +448,7 @@ Examples:
 
 ### Sequencing
 
-Sprint 10 is complete for all implementation and verification. Only documentation and retrospective remain.
+Sprint 10 implementation is complete. T15 closure gate is BLOCKED due to P1 findings requiring database remediation. Documentation and retrospective remain.
 
 ---
 

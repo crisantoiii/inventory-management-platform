@@ -42,9 +42,9 @@ The focus is not only on implementing business features but also on applying pro
 
 ## Project Status
 
-**Current Version:** v1.6.0 - Dynamic Capability-Based Authorization
+**Current Version:** v1.6.0 - Dynamic Capability-Based Authorization (Sprint 10 in progress)
 
-**Current Development Status:** Sprint 10 Dynamic Capability-Based Authorization — T01-T13 Complete, T14 Documentation Synchronization
+**Current Development Status:** Sprint 10 Dynamic Capability-Based Authorization — T01-T14 Complete, T15 Phase 24 complete, closure BLOCKED (P1 DB remediation required)
 
 ## Completed Modules
 

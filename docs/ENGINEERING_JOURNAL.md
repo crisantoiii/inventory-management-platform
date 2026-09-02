@@ -3549,8 +3549,8 @@ The findings above are seed data and policy design issues, not code bugs. The au
 
 | # | Finding | Severity | Scope |
 |---|---|---|---|
-| DF1 | InventoryManager group includes Administration.Access | Medium | Seed data — CapabilityCatalog.InventoryManager filter |
-| DF2 | InventoryManagement OR-composite grants broad access | Medium | Design — MultiCapabilityRequirement uses OR logic |
+| DF1 | InventoryManager group includes Administration.Access in persisted DB | P1 | Seed data — CapabilityCatalog.InventoryManager filter |
+| DF2 | Viewer has Supplier.Create in persisted DB, granting InventoryManagement access | P1 | Design — MultiCapabilityRequirement uses OR logic |
 | DF3 | Categories/Edit missing [Authorize] attribute | Medium | Pre-existing gap |
 | DF4 | Viewer has User.View capability | Low | Seed data — Viewer filter includes all *.View |
 | DF5 | Suppliers/Create uses ViewInventory policy | Low | Pre-existing policy choice |
@@ -3671,8 +3671,8 @@ All project documentation accurately reflects the implemented Sprint 10 authoriz
 
 | # | Finding | Severity | Sprint |
 |---|---|---|---|
-| DF1 | InventoryManager group includes Administration.Access | Medium | Post-Sprint 10 |
-| DF2 | InventoryManagement OR-composite grants broad access | Medium | Post-Sprint 10 |
+| DF1 | InventoryManager group includes Administration.Access in persisted DB | P1 | Post-Sprint 10 |
+| DF2 | Viewer has Supplier.Create in persisted DB, granting InventoryManagement access | P1 | Post-Sprint 10 |
 | DF3 | Categories/Edit missing [Authorize] attribute | Medium | Post-Sprint 10 |
 | DF4 | Viewer has User.View capability | Low | Post-Sprint 10 |
 | DF5 | Suppliers/Create uses ViewInventory policy | Low | Post-Sprint 10 |

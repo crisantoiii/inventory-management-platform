@@ -26,11 +26,11 @@ Account Management
 
 # Project Status
 
-**Current Version:** v1.6.0
+**Current Version:** v1.6.0 (Sprint 10 in progress - T15 Phase 24 complete)
 
-**Latest Release:** v1.6.0 — Sprint 10 Dynamic Capability-Based Authorization
+**Latest Release:** v1.5.0 — Sprint 8 Purchasing Enhancements (v1.6.0 pending P1 resolution)
 
-**Project Status:** Sprint 10 Dynamic Capability-Based Authorization — T01-T14 Complete, T15 Final Verification
+**Project Status:** Sprint 10 Dynamic Capability-Based Authorization — T01-T14 Complete, T15 Phase 24 complete, closure gate BLOCKED (P1 findings require DB remediation)
 
 **Last Updated:** September 2026
 
@@ -110,7 +110,7 @@ Verified:
 - ✅ v1.3.0 - Account Management
 - ✅ v1.4.0 - Additional Reporting & Exports
 - ✅ v1.5.0 - Sprint 8 Purchasing Enhancements
-- ✅ v1.6.0 - Sprint 10 Dynamic Capability-Based Authorization
+- ⏳ v1.6.0 - Sprint 10 Dynamic Capability-Based Authorization (closure BLOCKED)
 
 ---
 
@@ -118,8 +118,8 @@ Verified:
 
 - **Completed Modules:** 11
 - **Architecture Status:** Validated
-- **Current Milestone:** Sprint 10 — Dynamic Capability-Based Authorization (T01-T14 Complete)
-- **Next Milestone:** Sprint 10 — T15 Final Verification & Retrospective
+- **Current Milestone:** Sprint 10 — Dynamic Capability-Based Authorization (T01-T14 Complete, T15 Phase 24 complete)
+- **Next Milestone:** Sprint 10 — P1 DB remediation and closure re-gate
 
 ---
 
