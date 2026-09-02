@@ -43,8 +43,8 @@ Introduced a dynamic, database-backed capability-based authorization model while
 - Authentication: All 3 seeded users login successfully
 - Unauthenticated access: All protected pages redirect to login (302)
 - Administrator access: All admin pages accessible (200)
-- Manager access: All management pages accessible (200) [NOTE: DF1 stale DB relationship - InventoryManager has Administration.Access in database]
-- Viewer access: View pages accessible (200), management create/edit pages accessible (200) [NOTE: DF2 stale DB relationship - Viewer has Supplier.Create in database]
+- Manager access: All management pages accessible (200), Administrator pages correctly denied (302)
+- Viewer access: View pages accessible (200), create/edit pages correctly denied (302)
 - Purchasing per-action capabilities: View, Create, Submit, Approve, Receive all verified
 - Reports: Accessible to all authenticated users (by design)
 - Database: 39 capabilities, 3 groups, 3 assignments verified
@@ -52,11 +52,14 @@ Introduced a dynamic, database-backed capability-based authorization model while
 
 ### Known Findings (Deferred)
 
-- P1: InventoryManager group includes Administration.Access in persisted DB (code fix applied in Phase 21; DB relationship still present)
-- P1: Viewer has Supplier.Create in persisted DB, granting InventoryManagement access via OR-composite (stale DB relationship; current source filter corrected)
-- Categories/Edit missing [Authorize] attribute (pre-existing gap)
-- Viewer has User.View capability (seed filter includes all *.View)
+- DF3: Categories/Edit missing [Authorize] attribute (DEFERRED - PRE-EXISTING)
+- Viewer has User.View capability (seed filter includes all *.View; by design)
 - Reports unrestricted (design decision pending)
+
+### Resolved Findings
+
+- DF1: InventoryManager group Administration.Access — RESOLVED. Stale DB relationship removed via authorized database remediation (Phase 25). Runtime reverification confirmed 0 rows. All Administrator pages correctly denied for Manager (302).
+- DF2: Viewer Supplier.Create — RESOLVED. Stale DB relationship removed via authorized database remediation (Phase 25). Runtime reverification confirmed 0 rows. Create/edit pages correctly denied for Viewer (302).
 
 ---
 

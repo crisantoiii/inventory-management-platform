@@ -42,9 +42,9 @@ The focus is not only on implementing business features but also on applying pro
 
 ## Project Status
 
-**Current Version:** v1.6.0 - Dynamic Capability-Based Authorization (Sprint 10 in progress)
+**Current Version:** v1.6.0 - Dynamic Capability-Based Authorization
 
-**Current Development Status:** Sprint 10 Dynamic Capability-Based Authorization — T01-T14 Complete, T15 Phase 24 complete, closure BLOCKED (P1 DB remediation required)
+**Current Development Status:** Sprint 10 Dynamic Capability-Based Authorization — Complete. v1.6.0 released.
 
 ## Completed Modules
 
@@ -64,86 +64,70 @@ The focus is not only on implementing business features but also on applying pro
 
 ## Latest Release
 
-## v1.5.0 - Purchasing Enhancements
+## v1.6.0 - Dynamic Capability-Based Authorization
 
-### Highlights
+### Summary
 
-#### Reporting
+Introduced a dynamic, database-backed capability-based authorization model while preserving ASP.NET Core Identity authentication and maintaining backward compatibility. Replaced three static role-based authorization policies with capability-backed equivalents and migrated all page-level and UI-level authorization to the new model.
 
-- Inventory Valuation
-- Purchase History
-- Supplier Purchase Analysis
-- Stock Movement
-- Low Stock Report
-- Inventory Movement Report
-- Product Reports
+### Added
 
-#### Export
+- Domain entities: Capability, AuthorizationGroup, AuthorizationGroupCapability, UserAuthorizationGroup
+- Application interfaces: ICapabilityAuthorizationService, ICapabilityRepository, IAuthorizationGroupRepository
+- Application service: CapabilityAuthorizationService
+- Web authorization: CapabilityRequirement, MultiCapabilityRequirement, CapabilityAuthorizationHandler, MultiCapabilityAuthorizationHandler
+- AuthorizationPolicies with 39 capability constants
+- EF Core configurations for 4 authorization tables
+- Repositories: CapabilityRepository, AuthorizationGroupRepository
+- Migration: CreateAuthorizationSchema
+- Seeder: AuthorizationSeeder with CapabilityCatalog (39 capabilities, 3 groups)
+- Administration pages: Groups CRUD, EditCapabilities, EditUsers, Users CRUD, EditRoles, EditStatus, ResetPassword, Capabilities Index (14 pages)
+- 10 Application feature handlers for Group/Capability management
+- GetAllUsersHandler for user listing in group assignment
+- CapabilityAuthorizationExtensions for policy registration
+- ApplicationUserClaimsPrincipalFactory for MustChangePassword claim
 
-- Excel Export for all seven reports
-- PDF Export for all seven reports
-- Existing report filters preserved during export
-- Existing report sorting preserved during export
-- Full filtered result set exported without UI pagination limits
-- Inventory Valuation Total Inventory Value included in Excel and PDF output
+### Changed
 
-#### Verification
+- All 50 page-level [Authorize(Policy)] attributes migrated to capability-backed policies
+- 21 Razor UI authorization checks via IAuthorizationService.AuthorizeAsync
+- Three static role-based policies replaced with capability-backed equivalents (same policy names)
+- _ViewImports.cshtml updated with @using InventoryPlatform.Web.Authorization
 
-- All seven reports browser/manual verified
-- All seven Excel exports verified
-- All seven PDF exports verified
-- Empty database behavior verified
-- Explicit query-failure behavior verified
-- Database recovery verified
-- Existing authorization boundaries verified
-- Final project-wide verification completed
+### Security
 
-The release preserves the established read-oriented Reporting architecture and isolates PDF generation in the Web layer using QuestPDF.
+- Default deny enforced: all handler failure paths return without context.Succeed()
+- No fallback role authorization exists in the codebase
+- UI visibility independently enforced via server-side [Authorize] on every page
+- AccessDenied page renders correctly for denied authorization
 
-### v1.5.0 Release Highlights
+### Verified
 
-Sprint 8 Purchasing Enhancements is complete, verified, documented, and closed.
+- Build: SUCCESS (0 errors, 0 warnings)
+- Authentication: All 3 seeded users login successfully
+- Unauthenticated access: All protected pages redirect to login (302)
+- Administrator access: All admin pages accessible (200)
+- Manager access: All management pages accessible (200), Administrator pages correctly denied (302)
+- Viewer access: View pages accessible (200), create/edit pages correctly denied (302)
+- Purchasing per-action capabilities: View, Create, Submit, Approve, Receive all verified
+- Reports: Accessible to all authenticated users (by design)
+- Database: 39 capabilities, 3 groups, 3 assignments verified
+- Database remediation: Stale InventoryManager/Administration.Access and Viewer/Supplier.Create relationships removed and reverified
 
-#### Purchasing
+### Known Deferred Items
 
-- Multiple Purchase Order Item Management
-- Purchase Order Search
-- Purchase Order Filtering
-- Purchase Order Sorting
-- Purchase Order Pagination
-- Inventory Synchronization During Receiving
-- Integrated Purchasing Verification
+- Categories/Edit missing [Authorize] attribute (pre-existing gap)
+- Viewer has User.View capability (seed filter includes all *.View)
+- Reports unrestricted (design decision pending)
 
-#### Verification and Documentation
+The release preserves the established Clean Architecture, Vertical Slice Architecture, and identity abstraction while replacing static role-based authorization with a dynamic capability-based model.
 
-- P1-P7 Purchasing scope completed and verified
-- D1 Documentation Synchronization completed
-- D2 Design Decision Synchronization completed
-- D3 Final Sprint 8 Retrospective completed
-- D4 Final Documentation Validation completed
-- Sprint 8 final save point established
-- No future-priority feature implemented during Sprint 8
+### Previous Release
 
-The v1.5.0 release preserves the established Purchasing architecture and records Sprint 8 as the current completed milestone.
-
-### Historical Sprint 8 Closure
-
-Sprint 8 Purchasing Enhancements P0-P7 are complete, verified, documented, and closed.
-
-Completed:
-- P1 — Multiple Purchase Order Item Management
-- P2 — Purchase Order Search
-- P3 — Purchase Order Filtering
-- P4 — Purchase Order Sorting
-- P5 — Purchase Order Pagination
-- P6 — Inventory Synchronization During Receiving
-- P7 — Integrated Purchasing Verification
-
-P7 verified the complete Purchasing workflow and corrected an in-scope pagination regression so active `FromDate` and `ToDate` filters are preserved during pagination. No Dynamic Capability-Based Authorization implementation was introduced during Purchasing work.
-
-D1 - Documentation Synchronization, D2 - Design Decision Synchronization, D3 - Final Sprint 8 Retrospective, and D4 - Final Documentation Validation are complete. The Sprint 8 final save point has been established. The next development activity is planning for the next sprint; no new feature work is started by this closure.
+v1.5.0 — Sprint 8 Purchasing Enhancements (August 2026). Purchasing enhancements including multiple item management, search, filtering, sorting, pagination, and inventory synchronization. See CHANGELOG.md for full details.
 
 ---
+
 
 ## Architecture Validation
 
@@ -931,30 +915,22 @@ Development Tools
 
 ## Current
 
-- Sprint 8 - Purchasing Enhancements
-- P1 Multiple Purchase Order Item Management - Complete
-- P2 Purchase Order Search - Complete
-- P3 Purchase Order Filtering - Complete
-- P4 Purchase Order Sorting - Complete
-- P5 Purchase Order Pagination - Complete
-- P6 Inventory Synchronization During Receiving - Complete and verified
-- P7 Integrated Purchasing Verification - Complete and verified
+- Sprint 10 - Dynamic Capability-Based Authorization - Complete
+- v1.6.0 released
 
-## Sprint 8 Closure State
+## Sprint 10 Closure State
 
-- P0-P7 Purchasing Enhancements - Complete and verified
-- D1 Documentation Synchronization - Complete
-- D2 Design Decision Synchronization - Complete
-- D3 Final Sprint 8 Retrospective - Complete
-- D4 Final Documentation Validation - Complete
-- Final Sprint 8 save point - Established
+- T01-T14 Implementation and Documentation - Complete
+- T15 Final Verification, Retrospective & Save Point - Complete
+- Formal closure gate - PASS (Phase 26)
+- Database remediation - Complete and verified
+- v1.6.0 - Released
 
-Sprint 8 is closed. It remains the v1.5.0 release baseline. Dynamic Capability-Based Authorization remains the next locked feature priority after the current Sprint 9 code-quality workstream.
+v1.6.0 is the current release baseline.
 
 ## Future
 
 - Additional Purchasing User Experience Improvements
-- Dynamic Capability-Based Authorization
 - Sales
 - Audit Logging
 - Bulk Import / Export

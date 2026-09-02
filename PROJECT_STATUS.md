@@ -26,15 +26,31 @@ Account Management
 
 # Project Status
 
-**Current Version:** v1.6.0 (Sprint 10 in progress - T15 Phase 24 complete)
+**Current Version:** v1.6.0 - Dynamic Capability-Based Authorization
 
-**Latest Release:** v1.5.0 — Sprint 8 Purchasing Enhancements (v1.6.0 pending P1 resolution)
+**Latest Release:** v1.6.0 — Sprint 10 Dynamic Capability-Based Authorization
 
-**Project Status:** Sprint 10 Dynamic Capability-Based Authorization — T01-T14 Complete, T15 Phase 24 complete, closure gate BLOCKED (P1 findings require DB remediation)
+**Project Status:** Sprint 10 Dynamic Capability-Based Authorization — Complete. v1.6.0 released.
 
 **Last Updated:** September 2026
 
 # Latest Release
+
+## v1.6.0 - Dynamic Capability-Based Authorization
+
+Released: September 2026
+
+Completed:
+
+- Dynamic capability-based authorization model
+- 39 capabilities, 3 groups, 3 user assignments
+- 50 page-level [Authorize(Policy)] migrations
+- 21 Razor UI authorization migrations
+- Administration UI (14 pages)
+- Database remediation and runtime reverification
+- Formal closure gate PASS (Phase 26)
+
+Previous Release:
 
 ## v1.5.0 - Sprint 8 Purchasing Enhancements
 
@@ -110,7 +126,7 @@ Verified:
 - ✅ v1.3.0 - Account Management
 - ✅ v1.4.0 - Additional Reporting & Exports
 - ✅ v1.5.0 - Sprint 8 Purchasing Enhancements
-- ⏳ v1.6.0 - Sprint 10 Dynamic Capability-Based Authorization (closure BLOCKED)
+- ✅ v1.6.0 - Sprint 10 Dynamic Capability-Based Authorization
 
 ---
 
@@ -118,8 +134,8 @@ Verified:
 
 - **Completed Modules:** 11
 - **Architecture Status:** Validated
-- **Current Milestone:** Sprint 10 — Dynamic Capability-Based Authorization (T01-T14 Complete, T15 Phase 24 complete)
-- **Next Milestone:** Sprint 10 — P1 DB remediation and closure re-gate
+- **Current Milestone:** v1.6.0 — Dynamic Capability-Based Authorization (Complete)
+- **Next Milestone:** TBD — Sprint planning pending
 
 ---
 
@@ -149,9 +165,9 @@ No unrelated business capability or structural architectural redesign was introd
 
 ---
 
-# Sprint 10 - Dynamic Capability-Based Authorization (T01-T12)
+# Sprint 10 - Dynamic Capability-Based Authorization (Complete)
 
-**Status:** T01-T10 complete.
+**Status:** Complete. v1.6.0 released. Formal closure gate PASS (Phase 26).
 
 Sprint 10 introduces a dynamic, database-backed capability-based authorization model while preserving ASP.NET Core Identity authentication and maintaining backward compatibility.
 
@@ -307,9 +323,9 @@ Implemented changes:
 - Seed-based recovery: application restart restores Administrator Group access if lockout occurs
 - Administrator lockout is HIGH impact / LOW probability with automatic recovery on restart
 
-### Remaining Sprint 10 Tasks
+### Sprint 10 Closure
 
-- T15 — Sprint 10 Final Verification, Retrospective & Save Point
+- T15 — Sprint 10 Final Verification, Retrospective & Save Point — Complete
 
 ---
 
@@ -761,7 +777,7 @@ Final verification covered normal application regression, reporting workflows, e
 
 # Current Focus
 
-Sprint 10 Dynamic Capability-Based Authorization T01-T10 are complete. T10 (Existing Authorization Boundary Migration) migrated the three remaining static role-based policies to capability-backed equivalents. T11 (Authorization Administration) is the next task.
+Sprint 10 Dynamic Capability-Based Authorization is complete. v1.6.0 released.
 
 Completed in Sprint 8:
 
@@ -924,7 +940,7 @@ The architecture has now been validated through:
 
 ### Sprint 10 — Dynamic Capability-Based Authorization
 
-Sprint 10 Dynamic Capability-Based Authorization T01-T14 are complete. T14 (Documentation Synchronization & Architecture Validation) synchronized all project documentation with the verified implementation. T15 (Final Verification, Retrospective & Save Point) is the remaining task.
+Sprint 10 Dynamic Capability-Based Authorization is complete. T15 (Final Verification, Retrospective & Save Point) is complete. v1.6.0 released.
 
 ### Completed Sprint 8 Scope
 

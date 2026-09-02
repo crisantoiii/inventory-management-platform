@@ -77,7 +77,7 @@ The first Reporting vertical slice has also been implemented through Inventory V
 | Architecture Sprint | ✅ Complete |
 | Purchasing | ✅ Core Workflow + Sprint 8 P1-P7 Enhancements Complete |
 | Reporting | ✅ Sprint 7 Additional Reporting Complete |
-| Dynamic Capability-Based Authorization | Sprint 10 T01-T14 complete, T15 Phase 24 — closure BLOCKED (P1 DB remediation) |
+| Dynamic Capability-Based Authorization | ✅ Sprint 10 Complete — v1.6.0 released |
 
 ## Current Implementation
 
@@ -915,7 +915,7 @@ Status:
 
 - T01-T13 Complete (source and runtime verified)
 - T14 Documentation Synchronization (complete)
-- T15 Final Verification & Retrospective (remaining)
+- T15 Final Verification & Retrospective — Complete
 
 ### Authorization Administration (T11)
 

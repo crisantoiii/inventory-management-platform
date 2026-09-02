@@ -370,7 +370,7 @@ Completed Sprint 7 scope:
 
 Status: ✅ Complete
 
-**Implementation status:** T01-T14 complete. T15 (Final Verification & Retrospective) remaining.
+**Implementation status:** T01-T14 complete. T15 (Final Verification & Retrospective) complete. v1.6.0 released.
 
 ### Objective
 
@@ -437,7 +437,7 @@ Examples:
 - T01-T12: Full implementation (domain model, application abstractions, persistence, handlers, policies, admin UI, UI visibility)
 - T13: Runtime verification complete (build success, authorization verified for all 3 seeded users)
 - T14: Documentation synchronization in progress
-- T15: Final verification, retrospective, and save point remaining
+- T15: Final verification, retrospective, and save point — Complete
 
 ### Deferred Findings from T13
 

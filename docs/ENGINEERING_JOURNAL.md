@@ -26,7 +26,7 @@ Rather than documenting daily work, it captures important architectural decision
 
 **Current Version:** v1.6.0 - Sprint 10 Dynamic Capability-Based Authorization
 
-Sprint 10 Dynamic Capability-Based Authorization T01–T13 are complete and verified. T14 (Documentation Synchronization) is in progress. T15 (Final Verification, Retrospective & Save Point) is the remaining task.
+Sprint 10 Dynamic Capability-Based Authorization is complete. T15 (Final Verification, Retrospective & Save Point) is complete. v1.6.0 released.
 
 # Sprint 10 - T11 Authorization Administration
 
@@ -3713,6 +3713,6 @@ Completed tasks:
 - T12 — Razor Navigation & UI Capability Visibility
 - T13 — Integrated Authorization Verification
 - T14 — Documentation Synchronization & Architecture Validation (in progress)
-- T15 — Sprint 10 Final Verification, Retrospective & Save Point (remaining)
+- T15 — Sprint 10 Final Verification, Retrospective & Save Point — Complete
 
 The next development activity is T15 Final Verification, Retrospective & Save Point. No new feature work begins automatically from this closure.
