@@ -6,6 +6,7 @@ using InventoryPlatform.Application.Features.Users.ResetPassword;
 using InventoryPlatform.Application.Features.Users.UpdateUser;
 using InventoryPlatform.Application.Features.Users.UpdateUserRoles;
 using InventoryPlatform.Application.Features.Users.UpdateUserStatus;
+using InventoryPlatform.Application.Features.Users.GetAllUsers;
 using InventoryPlatform.Shared.Paging;
 using InventoryPlatform.Shared.Results;
 
@@ -42,5 +43,8 @@ public interface IIdentityService
 
     Task<Result> ResetPasswordAsync(
         ResetPasswordRequest request,
+        CancellationToken cancellationToken = default);
+
+    Task<IReadOnlyList<GetAllUsersResponse>> GetAllUsersAsync(
         CancellationToken cancellationToken = default);
 }

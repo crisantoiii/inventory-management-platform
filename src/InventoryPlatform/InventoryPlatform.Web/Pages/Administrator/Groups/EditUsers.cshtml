@@ -1,0 +1,42 @@
+@page "{id:int}"
+@model InventoryPlatform.Web.Pages.Administrator.Groups.EditUsersModel
+
+<h1>@ViewData["Title"]</h1>
+
+<form method="post">
+
+    <div asp-validation-summary="ModelOnly"
+         class="text-danger"></div>
+
+    <input asp-for="GroupId" type="hidden" />
+
+    <div class="mb-3">
+        <label class="form-label">Users</label>
+        @foreach (var user in Model.UserOptions)
+        {
+            <div class="form-check">
+                <input class="form-check-input"
+                       type="checkbox"
+                       name="SelectedUserIds"
+                       value="@user.Id"
+                       checked="@user.Selected"
+                       />
+
+                <label class="form-check-label">
+                    @user.UserName (@user.Email)
+                </label>
+            </div>
+        }
+    </div>
+
+    <button class="btn btn-primary">
+        Update
+    </button>
+
+    <a asp-page="Details"
+       asp-route-id="@Model.GroupId"
+       class="btn btn-secondary">
+        Cancel
+    </a>
+
+</form>

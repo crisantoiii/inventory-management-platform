@@ -1,6 +1,7 @@
 using InventoryPlatform.Application.Interfaces.Communication;
 using InventoryPlatform.Application.Interfaces.Identity;
 using InventoryPlatform.Application.Interfaces.Persistence;
+using InventoryPlatform.Application.Interfaces.Authorization;
 using InventoryPlatform.Infrastructure.Email;
 using InventoryPlatform.Infrastructure.Identity;
 using InventoryPlatform.Infrastructure.Persistence;
@@ -32,6 +33,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IInventoryTransactionRepository, InventoryTransactionRepository>();
         services.AddScoped<IDashboardRepository, DashboardRepository>();
         services.AddScoped<IIdentityService, IdentityService>();
+        services.AddScoped<ICapabilityRepository, CapabilityRepository>();
+        services.AddScoped<IAuthorizationGroupRepository, AuthorizationGroupRepository>();
         services.AddScoped<IPurchaseOrderRepository, PurchaseOrderRepository>();
         services.AddScoped<IInventoryValuationRepository, InventoryValuationRepository>();
         services.AddScoped<IAccountService, AccountService>();

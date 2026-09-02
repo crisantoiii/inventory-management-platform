@@ -1,6 +1,122 @@
 # Changelog
 
+## [v1.6.0] - Sprint 10 Dynamic Capability-Based Authorization
+
+### Summary
+
+Introduced a dynamic, database-backed capability-based authorization model while preserving ASP.NET Core Identity authentication and maintaining backward compatibility.
+
+### Added
+
+- Domain entities: Capability, AuthorizationGroup, AuthorizationGroupCapability, UserAuthorizationGroup
+- Application interfaces: ICapabilityAuthorizationService, ICapabilityRepository, IAuthorizationGroupRepository
+- Application service: CapabilityAuthorizationService
+- Web authorization: CapabilityRequirement, MultiCapabilityRequirement, CapabilityAuthorizationHandler, MultiCapabilityAuthorizationHandler
+- AuthorizationPolicies with 39 capability constants
+- EF Core configurations for 4 authorization tables
+- Repositories: CapabilityRepository, AuthorizationGroupRepository
+- Migration: CreateAuthorizationSchema
+- Seeder: AuthorizationSeeder with CapabilityCatalog (39 capabilities, 3 groups)
+- Administration pages: Groups CRUD, EditCapabilities, EditUsers, Users CRUD, EditRoles, EditStatus, ResetPassword, Capabilities Index (14 pages)
+- 10 Application feature handlers for Group/Capability management
+- GetAllUsersHandler for user listing in group assignment
+- CapabilityAuthorizationExtensions for policy registration
+- ApplicationUserClaimsPrincipalFactory for MustChangePassword claim
+
+### Changed
+
+- All 50 page-level [Authorize(Policy)] attributes migrated to capability-backed policies
+- 21 Razor UI authorization checks via IAuthorizationService.AuthorizeAsync
+- Three static role-based policies replaced with capability-backed equivalents (same policy names)
+- _ViewImports.cshtml updated with @using InventoryPlatform.Web.Authorization
+
+### Security
+
+- Default deny enforced: all handler failure paths return without context.Succeed()
+- No fallback role authorization exists in the codebase
+- UI visibility independently enforced via server-side [Authorize] on every page
+- AccessDenied page renders correctly for denied authorization
+
+### Verified
+
+- Build: SUCCESS (0 errors, 0 warnings)
+- Authentication: All 3 seeded users login successfully
+- Unauthenticated access: All protected pages redirect to login (302)
+- Administrator access: All admin pages accessible (200)
+- Manager access: All management pages accessible (200) [NOTE: DF1 stale DB relationship - InventoryManager has Administration.Access in database]
+- Viewer access: View pages accessible (200), management create/edit pages accessible (200) [NOTE: DF2 stale DB relationship - Viewer has Supplier.Create in database]
+- Purchasing per-action capabilities: View, Create, Submit, Approve, Receive all verified
+- Reports: Accessible to all authenticated users (by design)
+- Database: 39 capabilities, 3 groups, 3 assignments verified
+- Seed data: Additive-only restoration verified in source
+
+### Known Findings (Deferred)
+
+- P1: InventoryManager group includes Administration.Access in persisted DB (code fix applied in Phase 21; DB relationship still present)
+- P1: Viewer has Supplier.Create in persisted DB, granting InventoryManagement access via OR-composite (stale DB relationship; current source filter corrected)
+- Categories/Edit missing [Authorize] attribute (pre-existing gap)
+- Viewer has User.View capability (seed filter includes all *.View)
+- Reports unrestricted (design decision pending)
+
+---
+
 ## [Unreleased]
+
+### Sprint 10 T10 - Existing Authorization Boundary Migration
+
+**Status:** Complete
+
+#### Changed
+
+- Added `Administration.Access` capability to the seed data catalog.
+- Created `MultiCapabilityRequirement` and `MultiCapabilityAuthorizationHandler` for OR-composite capability authorization.
+- Added OR-composite `AddCapabilityPolicy` overload to `CapabilityAuthorizationExtensions`.
+- Replaced `Administrator` role-based policy with single-capability `Administration.Access` policy.
+- Replaced `InventoryManagement` role-based policy with OR-composite of 9 capabilities.
+- Replaced `ViewInventory` role-based policy with OR-composite of 7 view capabilities.
+- Replaced `/Administration` and `/Inventory` folder-level role conventions with policy-name references.
+- Registered `MultiCapabilityAuthorizationHandler` in DI alongside existing `CapabilityAuthorizationHandler`.
+
+#### Verified
+
+- Build: SUCCESS — 0 errors, 26 pre-existing warnings
+- Configuration-level policy equivalence established through group-capability analysis; runtime authorization behavior not verified due to environment limitations.
+- All 43 page-level `[Authorize(Policy = ...)]` attributes unchanged (reference same policy names).
+- All 46 Razor view `User.IsInRole` checks unchanged (deferred to T12).
+- PurchaseOrder authorization (T09) unchanged.
+- No database migration required.
+
+
+
+### Sprint 10 T12 - Razor Navigation & Capability Visibility
+
+**Status:** Complete
+
+#### Changed
+
+- Replaced 45 `User.IsInRole(...)` role-based UI visibility checks across 14 Razor `.cshtml` files with capability-backed `IAuthorizationService.AuthorizeAsync(...)` calls.
+- Replaced admin navigation role check in `_Layout.cshtml` with capability-backed check.
+- Added `@using InventoryPlatform.Web.Authorization` to `_ViewImports.cshtml` for global access to `AuthorizationPolicies`.
+- Added per-file `@using Microsoft.AspNetCore.Authorization` for `IAuthorizationService` injection.
+- Removed `@using InventoryPlatform.Infrastructure.Identity` from all 14 affected files (no longer needed).
+- Pre-computed authorization boolean variables (`canManage`, `canAdmin`) in each affected Razor file to minimize per-request authorization evaluations.
+
+#### Verified
+
+- Build: SUCCESS — 0 errors, 20 pre-existing warnings.
+- Source verification: All 6 searches confirm correct migration.
+- 0 `User.IsInRole(...)` remain in targeted `.cshtml` files.
+- 1 dead-code `IsInRole` in `EditStatus.cshtml.cs` documented but unchanged.
+- All page-level `[Authorize(Policy = ...)]` attributes unchanged.
+- No Domain, Application, or Infrastructure files modified.
+- No database migration required.
+
+#### Deferred
+
+- `Categories/Edit.cshtml.cs` missing `[Authorize]` — pre-existing, separate task.
+- `Suppliers/Create.cshtml.cs` using overly broad `ViewInventory` policy — pre-existing, separate task.
+- `Units/Create.cshtml.cs` using `Administrator` policy — pre-existing, separate task.
+- `EditStatus.cshtml.cs` line 61 dead-code `IsInRole`.
 
 ### Sprint 9 - ASP.NET Core Code Quality & Consistency
 

@@ -1,0 +1,45 @@
+@page
+@model InventoryPlatform.Web.Pages.Administrator.Capabilities.IndexModel
+
+<h1>@ViewData["Title"]</h1>
+
+@if (!Model.Capabilities.Any())
+{
+    <div class="alert alert-info">
+        No capabilities found.
+    </div>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Enabled</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var capability in Model.Capabilities)
+            {
+                <tr>
+                    <td>@capability.Name</td>
+                    <td>
+                        @if (capability.IsEnabled)
+                        {
+                            <span class="badge bg-success">Yes</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger">No</span>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<a asp-page="/Administrator/Groups/Index"
+   class="btn btn-secondary">
+    Back to Groups
+</a>

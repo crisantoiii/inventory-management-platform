@@ -1,4 +1,9 @@
-@using InventoryPlatform.Infrastructure.Identity;
+@using Microsoft.AspNetCore.Authorization
+@inject IAuthorizationService AuthorizationService
+
+@{
+    var canAdmin = (await AuthorizationService.AuthorizeAsync(User, null, AuthorizationPolicies.Administrator)).Succeeded;
+}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -62,10 +67,16 @@
                         </li>
 
                         <!-- Admin Controls -->
-                        @if (User.IsInRole(IdentityConstants.Roles.Administrator))
+                        @if (canAdmin)
                         {
                             <li class="nav-item">
                                 <a class="nav-link text-danger" asp-page="/Administrator/Users/Index">Users</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-danger" asp-page="/Administrator/Groups/Index">Groups</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-danger" asp-page="/Administrator/Capabilities/Index">Capabilities</a>
                             </li>
                         }
 

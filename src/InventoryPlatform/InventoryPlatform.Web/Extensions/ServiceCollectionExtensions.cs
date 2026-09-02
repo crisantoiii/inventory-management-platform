@@ -1,5 +1,6 @@
-﻿using InventoryPlatform.Infrastructure.Persistence.Context;
+using InventoryPlatform.Infrastructure.Persistence.Context;
 using InventoryPlatform.Web.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using LocalIdentity = InventoryPlatform.Infrastructure.Identity;
 using InventoryPlatform.Web.Reports.Excel;
@@ -31,6 +32,14 @@ public static class ServiceCollectionExtensions
         services.AddScoped<
             IUserClaimsPrincipalFactory<LocalIdentity.ApplicationUser>,
             ApplicationUserClaimsPrincipalFactory>();
+
+        services.AddScoped<
+            IAuthorizationHandler,
+            CapabilityAuthorizationHandler>();
+
+        services.AddScoped<
+            IAuthorizationHandler,
+            MultiCapabilityAuthorizationHandler>();
 
         services.AddScoped<ExcelReportWriter>();
         services.AddScoped<PdfReportWriter>();
@@ -77,34 +86,60 @@ public static class ServiceCollectionExtensions
 
             options.Conventions.AuthorizeFolder(
                 "/Administration",
-                LocalIdentity.IdentityConstants.Roles.Administrator);
+                AuthorizationPolicies.Administrator);
 
             options.Conventions.AuthorizeFolder(
                 "/Inventory",
-                $"{LocalIdentity.IdentityConstants.Roles.Administrator},{LocalIdentity.IdentityConstants.Roles.InventoryManager}");
+                AuthorizationPolicies.InventoryManagement);
         });
 
         services.AddAuthorization(options =>
         {
-            options.AddPolicy(
+            options.AddCapabilityPolicy(
                 AuthorizationPolicies.Administrator,
-                policy =>
-                    policy.RequireRole(LocalIdentity.IdentityConstants.Roles.Administrator));
+                AuthorizationPolicies.AdministrationAccess);
 
-            options.AddPolicy(
+            options.AddCapabilityPolicy(
                 AuthorizationPolicies.InventoryManagement,
-                policy =>
-                    policy.RequireRole(
-                        LocalIdentity.IdentityConstants.Roles.Administrator,
-                        LocalIdentity.IdentityConstants.Roles.InventoryManager));
+                AuthorizationPolicies.InventoryManagementCapabilities.ProductCreate,
+                AuthorizationPolicies.InventoryManagementCapabilities.ProductEdit,
+                AuthorizationPolicies.InventoryManagementCapabilities.CategoryCreate,
+                AuthorizationPolicies.InventoryManagementCapabilities.SupplierCreate,
+                AuthorizationPolicies.InventoryManagementCapabilities.SupplierEdit,
+                AuthorizationPolicies.InventoryManagementCapabilities.CustomerCreate,
+                AuthorizationPolicies.InventoryManagementCapabilities.CustomerEdit,
+                AuthorizationPolicies.InventoryManagementCapabilities.UnitEdit,
+                AuthorizationPolicies.InventoryManagementCapabilities.InventoryTransactionCreate);
 
-            options.AddPolicy(
+            options.AddCapabilityPolicy(
                 AuthorizationPolicies.ViewInventory,
-                policy =>
-                    policy.RequireRole(
-                        LocalIdentity.IdentityConstants.Roles.Administrator,
-                        LocalIdentity.IdentityConstants.Roles.InventoryManager,
-                        LocalIdentity.IdentityConstants.Roles.Viewer));
+                AuthorizationPolicies.ViewInventoryCapabilities.DashboardView,
+                AuthorizationPolicies.ViewInventoryCapabilities.ProductView,
+                AuthorizationPolicies.ViewInventoryCapabilities.CategoryView,
+                AuthorizationPolicies.ViewInventoryCapabilities.UnitView,
+                AuthorizationPolicies.ViewInventoryCapabilities.CustomerView,
+                AuthorizationPolicies.ViewInventoryCapabilities.SupplierView,
+                AuthorizationPolicies.ViewInventoryCapabilities.InventoryTransactionView);
+
+            options.AddCapabilityPolicy(
+                AuthorizationPolicies.ForCapability(AuthorizationPolicies.PurchaseOrder.View),
+                AuthorizationPolicies.PurchaseOrder.View);
+
+            options.AddCapabilityPolicy(
+                AuthorizationPolicies.ForCapability(AuthorizationPolicies.PurchaseOrder.Create),
+                AuthorizationPolicies.PurchaseOrder.Create);
+
+            options.AddCapabilityPolicy(
+                AuthorizationPolicies.ForCapability(AuthorizationPolicies.PurchaseOrder.Submit),
+                AuthorizationPolicies.PurchaseOrder.Submit);
+
+            options.AddCapabilityPolicy(
+                AuthorizationPolicies.ForCapability(AuthorizationPolicies.PurchaseOrder.Approve),
+                AuthorizationPolicies.PurchaseOrder.Approve);
+
+            options.AddCapabilityPolicy(
+                AuthorizationPolicies.ForCapability(AuthorizationPolicies.PurchaseOrder.Receive),
+                AuthorizationPolicies.PurchaseOrder.Receive);
         });
 
         services.AddRazorPages();

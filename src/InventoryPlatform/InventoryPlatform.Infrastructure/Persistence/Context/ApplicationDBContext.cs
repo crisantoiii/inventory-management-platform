@@ -21,6 +21,14 @@ public sealed class ApplicationDbContext
 
     public DbSet<PurchaseOrderItem> PurchaseOrderItems => Set<PurchaseOrderItem>();
 
+    public DbSet<Capability> Capabilities => Set<Capability>();
+
+    public DbSet<AuthorizationGroup> AuthorizationGroups => Set<AuthorizationGroup>();
+
+    public DbSet<AuthorizationGroupCapability> AuthorizationGroupCapabilities => Set<AuthorizationGroupCapability>();
+
+    public DbSet<UserAuthorizationGroup> UserAuthorizationGroups => Set<UserAuthorizationGroup>();
+
     public ApplicationDbContext(
         DbContextOptions<ApplicationDbContext> options)
         : base(options)

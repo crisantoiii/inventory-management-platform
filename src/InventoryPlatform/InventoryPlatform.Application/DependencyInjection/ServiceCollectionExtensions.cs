@@ -1,4 +1,6 @@
 using FluentValidation;
+using InventoryPlatform.Application.Authorization;
+using InventoryPlatform.Application.Interfaces.Authorization;
 using InventoryPlatform.Application.Features.Account.ChangePassword;
 using InventoryPlatform.Application.Features.Account.ConfirmEmail;
 using InventoryPlatform.Application.Features.Account.DisableTwoFactor;
@@ -65,6 +67,15 @@ using InventoryPlatform.Application.Features.Users.GetUsers;
 using InventoryPlatform.Application.Features.Users.UpdateUser;
 using InventoryPlatform.Application.Features.Users.UpdateUserRoles;
 using InventoryPlatform.Application.Features.Users.UpdateUserStatus;
+using InventoryPlatform.Application.Features.AuthorizationGroups.GetAuthorizationGroups;
+using InventoryPlatform.Application.Features.AuthorizationGroups.GetAuthorizationGroup;
+using InventoryPlatform.Application.Features.AuthorizationGroups.CreateAuthorizationGroup;
+using InventoryPlatform.Application.Features.AuthorizationGroups.UpdateAuthorizationGroup;
+using InventoryPlatform.Application.Features.AuthorizationGroups.DeleteAuthorizationGroup;
+using InventoryPlatform.Application.Features.AuthorizationGroups.ManageGroupCapabilities;
+using InventoryPlatform.Application.Features.AuthorizationGroups.ManageGroupUsers;
+using InventoryPlatform.Application.Features.Capabilities.GetCapabilities;
+using InventoryPlatform.Application.Features.Users.GetAllUsers;
 using Microsoft.Extensions.DependencyInjection;
 using AccountResetPassword = InventoryPlatform.Application.Features.Account.ResetPassword;
 using UserResetPassword = InventoryPlatform.Application.Features.Users.ResetPassword;
@@ -76,6 +87,8 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddApplication(
         this IServiceCollection services)
     {
+        services.AddScoped<ICapabilityAuthorizationService, CapabilityAuthorizationService>();
+
         
         services.AddScoped<CreateProductHandler>();
         services.AddScoped<GetProductHandler>();
@@ -141,6 +154,16 @@ public static class ServiceCollectionExtensions
         services.AddScoped<GetInventoryMovementHandler>();
         services.AddScoped<GetLowStockHandler>();
         services.AddScoped<GetProductReportsHandler>();
+
+        services.AddScoped<GetAuthorizationGroupsHandler>();
+        services.AddScoped<GetAuthorizationGroupHandler>();
+        services.AddScoped<CreateAuthorizationGroupHandler>();
+        services.AddScoped<UpdateAuthorizationGroupHandler>();
+        services.AddScoped<DeleteAuthorizationGroupHandler>();
+        services.AddScoped<ManageGroupCapabilitiesHandler>();
+        services.AddScoped<ManageGroupUsersHandler>();
+        services.AddScoped<GetCapabilitiesHandler>();
+        services.AddScoped<GetAllUsersHandler>();
 
         services.AddScoped<GetProfileHandler>();
         services.AddScoped<UpdateProfileHandler>();

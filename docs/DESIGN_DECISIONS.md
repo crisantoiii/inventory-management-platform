@@ -1656,21 +1656,34 @@ Rejected because user authorization is an application/security concern, while Do
 
 ## Implementation Status
 
-Accepted as the future authorization architecture.
+**Original status:** Accepted as the future authorization architecture. Not yet implemented.
 
-Not yet implemented.
+**Implementation outcome (Sprint 10, T01–T13):** Implemented.
 
-Additional Reporting is complete for Sprint 7; the next implementation scope will be established through Sprint Planning.
+Implemented across Sprint 10:
+- Domain entities: Capability, AuthorizationGroup, AuthorizationGroupCapability, UserAuthorizationGroup
+- Application abstractions: ICapabilityAuthorizationService, ICapabilityRepository, IAuthorizationGroupRepository
+- Infrastructure persistence: EF Core configurations, repositories, seed data (39 capabilities, 3 groups)
+- Web integration: CapabilityRequirement, MultiCapabilityRequirement, authorization handlers, policy registration
+- Administration: 7 Razor Pages for Group CRUD, capability/user assignment, capability catalog
+- UI visibility: 45 Razor User.IsInRole checks migrated to IAuthorizationService.AuthorizeAsync
+
+**Runtime verification (T13):** Build success. Authentication for all 3 seeded users. Authorization boundaries verified for Administrator, Manager, and Viewer. Per-action Purchasing capabilities verified. Database state verified (39 capabilities, 3 groups, 3 assignments).
+
+**Not runtime verified:** Active-session capability change behavior. Seed re-idempotency across restart.
+
+See DD-044 through DD-047, DD-040, DD-041 for implementation-specific architectural decisions.
+See DD-039 for the static policy migration approach.
 
 ### Implementation Boundary
 
-The future capability model is an authorization model, not an authentication replacement.
+The capability model is an authorization model, not an authentication replacement.
 
-Authentication will continue to be responsible for establishing the user's identity.
+Authentication continues to be responsible for establishing the user's identity.
 
-Authorization will determine whether the authenticated user has the required capability to attempt an application action.
+Authorization determines whether the authenticated user has the required capability to attempt an application action.
 
-Domain business rules will determine whether the action is valid for the current business state.
+Domain business rules determine whether the action is valid for the current business state.
 
 ---
 
@@ -2001,4 +2014,204 @@ The project should reduce meaningful duplication without hiding architectural bo
 - Direct Infrastructure DTO projections were retained.
 
 T06-T08 provide the source-level verification for these decisions.
+
+
+# DD-039 - Capability-Backed Policy Migration
+
+## Decision
+
+Migrate existing static role-based authorization policies (Administrator, InventoryManagement, ViewInventory) to capability-backed equivalents while preserving the same policy names and all existing [Authorize(Policy = ...)] attributes on page models.
+
+## Rationale
+
+The existing role-based policies (RequireRole) bind authorization to Identity roles, which are static. Dynamic capability-based authorization resolves permissions from the database via Groups and Capabilities, enabling runtime permission changes without code changes.
+
+By preserving the same policy names, all 43 page-level [Authorize] attributes require zero modification. Only the internal policy registration changes.
+
+## Implementation
+
+- Administrator policy: Single capability "Administration.Access" (only Administrator group has it)
+- InventoryManagement policy: OR-composite of 9 capabilities (create/edit across Products, Categories, Suppliers, Customers, Units, InventoryTransactions)
+- ViewInventory policy: OR-composite of 7 view capabilities
+
+OR-composite authorization uses MultiCapabilityRequirement + MultiCapabilityAuthorizationHandler, which evaluates capabilities in sequence and succeeds on the first match (TRUE OR semantics).
+
+## Alternatives Considered
+
+1. Deriving composite policies from the role's existing capability set in the seed catalog -- rejected because the InventoryManager capability set does not include Unit.Create, yet the role-based policy allows InventoryManager access to Unit Create pages.
+2. Creating separate policies for each individual capability -- rejected because the existing policy names are referenced by 43 page models and changing them would require mass page-model edits.
+
+## Outcome
+
+Accepted. Sprint 10 T10. Configuration-level policy equivalence established through group-capability analysis.
+
+## Verification
+
+Build: SUCCESS (0 errors, 26 pre-existing warnings). Runtime authorization behavior not verified due to environment limitations.
+
+
+
+## T12 - Razor UI Capability Visibility Migration
+
+### Decision
+
+Replace all `User.IsInRole(...)` role-based UI visibility checks in Razor views with capability-backed `IAuthorizationService.AuthorizeAsync(...)` calls using the existing authorization policies.
+
+### Approach
+
+Use a direct mapping strategy where each role-check pattern is replaced with the capability-backed policy that grants access to the same user groups:
+
+- `User.IsInRole("Administrator")` → `AuthorizationPolicies.Administrator` (single-cap: Administration.Access)
+- `User.IsInRole("Administrator") || User.IsInRole("InventoryManager")` → `AuthorizationPolicies.InventoryManagement` (OR-composite of 9 capabilities)
+
+### Pre-computation Pattern
+
+Authorization results are pre-computed once per page render in a `@{ }` block to avoid repeated authorization pipeline evaluations in loops:
+
+```cshtml
+@{
+    var canManage = (await AuthorizationService.AuthorizeAsync(
+        User, null, AuthorizationPolicies.InventoryManagement)).Succeeded;
+    var canAdmin = (await AuthorizationService.AuthorizeAsync(
+        User, null, AuthorizationPolicies.Administrator)).Succeeded;
+}
+```
+
+### Import Strategy
+
+- `AuthorizationPolicies` imported globally via `_ViewImports.cshtml` (project namespace, used by all affected files)
+- `IAuthorizationService` imported per-file via `@using Microsoft.AspNetCore.Authorization` (framework namespace, visible dependency)
+
+### Behavioral Equivalence
+
+For seeded users, the capability-backed checks produce identical UI visibility. For non-seeded users whose role and authorization-group memberships diverge, capability-backed authorization follows the authoritative capability model.
+
+### Justification
+
+T12 is a mechanism migration at the authorization architecture level. It does not introduce new policies, capabilities, handlers, persistence changes, or server-side authorization rules. It migrates Razor UI checks to the existing capability-backed authorization infrastructure.
+
+---
+
+# DD-036 — Dynamic Capability-Based Authorization: Group Model
+
+**Status:** Implemented
+
+**Context**
+The platform needed a dynamic authorization model that evolved from existing Identity roles without requiring a complete authentication rewrite.
+
+**Decision**
+User → Group → Capability (Option A). Users belong to one or more AuthorizationGroups. Groups contain one or more Capabilities. Effective capabilities are the union of all capabilities across all enabled Groups.
+
+**Reason**
+Simplest model satisfying the requirements. Single join-table chain. No unnecessary indirection.
+
+**Rejected Alternatives**
+- User + Group parallel model (more complex)
+- Role → Group chain (unnecessary indirection)
+
+**Consequences**
+- AuthorizationGroupCapability and UserAuthorizationGroup join tables
+- EF Core cascade deletes on all relationships
+- Union semantics for multiple groups
+
+---
+
+# DD-037 — Dynamic Capability-Based Authorization: Policy Registration
+
+**Status:** Implemented
+
+**Context**
+ASP.NET Core authorization requires policies to be registered. The capability system needs dynamic database-backed resolution.
+
+**Decision**
+Static policy registration with capability-backed requirements. Policies are registered at startup via `AddCapabilityPolicy` extension method. Each policy wraps a CapabilityRequirement or MultiCapabilityRequirement. Resolution is dynamic (database query per request).
+
+**Reason**
+Simple, debuggable, sufficient for finite capability set. Standard ASP.NET Core pattern.
+
+**Rejected Alternatives**
+- Dynamic policy provider (IAuthorizationPolicyProvider) — unnecessary complexity
+- Application service called from PageModels — bypasses ASP.NET Core authorization middleware
+
+---
+
+# DD-038 — Dynamic Capability-Based Authorization: Default Deny
+
+**Status:** Implemented
+
+**Context**
+The authorization model must fail-closed. No accidental implicit allow.
+
+**Decision**
+Handler returns without calling `context.Succeed()` on any failure path. ASP.NET Core's default behavior denies access when no handler succeeds.
+
+**Evidence**
+All failure paths traced: not authenticated, empty userId, capability not found, capability disabled, no groups, no matching capability — all result in non-success. DB exceptions propagate as 500 errors (still denies access).
+
+**Consequences**
+- Zero fallback role authorization in the codebase
+- Database failures produce 500 instead of clean 403 (acceptable for portfolio scope)
+
+---
+
+# DD-039 — Dynamic Capability-Based Authorization: Administrator Strategy
+
+**Status:** Implemented
+
+**Context**
+Administrator access must not be accidentally lost during migration.
+
+**Decision**
+Hybrid: Identity role retained + Administrator Group with ALL capabilities + seed-based recovery on restart.
+
+**Mechanism**
+- IdentitySeeder seeds roles and assigns users to groups on every startup
+- AuthorizationSeeder creates missing capabilities, groups, and adds missing capabilities to groups
+- AssignUsersToGroupsAsync re-assigns seeded users to their groups if assignments are missing
+
+**Limitations (from T13)**
+- Seed does NOT clear account lockout state
+- Seed is additive-only for capabilities beyond the catalog
+- Seed does NOT restore Identity roles if removed (but roles are not used for authorization)
+
+---
+
+# DD-040 — Dynamic Capability-Based Authorization: Caching
+
+**Status:** Deferred
+
+**Context**
+Dynamic authorization requires database queries per request.
+
+**Decision**
+Defer caching. Two indexed queries per authorization check. Portfolio project scope does not demonstrate need.
+
+**Future Consideration**
+If performance issues arise, evaluate request-level or user-level caching with appropriate invalidation.
+
+---
+
+# DD-041 — Dynamic Capability-Based Authorization: UI Visibility
+
+**Status:** Implemented
+
+**Context**
+Razor views need to show/hide UI elements based on capabilities.
+
+**Decision**
+Use `IAuthorizationService.AuthorizeAsync(User, null, policyName)` in Razor views with pre-computed boolean variables. UI hiding is convenience only — server-side `[Authorize]` is the security boundary.
+
+**Pattern**
+```cshtml
+@{
+    var canManage = (await AuthorizationService.AuthorizeAsync(
+        User, null, AuthorizationPolicies.InventoryManagement)).Succeeded;
+}
+@if (canManage) { /* show create button */ }
+```
+
+**Consequences**
+- 14 Razor files migrated from `User.IsInRole` to `IAuthorizationService`
+- Zero `IdentityConstants.Roles` references in .cshtml files
+- Server-side authorization remains independent of UI visibility
 
