@@ -181,14 +181,14 @@ public static class AuthorizationSeeder
                     name is not Unit.Activate &&
                     name is not Unit.Deactivate &&
                     name is not Customer.Activate &&
-                    name is not Customer.Deactivate)
+                    name is not Customer.Deactivate &&
+                    name is not Administration.Access)
                 .ToArray();
 
         public static readonly IReadOnlyList<string> Viewer =
             All
                 .Where(name =>
                     name.EndsWith(".View", StringComparison.Ordinal) ||
-                    name == Supplier.Create ||
                     name.StartsWith("PurchaseOrder.", StringComparison.Ordinal))
                 .ToArray();
 
