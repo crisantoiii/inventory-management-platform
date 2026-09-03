@@ -18,7 +18,7 @@
 | T02 | PurchaseOrder Domain Tests | COMPLETE |
 | T03 | Product Domain Tests | COMPLETE |
 | T04 | Authorization Domain Tests | COMPLETE |
-| T05 | CapabilityAuthorizationService Tests | NOT STARTED |
+| T05 | CapabilityAuthorizationService Tests | COMPLETE |
 | T06 | Authorization Handler Tests | DEFERRED TO SPRINT 12 |
 | T07 | AuthorizationSeeder Integration Tests | NOT STARTED |
 | T08 | Authorization Repository Integration Tests | NOT STARTED |
@@ -414,8 +414,86 @@ dotnet test             SUCCESS (205 tests, 205 passed, 0 failed)
 
 ---
 
+## T05 — CapabilityAuthorizationService Tests
+
+**Status: COMPLETE**
+
+### Implementation
+
+Created one test file:
+
+```text
+tests/InventoryPlatform.UnitTests/Application/CapabilityAuthorizationServiceTests.cs
+```
+
+Also created two hand-written fake implementations (test-project-only):
+
+- `FakeCapabilityRepository` — implements `ICapabilityRepository`
+- `FakeAuthorizationGroupRepository` — implements `IAuthorizationGroupRepository`
+
+No mocking framework was added.
+
+### Service Behaviors Tested
+
+**Capability Granted:**
+- User with enabled capability in one of their groups → returns true
+
+**Capability Not Granted:**
+- Capability exists but user's groups don't contain it → returns false
+
+**Disabled Capability:**
+- Matching capability exists but is disabled → returns false
+
+**Multiple Groups:**
+- Capability in second group (not first) → returns true (multi-group union)
+- Capability absent from all user's groups → returns false
+
+**Multiple Capabilities Within a Group:**
+- Group with multiple capabilities returns correct result
+
+**User With No Groups:**
+- User belongs to no authorization groups → returns false
+
+**Empty/Invalid Inputs:**
+- Empty user ID → returns false
+- Capability not found → returns false
+- Null capability name → returns false
+- Empty capability name → returns false
+- Whitespace capability name → returns false
+
+**Repository Interaction:**
+- GetByNameAsync receives the correct capability name
+- GetForUserAsync receives the correct user ID
+- When capability not found, GetForUserAsync is NOT called (short-circuit)
+
+### Test Double Strategy
+
+- Hand-written fakes for `ICapabilityRepository` and `IAuthorizationGroupRepository`
+- No mocking framework added
+- Fakes are test-project-only, not shared
+- Minimal implementation: only methods actually called by `CapabilityAuthorizationService` have meaningful behavior; other `IRepository<T>` methods return defaults
+
+### Validation
+
+```text
+dotnet build            SUCCESS (0 errors, 0 warnings)
+dotnet test             SUCCESS (220 tests, 220 passed, 0 failed)
+```
+
+15 new T05 application service tests + 204 previous UnitTests + 1 IntegrationTests = 220 total.
+
+### Production source changes: NONE
+
+### T05 Notes
+
+- The service short-circuits on empty user ID or null/whitespace capability name without calling repositories. Repository interaction tests verify this behavior.
+- The service uses capability name lookup, not ID-based lookup, so test fakes simulate name-based resolution.
+- The service compares `groupCapability.CapabilityId == capability.Id` to match capabilities across groups, which is verified through multi-group tests.
+
+---
+
 ## Final Sprint Assessment
 
-PENDING — Sprint 11 is not complete. T01–T04 are complete. T05–T11 (minus T06) remain to be implemented.
+PENDING — Sprint 11 is not complete. T01–T05 are complete. T07–T11 (minus T06) remain to be implemented.
 
 T11 is the final Sprint 11 task. It synchronizes project-wide documentation with actual implementation and formally closes Sprint 11.
