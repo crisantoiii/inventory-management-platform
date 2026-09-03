@@ -15,7 +15,7 @@
 | Task | Name | Status |
 |------|------|--------|
 | T01 | Test Infrastructure Foundation | COMPLETE |
-| T02 | PurchaseOrder Domain Tests | NOT STARTED |
+| T02 | PurchaseOrder Domain Tests | COMPLETE |
 | T03 | Product Domain Tests | NOT STARTED |
 | T04 | Authorization Domain Tests | NOT STARTED |
 | T05 | CapabilityAuthorizationService Tests | NOT STARTED |
@@ -24,6 +24,7 @@
 | T08 | Authorization Repository Integration Tests | NOT STARTED |
 | T09 | CI / Automated Test Execution | NOT STARTED |
 | T10 | Test Conventions and Sprint Documentation | NOT STARTED |
+| T11 | Documentation Synchronization and Sprint Closure | NOT STARTED |
 
 ---
 
@@ -161,11 +162,14 @@ T01 had a minor test-file authoring issue (`using Xunit;` missing) which was cor
 
 ## Lessons Learned
 
-Initial Sprint 11 observations (from T01 only):
+Sprint 11 observations:
 
 - xUnit `[Fact]` requires the `using Xunit;` namespace import; it is not included in implicit usings
 - Project-level test infrastructure can be validated independently before substantive test coverage is added
 - Dependency boundaries can be verified directly from `.csproj` files after project creation
+- PurchaseOrder domain is well-suited for direct unit testing — no mocking or infrastructure needed
+- PurchaseOrderItem behavior is tightly coupled to PurchaseOrder receiving workflow and benefits from dedicated test coverage
+- State transition testing (Draft→Submitted→Approved→Receiving→Completed) is high-value for regression protection
 
 ---
 
@@ -188,6 +192,53 @@ Sprint 11 does NOT move authorization handlers to another production project.
 
 ---
 
+## T02 — PurchaseOrder Domain Tests
+
+**Status: COMPLETE**
+
+### Implementation
+
+Created two test files:
+
+```text
+tests/InventoryPlatform.UnitTests/Domain/Purchasing/PurchaseOrderTests.cs
+tests/InventoryPlatform.UnitTests/Domain/Purchasing/PurchaseOrderItemTests.cs
+```
+
+### Behaviors Covered
+
+**PurchaseOrder:**
+- Creation (valid parameters, initial state, Status=Draft)
+- AddItem (valid items, multiple items, TotalAmount calculation, duplicate product rejection, zero/negative quantity rejection, negative unit cost rejection, zero unit cost allowed)
+- UpdateItem (quantity/cost updates, nonexistent item rejection, invalid updates)
+- RemoveItem (removal, TotalAmount update, nonexistent item rejection)
+- Submit (Draft→Submitted, no-items rejection, already-submitted rejection)
+- Approve (Submitted→Approved, wrong-state rejections)
+- Receive (partial receiving, full receiving, completion detection, invalid state rejections, quantity validation)
+- Invalid state transitions (AddItem/UpdateItem/RemoveItem from non-Draft states)
+- Domain invariants (TotalAmount calculation, Items is read-only, computed properties)
+
+**PurchaseOrderItem:**
+- Creation (all properties, initial ReceivedQuantity=0)
+- Computed properties (LineTotal, RemainingQuantity, IsFullyReceived)
+- Receive (valid quantities, accumulation, zero/negative rejection, over-receive rejection)
+- Update (quantity/cost updates, validation, zero unit cost allowed)
+
+### Validation
+
+```text
+dotnet build            SUCCESS (0 errors, 0 warnings)
+dotnet test             SUCCESS (102 tests, 102 passed, 0 failed)
+```
+
+101 new T02 PurchaseOrder domain tests + 1 T01 placeholder test = 102 total in UnitTests.
+
+### Production source changes: NONE
+
+---
+
 ## Final Sprint Assessment
 
-PENDING — Sprint 11 is not complete. T01 is complete. T02–T10 (minus T06) remain to be implemented.
+PENDING — Sprint 11 is not complete. T01 and T02 are complete. T03–T11 (minus T06) remain to be implemented.
+
+T11 is the final Sprint 11 task. It synchronizes project-wide documentation with actual implementation and formally closes Sprint 11.
