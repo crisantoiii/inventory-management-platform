@@ -23,7 +23,7 @@
 | T07 | AuthorizationSeeder Integration Tests | COMPLETE |
 | T08 | Authorization Repository Integration Tests | COMPLETE |
 | T09 | CI / Automated Test Execution | COMPLETE |
-| T10 | Test Conventions and Sprint Documentation | NOT STARTED |
+| T10 | Test Conventions and Sprint Documentation | COMPLETE |
 | T11 | Documentation Synchronization and Sprint Closure | NOT STARTED |
 
 ---
@@ -760,8 +760,96 @@ CI configuration validated structurally; remote CI execution not performed. No C
 
 ---
 
+## T10 — Test Conventions and Sprint Documentation
+
+**Status: COMPLETE**
+
+### Implementation
+
+Created one documentation file:
+
+```text
+docs/TESTING_CONVENTIONS.md
+```
+
+### Documentation Content
+
+**Test Architecture:**
+- Two-project structure: UnitTests (Domain/Application/Shared) and IntegrationTests (Domain/Application/Infrastructure/Shared)
+- Neither project references InventoryPlatform.Web
+- xUnit framework with hand-written fakes (no mocking framework)
+
+**When to Use Each Project:**
+- UnitTests: Domain behavior, Application service isolation, business rules
+- IntegrationTests: Repository behavior, Seeder verification, EF Core persistence
+
+**Test Naming Convention:**
+- Pattern: `MethodOrBehavior_WhenCondition_ExpectedResult`
+- Derived from actual Sprint 11 test files
+
+**Test Organization:**
+- Folder structure mirrors production project organization
+- Namespaces match folder structure
+- One test class per subject under test
+
+**Test Design Patterns:**
+- Direct object construction for domain tests
+- Hand-written fakes for Application service tests
+- Real repository implementations for integration tests
+- Direct DbContext for test data setup
+
+**Test Isolation:**
+- Unique InMemory database name per integration test class (Guid-based)
+- IDisposable cleanup for DbContext
+- Tests do not depend on execution order
+
+**EF Core InMemory Usage:**
+- What it validates (query behavior, relationship loading, basic CRUD)
+- What it does NOT validate (SQL Server behavior, constraints, migrations)
+
+**Authorization Seed Baseline:**
+- 39 capabilities, 39 Administrator, 21 InventoryManager, 13 Viewer, 73 total relationships
+- Includes source correction note (planning said 12/72, actual is 13/73)
+
+**Running Tests:**
+- Provider-neutral commands for restore/build/test
+- CI status: no provider configured, locally reproducible
+
+**Current Test Coverage:**
+- UnitTests: 219 tests (62 PO + 39 POI + 56 Product + 15 Capability + 31 AuthGroup + 15 Service + 1 placeholder)
+- IntegrationTests: 61 tests (24 Seeder + 12 CapRepo + 24 GroupRepo + 1 placeholder)
+- Total: 280 tests, 280 passed, 0 failures
+
+**Deferred Work:**
+- Sprint 12: T06 Web Authorization Handler Tests, WebApplicationFactory, Razor integration tests
+- Future: Playwright, coverage gates, mutation testing, performance testing, SQL Server testing
+
+**Key Conventions Summary:**
+1. Two test projects with strict dependency boundaries
+2. No Web reference in test projects
+3. xUnit with hand-written fakes
+4. Behavior-oriented test naming
+5. Isolated InMemory databases per test class
+6. Real implementations for integration tests
+7. No production changes for testing
+8. Provider-neutral CI readiness
+9. Behavior-focused coverage
+
+### Validation
+
+```text
+dotnet build            SUCCESS (0 errors, 0 warnings)
+dotnet test             SUCCESS (280 tests, 280 passed, 0 failed)
+```
+
+No test count change — T10 is documentation only.
+
+### Production source changes: NONE
+
+---
+
 ## Final Sprint Assessment
 
-PENDING — Sprint 11 is not complete. T01–T05, T07–T09 are complete. T10–T11 (minus T06) remain to be implemented.
+PENDING — Sprint 11 is not complete. T01–T05, T07–T10 are complete. T11 (Documentation Synchronization and Sprint Closure) remains.
 
 T11 is the final Sprint 11 task. It synchronizes project-wide documentation with actual implementation and formally closes Sprint 11.
