@@ -20,7 +20,7 @@
 | T04 | Authorization Domain Tests | COMPLETE |
 | T05 | CapabilityAuthorizationService Tests | COMPLETE |
 | T06 | Authorization Handler Tests | DEFERRED TO SPRINT 12 |
-| T07 | AuthorizationSeeder Integration Tests | NOT STARTED |
+| T07 | AuthorizationSeeder Integration Tests | COMPLETE |
 | T08 | Authorization Repository Integration Tests | NOT STARTED |
 | T09 | CI / Automated Test Execution | NOT STARTED |
 | T10 | Test Conventions and Sprint Documentation | NOT STARTED |
@@ -492,8 +492,100 @@ dotnet test             SUCCESS (220 tests, 220 passed, 0 failed)
 
 ---
 
+## T07 — AuthorizationSeeder Integration Tests
+
+**Status: COMPLETE**
+
+### Implementation
+
+Created one test file:
+
+```text
+tests/InventoryPlatform.IntegrationTests/Authorization/AuthorizationSeederTests.cs
+```
+
+### Seeder Behaviors Covered
+
+**Empty Database Seeding:**
+- Seeds 39 capabilities
+- Seeds 3 authorization groups (Administrator, InventoryManager, Viewer)
+- Seeds 73 total group-capability relationships
+
+**Capability Names:**
+- All 39 expected capability names are present
+
+**Capability Enabled State:**
+- All seeded capabilities are enabled (IsEnabled=true)
+
+**Administrator Coverage:**
+- Receives all 39 capabilities
+- Receives Administration.Access
+- Receives all Product capabilities
+- Receives all PurchaseOrder capabilities
+
+**InventoryManager Coverage:**
+- Receives 21 capabilities
+- Does NOT receive User.* capabilities (6 excluded)
+- Does NOT receive Administration.Access
+- Does NOT receive any Activate/Deactivate capabilities (10 excluded)
+- Does NOT receive Unit.Create (1 excluded)
+- Receives Dashboard.View
+
+**Viewer Coverage:**
+- Receives 13 capabilities (7 .View + 5 PurchaseOrder.* + User.View)
+- Receives all View capabilities including User.View
+- Receives all PurchaseOrder capabilities
+- Does NOT receive Create/Edit/Activate/Deactivate/Administration capabilities
+
+**Idempotency:**
+- Running seeder twice does not duplicate capabilities
+- Running seeder twice does not duplicate groups
+- Running seeder twice does not duplicate relationships
+- Running seeder twice maintains expected state (39/21/13)
+
+**Pre-existing Data:**
+- When capabilities already exist, seeder does not recreate them
+
+### Verified Seed Baseline (Source-Confirmed)
+
+```text
+Capabilities:                    39
+Administrator capabilities:      39
+InventoryManager capabilities:   21
+Viewer capabilities:            13
+Total group-capability relationships: 73
+```
+
+**IMPORTANT:** The planning report stated Viewer=12 and Total=72. The actual source code reveals Viewer=13 because `User.View` ends with `.View` and matches the Viewer filter. The source code is authoritative.
+
+### Test Database Strategy
+
+- EF Core InMemory provider
+- Unique InMemory database name per test (via Guid.NewGuid)
+- Direct ApplicationDbContext verification (no repository abstraction)
+- AsNoTracking() for all verification queries
+
+### Validation
+
+```text
+dotnet build            SUCCESS (0 errors, 0 warnings)
+dotnet test             SUCCESS (244 tests, 244 passed, 0 failed)
+```
+
+24 new T07 integration tests + 1 T01 placeholder + 219 UnitTests = 244 total.
+
+### Production source changes: NONE
+
+### T07 Discoveries
+
+**Seed count correction:** The planning baseline stated Viewer=12, Total=72. Source inspection during test implementation confirmed Viewer=13, Total=73. The `User.View` capability name ends with `.View` and therefore matches the Viewer filter's `EndsWith(".View")` predicate. This is correct source-level behavior.
+
+**User-group assignment scope:** AuthorizationSeeder does NOT perform user-group assignment. That responsibility belongs to IdentitySeeder (outside T07 scope).
+
+---
+
 ## Final Sprint Assessment
 
-PENDING — Sprint 11 is not complete. T01–T05 are complete. T07–T11 (minus T06) remain to be implemented.
+PENDING — Sprint 11 is not complete. T01–T05 and T07 are complete. T08–T11 (minus T06) remain to be implemented.
 
 T11 is the final Sprint 11 task. It synchronizes project-wide documentation with actual implementation and formally closes Sprint 11.
