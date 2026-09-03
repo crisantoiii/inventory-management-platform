@@ -30,7 +30,7 @@ Account Management
 
 **Latest Release:** v1.6.0 — Sprint 10 Dynamic Capability-Based Authorization
 
-**Project Status:** Sprint 10 Dynamic Capability-Based Authorization — Complete. v1.6.0 released.
+**Project Status:** Sprint 11 Automated Testing & Test Automation — Complete. 280 automated tests established.
 
 **Last Updated:** September 2026
 

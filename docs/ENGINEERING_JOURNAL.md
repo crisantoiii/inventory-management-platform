@@ -24,9 +24,104 @@ Rather than documenting daily work, it captures important architectural decision
 
 # Current Release State
 
-**Current Version:** v1.6.0 - Sprint 10 Dynamic Capability-Based Authorization
+**Current Version:** Sprint 11 Automated Testing & Test Automation
 
-Sprint 10 Dynamic Capability-Based Authorization is complete. T15 (Final Verification, Retrospective & Save Point) is complete. v1.6.0 released.
+Sprint 11 Automated Testing & Test Automation is complete. 280 automated tests established across Domain, Application, and Infrastructure layers.
+
+# Sprint 11 - Automated Testing & Test Automation
+
+## Summary
+
+Established the project's first automated testing foundation and implemented risk-based automated coverage for the highest-value Domain, Application authorization, authorization seeding, and authorization repository behaviors.
+
+## Implementation
+
+Created two test projects:
+- `InventoryPlatform.UnitTests` (219 tests) — Domain behavior, Application service isolation
+- `InventoryPlatform.IntegrationTests` (61 tests) — Repository behavior, Seeder verification, EF Core persistence
+
+### Test Architecture
+
+```text
+InventoryPlatform.UnitTests
+    -> InventoryPlatform.Domain
+    -> InventoryPlatform.Application
+    -> InventoryPlatform.Shared
+
+InventoryPlatform.IntegrationTests
+    -> InventoryPlatform.Domain
+    -> InventoryPlatform.Application
+    -> InventoryPlatform.Infrastructure
+    -> InventoryPlatform.Shared
+```
+
+Neither test project references InventoryPlatform.Web.
+
+## Test Coverage
+
+**Domain:**
+- PurchaseOrder workflow state transitions (Draft→Submitted→Approved→Receiving→Completed)
+- PurchaseOrderItem receiving behavior
+- Product stock operations, pricing, activation
+- Capability enable/disable behavior
+- AuthorizationGroup capability/user assignment
+
+**Application:**
+- CapabilityAuthorizationService authorization resolution
+- Multi-group union behavior
+- Disabled capability handling
+
+**Infrastructure:**
+- AuthorizationSeeder capability/group/relationship creation
+- CapabilityRepository query behavior
+- AuthorizationGroupRepository aggregate loading
+
+## Technology
+
+- xUnit test framework
+- Hand-written fakes (no mocking framework)
+- EF Core InMemory for integration tests
+- Unique InMemory database per test class for isolation
+
+## Validation
+
+```text
+Build:    SUCCESS (0 errors, 0 warnings)
+UnitTests:     219 passed
+IntegrationTests:  61 passed
+Total:         280 passed, 0 failed
+```
+
+## Authorization Seed Baseline (Source-Confirmed)
+
+```text
+Capabilities:                    39
+Administrator capabilities:      39
+InventoryManager capabilities:   21
+Viewer capabilities:            13
+Total group-capability relationships: 73
+```
+
+## CI Status
+
+No CI provider was verified in the repository. Provider-neutral local execution baseline established:
+
+```text
+cd src/InventoryPlatform && dotnet restore
+cd src/InventoryPlatform && dotnet build --no-restore
+cd src/InventoryPlatform && dotnet test --no-build
+```
+
+## Deferred to Sprint 12
+
+- T06: Authorization Handler Tests (CapabilityAuthorizationHandler, MultiCapabilityAuthorizationHandler)
+- WebApplicationFactory integration tests
+- Razor Page authorization integration tests
+- CI provider establishment
+
+## Outcome
+
+The project now has a sustainable automated testing foundation. 280 tests provide regression protection for the highest-risk Domain, Application, and Infrastructure behaviors. The test architecture respects Clean Architecture boundaries and can be extended in future sprints.
 
 # Sprint 10 - T11 Authorization Administration
 

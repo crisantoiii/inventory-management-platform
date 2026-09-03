@@ -1,5 +1,81 @@
 # Changelog
 
+## [Sprint 11] - Automated Testing & Test Automation
+
+### Summary
+
+Established the project's first automated testing foundation and implemented risk-based automated coverage for the highest-value Domain, Application authorization, authorization seeding, and authorization repository behaviors.
+
+### Added
+
+- Two test projects: InventoryPlatform.UnitTests and InventoryPlatform.IntegrationTests
+- xUnit test framework with hand-written fakes (no mocking framework)
+- EF Core InMemory for integration tests
+- 280 automated tests covering Domain, Application, and Infrastructure
+- Testing conventions documentation (docs/TESTING_CONVENTIONS.md)
+- Provider-neutral CI readiness baseline
+
+### Test Coverage
+
+**UnitTests (219 tests):**
+- PurchaseOrder domain workflow (62 tests)
+- PurchaseOrderItem behavior (39 tests)
+- Product domain behavior (56 tests)
+- Capability domain behavior (15 tests)
+- AuthorizationGroup domain behavior (31 tests)
+- CapabilityAuthorizationService behavior (15 tests)
+
+**IntegrationTests (61 tests):**
+- AuthorizationSeeder behavior (24 tests)
+- CapabilityRepository behavior (12 tests)
+- AuthorizationGroupRepository behavior (24 tests)
+
+### Test Architecture
+
+```text
+InventoryPlatform.UnitTests
+    -> InventoryPlatform.Domain
+    -> InventoryPlatform.Application
+    -> InventoryPlatform.Shared
+
+InventoryPlatform.IntegrationTests
+    -> InventoryPlatform.Domain
+    -> InventoryPlatform.Application
+    -> InventoryPlatform.Infrastructure
+    -> InventoryPlatform.Shared
+```
+
+Neither test project references InventoryPlatform.Web.
+
+### Verified
+
+- Build: SUCCESS (0 errors, 0 warnings)
+- UnitTests: 219 passed
+- IntegrationTests: 61 passed
+- Total: 280 passed, 0 failed
+- Authorization seed baseline: 39 capabilities, 39 Administrator, 21 InventoryManager, 13 Viewer, 73 relationships
+
+### Deferred
+
+- T06: Authorization Handler Tests → Sprint 12
+- WebApplicationFactory integration tests → Sprint 12
+- Razor Page authorization integration tests → Sprint 12
+- CI provider establishment → Sprint 12 (if repository hosting is confirmed)
+
+### Authorization Seed Baseline (Source-Confirmed)
+
+```text
+Capabilities:                    39
+Administrator capabilities:      39
+InventoryManager capabilities:   21
+Viewer capabilities:            13
+Total group-capability relationships: 73
+```
+
+**Note:** Viewer receives 13 capabilities because `User.View` matches the Viewer filter's `EndsWith(".View")` predicate. Earlier planning documentation stated 12/72; current source and tests are authoritative.
+
+---
+
 ## [v1.6.0] - Sprint 10 Dynamic Capability-Based Authorization
 
 ### Summary

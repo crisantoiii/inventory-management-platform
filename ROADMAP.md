@@ -135,9 +135,49 @@ Verification limitation:
 
 Sprint 9 did not introduce unrelated business capabilities or structural architectural redesign.
 
+## Sprint 11 - Automated Testing & Test Automation
+
+**Status:** Complete
+
+Sprint 11 established the project's first automated testing foundation and implemented risk-based automated coverage for the highest-value Domain, Application authorization, authorization seeding, and authorization repository behaviors.
+
+### Completed
+
+- T01: Test Infrastructure Foundation (xUnit, EF Core InMemory)
+- T02: PurchaseOrder Domain Tests (101 tests)
+- T03: Product Domain Tests (56 tests)
+- T04: Authorization Domain Tests (46 tests)
+- T05: CapabilityAuthorizationService Tests (15 tests)
+- T07: AuthorizationSeeder Integration Tests (24 tests)
+- T08: Authorization Repository Integration Tests (36 tests)
+- T09: CI / Automated Test Execution (provider-neutral baseline)
+- T10: Test Conventions and Sprint Documentation
+- T11: Documentation Synchronization and Sprint Closure
+
+### Deferred
+
+- T06: Authorization Handler Tests → Sprint 12
+
+### Final Test Baseline
+
+```text
+UnitTests:        219 passed
+IntegrationTests:  61 passed
+Total:            280 passed, 0 failed
+Build:            0 errors, 0 warnings
+```
+
+### Sprint 12 Direction
+
+Sprint 12 should focus on:
+- Web Authorization Handler Tests (CapabilityAuthorizationHandler, MultiCapabilityAuthorizationHandler)
+- WebApplicationFactory integration tests
+- Razor Page authorization integration tests
+- CI provider establishment (if repository hosting is confirmed)
+
 ## Next Sprint Planning
 
-Sprint 8 is closed, and Sprint 9 is the current code-quality workstream. The next locked feature priority after Sprint 9 is Dynamic Capability-Based Authorization. Its implementation requires a separate Sprint Planning process and must not begin automatically from this closure.
+Sprint 11 is complete. The next locked feature priority is Sprint 12 Web Authorization Handler Tests. Additional feature development requires a separate Sprint Planning process.
 
 ## D1 - Documentation Synchronization
 
