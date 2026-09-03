@@ -17,7 +17,7 @@
 | T01 | Test Infrastructure Foundation | COMPLETE |
 | T02 | PurchaseOrder Domain Tests | COMPLETE |
 | T03 | Product Domain Tests | COMPLETE |
-| T04 | Authorization Domain Tests | NOT STARTED |
+| T04 | Authorization Domain Tests | COMPLETE |
 | T05 | CapabilityAuthorizationService Tests | NOT STARTED |
 | T06 | Authorization Handler Tests | DEFERRED TO SPRINT 12 |
 | T07 | AuthorizationSeeder Integration Tests | NOT STARTED |
@@ -331,8 +331,91 @@ Product domain uses Guard-based validation (ArgumentException/ArgumentOutOfRange
 
 ---
 
+## T04 — Authorization Domain Tests
+
+**Status: COMPLETE**
+
+### Implementation
+
+Created two test files:
+
+```text
+tests/InventoryPlatform.UnitTests/Domain/Authorization/CapabilityTests.cs
+tests/InventoryPlatform.UnitTests/Domain/Authorization/AuthorizationGroupTests.cs
+```
+
+### Behaviors Covered
+
+**Capability:**
+- Construction with valid name
+- Rejects empty/null/whitespace name
+- Default state: IsEnabled=true
+- Rename updates name
+- Rename rejects empty/null name
+- Rename preserves IsEnabled state
+- Enable when disabled enables
+- Enable when already enabled is idempotent
+- Disable when enabled disables
+- Disable when already disabled is idempotent
+- Disable then Enable returns to enabled
+- GroupCapabilities initially empty
+- GroupCapabilities is read-only
+
+**AuthorizationGroup:**
+- Construction with valid name
+- Rejects empty/null/whitespace name
+- Rename updates name
+- Rename rejects empty/null name
+
+**AuthorizationGroup — Capability Management:**
+- AddCapability with valid capability adds to group
+- AddCapability with null throws ArgumentNullException
+- AddCapability with unpersisted capability (Id=0) throws DomainException
+- AddCapability duplicate capability is idempotent
+- AddCapability multiple different capabilities all added
+- AddCapability relationship reflects correct group and capability IDs
+- AddCapability updates capability's GroupCapabilities collection
+- RemoveCapability existing capability removes from group
+- RemoveCapability nonexistent capability ID does nothing
+- RemoveCapability with zero/negative ID throws ArgumentOutOfRangeException
+- RemoveCapability only removes specified capability
+
+**AuthorizationGroup — User Management:**
+- AssignUser with valid user ID adds user to group
+- AssignUser with empty GUID throws ArgumentException
+- AssignUser duplicate user is idempotent
+- AssignUser multiple different users all added
+- AssignUser relationship reflects correct user and group IDs
+- RemoveUser existing user removes from group
+- RemoveUser nonexistent user does nothing
+- RemoveUser with empty GUID throws ArgumentException
+- RemoveUser only removes specified user
+
+**Collections:**
+- Capabilities is read-only
+- UserGroups is read-only
+
+### Test Design Notes
+
+- Tests that need persisted entity IDs (for relationship creation) use reflection to simulate a persisted BaseEntity.Id, since the group/capability relationship entities require positive IDs.
+- A static `_nextId` counter ensures each capability gets a unique simulated ID to avoid false duplicate detection.
+- All relationship tests go through the public AuthorizationGroup API (AddCapability, AssignUser) which internally creates AuthorizationGroupCapability and UserAuthorizationGroup via their internal factory methods.
+
+### Validation
+
+```text
+dotnet build            SUCCESS (0 errors, 0 warnings)
+dotnet test             SUCCESS (205 tests, 205 passed, 0 failed)
+```
+
+46 new T04 authorization domain tests + 158 previous UnitTests + 1 IntegrationTests placeholder = 205 total.
+
+### Production source changes: NONE
+
+---
+
 ## Final Sprint Assessment
 
-PENDING — Sprint 11 is not complete. T01–T03 are complete. T04–T11 (minus T06) remain to be implemented.
+PENDING — Sprint 11 is not complete. T01–T04 are complete. T05–T11 (minus T06) remain to be implemented.
 
 T11 is the final Sprint 11 task. It synchronizes project-wide documentation with actual implementation and formally closes Sprint 11.
