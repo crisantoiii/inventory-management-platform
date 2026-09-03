@@ -16,7 +16,7 @@
 |------|------|--------|
 | T01 | Test Infrastructure Foundation | COMPLETE |
 | T02 | PurchaseOrder Domain Tests | COMPLETE |
-| T03 | Product Domain Tests | NOT STARTED |
+| T03 | Product Domain Tests | COMPLETE |
 | T04 | Authorization Domain Tests | NOT STARTED |
 | T05 | CapabilityAuthorizationService Tests | NOT STARTED |
 | T06 | Authorization Handler Tests | DEFERRED TO SPRINT 12 |
@@ -237,8 +237,102 @@ dotnet test             SUCCESS (102 tests, 102 passed, 0 failed)
 
 ---
 
+## T03 — Product Domain Tests
+
+**Status: COMPLETE**
+
+### Implementation
+
+Created one test file:
+
+```text
+tests/InventoryPlatform.UnitTests/Domain/Products/ProductTests.cs
+```
+
+### Behaviors Covered
+
+**Product Creation:**
+- Constructor with valid parameters creates product correctly
+- Constructor rejects invalid/null SKU
+- Constructor rejects invalid/null Name
+- Constructor rejects negative CostPrice
+- Constructor rejects negative SellingPrice
+- Constructor rejects zero/negative CategoryId
+- Constructor rejects zero/negative UnitId
+- Constructor rejects negative QuantityOnHand
+- Zero prices and zero quantity allowed where applicable
+
+**Rename:**
+- Valid name updates Name
+- Empty/null name throws ArgumentException
+
+**ChangeCategory:**
+- Valid ID updates CategoryId
+- Zero/negative IDs throw ArgumentOutOfRangeException
+
+**ChangeUnit:**
+- Valid ID updates UnitId
+- Zero/negative IDs throw ArgumentOutOfRangeException
+
+**AdjustStock:**
+- Positive quantity increases QuantityOnHand
+- Negative quantity decreases QuantityOnHand
+- Zero quantity allowed
+- Negative adjustment exceeding stock throws ArgumentOutOfRangeException
+- Failed adjustment does not mutate state
+
+**IncreaseStock:**
+- Valid quantity increases stock
+- Zero/negative quantities throw ArgumentOutOfRangeException
+- Multiple calls accumulate correctly
+
+**DecreaseStock:**
+- Valid quantity decreases stock
+- Decrease to exactly zero succeeds
+- Quantity exceeding available stock throws ArgumentOutOfRangeException
+- Zero/negative quantities throw ArgumentOutOfRangeException
+- Failed decrease does not mutate state
+
+**CanDecreaseStock:**
+- Returns true when quantity available
+- Returns true when quantity equals available
+- Returns false when quantity exceeds available
+- Returns false when no stock
+
+**ChangeCostPrice / ChangeSellingPrice:**
+- Valid values update prices
+- Zero prices allowed
+- Negative prices throw ArgumentOutOfRangeException
+
+**Activation / Deactivation:**
+- Deactivate sets IsActive to false
+- Activate sets IsActive to true
+
+**Barcode / Description:**
+- ChangeBarcode updates value
+- ChangeBarcode(null) sets null
+- UpdateDescription updates value
+- UpdateDescription(null) sets null
+
+### Validation
+
+```text
+dotnet build            SUCCESS (0 errors, 0 warnings)
+dotnet test             SUCCESS (159 tests, 159 passed, 0 failed)
+```
+
+56 new T03 Product domain tests + 101 T02 tests + 1 T01 placeholder test = 158 in UnitTests. 1 in IntegrationTests.
+
+### Production source changes: NONE
+
+### T03 Notes
+
+Product domain uses Guard-based validation (ArgumentException/ArgumentOutOfRangeException) rather than DomainException. Tests assert the actual exception types from the production code.
+
+---
+
 ## Final Sprint Assessment
 
-PENDING — Sprint 11 is not complete. T01 and T02 are complete. T03–T11 (minus T06) remain to be implemented.
+PENDING — Sprint 11 is not complete. T01–T03 are complete. T04–T11 (minus T06) remain to be implemented.
 
 T11 is the final Sprint 11 task. It synchronizes project-wide documentation with actual implementation and formally closes Sprint 11.
