@@ -21,7 +21,7 @@
 | T05 | CapabilityAuthorizationService Tests | COMPLETE |
 | T06 | Authorization Handler Tests | DEFERRED TO SPRINT 12 |
 | T07 | AuthorizationSeeder Integration Tests | COMPLETE |
-| T08 | Authorization Repository Integration Tests | NOT STARTED |
+| T08 | Authorization Repository Integration Tests | COMPLETE |
 | T09 | CI / Automated Test Execution | NOT STARTED |
 | T10 | Test Conventions and Sprint Documentation | NOT STARTED |
 | T11 | Documentation Synchronization and Sprint Closure | NOT STARTED |
@@ -584,8 +584,113 @@ dotnet test             SUCCESS (244 tests, 244 passed, 0 failed)
 
 ---
 
+## T08 — Authorization Repository Integration Tests
+
+**Status: COMPLETE**
+
+### Implementation
+
+Created two test files:
+
+```text
+tests/InventoryPlatform.IntegrationTests/Authorization/CapabilityRepositoryTests.cs
+tests/InventoryPlatform.IntegrationTests/Authorization/AuthorizationGroupRepositoryTests.cs
+```
+
+### Repository Methods Tested
+
+**CapabilityRepository.GetByNameAsync:**
+- Returns capability when it exists
+- Returns null when capability does not exist
+- Returns persisted entity ID
+- Returns correct capability by exact name match
+- Case-sensitive name lookup ("product.view" does not match "Product.View")
+- Returns disabled capabilities (does not filter by enabled state)
+- Returns correct capability when multiple exist
+- Does not return unrelated capabilities
+
+**CapabilityRepository.GetByIdAsync (base):**
+- Returns capability when it exists
+- Returns null when capability does not exist
+
+**CapabilityRepository.AddAsync (base):**
+- Persists new capability with generated ID
+
+**CapabilityRepository.ExistsAsync (base):**
+- Returns true when matching capability exists
+- Returns false when no matching capability
+
+**AuthorizationGroupRepository.GetWithCapabilitiesAsync:**
+- Returns group with capabilities loaded when group exists
+- Returns null when group does not exist
+- Returns correct capability names
+- Returns empty capabilities for group without capabilities
+- Does not return capabilities from other groups
+
+**AuthorizationGroupRepository.GetForUserAsync:**
+- Returns group when user is assigned to one group
+- Returns all groups when user is assigned to multiple groups
+- Returns empty when user has no groups
+- Returns groups with capabilities loaded
+- Does not return unassigned groups
+- Handles duplicate user assignment (returns single group)
+
+**AuthorizationGroupRepository.GetWithCapabilitiesAndUsersAsync:**
+- Returns group with both capabilities and users loaded
+- Returns null when group does not exist
+- Returns correct user IDs
+- Handles group with no users
+- Handles group with no capabilities
+
+**AuthorizationGroupRepository.GetAllWithDetailsAsync:**
+- Returns all groups
+- Returns groups with capabilities loaded
+- Returns groups with users loaded
+- Relationships do not bleed between groups
+- Returns empty when database is empty
+
+**AuthorizationGroupRepository.GetByIdAsync (base):**
+- Returns group when it exists
+- Returns null when group does not exist
+
+### Test Coverage Summary
+
+- 36 new integration tests (12 CapabilityRepository + 24 AuthorizationGroupRepository)
+- Real repository implementations tested against EF Core InMemory
+- Direct DbContext used for test data setup, repository used for Act/Assert
+- Each test uses isolated InMemory database (Guid-based naming)
+- Eager-loading behavior verified (Include Capabilities, Include UserGroups)
+- Relationship isolation verified (no bleed between groups)
+
+### Test Database Strategy
+
+- EF Core InMemory provider
+- Unique InMemory database name per test class (via Guid.NewGuid)
+- Real repository implementations instantiated with real ApplicationDbContext
+- Test data created through domain methods (AuthorizationGroup.AddCapability, AuthorizationGroup.AssignUser) and direct DbContext inserts
+
+### Validation
+
+```text
+dotnet build            SUCCESS (0 errors, 0 warnings)
+dotnet test             SUCCESS (280 tests, 280 passed, 0 failed)
+```
+
+36 new T08 integration tests + 25 previous IntegrationTests + 219 UnitTests = 280 total.
+
+### Production source changes: NONE
+
+### T08 Discoveries
+
+- `CapabilityRepository.GetByNameAsync` uses exact case-sensitive string equality (`==`) for name lookup. This is the intended behavior per the implementation.
+- `CapabilityRepository.GetByNameAsync` returns disabled capabilities. The enabled/disabled filtering is handled at the `CapabilityAuthorizationService` layer (tested in T05), not at the repository layer.
+- `AuthorizationGroupRepository.GetForUserAsync` includes capabilities via `.Include(x => x.Capabilities)`, ensuring the authorization service has all required data.
+- `AuthorizationGroupRepository.GetAllWithDetailsAsync` uses `.AsNoTracking()` for read-only scenarios.
+
+---
+
 ## Final Sprint Assessment
 
-PENDING — Sprint 11 is not complete. T01–T05 and T07 are complete. T08–T11 (minus T06) remain to be implemented.
+PENDING — Sprint 11 is not complete. T01–T05, T07, and T08 are complete. T09–T11 (minus T06) remain to be implemented.
 
 T11 is the final Sprint 11 task. It synchronizes project-wide documentation with actual implementation and formally closes Sprint 11.
