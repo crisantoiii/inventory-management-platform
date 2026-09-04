@@ -758,6 +758,111 @@ T04 — Create `MultiCapabilityAuthorizationHandlerTests` (not started; see gove
 
 ---
 
+## 21. Task Execution Record — T04 (MultiCapabilityAuthorizationHandlerTests)
+
+> **T04 STATUS: COMPLETE** — recorded below with factual execution results only.
+
+| Field | Value |
+|-------|-------|
+| **Task** | T04 — Create `MultiCapabilityAuthorizationHandlerTests` |
+| **Status** | COMPLETE |
+| **Depends on** | T02 (`FakeCapabilityAuthorizationService`), T03 (test conventions) |
+| **Test file created** | `tests/InventoryPlatform.Web.Tests/Authorization/MultiCapabilityAuthorizationHandlerTests.cs` |
+| **Tests added** | 12 |
+| **Production source changes** | None |
+
+### 21.1 Test File Created
+
+`tests/InventoryPlatform.Web.Tests/Authorization/MultiCapabilityAuthorizationHandlerTests.cs` —
+xUnit tests constructing `MultiCapabilityAuthorizationHandler` directly with the T02
+hand-written `FakeCapabilityAuthorizationService`, a real `ClaimsPrincipal`/`ClaimsIdentity`,
+and a real `MultiCapabilityRequirement` inside an `AuthorizationHandlerContext`. No mocking
+framework, no database, no WebApplicationFactory.
+
+### 21.2 Behavior Covered
+
+Verified against the actual `MultiCapabilityAuthorizationHandler` source behavior
+(OR semantics confirmed from source: the handler iterates the requirement's capability
+list and calls `context.Succeed` on the first granted capability, then returns):
+
+1. OR semantics — first capability granted, second denied → requirement succeeds; the
+   handler short-circuits (exactly 1 service call).
+2. OR semantics — first denied, second granted → requirement succeeds; 2 service calls,
+   proving the handler evaluates more than the first capability.
+3. OR semantics — three capabilities, only the third granted → requirement succeeds;
+   3 service calls.
+4. All capabilities denied → requirement does not succeed (context neither succeeded
+   nor failed); all 3 capabilities are evaluated.
+5. Capabilities granted only to a different user → requirement does not succeed; the
+   handler passes the principal's own user ID (`ClaimTypes.NameIdentifier` GUID) to the
+   service (`LastRequestedUserId` verified).
+6. Not-authenticated identity (even carrying a valid NameIdentifier claim) → returns
+   before consulting the service; no service call.
+7. Authenticated identity with no NameIdentifier claim → no service call; not succeeded.
+8. Authenticated identity with a non-GUID NameIdentifier value → no service call; not succeeded.
+9. `MultiCapabilityRequirement` with valid names → stores the capability names in order.
+10. `MultiCapabilityRequirement` with `null` names → throws `ArgumentException`.
+11. `MultiCapabilityRequirement` with an empty list → throws `ArgumentException`.
+12. `MultiCapabilityRequirement` with a whitespace capability name → throws `ArgumentException`.
+
+`CapabilityAuthorizationHandler` was NOT re-tested in T04 (belongs to T03); the T03 test
+file remains unchanged.
+
+### 21.3 Test Counts
+
+| Project | Before T04 | After T04 |
+|---------|-----------|----------|
+| UnitTests | 219 | 219 |
+| IntegrationTests | 61 | 61 |
+| Web.Tests | 21 | 33 |
+| **Total** | **301** | **313** |
+
+All 313 tests passed, 0 failed, 0 skipped.
+
+### 21.4 Validation Results
+
+```text
+dotnet build InventoryPlatform.slnx
+  Build succeeded.
+  0 Warning(s)
+  0 Error(s)
+
+dotnet test (per project)
+  UnitTests:       219 passed, 0 failed
+  IntegrationTests: 61 passed, 0 failed
+  Web.Tests:        33 passed, 0 failed
+  (of which MultiCapabilityAuthorizationHandlerTests: 12 passed)
+```
+
+### 21.5 Architecture / Dependency Verification
+
+- `InventoryPlatform.Web.Tests.csproj` references only `InventoryPlatform.Web` (unchanged).
+- No reference to `InventoryPlatform.UnitTests` or `InventoryPlatform.IntegrationTests`; no cross-test-project dependency introduced.
+- No new NuGet packages added (xUnit only, matching existing test projects).
+- UnitTests/IntegrationTests csproj files unchanged (no Web reference).
+- No production source files changed.
+
+### 21.6 Deviations / Notes
+
+- The actual `MultiCapabilityAuthorizationHandler` implements OR semantics exactly as
+  documented in the task breakdown (first granted capability satisfies the requirement);
+  no AND-semantics behavior was found or tested.
+- The handler's unauthenticated / missing-claim / invalid-GUID branches are duplicated
+  in the two handlers (separate production code paths); T04 covers them for the
+  multi-capability handler without modifying either handler.
+- The retrospective top banner still reads "PLANNED" and earlier planning sections were
+  intentionally left untouched (only additive T04 facts recorded here).
+- `docs/TESTING_CONVENTIONS.md` still lists T03/T04 as "planned"; per task scope,
+  documentation synchronization is deferred to the Sprint 12 documentation-closure task.
+- T05 (`Categories/Edit` authorization remediation) was NOT implemented.
+
+### 21.7 Next Task
+
+T05 — Remediate Categories/Edit (`[Authorize(Policy = InventoryManagement)]`);
+not started (see governing rules).
+
+---
+
 ## Appendix A — Source Files Verified
 
 ### Authorization Handlers and Requirements
