@@ -678,6 +678,86 @@ before any T01 implementation begins.
 
 ---
 
+## 20. Task Execution Record — T03 (CapabilityAuthorizationHandlerTests)
+
+> **T03 STATUS: COMPLETE** — recorded below with factual execution results only.
+
+| Field | Value |
+|-------|-------|
+| **Task** | T03 — Create `CapabilityAuthorizationHandlerTests` |
+| **Status** | COMPLETE |
+| **Depends on** | T02 (`FakeCapabilityAuthorizationService`) |
+| **Test file created** | `tests/InventoryPlatform.Web.Tests/Authorization/CapabilityAuthorizationHandlerTests.cs` |
+| **Tests added** | 8 |
+| **Production source changes** | None |
+
+### 20.1 Test File Created
+
+`tests/InventoryPlatform.Web.Tests/Authorization/CapabilityAuthorizationHandlerTests.cs` —
+xUnit tests constructing `CapabilityAuthorizationHandler` directly with the T02
+hand-written `FakeCapabilityAuthorizationService`, a real `ClaimsPrincipal`/`ClaimsIdentity`,
+and a real `CapabilityRequirement` inside an `AuthorizationHandlerContext`. No mocking
+framework, no database, no WebApplicationFactory.
+
+### 20.2 Behavior Covered
+
+Verified against the actual `CapabilityAuthorizationHandler` source behavior:
+
+1. Authenticated user whose (userId, capability) pair is authorized → requirement succeeds.
+2. Authenticated user lacking the required capability (granted only to another user) → not succeeded; service is consulted with the principal's user ID.
+3. Service explicitly returns `false` for the user/capability → handler does not succeed.
+4. Handler passes the authenticated identity's `ClaimTypes.NameIdentifier` GUID value as the user ID to `ICapabilityAuthorizationService`.
+5. Handler requests the requirement's capability name (not a different granted capability) and does not succeed on an unrelated grant.
+6. Not-authenticated identity (even carrying a valid NameIdentifier claim) → returns before consulting the service; no service call.
+7. Authenticated identity with no NameIdentifier claim → no service call; not succeeded.
+8. Authenticated identity with a non-GUID NameIdentifier value → no service call; not succeeded.
+
+`MultiCapabilityAuthorizationHandler` was NOT tested in T03 (belongs to T04).
+
+### 20.3 Test Counts
+
+| Project | Before T03 | After T03 |
+|---------|-----------|----------|
+| UnitTests | 219 | 219 |
+| IntegrationTests | 61 | 61 |
+| Web.Tests | 13 | 21 |
+| **Total** | **293** | **301** |
+
+All 301 tests passed, 0 failed, 0 skipped.
+
+### 20.4 Validation Results
+
+```text
+dotnet build InventoryPlatform.slnx
+  Build succeeded.
+  0 Warning(s)
+  0 Error(s)
+
+dotnet test (per project)
+  UnitTests:       219 passed, 0 failed
+  IntegrationTests: 61 passed, 0 failed
+  Web.Tests:        21 passed, 0 failed
+```
+
+### 20.5 Architecture / Dependency Verification
+
+- `InventoryPlatform.Web.Tests.csproj` references only `InventoryPlatform.Web` (unchanged).
+- No reference to `InventoryPlatform.UnitTests` or `InventoryPlatform.IntegrationTests`; no cross-test-project dependency introduced.
+- No new NuGet packages added (xUnit only, matching existing test projects).
+- UnitTests/IntegrationTests csproj files unchanged (no Web reference).
+
+### 20.6 Deviations / Notes
+
+- The retrospective top banner still reads "PLANNED" and earlier planning sections were intentionally left untouched (only additive T03 facts recorded here).
+- `docs/TESTING_CONVENTIONS.md` still lists T03/T04 as "planned"; per task scope, documentation synchronization is deferred to the Sprint 12 documentation-closure task.
+- T04 (`MultiCapabilityAuthorizationHandlerTests`) was NOT implemented.
+
+### 20.7 Next Task
+
+T04 — Create `MultiCapabilityAuthorizationHandlerTests` (not started; see governing rules).
+
+---
+
 ## Appendix A — Source Files Verified
 
 ### Authorization Handlers and Requirements
