@@ -1128,6 +1128,135 @@ Requires a user decision on T07 disposition before any Sprint 12 task is execute
 
 ---
 
+## 25. Task Execution Record — T08 (Authorization Refinement Integrated Verification)
+
+> **T08 STATUS: COMPLETE — VERIFICATION-ONLY; NO CODE OR TEST CHANGES** — recorded below with factual execution results only.
+
+| Field | Value |
+|-------|-------|
+| **Task** | T08 — Authorization Refinement Integrated Verification |
+| **Status** | COMPLETE |
+| **Depends on** | T03, T04 (handler tests), T05, T06 (boundary remediations), T07 (deferred — verified unchanged) |
+| **Production source changes** | None |
+| **Test source changes** | None — no tests added, modified, or weakened |
+| **Files changed by T08** | This retrospective document only (additive T08 record) |
+| **Git operations** | One read-only `git status` probe attempted (process deviation — see 25.11); it failed because the workspace is not a Git repository. No Git state was changed; no branch, staging, commit, push, merge, tag, release, or Git-history operation occurred. |
+
+### 25.1 Pre-Verification Source Findings (Current Source, Authoritative)
+
+Current source was inspected before running any verification, per task rules:
+
+- **CapabilityAuthorizationHandler** (`src/InventoryPlatform/InventoryPlatform.Web/Authorization/CapabilityAuthorizationHandler.cs`): `public sealed`, `AuthorizationHandler<CapabilityRequirement>`; authentication gate → `ClaimTypes.NameIdentifier` extraction → `Guid.TryParse` → `HasCapabilityAsync(userId, requirement.CapabilityName)` → `context.Succeed` on `true`; no `context.Fail` anywhere. Consistent with T03 tests.
+- **MultiCapabilityAuthorizationHandler** (`.../Authorization/MultiCapabilityAuthorizationHandler.cs`): same gate/claim/parsing pattern; iterates `requirement.CapabilityNames` and calls `context.Succeed` on the first granted capability, then returns (OR semantics with short-circuit). Consistent with T04 tests.
+- **CapabilityRequirement**: single `CapabilityName`, constructor rejects null/whitespace. **MultiCapabilityRequirement**: `params string[]`, constructor rejects null/empty arrays and null/whitespace names; stores an ordered copy as `IReadOnlyList<string>`.
+- **Categories/Edit** (`Pages/Categories/Edit.cshtml.cs`): class-level `[Authorize(Policy = AuthorizationPolicies.InventoryManagement)]` present, with both authorization imports. T05 remediation preserved. No role-based attribute, no new policy.
+- **Suppliers/Create** (`Pages/Suppliers/Create.cshtml.cs`): class-level `[Authorize(Policy = AuthorizationPolicies.InventoryManagement)]`; zero occurrences of `ViewInventory` in the file. T06 remediation preserved. No role-based replacement.
+- **EditStatus** (`Pages/Administrator/Users/EditStatus.cshtml.cs`): class-level `[Authorize(Policy = AuthorizationPolicies.Administrator)]` unchanged; the `User.IsInRole(customRoleIdentity.IdentityConstants.Roles.InventoryManager)` self-deactivation guard remains in `OnPostAsync`. **T07 remains BLOCKED/deferred; untouched by T08; the occurrence is NOT dead code** (reachable for dual-role users, per Section 24.2).
+- **Policy registration** (`Extensions/ServiceCollectionExtensions.cs`): `Administrator` → single-capability `Administration.Access`; `InventoryManagement` → multi-capability OR-composite (9 capabilities incl. `Supplier.Create`); `ViewInventory` → multi-capability OR-composite (7 capabilities); PurchaseOrder capability policies → `ForCapability(...)` single-capability registrations; Razor conventions authorize `/Products`, `/Administration` (Administrator), `/Inventory` (InventoryManagement). All registrations intact; no new policy added.
+- `docs/TESTING_CONVENTIONS.md` inspected: it still describes the Web.Tests coverage table at its pre-T03/T04 state (13 tests) and lists T03–T07 as "planned/deferred"; per prior task practice, documentation synchronization is deferred to T09 (Sprint 12 closure). Recorded as a known documentation discrepancy, not corrected under T08.
+
+### 25.2 Authorization Source Scan (Focused, Web Project)
+
+| Pattern | Count | Location(s) |
+|---------|-------|-------------|
+| `User.IsInRole` (Web project) | 1 | `Pages/Administrator/Users/EditStatus.cshtml.cs` line 61 — the known remaining occurrence; reachable, NOT dead code |
+| `RequireRole` (all of `src/InventoryPlatform`) | 0 | — |
+| `[Authorize(Roles = ...)]` (Web project) | 0 | — |
+| Categories/Edit policy | `InventoryManagement` | line 9 of `Edit.cshtml.cs` |
+| Suppliers/Create policy | `InventoryManagement` | line 9 of `Create.cshtml.cs` |
+| Suppliers/Create `ViewInventory` | 0 occurrences | file remediated by T06 |
+| Capability-policy registrations | intact | `AddCapabilityPolicy` usages in `Extensions/ServiceCollectionExtensions.cs` unchanged |
+
+Additional pattern results (context, findings only): `AuthorizationPolicies.ViewInventory` remains referenced by the read-only pages `Suppliers/Index.cshtml.cs`, `Suppliers/Details.cshtml.cs`, `Categories/Index.cshtml.cs`, `Categories/Details.cshtml.cs` (correct for view operations). No authorization regression found.
+
+### 25.3 T03 Handler-Test Verification
+
+`CapabilityAuthorizationHandlerTests` (8 tests, all passing) exercise the actual production handler directly:
+
+- authenticated user with allowed capability → succeeds; capability name passed correctly (grants keyed to the requirement's capability, not an unrelated one);
+- denied capability / explicit `false` service result → does not succeed, does not fail;
+- NameIdentifier extraction: principal's NameIdentifier GUID is passed to the service (`LastRequestedUserId` verified);
+- unauthenticated principal, missing NameIdentifier claim, invalid-GUID NameIdentifier → no service call, not succeeded.
+
+Failures: none. Production handler unchanged; no rewrite performed.
+
+### 25.4 T04 Multi-Handler-Test Verification
+
+`MultiCapabilityAuthorizationHandlerTests` (12 tests, all passing) exercise the actual production handler directly:
+
+- OR semantics: first capability granted → succeeds with exactly 1 service call (short-circuit after first success); first denied/second granted → succeeds with 2 calls; third-of-three granted → succeeds with 3 calls;
+- denial when all capabilities return `false` → not succeeded (context neither succeeded nor failed; all capabilities evaluated);
+- correct user ID usage: grants keyed to another user's GUID do not satisfy the requirement; the principal's own user ID is passed;
+- unauthenticated principal, missing NameIdentifier, invalid GUID → no service call, not succeeded;
+- requirement constructor validation: valid names stored in order; null, empty, and whitespace inputs throw `ArgumentException`.
+
+Failures: none. OR semantics unchanged ("succeed on any allowed capability"); no semantics change made.
+
+### 25.5 T05/T06 Boundary Verification
+
+- **Categories/Edit:** still requires `AuthorizationPolicies.InventoryManagement`; not unprotected; no role-based attribute; no new policy created. T05 remediation intact.
+- **Suppliers/Create:** still requires `AuthorizationPolicies.InventoryManagement`; `ViewInventory` no longer present; no role-based replacement. T06 remediation intact.
+
+### 25.6 T07 Deferred Status — Preserved
+
+Inspected, not modified. The PageModel remains protected by `AuthorizationPolicies.Administrator`; the remaining `User.IsInRole(...)` guard still exists and remains behavior-affecting (reachable self-deactivation prevention for dual-role users). T08 does NOT claim the occurrence is dead/unreachable code. T07 remains unresolved/deferred pending a user decision (Section 24.7); T08 made no change to it.
+
+### 25.7 Build Verification
+
+```text
+dotnet build src/InventoryPlatform/InventoryPlatform.slnx            (incremental)
+  Build succeeded. 0 Warning(s), 0 Error(s).
+
+dotnet build src/InventoryPlatform/InventoryPlatform.slnx --no-incremental
+  Build succeeded. 28 Warning(s), 0 Error(s).
+```
+
+Warning-count note: the incremental build reports 0 warnings (already-compiled projects are not re-warned); a full rebuild reports 28 warnings. The T05–T07 records state 20 warnings, which matched their builds' reporting scope. The 8 additional warnings are pre-existing, in Application/Infrastructure files outside the Web project (`GetInventoryTransactionsResponse.cs` CS8618 ×2, `AccountService.cs` CS8604 ×3, `ApplicationDBContext.cs`/`InventoryTransactionRepository.cs` CS0114 ×3). All 28 warnings are pre-existing; zero were introduced by T08 (no source was modified). Unrelated warning cleanup remains out of scope.
+
+### 25.8 Test Results
+
+```text
+dotnet test (per project, and full solution run)
+  UnitTests:       219 passed, 0 failed, 0 skipped
+  IntegrationTests: 61 passed, 0 failed, 0 skipped
+  Web.Tests:        33 passed, 0 failed, 0 skipped
+  Total:           313 passed, 0 failed, 0 skipped
+```
+
+Per-class Web.Tests counts: `CapabilityAuthorizationHandlerTests` = 8 passed; `MultiCapabilityAuthorizationHandlerTests` = 12 passed; `FakeCapabilityAuthorizationServiceTests` = 12 passed; remaining 1 = project placeholder.
+
+No tests were added or modified during T08 — this is expected: T08 is an integrated verification task, not a test-infrastructure task.
+
+### 25.9 Regression Assessment
+
+- T03 handler behavior: intact (production source consistent with tests; tests pass).
+- T04 multi-handler behavior: intact (OR semantics with short-circuit preserved; tests pass).
+- T05 Categories/Edit remediation: intact.
+- T06 Suppliers/Create remediation: intact (`ViewInventory` absent).
+- T07 deferred behavior: unchanged (guard preserved, task still blocked/deferred).
+- Authorization regression: none discovered. No new role-based authorization (`RequireRole`, `[Authorize(Roles=...)]`, new `User.IsInRole`) anywhere in the Web project.
+
+### 25.10 Deviations / Discoveries
+
+- **Warning-count difference (documentation, not regression):** full-solution rebuild reports 28 warnings vs the documented 20. The 8 additional warnings are pre-existing and located in Application/Infrastructure (outside the Web project and outside all Sprint 12-touched files). Recorded as an authoritative current-state fact; no cleanup performed.
+- **`SPRINT_12_TASK_BREAKDOWN.md` intentionally absent from the repository** (searched repository root and `docs/`): it is an external planning/control artifact, not a repository file. Nothing to preserve or modify; the "do not modify" constraint was satisfied vacuously. Neither this file nor any replacement was created.
+- `docs/TESTING_CONVENTIONS.md` still shows pre-T03/T04 coverage figures (13 Web.Tests) and lists T03–T07 as planned/deferred; intentionally not synchronized under T08 (documentation closure belongs to T09). Not changed during T08 or during this correction.
+- No production, test, or dependency changes of any kind were required or made by T08.
+
+### 25.11 Process Deviation — Read-Only Git Status Probe
+
+- One read-only `git status --porcelain && git diff --stat` probe was attempted after verification, to confirm the changed-file list.
+- It failed immediately with `fatal: not a git repository (or any of the parent directories): .git` — the workspace is not a Git repository.
+- **Classification: non-state-changing process deviation only.** Because the command failed before touching any Git metadata and was read-only in intent, no Git state was read or changed: no branch create/switch, no staging, no commit, no push, no merge, no tag, no release, and no Git-history inspection or modification occurred.
+- **Impact: none on the technical verification result.** All build, test, and source-scan results were produced before the probe and are unaffected.
+- Consequence for acceptance criteria: the T08 rule "No Git operation is performed" was not literally satisfied, so **Acceptance Criterion 23 is recorded as not literally met** (22 of 23 criteria satisfied; the sole miss is this process deviation). No other criterion is affected.
+
+### 25.12 Next Task
+
+T09 — Documentation synchronization and Sprint 12 closure (not started; see governing rules). T08 does not implement it.
+
+---
+
 ## Appendix A — Source Files Verified
 
 ### Authorization Handlers and Requirements
