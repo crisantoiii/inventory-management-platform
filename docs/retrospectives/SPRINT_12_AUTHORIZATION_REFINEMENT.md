@@ -953,6 +953,95 @@ T06 — Remediate Suppliers/Create (change `ViewInventory` to `InventoryManageme
 
 ---
 
+## 23. Task Execution Record — T06 (Suppliers/Create Authorization Remediation)
+
+> **T06 STATUS: COMPLETE** — recorded below with factual execution results only.
+
+| Field | Value |
+|-------|-------|
+| **Task** | T06 — Remediate Suppliers/Create — change `ViewInventory` to `InventoryManagement` |
+| **Status** | COMPLETE |
+| **Depends on** | T05 (scope verification confirmed the defect; no blocking dependency for the production change) |
+| **Production file changed** | `src/InventoryPlatform/InventoryPlatform.Web/Pages/Suppliers/Create.cshtml.cs` |
+| **Tests added** | 0 (T06 is a production policy-alignment fix; test scope excludes new test projects, HTTP-pipeline testing, and WebApplicationFactory) |
+| **Git operations** | None |
+
+### 23.1 Defect Confirmation (Current Source, Pre-Implementation)
+
+Before modification, the current repository source was inspected and confirmed the defect:
+
+- `Pages/Suppliers/Create.cshtml.cs` (`CreateModel`) used `[Authorize(Policy = AuthorizationPolicies.ViewInventory)]` at class level (line 9). Both required imports (`InventoryPlatform.Web.Authorization`, `Microsoft.AspNetCore.Authorization`) were already present.
+- `Pages/Suppliers/Create.cshtml` contains no authorization logic of its own (pure markup); the class-level PageModel attribute is the only server-side boundary.
+- Neighboring evidence confirms the mismatch: the equivalent mutation page `Suppliers/Edit` → `InventoryManagement`; view pages `Suppliers/Index` and `Suppliers/Details` → `ViewInventory` (correct for read operations); `Suppliers/Activate` and `Suppliers/Deactivate` → `Administrator`.
+- The `InventoryManagement` policy is the intended target and already exists: it is registered via the multi-capability OR-composite overload and includes `SupplierCreate` (`InventoryManagementCapabilities.SupplierCreate`) among its 9 capabilities (`Extensions/ServiceCollectionExtensions.cs`). No new policy or capability was needed.
+- Effect of the defect: any authenticated user holding any single ViewInventory capability (e.g., a Viewer with `Category.View`) could create suppliers server-side through direct URL access, despite the UI button being hidden.
+
+### 23.2 Exact Production Change
+
+`src/InventoryPlatform/InventoryPlatform.Web/Pages/Suppliers/Create.cshtml.cs` — one-line policy swap at the class level:
+
+```text
+- [Authorize(Policy = AuthorizationPolicies.ViewInventory)]
++ [Authorize(Policy = AuthorizationPolicies.InventoryManagement)]
+```
+
+No other change of any kind. No import was added or removed. The supplier creation workflow, `CreateSupplierHandler` call, validation, persistence, TempData/redirect behavior, and the Razor markup (`Create.cshtml`) were left untouched. No additional production change was required.
+
+### 23.3 Test Counts
+
+| Project | Before T06 | After T06 |
+|---------|-----------|----------|
+| UnitTests | 219 | 219 |
+| IntegrationTests | 61 | 61 |
+| Web.Tests | 33 | 33 |
+| **Total** | **313** | **313** |
+
+All 313 tests passed, 0 failed, 0 skipped. The pre-T06 baseline stated in the task (219 / 61 / 33 = 313) matched the actual repository state exactly.
+
+### 23.4 Validation Results
+
+```text
+dotnet build src/InventoryPlatform/InventoryPlatform.slnx
+  Build succeeded.
+  20 Warning(s) — identical pre-existing CS8601/CS8602 nullable-reference warning set
+  recorded during T05 (Pages/Account/*, Pages/Administrator/Users/*,
+  Pages/Reports/PurchaseHistory/*); zero warnings reference Suppliers or the
+  changed file. 0 warnings introduced by T06.
+  0 Error(s)
+
+dotnet test (per project)
+  UnitTests:       219 passed, 0 failed, 0 skipped
+  IntegrationTests: 61 passed, 0 failed, 0 skipped
+  Web.Tests:        33 passed, 0 failed, 0 skipped
+  Total:           313 passed
+```
+
+### 23.5 Authorization / Architecture Verification
+
+- `Suppliers/Create.cshtml.cs` now requires `AuthorizationPolicies.InventoryManagement` (verified by source inspection, line 9).
+- `AuthorizationPolicies.ViewInventory` is no longer referenced anywhere in `Suppliers/Create.cshtml.cs` (verified: 0 occurrences).
+- Capability-based authorization remains the only enforcement mechanism: the attribute references the existing registered capability policy; no handler, requirement, registration, or seed data was changed.
+- No role-based authorization introduced: no `RequireRole`, no `Roles =`, no new role checks in the changed file; no role names hard-coded.
+- No `User.IsInRole` introduced: the single pre-existing dead-code occurrence remains only in `Administrator/Users/EditStatus.cshtml.cs` line 61 (T07 scope, intentionally untouched).
+- No new policy created: `AuthorizationPolicies.cs` unchanged; no new `AddPolicy`/`AddCapabilityPolicy` registration.
+- No new capability created: capability constants and seed data unchanged.
+- Unrelated authorization boundaries unchanged (verified in source): `Categories/Edit` retains the T05 fix (`InventoryManagement`); `Units/Create` unchanged (`Administrator`); `Suppliers/Index` and `Suppliers/Details` unchanged (`ViewInventory`, correct for read pages); EditStatus dead `IsInRole` unchanged (T07 scope).
+- Intended semantics achieved without role names: Administrator/InventoryManager users holding any `InventoryManagement` composite capability (including `Supplier.Create`) are allowed; view-only users are denied; unauthenticated users are handled by the existing authentication pipeline (`RequireAuthenticatedUser` inside the registered policy).
+- Authorization logic remains in the Web/PageModel layer; no authorization logic moved into Application, Domain, or Infrastructure; no direct repository/DbContext access introduced; no new package/dependency.
+
+### 23.6 Deviations / Notes
+
+- None. Build-warning count (20) matched the T05 record exactly; no new warnings were introduced. Test counts matched the stated baseline exactly.
+- The retrospective top banner and planning sections were intentionally left untouched (only additive T06 facts recorded here), consistent with T03/T04/T05 practice.
+- `SPRINT_12_TASK_BREAKDOWN.md` was NOT modified.
+- T07 (EditStatus dead-code `IsInRole` cleanup) was NOT implemented.
+
+### 23.7 Next Task
+
+T07 — Remove EditStatus.cshtml.cs dead-code `IsInRole` (optional cleanup); not started (see governing rules).
+
+---
+
 ## Appendix A — Source Files Verified
 
 ### Authorization Handlers and Requirements
