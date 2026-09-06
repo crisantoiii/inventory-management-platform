@@ -1042,6 +1042,92 @@ T07 — Remove EditStatus.cshtml.cs dead-code `IsInRole` (optional cleanup); not
 
 ---
 
+## 24. Task Execution Record — T07 (EditStatus Dead-Code `IsInRole` Removal)
+
+> **T07 STATUS: BLOCKED — PRE-IMPLEMENTATION PRECONDITION FAILED; NO CODE CHANGED** — recorded below with factual execution results only.
+
+| Field | Value |
+|-------|-------|
+| **Task** | T07 — Remove EditStatus.cshtml.cs dead-code `IsInRole` (optional cleanup) |
+| **Status** | BLOCKED (stop condition from the task's own pre-implementation rules) |
+| **Production source changes** | None — the removal precondition ("role check is redundant/dead") could not be confirmed from current source |
+| **Files changed by T07** | This retrospective document only (discrepancy record) |
+| **Git operations** | None |
+
+### 24.1 Current-Source Confirmation of the Targeted Code
+
+The targeted occurrence exists as documented: `Pages/Administrator/Users/EditStatus.cshtml.cs` line 61, inside `OnPostAsync`:
+
+```csharp
+var user = await _getUserHandler.HandleAsync(Input.Id);
+var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+if (User.IsInRole(customRoleIdentity.IdentityConstants.Roles.InventoryManager))
+{
+    if (user.Value.Id.ToString() == currentUserId)
+    {
+        return Page();
+    }
+}
+```
+
+The PageModel is class-level protected by `[Authorize(Policy = AuthorizationPolicies.Administrator)]` (line 22, unchanged). It is the only `User.IsInRole` occurrence in the entire Web project (search result: 1 occurrence).
+
+### 24.2 Why the "Dead / Unreachable" Premise Is NOT Confirmed
+
+The historical classification (Sprint 10 T10/T12, Sections 5.3 and 6.2 of this document) describes the block as "unreachable dead code" because the page requires the Administrator policy. Current-source reachability analysis refutes that premise:
+
+1. **Nothing enforces single-role assignment.** `IdentityService.CreateUserAsync` uses `AddToRolesAsync(user, request.Roles)` (plural, unvalidated beyond `CreateUserValidator` requiring ≥ 1 role) and `UpdateUserRolesAsync` uses `RemoveFromRolesAsync`/`AddToRolesAsync` with no single-role restriction. No FluentValidation validator exists for `UpdateUserRolesRequest`.
+2. **The EditRoles UI allows selecting multiple roles.** `EditRoles.cshtml` renders one checkbox per role (Administrator, InventoryManager, Viewer) with no mutual-exclusion constraint, and `EditRolesModel.OnPostAsync` submits the full selection.
+3. **Role claims are functional.** `.AddIdentity<LocalIdentity.ApplicationUser, IdentityRole<Guid>>` is registered; Identity populates role claims on sign-in, so `User.IsInRole(...)` evaluates real claims at runtime.
+4. **Authorization-group membership is independent of Identity roles.** `IdentitySeeder.AssignUsersToGroupsAsync` maps seeded users to capability groups by e-mail, and no code path synchronizes the Administrator authorization-group membership with the absence of the InventoryManager Identity role. Therefore "satisfies the Administrator capability policy" does NOT imply "lacks the InventoryManager role claim".
+
+Consequently a user holding BOTH the Administrator role (or Administrator authorization-group membership) AND the InventoryManager role is constructible through supported application flows, and for that user the `IsInRole` branch IS reachable. The block is a **reachable business-rule guard** (self-deactivation prevention), not dead authorization code:
+
+- Condition 3 of the task ("the role check does not provide an independent authorization boundary that is required for correctness") — NOT satisfied.
+- Condition 4 ("removing it will not weaken authorization") — NOT satisfied: removing the whole block removes a reachable self-deactivation protection for dual-role users (a plain Administrator without the manager role is not blocked by the current guard, so the guard is additionally inconsistent).
+
+### 24.3 Action Taken
+
+Per the task's own instruction — "If any of these are not true, do not remove the code. Report the discrepancy and stop before broadening scope" — the code was NOT removed and no production file was modified. Alternative re-scoping options (e.g., unwrapping the role condition to make the self-deactivation guard unconditional, or removing the entire block) each change observable behavior and were NOT implemented without a user decision.
+
+### 24.4 Validation Results (Repository Unchanged, Confirmed Green)
+
+```text
+dotnet build src/InventoryPlatform/InventoryPlatform.slnx
+  Build succeeded.
+  20 Warning(s) — the same pre-existing CS8601/CS8602 nullable-reference set
+  recorded during T05/T06 (including 3 in EditStatus.cshtml.cs itself); none
+  introduced by T07 (no source was modified).
+  0 Error(s)
+
+dotnet test (per project)
+  UnitTests:       219 passed, 0 failed, 0 skipped
+  IntegrationTests: 61 passed, 0 failed, 0 skipped
+  Web.Tests:        33 passed, 0 failed, 0 skipped
+  Total:           313 passed
+```
+
+### 24.5 Authorization / Scope Verification
+
+- `EditStatus` retains `[Authorize(Policy = AuthorizationPolicies.Administrator)]` — unchanged.
+- `IsInRole` occurrences in the Web project: 1 (unchanged; the targeted line 61 remains).
+- Categories/Edit (T05 result), Suppliers/Create (T06 result), Units/Create, policy registration, capability constants, seed data, handlers, requirements: all unchanged (verified in source during inspection).
+- No new policy, capability, role check, package, or dependency introduced. Application, Domain, Infrastructure, database/migrations untouched.
+
+### 24.6 Deviations / Discoveries
+
+- **Deviation from plan (blocker):** the task's core premise ("unreachable dead code") is contradicted by current source; the block is a reachable, role-conditioned self-deactivation guard. T07 cannot be completed as specified without changing authorization/business semantics.
+- **Guard inconsistency discovered:** the self-deactivation protection only applies when the operator also holds the InventoryManager role; a plain Administrator can deactivate their own account. This is a pre-existing behavior observation, recorded only — not fixed (out of T07 scope).
+- **Documentation discrepancy:** Sections 5.3 and 6.2 (and the T03/T04 execution records) repeat the "dead/unreachable" classification; Section 24.2 supersedes that assessment with current-source evidence.
+- `SPRINT_12_TASK_BREAKDOWN.md` was NOT modified. T08 and later tasks NOT implemented.
+
+### 24.7 Next Step
+
+Requires a user decision on T07 disposition before any Sprint 12 task is executed: (a) defer/skip T07, (b) re-scope T07 as an explicit behavior-changing remediation (e.g., unconditional self-deactivation guard), or (c) remove the block accepting the documented semantic change. No next task is auto-selected.
+
+---
+
 ## Appendix A — Source Files Verified
 
 ### Authorization Handlers and Requirements
