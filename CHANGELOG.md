@@ -1,5 +1,40 @@
 # Changelog
 
+## [Sprint 12] - Authorization Refinement
+
+### Summary
+
+Hardened the capability-based authorization model through automated Web authorization-handler testing and remediation of two confirmed authorization-boundary defects, without changing the authorization architecture. Not a release sprint — v1.6.0 remains the current release baseline.
+
+### Added
+
+- Third test project: `InventoryPlatform.Web.Tests` (references `InventoryPlatform.Web` only; no test-project cross-references)
+- `FakeCapabilityAuthorizationService` — hand-written fake implementing `ICapabilityAuthorizationService` (no mocking framework)
+- `CapabilityAuthorizationHandlerTests` — 8 tests covering authentication gate, NameIdentifier extraction/parsing, service delegation, and succeed/do-not-succeed outcomes
+- `MultiCapabilityAuthorizationHandlerTests` — 12 tests covering OR semantics with short-circuit, denial when all capabilities are denied, correct user-ID usage, gate/claim edge cases, and requirement constructor validation
+- Testing conventions updated for the three-project test architecture
+
+### Changed
+
+- `Categories/Edit.cshtml.cs` now requires `[Authorize(Policy = AuthorizationPolicies.InventoryManagement)]` (previously unprotected)
+- `Suppliers/Create.cshtml.cs` now requires `[Authorize(Policy = AuthorizationPolicies.InventoryManagement)]` (previously `ViewInventory`; 0 `ViewInventory` occurrences remain)
+
+### Verified
+
+- Build: SUCCESS (0 errors; full rebuild reports 28 pre-existing warnings — none introduced by Sprint 12)
+- UnitTests: 219 passed
+- IntegrationTests: 61 passed
+- Web.Tests: 33 passed
+- Total: 313 passed, 0 failed, 0 skipped
+- Integrated authorization verification (T08): no authorization regression; `RequireRole` = 0; `[Authorize(Roles = ...)]` = 0; capability-policy registrations intact
+
+### Known/Deferred
+
+- EditStatus `User.IsInRole(InventoryManager)` self-deactivation guard (`Pages/Administrator/Users/EditStatus.cshtml.cs`, line 61): Sprint 12 T07 cleanup was blocked after source inspection showed the guard is reachable for supported multi-role users and behavior-affecting — it is NOT dead code. Removal would change observable behavior and requires an explicit behavioral decision. This is NOT a completed fix.
+- WebApplicationFactory integration tests, Razor Page authorization integration tests, and CI provider establishment remain deferred.
+
+---
+
 ## [Sprint 11] - Automated Testing & Test Automation
 
 ### Summary

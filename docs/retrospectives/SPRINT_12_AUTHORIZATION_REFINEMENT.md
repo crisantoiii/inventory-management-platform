@@ -2,7 +2,7 @@
 
 ---
 
-> **SPRINT 12 STATUS: PLANNED - IMPLEMENTATION NOT YET STARTED**
+> **SPRINT 12 STATUS: COMPLETED — CLOSED (T09)** — Implementation and verification complete (T01–T06, T08, T09); T07 remains BLOCKED/deferred (see Sections 24 and 26). Sections 1–19 below are preserved as the historical planning artifact; later task-execution records (Sections 20–26) are authoritative for actual outcomes.
 
 ---
 
@@ -15,7 +15,7 @@
 | **Repository** | Inventory Management Platform |
 | **Branch** | `feature/authorization_refinement` |
 | **Sprint Objective** | Authorization Handler Testing + Authorization Boundary Hardening |
-| **Status** | PLANNED — IMPLEMENTATION NOT YET STARTED |
+| **Status** | COMPLETED — CLOSED (final status; see Section 26). Planning-era status: PLANNED — IMPLEMENTATION NOT YET STARTED |
 
 ---
 
@@ -170,14 +170,14 @@ Sprint 12 tests should follow the same convention.
 
 **File:** `src/InventoryPlatform/InventoryPlatform.Web/Pages/Administrator/Users/EditStatus.cshtml.cs`
 
-**Source evidence (verified):** The class-level `[Authorize(Policy = AuthorizationPolicies.Administrator)]` means only Administrators can reach `OnPostAsync`. The `IsInRole` check on line 61 is unreachable dead code — it can only execute for users who already passed the Administrator check.
+**Source evidence (planning-era assessment — SUPERSEDED by Section 24.2 and the corrected classification below):** The class-level `[Authorize(Policy = AuthorizationPolicies.Administrator)]` was believed to mean only Administrators can reach `OnPostAsync`, making the `IsInRole` check on line 61 appear to be unreachable dead code. Sprint 12 source inspection disproved this: the guard is reachable for supported multi-role users.
 
 **Documented state:**
 - Sprint 10 T10 (line 32): "Code-level IsInRole: 1 occurrence in EditStatus.cshtml.cs line 61 — unreachable dead code"
 - Sprint 10 T10 (line 46): "EditStatus.cshtml.cs IsInRole: Unreachable dead code."
 - Sprint 10 T12 (line 18): "One dead-code User.IsInRole(...) occurrence in EditStatus.cshtml.cs was documented but intentionally left unchanged (unreachable behind class-level [Authorize(Policy = Administrator)])."
 
-**Classification:** NOT an authorization defect. Dead code for code quality cleanup only. Out of mandatory Sprint 12 scope unless current evidence demonstrates a meaningful security issue. Optionally included as cleanup.
+**Classification (planning-era, SUPERSEDED):** This planning-era classification was invalidated by Sprint 12 T07 source inspection: the `IsInRole` block is a reachable, behavior-affecting self-deactivation guard for supported multi-role users, NOT dead/unreachable code. Section 24.2 of this document supersedes this assessment with current-source evidence; T07 is BLOCKED/deferred, not completed.
 
 ---
 
@@ -188,17 +188,17 @@ Sprint 12 tests should follow the same convention.
 The Sprint 10 retrospective states "All P1 findings resolved." This statement requires clarification:
 
 - P1 findings at the **database level** (InventoryManager seed having Administration.Access, Viewer seed having Supplier.Create) **were resolved** by T15 Phase 21/25 remediation.
-- P1 findings at the **source code level** (Categories/Edit missing attribute, Suppliers/Create wrong policy, EditStatus dead code) **were NOT resolved** — they were documented as pre-existing issues and explicitly deferred as "Future" work.
+- P1 findings at the **source code level** (Categories/Edit missing attribute, Suppliers/Create wrong policy, EditStatus "dead code" — label superseded by Section 24.2: the EditStatus guard is reachable, not dead) **were NOT resolved** — they were documented as pre-existing issues and explicitly deferred as "Future" work.
 
 The retrospective's "All P1 findings resolved" claim is accurate only for the database-level remediation scope. The source-level defects were never within T15's remediation scope.
 
 ### 6.2 Current Authorization State
 
 ```text
-Page-level [Authorize(Policy)] attributes:     50 total
+Page-level [Authorize(Policy)] attributes:     50 total (planning-era)
   - Correct:                                    48
-  - Missing:                                     1 (Categories/Edit)
-  - Wrong policy:                                1 (Suppliers/Create)
+  - Missing:                                     1 (Categories/Edit)   → REMEDIATED in Sprint 12 (T05)
+  - Wrong policy:                                1 (Suppliers/Create)   → REMEDIATED in Sprint 12 (T06)
 
 Razor UI IAuthorizationService.AuthorizeAsync:  21 checks (all correct, migrated in Sprint 10 T12)
 
@@ -206,8 +206,11 @@ RequireRole usages:                              0
 Explicit Forbid() calls:                         0
 
 Authorization handlers:                           2 (CapabilityAuthorizationHandler, MultiCapabilityAuthorizationHandler)
-Handler automated tests:                          0 (the gap Sprint 12 addresses)
+Handler automated tests:                          0 at planning time (the gap Sprint 12 addressed)
+                                                  → ESTABLISHED in Sprint 12 (T03: 8 tests, T04: 12 tests; passing)
 ```
+
+**Sprint 12 outcome note (authoritative):** Categories/Edit now requires `AuthorizationPolicies.InventoryManagement` (T05); Suppliers/Create now requires `AuthorizationPolicies.InventoryManagement` with zero `ViewInventory` occurrences (T06); Web authorization-handler tests exist and pass (T03/T04). The single remaining `User.IsInRole` occurrence in `Pages/Administrator/Users/EditStatus.cshtml.cs` (line 61) is reachable and behavior-affecting — NOT dead code; T07 is blocked/deferred.
 
 ### 6.3 Authorization Handler Architecture
 
@@ -276,9 +279,11 @@ Protect the authorization declarations on Razor PageModels. A handler test can p
 | T04 | Create `MultiCapabilityAuthorizationHandlerTests` | Handler unit tests | Handler tests |
 | T05 | Remediate Categories/Edit — add `[Authorize(Policy = InventoryManagement)]` | Defect fix | Authorization fix |
 | T06 | Remediate Suppliers/Create — change to `[Authorize(Policy = InventoryManagement)]` | Defect fix | Authorization fix |
-| T07 | Remove EditStatus.cshtml.cs dead-code IsInRole (optional cleanup) | Code cleanup | Optional |
+| T07 | Remove EditStatus.cshtml.cs dead-code IsInRole (optional cleanup) | Code cleanup | Optional — BLOCKED: premise disproved; guard is reachable (Section 24) |
 | T08 | Verify all handler tests pass, build succeeds, regression confirmed | Validation | Verification |
 | T09 | Documentation synchronization and Sprint 12 closure | Documentation | Documentation |
+
+Final Sprint 12 task outcomes: T01–T06 COMPLETE, T07 BLOCKED/DEFERRED, T08 COMPLETE, T09 COMPLETE (Section 26).
 
 ### 8.2 NOT IN SCOPE
 
@@ -509,7 +514,7 @@ Only work directly supporting **Authorization Handler Testing + Authorization Bo
 
 The following items appeared in roadmap or previous sprint documentation but do NOT belong in Sprint 12:
 
-- Administrator/Users/EditStatus dead-code cleanup: Code quality item, not an authorization defect. Optionally included as cleanup, but not required for the authorization objective.
+- Administrator/Users/EditStatus "dead-code" cleanup: initially classified as a code-quality item, not an authorization defect (optionally included as cleanup). Planning-era classification; SUPERSEDED by Sprint 12 T07 source inspection (Section 24.2) — the block is a reachable, behavior-affecting self-deactivation guard, and the optional cleanup task was blocked rather than completed.
 - Reports authorization (unrestricted by design): This is an intentional design decision (DD-032), not a defect. No action required.
 - InventoryManagement OR-composite broad access: This is the intended behavior of the authorization model. It is not a defect.
 
@@ -624,9 +629,9 @@ These are high-level acceptance criteria. The subsequent Task Breakdown must con
 
 ## 17. Sprint 12 Status
 
-**SPRINT 12 STATUS: PLANNED — IMPLEMENTATION NOT YET STARTED**
+**SPRINT 12 STATUS (planning-era): PLANNED — IMPLEMENTATION NOT YET STARTED** — superseded by the task-execution records (Sections 20–26); the sprint is COMPLETED/CLOSED with T07 blocked/deferred.
 
-- No code has been written
+- No code had been written at planning time
 - No tests have been created
 - No defects have been fixed
 - No project files have been modified
@@ -644,7 +649,7 @@ The following conditions are evaluated to determine whether Sprint 12 has a suff
 | Sprint objective is clear | ✅ Authorization Handler Testing + Authorization Boundary Hardening |
 | Sprint 11 baseline is established | ✅ 280 tests, 0 failures, 0 build errors |
 | Relevant Sprint 11 lessons are captured | ✅ Architecture, testing, documentation, test doubles |
-| Current authorization findings are identified | ✅ 2 confirmed defects, 1 dead code |
+| Current authorization findings are identified | ✅ 2 confirmed defects, 1 "dead code" (label superseded by Section 24.2: reachable, not dead) |
 | Categories/Edit defect is addressed | ✅ In scope (T05) |
 | Suppliers/Create defect is addressed | ✅ In scope (T06) |
 | Handler testing scope is clear | ✅ Both handlers, with fake service |
@@ -932,7 +937,7 @@ Note: the T03/T04 records above report "0 Warning(s)" builds; the current build 
 - `Categories/Edit.cshtml.cs` now requires `AuthorizationPolicies.InventoryManagement` (verified by source inspection: the attribute is present at the class level; both authorization imports added).
 - Capability-based authorization remains the only enforcement mechanism: the attribute references the existing registered policy; no handler, requirement, or registration was changed.
 - No role-based authorization introduced: no `RequireRole`, no `Roles =`, no new role checks in the changed file.
-- No `User.IsInRole` introduced: the single pre-existing dead-code occurrence remains only in `Administrator/Users/EditStatus.cshtml.cs` line 61 (T07 scope, intentionally untouched).
+- No `User.IsInRole` introduced: the single pre-existing occurrence (then classified "dead code"; superseded by Section 24.2 — reachable) remains only in `Administrator/Users/EditStatus.cshtml.cs` line 61 (T07 scope, intentionally untouched).
 - No new policy created: `AuthorizationPolicies.cs` unchanged; no new `AddPolicy`/`AddCapabilityPolicy` registration.
 - No new capability created: `InventoryManagementCapabilities`/`ViewInventoryCapabilities` unchanged; seed data untouched.
 - Unrelated authorization boundaries unchanged: `Suppliers/Create.cshtml.cs` still uses `ViewInventory` (T06 scope, verified in source); `Units/Create.cshtml.cs` still uses `Administrator` (verified in source); EditStatus dead `IsInRole` unchanged (T07 scope, verified in source).
@@ -1022,7 +1027,7 @@ dotnet test (per project)
 - `AuthorizationPolicies.ViewInventory` is no longer referenced anywhere in `Suppliers/Create.cshtml.cs` (verified: 0 occurrences).
 - Capability-based authorization remains the only enforcement mechanism: the attribute references the existing registered capability policy; no handler, requirement, registration, or seed data was changed.
 - No role-based authorization introduced: no `RequireRole`, no `Roles =`, no new role checks in the changed file; no role names hard-coded.
-- No `User.IsInRole` introduced: the single pre-existing dead-code occurrence remains only in `Administrator/Users/EditStatus.cshtml.cs` line 61 (T07 scope, intentionally untouched).
+- No `User.IsInRole` introduced: the single pre-existing occurrence (then classified "dead code"; superseded by Section 24.2 — reachable) remains only in `Administrator/Users/EditStatus.cshtml.cs` line 61 (T07 scope, intentionally untouched).
 - No new policy created: `AuthorizationPolicies.cs` unchanged; no new `AddPolicy`/`AddCapabilityPolicy` registration.
 - No new capability created: capability constants and seed data unchanged.
 - Unrelated authorization boundaries unchanged (verified in source): `Categories/Edit` retains the T05 fix (`InventoryManagement`); `Units/Create` unchanged (`Administrator`); `Suppliers/Index` and `Suppliers/Details` unchanged (`ViewInventory`, correct for read pages); EditStatus dead `IsInRole` unchanged (T07 scope).
@@ -1034,11 +1039,11 @@ dotnet test (per project)
 - None. Build-warning count (20) matched the T05 record exactly; no new warnings were introduced. Test counts matched the stated baseline exactly.
 - The retrospective top banner and planning sections were intentionally left untouched (only additive T06 facts recorded here), consistent with T03/T04/T05 practice.
 - `SPRINT_12_TASK_BREAKDOWN.md` was NOT modified.
-- T07 (EditStatus dead-code `IsInRole` cleanup) was NOT implemented.
+- T07 (EditStatus `IsInRole` cleanup — premise later disproved; reachable guard, not dead code) was NOT implemented.
 
 ### 23.7 Next Task
 
-T07 — Remove EditStatus.cshtml.cs dead-code `IsInRole` (optional cleanup); not started (see governing rules).
+T07 — Remove EditStatus.cshtml.cs "dead-code" `IsInRole` (optional cleanup; premise later disproved by source inspection — the guard is reachable, see Section 24); not started at T06 time.
 
 ---
 
@@ -1162,7 +1167,7 @@ Current source was inspected before running any verification, per task rules:
 | `User.IsInRole` (Web project) | 1 | `Pages/Administrator/Users/EditStatus.cshtml.cs` line 61 — the known remaining occurrence; reachable, NOT dead code |
 | `RequireRole` (all of `src/InventoryPlatform`) | 0 | — |
 | `[Authorize(Roles = ...)]` (Web project) | 0 | — |
-| Categories/Edit policy | `InventoryManagement` | line 9 of `Edit.cshtml.cs` |
+| Categories/Edit policy | `InventoryManagement` | line 10 of `Edit.cshtml.cs` |
 | Suppliers/Create policy | `InventoryManagement` | line 9 of `Create.cshtml.cs` |
 | Suppliers/Create `ViewInventory` | 0 occurrences | file remediated by T06 |
 | Capability-policy registrations | intact | `AddCapabilityPolicy` usages in `Extensions/ServiceCollectionExtensions.cs` unchanged |
@@ -1253,7 +1258,70 @@ No tests were added or modified during T08 — this is expected: T08 is an integ
 
 ### 25.12 Next Task
 
-T09 — Documentation synchronization and Sprint 12 closure (not started; see governing rules). T08 does not implement it.
+T09 — Documentation synchronization and Sprint 12 closure (not started at T08 time; see governing rules). T08 did not implement it.
+
+---
+
+## 26. Task Execution Record — T09 (Sprint 12 Documentation Synchronization and Closure)
+
+> **T09 STATUS: COMPLETE — DOCUMENTATION-ONLY** — recorded below with factual execution results only.
+
+| Field | Value |
+|-------|-------|
+| **Task** | T09 — Sprint 12 Documentation Synchronization and Closure |
+| **Status** | COMPLETE |
+| **Depends on** | T01–T06, T08 (completed records), T07 (blocked/deferred — preserved) |
+| **Production source changes** | None |
+| **Test source changes** | None |
+| **Git operations** | None |
+
+### 26.1 Documentation Synchronized
+
+- **`docs/TESTING_CONVENTIONS.md`** — synchronized to the current test architecture: Web.Tests 33-test baseline (fake 12 + T03 8 + T04 12 + placeholder 1), total 313; handler testing marked COMPLETED (no longer planned/deferred); file-structure tree extended with both handler-test files; deferred section replaced with the factual Sprint 12 outcome (completed T03–T06/T08, T07 blocked/deferred with the reachable-guard explanation). No HTTP-pipeline or browser-testing coverage is claimed.
+- **`docs/retrospectives/SPRINT_12_AUTHORIZATION_REFINEMENT.md`** — sprint status finalized (top banner and Section 17 annotated as COMPLETED/CLOSED, preserving the historical planning text); planning-era "dead/unreachable" classifications in Sections 5.3 and 6.2 explicitly superseded (marking the historical evidence quotes as historical while stating the current-source conclusion); scope table (8.1) and Appendix A defect table annotated with final outcomes; T08 record's Categories/Edit scan-row line number corrected (line 10, not 9); this T09 record added.
+- **`PROJECT_STATUS.md`** — Sprint 12 Authorization Refinement section added (Complete, with T07 Blocked/Deferred); project status line and Current Focus updated to Sprint 12 with the 313-test baseline; test conventions line updated to name all three test projects.
+- **`README.md`** — Current Development Status updated to Sprint 12 Complete with the 313-test baseline; Completed Modules list now includes Web authorization-handler testing (Sprint 12) and removes the resolved Categories/Edit item from Known Deferred Items; Roadmap Current section updated (Sprint 12 complete, T07 deferred item recorded, 313-test baseline). No new version/release/tag invented — v1.6.0 remains the current release baseline and Sprint 12 is documented as a non-release sprint (tests and authorization fixes only).
+- **`ROADMAP.md`** — version banner extended with `v1.7 Sprint 12 Authorization Testing ✅` (status marker only); Sprint 12 section added (Completed / Blocked-Deferred / Final Test Baseline); "Next Sprint Planning" updated from the stale "next locked priority is Sprint 12" to "Sprint 12 is complete; the next activity is a separate Sprint Planning session". No Sprint 13 scope invented.
+- **`CHANGELOG.md`** — `[Sprint 12]` entry added at the top following the established `[Sprint N]` entry convention (Sprint 11 precedent), documenting only actual completed changes (Web.Tests infrastructure, T03/T04 handler tests, T05/T06 boundary fixes, T08 verification) plus the unresolved EditStatus behavior under Known/Deferred. No release date, version, or tag invented.
+- **`docs/ENGINEERING_JOURNAL.md`** — Current Release State updated to Sprint 12; a Sprint 12 section added with the key evidence-driven lesson: the EditStatus `User.IsInRole` block was previously classified as dead/unreachable, but source inspection showed it is reachable for supported multi-role users and therefore behavior-affecting — recorded as an engineering finding, not a remediation.
+- **`docs/DESIGN_DECISIONS.md`** — NOT modified. Sprint 12 introduced no new architectural/design decision: the T07 blocker is a discovered discrepancy, not a design change; the capability-based authorization model, handlers, requirements, and policy-registration approach are unchanged.
+
+### 26.2 Final Verified Baseline (Authoritative, Re-Executed After Documentation Changes)
+
+```text
+dotnet build src/InventoryPlatform/InventoryPlatform.slnx            (incremental)
+  Build succeeded. 0 Warning(s), 0 Error(s).
+
+dotnet build src/InventoryPlatform/InventoryPlatform.slnx --no-incremental
+  Build succeeded. 28 Warning(s), 0 Error(s).  — all 28 pre-existing; none introduced
+  (8 beyond the historical 20-warning records are Application/Infrastructure warnings
+  surfaced by full-rebuild reporting scope; see Section 25.7)
+
+dotnet test (full solution run)
+  UnitTests:       219 passed, 0 failed, 0 skipped
+  IntegrationTests: 61 passed, 0 failed, 0 skipped
+  Web.Tests:        33 passed, 0 failed, 0 skipped
+  Total:           313 passed, 0 failed, 0 skipped
+```
+
+### 26.3 T07 Disposition — Preserved
+
+T07 remains BLOCKED/DEFERRED. The remaining `User.IsInRole(InventoryManager)` occurrence in `Pages/Administrator/Users/EditStatus.cshtml.cs` (line 61) is a reachable, behavior-affecting self-deactivation guard for supported multi-role users — NOT dead/unreachable code. No documentation produced by T09 describes it as dead code, claims it was removed, reports the `User.IsInRole` count as zero, or invents a remediation decision. The count remains 1 in the Web project; `RequireRole` = 0; `[Authorize(Roles = ...)]` = 0.
+
+### 26.4 T08 Process Deviation — Preserved
+
+The T08 record (Section 25.11) is preserved verbatim: one read-only `git status` probe was attempted during T08, failed because the workspace was not a Git repository, changed no Git state, and is classified as a non-state-changing process deviation that did not affect the technical verification result. No Git command was executed during T09.
+
+### 26.5 Scope Verification
+
+- No production source, test source, project file, package reference, database/migration, authorization policy, handler, requirement, PageModel, or CI configuration was modified by T09.
+- `SPRINT_12_TASK_BREAKDOWN.md` was NOT created or modified — it is intentionally maintained outside the repository as a planning/control artifact and is not treated as a missing repository document.
+- No Sprint 13 scope invented; no release/version/tag invented; no later task implemented.
+- Validation was re-executed after all documentation edits (results in 26.2), confirming the documentation-only nature of T09.
+
+### 26.6 Sprint 12 Closure
+
+Sprint 12 achieved its core objective — Authorization Handler Testing + Authorization Boundary Hardening — despite the T07 cleanup assumption being invalidated by current-source evidence: both authorization handlers are covered by passing automated tests via a reusable hand-written fake (T02–T04), both confirmed authorization-boundary defects are remediated with the existing capability-based `InventoryManagement` policy (T05/T06), integrated verification passed with no authorization regression (T08), and documentation is synchronized (T09). The blocked T07 cleanup is a deferred code-quality item that requires an explicit behavioral decision, not a closure blocker for the approved sprint scope. **SPRINT 12 IS CLOSED.**
 
 ---
 
@@ -1278,9 +1346,9 @@ T09 — Documentation synchronization and Sprint 12 closure (not started; see go
 
 | File | Finding |
 |------|---------|
-| `src/InventoryPlatform/InventoryPlatform.Web/Pages/Categories/Edit.cshtml.cs` | Missing `[Authorize]` — CONFIRMED DEFECT |
-| `src/InventoryPlatform/InventoryPlatform.Web/Pages/Suppliers/Create.cshtml.cs` | Uses `ViewInventory` instead of `InventoryManagement` — CONFIRMED DEFECT |
-| `src/InventoryPlatform/InventoryPlatform.Web/Pages/Administrator/Users/EditStatus.cshtml.cs` | Dead-code `IsInRole` behind Administrator policy — NOT A DEFECT |
+| `src/InventoryPlatform/InventoryPlatform.Web/Pages/Categories/Edit.cshtml.cs` | Missing `[Authorize]` — CONFIRMED DEFECT at planning time → REMEDIATED by T05 (now `[Authorize(Policy = InventoryManagement)]`) |
+| `src/InventoryPlatform/InventoryPlatform.Web/Pages/Suppliers/Create.cshtml.cs` | Uses `ViewInventory` instead of `InventoryManagement` — CONFIRMED DEFECT at planning time → REMEDIATED by T06 (now `[Authorize(Policy = InventoryManagement)]`; 0 `ViewInventory` occurrences) |
+| `src/InventoryPlatform/InventoryPlatform.Web/Pages/Administrator/Users/EditStatus.cshtml.cs` | `IsInRole` behind Administrator policy — planning-era "NOT A DEFECT / dead code" classification SUPERSEDED by Section 24: reachable, behavior-affecting self-deactivation guard; T07 BLOCKED/deferred |
 
 ### Comparison PageModels (for policy consistency verification)
 

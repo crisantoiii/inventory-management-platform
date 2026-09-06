@@ -24,9 +24,45 @@ Rather than documenting daily work, it captures important architectural decision
 
 # Current Release State
 
-**Current Version:** Sprint 11 Automated Testing & Test Automation
+**Current Version:** Sprint 12 Authorization Refinement (non-release sprint; v1.6.0 remains the release baseline)
 
-Sprint 11 Automated Testing & Test Automation is complete. 280 automated tests established across Domain, Application, and Infrastructure layers.
+Sprint 12 Authorization Refinement is complete. 313 automated tests established across Domain, Application, Infrastructure, and Web authorization layers (219 UnitTests, 61 IntegrationTests, 33 Web.Tests). Sprint 11's 280-test foundation remains intact beneath it.
+
+# Sprint 12 - Authorization Refinement
+
+## Summary
+
+Hardened the existing capability-based authorization model through automated Web authorization-handler testing and remediation of two confirmed authorization-boundary defects. No authorization architecture change; no new production capability.
+
+## Implementation
+
+- Created `InventoryPlatform.Web.Tests` (third test project, references Web only; no test-project cross-references)
+- Established `FakeCapabilityAuthorizationService`, a hand-written fake of `ICapabilityAuthorizationService` (no mocking framework)
+- `CapabilityAuthorizationHandlerTests` (8 tests): authentication gate, NameIdentifier claim extraction and GUID parsing, service delegation with correct capability name, succeed/do-not-succeed outcomes
+- `MultiCapabilityAuthorizationHandlerTests` (12 tests): OR semantics with short-circuit after the first granted capability, denial when all capabilities are denied, correct user-ID usage, gate/claim edge cases, requirement constructor validation
+- Categories/Edit: added class-level `[Authorize(Policy = AuthorizationPolicies.InventoryManagement)]` (was unprotected)
+- Suppliers/Create: replaced `ViewInventory` with `InventoryManagement` (0 `ViewInventory` occurrences remain)
+
+## Engineering Finding: Evidence Beats Historical Classification (T07)
+
+The remaining `User.IsInRole(InventoryManager)` block in `Pages/Administrator/Users/EditStatus.cshtml.cs` (line 61) had been classified since Sprint 10 as unreachable dead code, on the assumption that the class-level Administrator policy implied no InventoryManager role claim. Sprint 12 source inspection disproved that assumption: multi-role assignment is supported by the application (plural role add/update, checkbox-based EditRoles UI, functional role claims), authorization-group membership is independent of Identity roles, and nothing synchronizes the two. The branch is therefore **reachable for supported multi-role users and behavior-affecting** (a self-deactivation guard). The cleanup task (T07) was correctly blocked rather than silently changing authorization behavior. Recorded here as an engineering finding, not a remediation: historical "dead code" classifications must be re-validated against current source before acting on them.
+
+## Validation
+
+```text
+Build:             SUCCESS (0 errors; full rebuild: 28 pre-existing warnings)
+UnitTests:         219 passed
+IntegrationTests:   61 passed
+Web.Tests:          33 passed
+Total:             313 passed, 0 failed, 0 skipped
+```
+
+No authorization regression discovered; capability-based authorization preserved (`RequireRole` = 0; `[Authorize(Roles = ...)]` = 0; 1 reachable `User.IsInRole` remains in EditStatus).
+
+## Deferred
+
+- T07 EditStatus `IsInRole` cleanup — blocked pending an explicit behavioral decision (unconditional self-deactivation guard vs. removal vs. keep)
+- WebApplicationFactory integration tests, Razor Page authorization integration tests, CI provider establishment
 
 # Sprint 11 - Automated Testing & Test Automation
 
@@ -114,10 +150,10 @@ cd src/InventoryPlatform && dotnet test --no-build
 
 ## Deferred to Sprint 12
 
-- T06: Authorization Handler Tests (CapabilityAuthorizationHandler, MultiCapabilityAuthorizationHandler)
-- WebApplicationFactory integration tests
-- Razor Page authorization integration tests
-- CI provider establishment
+- T06: Authorization Handler Tests (CapabilityAuthorizationHandler, MultiCapabilityAuthorizationHandler) — COMPLETED in Sprint 12 (T03/T04)
+- WebApplicationFactory integration tests — still deferred
+- Razor Page authorization integration tests — still deferred
+- CI provider establishment — still deferred
 
 ## Outcome
 

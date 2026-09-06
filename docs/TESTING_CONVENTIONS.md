@@ -107,13 +107,14 @@ Use Web.Tests for Web-layer behavior such as:
 - Web-layer authorization boundary behavior
 - Other Web-layer authorization behavior where appropriate
 
-Handler tests construct handlers directly with a hand-written `FakeCapabilityAuthorizationService` implementing `ICapabilityAuthorizationService`. No WebApplicationFactory or HTTP pipeline is required.
+Handler tests construct handlers directly with a hand-written `FakeCapabilityAuthorizationService` implementing `ICapabilityAuthorizationService`. No WebApplicationFactory or HTTP pipeline is required.**Completed in Sprint 12:**
 
-**Examples from Sprint 12:**
 - `FakeCapabilityAuthorizationService` — hand-written fake implementing `ICapabilityAuthorizationService`
-- `FakeCapabilityAuthorizationServiceTests` — verification that the fake compiles, instantiates, and produces controlled results
-- `CapabilityAuthorizationHandlerTests` — (planned T03)
-- `MultiCapabilityAuthorizationHandlerTests` — (planned T04)
+- `FakeCapabilityAuthorizationServiceTests` — verification that the fake compiles, instantiates, and produces controlled results (12 tests)
+- `CapabilityAuthorizationHandlerTests` — `CapabilityAuthorizationHandler` behavior tests, COMPLETED (T03, 8 tests)
+- `MultiCapabilityAuthorizationHandlerTests` — `MultiCapabilityAuthorizationHandler` behavior tests, COMPLETED (T04, 12 tests)
+
+Web authorization-handler testing is no longer planned/deferred: it is completed and verified (Sprint 12 T08 integrated verification).
 
 ---
 
@@ -176,6 +177,8 @@ tests/
     Authorization/
       FakeCapabilityAuthorizationService.cs
       FakeCapabilityAuthorizationServiceTests.cs
+      CapabilityAuthorizationHandlerTests.cs
+      MultiCapabilityAuthorizationHandlerTests.cs
 ```
 
 ### Namespace Convention
@@ -399,17 +402,19 @@ No CI provider is currently configured in the repository. The complete test suit
 | Infrastructure | Placeholder | 1 |
 | **Total** | | **61** |
 
-### Web.Tests (13 tests)
+### Web.Tests (33 tests)
 
 | Area | Subject | Tests |
 |------|---------|-------|
 | Authorization | FakeCapabilityAuthorizationService verification | 12 |
+| Authorization | CapabilityAuthorizationHandler behavior (T03) | 8 |
+| Authorization | MultiCapabilityAuthorizationHandler behavior (T04) | 12 |
 | Infrastructure | Placeholder | 1 |
-| **Total** | | **13** |
+| **Total** | | **33** |
 
-**Total: 293 tests, 293 passed, 0 failures**
+**Total: 313 tests, 313 passed, 0 failures**
 
-The Web.Tests verification tests confirm that the `FakeCapabilityAuthorizationService` compiles against the real `ICapabilityAuthorizationService` interface, produces controlled authorization results, and supports the capability inputs required by the handler tests in T03/T04.
+The Web.Tests verification tests confirm that the `FakeCapabilityAuthorizationService` compiles against the real `ICapabilityAuthorizationService` interface and produces controlled authorization results. The T03/T04 handler tests exercise the actual `CapabilityAuthorizationHandler` and `MultiCapabilityAuthorizationHandler` production sources directly (authentication gate, NameIdentifier extraction/parsing, service delegation, succeed/do-not-succeed outcomes, OR semantics with short-circuit, requirement constructor validation). Handler testing is source-level/unit-level; Razor Page authorization boundaries (Categories/Edit, Suppliers/Create) were verified at source level and by the remediations themselves — no HTTP-pipeline or browser testing exists or is claimed.
 
 ---
 
@@ -417,13 +422,19 @@ The Web.Tests verification tests confirm that the `FakeCapabilityAuthorizationSe
 
 The following testing work is intentionally deferred and NOT part of the current scope:
 
-### Sprint 12 (remaining)
+### Sprint 12 Outcome
 
-- `CapabilityAuthorizationHandler` unit tests (T03)
-- `MultiCapabilityAuthorizationHandler` unit tests (T04)
-- Categories/Edit authorization defect remediation (T05)
-- Suppliers/Create authorization defect remediation (T06)
-- EditStatus dead-code cleanup (T07, optional)
+Completed:
+
+- `CapabilityAuthorizationHandler` unit tests (T03) — 8 tests, passing
+- `MultiCapabilityAuthorizationHandler` unit tests (T04) — 12 tests, passing
+- Categories/Edit authorization remediation (T05) — `[Authorize(Policy = InventoryManagement)]`
+- Suppliers/Create authorization remediation (T06) — `ViewInventory` replaced with `InventoryManagement`
+- Integrated verification (T08) — 313 passed, 0 failed, 0 skipped
+
+Blocked/deferred:
+
+- EditStatus `User.IsInRole` cleanup (T07) — the remaining occurrence (`Pages/Administrator/Users/EditStatus.cshtml.cs`, line 61) is a reachable, behavior-affecting self-deactivation guard for supported multi-role users, NOT dead code. Removing it would change observable behavior; T07 remains blocked/deferred pending an explicit behavioral decision.
 
 ### Future Considerations
 

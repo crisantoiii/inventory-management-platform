@@ -44,7 +44,7 @@ The focus is not only on implementing business features but also on applying pro
 
 **Current Version:** v1.6.0 - Dynamic Capability-Based Authorization
 
-**Current Development Status:** Sprint 11 Automated Testing & Test Automation — Complete. 280 automated tests established.
+**Current Development Status:** Sprint 12 Authorization Refinement — Complete. 313 automated tests established (219 UnitTests, 61 IntegrationTests, 33 Web.Tests). Not a release sprint — v1.6.0 remains the current release baseline. T07 (EditStatus `IsInRole` cleanup) remains Blocked/Deferred — the remaining check is a reachable, behavior-affecting guard, not dead code.
 
 ## Completed Modules
 
@@ -58,6 +58,7 @@ The focus is not only on implementing business features but also on applying pro
 - ✅ Authentication & Authorization
 - ✅ Dynamic Capability-Based Authorization
 - ✅ Automated Testing (Sprint 11 — 280 tests, xUnit, EF Core InMemory)
+- ✅ Web Authorization Handler Testing (Sprint 12 — 33 Web.Tests total, 313 project-wide, no mocking framework)
 - ✅ User Management
 - ✅ Account Management
 - ✅ Purchasing (Core Workflow + Sprint 8 P1-P7 Enhancements Complete)
@@ -117,7 +118,7 @@ Introduced a dynamic, database-backed capability-based authorization model while
 
 ### Known Deferred Items
 
-- Categories/Edit missing [Authorize] attribute (pre-existing gap)
+- EditStatus `User.IsInRole(InventoryManager)` self-deactivation guard (Sprint 12 T07, Blocked/Deferred): the guard is reachable for supported multi-role users and behavior-affecting — NOT dead code; removal would change observable behavior and requires an explicit behavioral decision. Categories/Edit (Sprint 12 T05) and Suppliers/Create (Sprint 12 T06) authorization gaps were remediated in Sprint 12.
 - Viewer has User.View capability (seed filter includes all *.View)
 - Reports unrestricted (design decision pending)
 
@@ -916,8 +917,9 @@ Development Tools
 
 ## Current
 
+- Sprint 12 - Authorization Refinement - Complete (handler tests + authorization boundary fixes; 313 automated tests; T07 EditStatus cleanup deferred/blocked)
 - Sprint 10 - Dynamic Capability-Based Authorization - Complete
-- v1.6.0 released
+- v1.6.0 released (v1.6.0 remains the current release baseline; Sprint 12 is not a release sprint)
 
 ## Sprint 10 Closure State
 
