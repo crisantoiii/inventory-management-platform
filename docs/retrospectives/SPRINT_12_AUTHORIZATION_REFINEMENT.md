@@ -863,6 +863,96 @@ not started (see governing rules).
 
 ---
 
+## 22. Task Execution Record — T05 (Categories/Edit Authorization Remediation)
+
+> **T05 STATUS: COMPLETE** — recorded below with factual execution results only.
+
+| Field | Value |
+|-------|-------|
+| **Task** | T05 — Remediate Categories/Edit — add `[Authorize(Policy = InventoryManagement)]` |
+| **Status** | COMPLETE |
+| **Depends on** | T03/T04 (test conventions; no blocking dependency for the production change) |
+| **Production file changed** | `src/InventoryPlatform/InventoryPlatform.Web/Pages/Categories/Edit.cshtml.cs` |
+| **Tests added** | 0 (T05 is a production authorization fix; test scope excludes new test projects, HTTP-pipeline testing, and WebApplicationFactory) |
+| **Git operations** | None |
+
+### 22.1 Defect Confirmation (Current Source, Pre-Implementation)
+
+Before modification, the current repository source was inspected and confirmed the defect:
+
+- `Pages/Categories/Edit.cshtml.cs` (`EditModel`) had **no `[Authorize]` attribute** and **no authorization imports** (`InventoryPlatform.Web.Authorization`, `Microsoft.AspNetCore.Authorization` were absent).
+- No fallback authorization policy is registered (`options.FallbackPolicy` unused), and the Razor `Conventions.AuthorizeFolder` registrations cover only `/Products`, `/Administration`, and `/Inventory` — `/Categories` is NOT covered by any folder convention. The page was therefore genuinely reachable by any authenticated user (including Viewer) through direct URL access.
+- Neighboring PageModels confirm the intended boundary: `Categories/Create` → `InventoryManagement`; `Categories/Activate` and `Categories/Deactivate` → `Administrator`; `Units/Edit`, `Suppliers/Edit`, `Products/Edit`, `Customers/Edit`, `Products/Create`, `Customers/Create`, `InventoryTransactions/Create` → all `InventoryManagement`.
+- The `InventoryManagement` policy already exists (`AuthorizationPolicies.InventoryManagement`, `nameof`-based constant) and is registered via the multi-capability OR-composite overload with the 9 `InventoryManagementCapabilities.*` capabilities in `Extensions/ServiceCollectionExtensions.cs`. No new policy or capability was needed.
+
+### 22.2 Exact Production Change
+
+`src/InventoryPlatform/InventoryPlatform.Web/Pages/Categories/Edit.cshtml.cs` — two additive edits, matching the established Web project convention exactly:
+
+1. Added the two imports used by every other protected PageModel:
+   - `using InventoryPlatform.Web.Authorization;`
+   - `using Microsoft.AspNetCore.Authorization;`
+2. Added the class-level attribute directly above `public class EditModel : PageModel`:
+   - `[Authorize(Policy = AuthorizationPolicies.InventoryManagement)]`
+
+No other production change was required. No handler, requirement, policy, capability, seed data, Application, Domain, Infrastructure, or database/migration file was touched.
+
+### 22.3 Test Counts
+
+| Project | Before T05 | After T05 |
+|---------|-----------|----------|
+| UnitTests | 219 | 219 |
+| IntegrationTests | 61 | 61 |
+| Web.Tests | 33 | 33 |
+| **Total** | **313** | **313** |
+
+All 313 tests passed, 0 failed, 0 skipped. The T05 pre-T05 baseline stated in the task (219 / 61 / 33 = 313) matched the actual repository state exactly.
+
+### 22.4 Validation Results
+
+```text
+dotnet build src/InventoryPlatform/InventoryPlatform.slnx
+  Build succeeded.
+  20 Warning(s) — all pre-existing CS8601/CS8602 nullable-reference warnings in
+  unrelated Web PageModels (Pages/Account/*, Pages/Administrator/Users/*,
+  Pages/Reports/PurchaseHistory/*); zero warnings reference Categories/Edit.
+  0 Error(s)
+
+dotnet test (per project)
+  UnitTests:       219 passed, 0 failed, 0 skipped
+  IntegrationTests: 61 passed, 0 failed, 0 skipped
+  Web.Tests:        33 passed, 0 failed, 0 skipped
+  Total:           313 passed
+```
+
+Note: the T03/T04 records above report "0 Warning(s)" builds; the current build reports 20 warnings, all in files untouched since (and unrelated to) T05. Actual current-repository results are treated as authoritative per task rules.
+
+### 22.5 Authorization / Architecture Verification
+
+- `Categories/Edit.cshtml.cs` now requires `AuthorizationPolicies.InventoryManagement` (verified by source inspection: the attribute is present at the class level; both authorization imports added).
+- Capability-based authorization remains the only enforcement mechanism: the attribute references the existing registered policy; no handler, requirement, or registration was changed.
+- No role-based authorization introduced: no `RequireRole`, no `Roles =`, no new role checks in the changed file.
+- No `User.IsInRole` introduced: the single pre-existing dead-code occurrence remains only in `Administrator/Users/EditStatus.cshtml.cs` line 61 (T07 scope, intentionally untouched).
+- No new policy created: `AuthorizationPolicies.cs` unchanged; no new `AddPolicy`/`AddCapabilityPolicy` registration.
+- No new capability created: `InventoryManagementCapabilities`/`ViewInventoryCapabilities` unchanged; seed data untouched.
+- Unrelated authorization boundaries unchanged: `Suppliers/Create.cshtml.cs` still uses `ViewInventory` (T06 scope, verified in source); `Units/Create.cshtml.cs` still uses `Administrator` (verified in source); EditStatus dead `IsInRole` unchanged (T07 scope, verified in source).
+- Authorization logic remains in the Web/PageModel layer; no authorization logic moved into Application, Domain, or Infrastructure; no direct repository/DbContext access introduced.
+
+### 22.6 Deviations / Notes
+
+- Build warnings: 20 pre-existing nullable-reference warnings observed in the current build (see 22.4); none caused by T05 and none in Categories/Edit. Recorded as an authoritative current-state fact rather than silently reporting the historical "0 warnings".
+- Test project location note: the three test projects live under the repository-root `tests/` directory (not under `src/InventoryPlatform/`), which required running `dotnet test` from the repository root. No files were moved.
+- No new test was added for this change. The Sprint 12 planning explicitly bounds T05 to the production attribute change; reflection/metadata boundary tests (`PageAuthorizationBoundaryTests`) remain part of the sprint's separate boundary-testing task, not T05.
+- The retrospective top banner and planning sections were intentionally left untouched (only additive T05 facts recorded here), consistent with T03/T04 practice.
+- `SPRINT_12_TASK_BREAKDOWN.md` was NOT modified.
+- T06 (`Suppliers/Create` policy change) was NOT implemented.
+
+### 22.7 Next Task
+
+T06 — Remediate Suppliers/Create (change `ViewInventory` to `InventoryManagement`); not started (see governing rules).
+
+---
+
 ## Appendix A — Source Files Verified
 
 ### Authorization Handlers and Requirements
