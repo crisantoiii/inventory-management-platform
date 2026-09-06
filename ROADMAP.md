@@ -22,6 +22,7 @@ v1.3  Account Management       ✅
 v1.4  Additional Reporting     ✅
 v1.5  Purchasing Enhancements  ✅
 v1.6  Dynamic Capability Auth  ✅
+(Sprint 11 Automated Testing ✅ — non-release; Sprint 12 Authorization Refinement ✅ — non-release)
 
 ---
 
@@ -158,7 +159,7 @@ Sprint 11 established the project's first automated testing foundation and imple
 
 - T06: Authorization Handler Tests → Sprint 12
 
-### Final Test Baseline
+### Final Test Baseline (Sprint 11 historical baseline; superseded by the Sprint 12 total below)
 
 ```text
 UnitTests:        219 passed
@@ -175,9 +176,40 @@ Sprint 12 should focus on:
 - Razor Page authorization integration tests
 - CI provider establishment (if repository hosting is confirmed)
 
+## Sprint 12 - Authorization Refinement
+
+**Status:** Complete
+
+Sprint 12 hardened the capability-based authorization model through automated Web authorization-handler testing and remediation of two confirmed authorization-boundary defects, without changing the authorization architecture.
+
+### Completed
+
+- T01: `InventoryPlatform.Web.Tests` project foundation (references Web only)
+- T02: `FakeCapabilityAuthorizationService` hand-written test double (no mocking framework)
+- T03: `CapabilityAuthorizationHandlerTests` (8 tests)
+- T04: `MultiCapabilityAuthorizationHandlerTests` (12 tests, OR semantics with short-circuit)
+- T05: Categories/Edit remediation — `[Authorize(Policy = AuthorizationPolicies.InventoryManagement)]`
+- T06: Suppliers/Create remediation — `ViewInventory` replaced with `InventoryManagement`
+- T08: Integrated verification — passed (no authorization regression)
+- T09: Documentation synchronization and Sprint 12 closure
+
+### Blocked/Deferred
+
+- T07: EditStatus `User.IsInRole(InventoryManager)` cleanup — the remaining occurrence (line 61) is a reachable, behavior-affecting self-deactivation guard for supported multi-role users, NOT dead code. Removal would change observable behavior and requires an explicit behavioral decision.
+
+### Final Test Baseline
+
+```text
+UnitTests:        219 passed
+IntegrationTests:  61 passed
+Web.Tests:         33 passed
+Total:            313 passed, 0 failed, 0 skipped
+Build:             0 errors (full rebuild: 28 pre-existing warnings)
+```
+
 ## Next Sprint Planning
 
-Sprint 11 is complete. The next locked feature priority is Sprint 12 Web Authorization Handler Tests. Additional feature development requires a separate Sprint Planning process.
+Sprint 11 and Sprint 12 are complete. Sprint 12 achieved its core authorization-refinement objective; the blocked T07 cleanup is a deferred code-quality item requiring an explicit behavioral decision, not a closure blocker. The next activity is a separate Sprint Planning session; no Sprint 13 scope is defined.
 
 ## D1 - Documentation Synchronization
 

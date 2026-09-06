@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace InventoryPlatform.Web.Pages.Suppliers;
 
-[Authorize(Policy = AuthorizationPolicies.ViewInventory)]
+[Authorize(Policy = AuthorizationPolicies.InventoryManagement)]
 public class CreateModel : PageModel
 {
     private readonly CreateSupplierHandler _handler;

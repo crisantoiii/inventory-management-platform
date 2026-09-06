@@ -30,7 +30,7 @@ Account Management
 
 **Latest Release:** v1.6.0 — Sprint 10 Dynamic Capability-Based Authorization
 
-**Project Status:** Sprint 11 Automated Testing & Test Automation — Complete. 280 automated tests established.
+**Project Status:** Sprint 12 Authorization Refinement — Complete. 313 automated tests established (219 UnitTests, 61 IntegrationTests, 33 Web.Tests). T07 (EditStatus `IsInRole` cleanup) remains Blocked/Deferred — the remaining check is a reachable, behavior-affecting guard, not dead code.
 
 **Last Updated:** September 2026
 
@@ -134,8 +134,9 @@ Verified:
 
 - **Completed Modules:** 11
 - **Architecture Status:** Validated
-- **Current Milestone:** v1.6.0 — Dynamic Capability-Based Authorization (Complete)
-- **Next Milestone:** TBD — Sprint planning pending
+- **Current Milestone:** Sprint 12 — Authorization Refinement (Complete; not a release sprint — v1.6.0 remains the current release baseline)
+- **Next Milestone:** TBD — separate Sprint Planning session pending; no Sprint 13 scope defined
+- **Automated Tests:** 313 passing (219 UnitTests, 61 IntegrationTests, 33 Web.Tests)
 
 ---
 
@@ -329,6 +330,48 @@ Implemented changes:
 
 ---
 
+# Sprint 12 - Authorization Refinement (Complete)
+
+**Status:** Complete. T01–T06, T08, and T09 complete; T07 Blocked/Deferred. Documentation-only closure performed (T09). Not a release sprint — v1.6.0 remains the current release baseline.
+
+Sprint 12 hardened the capability-based authorization model through automated handler testing and remediation of two confirmed authorization-boundary defects, without changing the authorization architecture.
+
+### Completed Sprint 12 Tasks
+
+- T01 — Web.Tests project foundation (`InventoryPlatform.Web.Tests`, references Web only) — Complete
+- T02 — `FakeCapabilityAuthorizationService` hand-written test double (no mocking framework) — Complete
+- T03 — `CapabilityAuthorizationHandlerTests` (8 tests) — Complete
+- T04 — `MultiCapabilityAuthorizationHandlerTests` (12 tests, OR semantics with short-circuit) — Complete
+- T05 — Categories/Edit remediation: `[Authorize(Policy = AuthorizationPolicies.InventoryManagement)]` — Complete
+- T06 — Suppliers/Create remediation: `ViewInventory` replaced with `InventoryManagement` (0 `ViewInventory` occurrences) — Complete
+- T07 — EditStatus `IsInRole` cleanup — **BLOCKED/DEFERRED**: the remaining `User.IsInRole(InventoryManager)` guard (line 61) is reachable for supported multi-role users and behavior-affecting (self-deactivation prevention); removing it would change observable behavior. It is NOT dead code.
+- T08 — Integrated verification — Complete (passed, with one documented non-state-changing process deviation: a read-only Git-status probe that failed because the workspace is not a Git repository)
+- T09 — Documentation synchronization and Sprint 12 closure — Complete
+
+### Final Verified Baseline
+
+```text
+UnitTests:        219 passed
+IntegrationTests:  61 passed
+Web.Tests:         33 passed
+Total:            313 passed, 0 failed, 0 skipped
+Build:             0 errors
+Full rebuild:      28 pre-existing warnings (no warnings introduced by Sprint 12)
+```
+
+### Authorization State (Verified)
+
+- Categories/Edit and Suppliers/Create require `AuthorizationPolicies.InventoryManagement`
+- CapabilityAuthorizationHandler and MultiCapabilityAuthorizationHandler tests pass
+- `RequireRole`: 0 — `[Authorize(Roles = ...)]`: 0 — `User.IsInRole` in Web: 1 (EditStatus line 61, reachable)
+- No authorization regression discovered; capability-based authorization preserved
+
+### Known Deferred Item
+
+- T07: the EditStatus `IsInRole` guard requires an explicit behavioral decision (unconditional self-deactivation guard vs. removal vs. keep). See `docs/retrospectives/SPRINT_12_AUTHORIZATION_REFINEMENT.md` Section 24.
+
+---
+
 
 # Architecture Validation
 
@@ -478,6 +521,8 @@ The architecture has been validated and is considered stable for future business
 - ✅ ASP.NET Core Identity
 - ✅ Role-based Authorization
 - ✅ Policy-based Authorization
+- ✅ Dynamic Capability-Based Authorization
+- ✅ Web Authorization Handler Tests (Sprint 12 — CapabilityAuthorizationHandler, MultiCapabilityAuthorizationHandler)
 
 ## User Management
 
@@ -777,7 +822,7 @@ Final verification covered normal application regression, reporting workflows, e
 
 # Current Focus
 
-Sprint 10 Dynamic Capability-Based Authorization is complete. v1.6.0 released.
+Sprint 12 Authorization Refinement is complete. 313 automated tests established. T07 (EditStatus `IsInRole` cleanup) remains blocked/deferred pending an explicit behavioral decision. The next activity is a separate Sprint Planning session; no Sprint 13 scope is defined yet.
 
 Completed in Sprint 8:
 
@@ -937,6 +982,10 @@ The architecture has now been validated through:
 
 
 ## Current Focus
+
+### Sprint 12 — Authorization Refinement
+
+Sprint 12 Authorization Refinement is complete. 313 automated tests established (219 UnitTests, 61 IntegrationTests, 33 Web.Tests). T07 (EditStatus `IsInRole` cleanup) remains blocked/deferred pending an explicit behavioral decision. The next activity is a separate Sprint Planning session.
 
 ### Sprint 10 — Dynamic Capability-Based Authorization
 

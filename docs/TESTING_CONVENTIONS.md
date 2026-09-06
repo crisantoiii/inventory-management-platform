@@ -1,6 +1,6 @@
 # Testing Conventions
 
-This document establishes the automated testing conventions for the Inventory Platform. These conventions are derived from the Sprint 11 implementation and are authoritative for current test authoring.
+This document establishes the automated testing conventions for the Inventory Platform. These conventions are derived from Sprint 11 and Sprint 12 implementations and are authoritative for current test authoring.
 
 ---
 
@@ -12,8 +12,11 @@ This document establishes the automated testing conventions for the Inventory Pl
 |---------|---------|------------|
 | `InventoryPlatform.UnitTests` | Domain behavior, Application service isolation tests | Domain, Application, Shared |
 | `InventoryPlatform.IntegrationTests` | Persistence/Infrastructure behavior tests | Domain, Application, Infrastructure, Shared |
+| `InventoryPlatform.Web.Tests` | Web-layer authorization handler tests | Web (transitively: Application, Domain, Infrastructure, Shared) |
 
-**Neither test project references `InventoryPlatform.Web`.**
+UnitTests must NOT reference `InventoryPlatform.Web`.
+IntegrationTests must NOT reference `InventoryPlatform.Web`.
+Web.Tests must NOT reference `InventoryPlatform.UnitTests` or `InventoryPlatform.IntegrationTests`.
 
 ### Dependency Boundaries
 
@@ -28,6 +31,9 @@ InventoryPlatform.IntegrationTests
     -> InventoryPlatform.Application
     -> InventoryPlatform.Infrastructure
     -> InventoryPlatform.Shared
+
+InventoryPlatform.Web.Tests
+    -> InventoryPlatform.Web
 ```
 
 UnitTests must NOT reference:
@@ -37,9 +43,13 @@ UnitTests must NOT reference:
 IntegrationTests must NOT reference:
 - `InventoryPlatform.Web`
 
+Web.Tests must NOT reference:
+- `InventoryPlatform.UnitTests`
+- `InventoryPlatform.IntegrationTests`
+
 ### Framework and Packages
 
-**Both projects use:**
+**All three projects use:**
 - xUnit test framework
 - Microsoft.NET.Test.Sdk 17.*
 - xunit 2.*
@@ -49,7 +59,7 @@ IntegrationTests must NOT reference:
 **IntegrationTests additionally uses:**
 - Microsoft.EntityFrameworkCore.InMemory 10.0.*
 
-No mocking frameworks (Moq, NSubstitute, FakeItEasy) are used. Test doubles are hand-written where required.
+**No mocking frameworks** (Moq, NSubstitute, FakeItEasy) are used in any test project. Test doubles are hand-written where required.
 
 ---
 
@@ -87,6 +97,24 @@ Use IntegrationTests where persistence or Infrastructure behavior is the subject
 - `AuthorizationSeederTests` — seed data creation and idempotency
 - `CapabilityRepositoryTests` — repository query behavior
 - `AuthorizationGroupRepositoryTests` — aggregate loading, relationship traversal
+
+### Web.Tests
+
+Use Web.Tests for Web-layer behavior such as:
+
+- `CapabilityAuthorizationHandler` unit tests
+- `MultiCapabilityAuthorizationHandler` unit tests
+- Web-layer authorization boundary behavior
+- Other Web-layer authorization behavior where appropriate
+
+Handler tests construct handlers directly with a hand-written `FakeCapabilityAuthorizationService` implementing `ICapabilityAuthorizationService`. No WebApplicationFactory or HTTP pipeline is required.**Completed in Sprint 12:**
+
+- `FakeCapabilityAuthorizationService` — hand-written fake implementing `ICapabilityAuthorizationService`
+- `FakeCapabilityAuthorizationServiceTests` — verification that the fake compiles, instantiates, and produces controlled results (12 tests)
+- `CapabilityAuthorizationHandlerTests` — `CapabilityAuthorizationHandler` behavior tests, COMPLETED (T03, 8 tests)
+- `MultiCapabilityAuthorizationHandlerTests` — `MultiCapabilityAuthorizationHandler` behavior tests, COMPLETED (T04, 12 tests)
+
+Web authorization-handler testing is no longer planned/deferred: it is completed and verified (Sprint 12 T08 integrated verification).
 
 ---
 
@@ -144,6 +172,13 @@ tests/
       AuthorizationSeederTests.cs
       CapabilityRepositoryTests.cs
       AuthorizationGroupRepositoryTests.cs
+
+  InventoryPlatform.Web.Tests/
+    Authorization/
+      FakeCapabilityAuthorizationService.cs
+      FakeCapabilityAuthorizationServiceTests.cs
+      CapabilityAuthorizationHandlerTests.cs
+      MultiCapabilityAuthorizationHandlerTests.cs
 ```
 
 ### Namespace Convention
@@ -154,6 +189,7 @@ Namespaces match folder structure:
 namespace InventoryPlatform.UnitTests.Domain.Purchasing;
 namespace InventoryPlatform.UnitTests.Application;
 namespace InventoryPlatform.IntegrationTests.Authorization;
+namespace InventoryPlatform.Web.Tests.Authorization;
 ```
 
 ### File Organization
@@ -330,6 +366,9 @@ dotnet test tests/InventoryPlatform.UnitTests --no-build
 
 # Run only IntegrationTests
 dotnet test tests/InventoryPlatform.IntegrationTests --no-build
+
+# Run only Web.Tests
+dotnet test tests/InventoryPlatform.Web.Tests --no-build
 ```
 
 ### CI Status
@@ -363,43 +402,66 @@ No CI provider is currently configured in the repository. The complete test suit
 | Infrastructure | Placeholder | 1 |
 | **Total** | | **61** |
 
-**Total: 280 tests, 280 passed, 0 failures**
+### Web.Tests (33 tests)
+
+| Area | Subject | Tests |
+|------|---------|-------|
+| Authorization | FakeCapabilityAuthorizationService verification | 12 |
+| Authorization | CapabilityAuthorizationHandler behavior (T03) | 8 |
+| Authorization | MultiCapabilityAuthorizationHandler behavior (T04) | 12 |
+| Infrastructure | Placeholder | 1 |
+| **Total** | | **33** |
+
+**Total: 313 tests, 313 passed, 0 failures**
+
+The Web.Tests verification tests confirm that the `FakeCapabilityAuthorizationService` compiles against the real `ICapabilityAuthorizationService` interface and produces controlled authorization results. The T03/T04 handler tests exercise the actual `CapabilityAuthorizationHandler` and `MultiCapabilityAuthorizationHandler` production sources directly (authentication gate, NameIdentifier extraction/parsing, service delegation, succeed/do-not-succeed outcomes, OR semantics with short-circuit, requirement constructor validation). Handler testing is source-level/unit-level; Razor Page authorization boundaries (Categories/Edit, Suppliers/Create) were verified at source level and by the remediations themselves — no HTTP-pipeline or browser testing exists or is claimed.
 
 ---
 
 ## Deferred Testing Work
 
-The following testing work is intentionally deferred and NOT part of the current Sprint 11 scope:
+The following testing work is intentionally deferred and NOT part of the current scope:
 
-### Sprint 12
+### Sprint 12 Outcome
 
-- T06: Web Authorization Handler Tests (`CapabilityAuthorizationHandler`, `MultiCapabilityAuthorizationHandler`)
-- WebApplicationFactory integration tests
-- Razor Page authorization integration tests
-- HTTP pipeline testing
+Completed:
+
+- `CapabilityAuthorizationHandler` unit tests (T03) — 8 tests, passing
+- `MultiCapabilityAuthorizationHandler` unit tests (T04) — 12 tests, passing
+- Categories/Edit authorization remediation (T05) — `[Authorize(Policy = InventoryManagement)]`
+- Suppliers/Create authorization remediation (T06) — `ViewInventory` replaced with `InventoryManagement`
+- Integrated verification (T08) — 313 passed, 0 failed, 0 skipped
+
+Blocked/deferred:
+
+- EditStatus `User.IsInRole` cleanup (T07) — the remaining occurrence (`Pages/Administrator/Users/EditStatus.cshtml.cs`, line 61) is a reachable, behavior-affecting self-deactivation guard for supported multi-role users, NOT dead code. Removing it would change observable behavior; T07 remains blocked/deferred pending an explicit behavioral decision.
 
 ### Future Considerations
 
+- WebApplicationFactory integration tests
+- Razor Page authorization integration tests
+- HTTP pipeline testing
 - Browser automation (Playwright)
 - Code coverage reporting and gates
 - Mutation testing
 - Performance/load testing
-- IdentitySeeder / user-group assignment tests
 - SQL Server integration testing
 - Broader repository coverage
 - FluentValidation test coverage
+- CI provider establishment
 
 ---
 
 ## Key Conventions Summary
 
-1. **Two test projects:** UnitTests (no DB) and IntegrationTests (EF Core InMemory)
-2. **No Web reference:** Neither test project references InventoryPlatform.Web
-3. **xUnit framework:** All tests use `[Fact]` attributes
-4. **Hand-written fakes:** No mocking framework; minimal in-memory fakes for Application service tests
-5. **Behavior-oriented naming:** `MethodOrBehavior_WhenCondition_ExpectedResult`
-6. **Isolated databases:** Each integration test class uses a unique InMemory database name
-7. **Real implementations:** Integration tests use actual repository implementations
-8. **No production changes:** Test infrastructure does not alter production code
-9. **Provider-neutral CI:** Tests are locally reproducible; no CI provider is configured
-10. **Behavior-focused coverage:** Tests verify business behavior, not implementation details
+1. **Three test projects:** UnitTests (no DB), IntegrationTests (EF Core InMemory), Web.Tests (handler tests)
+2. **No Web reference:** UnitTests and IntegrationTests do not reference InventoryPlatform.Web
+3. **No test-project cross-references:** Web.Tests does not reference UnitTests or IntegrationTests
+4. **xUnit framework:** All tests use `[Fact]` attributes
+5. **Hand-written fakes:** No mocking framework; minimal in-memory fakes for Application service and handler tests
+6. **Behavior-oriented naming:** `MethodOrBehavior_WhenCondition_ExpectedResult`
+7. **Isolated databases:** Each integration test class uses a unique InMemory database name
+8. **Real implementations:** Integration tests use actual repository implementations
+9. **No production changes:** Test infrastructure does not alter production code
+10. **Provider-neutral CI:** Tests are locally reproducible; no CI provider is configured
+11. **Behavior-focused coverage:** Tests verify business behavior, not implementation details
