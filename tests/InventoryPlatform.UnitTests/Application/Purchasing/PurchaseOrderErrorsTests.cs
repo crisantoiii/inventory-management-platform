@@ -7,6 +7,22 @@ namespace InventoryPlatform.UnitTests.Application.Purchasing;
 public sealed class PurchaseOrderErrorsTests
 {
     // =====================================================================
+    // NotFound (used by the Submit/Approve transition handlers, T03)
+    // =====================================================================
+
+    [Fact]
+    public void NotFound_ReturnsExpectedCodeAndMessage()
+    {
+        // Act
+        var error = PurchaseOrderErrors.NotFound;
+
+        // Assert
+        Assert.IsType<Error>(error);
+        Assert.Equal("PurchaseOrder.NotFound", error.Code);
+        Assert.Equal("Purchase order not found.", error.Message);
+    }
+
+    // =====================================================================
     // SupplierNotFound
     // =====================================================================
 
