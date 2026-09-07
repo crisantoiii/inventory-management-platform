@@ -1,8 +1,8 @@
 # Sprint 13 Retrospective — Purchasing Workflow Test Automation
 
-> **SPRINT 13 STATUS: IN PROGRESS — T01 COMPLETE (T02–T08 NOT STARTED)**
+> **SPRINT 13 STATUS: IN PROGRESS — T01 COMPLETE, T02 COMPLETE (T03–T08 NOT STARTED)**
 >
-> This document is the Sprint 13 **retrospective baseline**, created only after the Sprint 13 planning report (`plan/SPRINT_13_PLANNING_REPORT.md`, Revision 5) was explicitly accepted. At baseline creation it claimed no completed Sprint 13 work; execution updates are appended below as tasks actually complete (currently: **T01 complete**; T02–T08 not started). It will be **updated during execution** (task status table and execution log) and **finalized during T08** (Documentation Synchronization & Sprint 13 Closure).
+> This document is the Sprint 13 **retrospective baseline**, created only after the Sprint 13 planning report (`plan/SPRINT_13_PLANNING_REPORT.md`, Revision 5) was explicitly accepted. At baseline creation it claimed no completed Sprint 13 work; execution updates are appended below as tasks actually complete (currently: **T01 complete, T02 complete**; T03–T08 not started). It will be **updated during execution** (task status table and execution log) and **finalized during T08** (Documentation Synchronization & Sprint 13 Closure).
 >
 > Authoritative planning baseline: `plan/SPRINT_13_PLANNING_REPORT.md` (Revision 5, accepted). Executable sprint control: `plan/SPRINT_13_TASK_BREAKDOWN.md` (external planning/control artifact — not intended for repository commit).
 
@@ -14,9 +14,9 @@
 |---|---|
 | **Sprint** | 13 |
 | **Sprint title** | Purchasing Workflow Test Automation |
-| **Status** | IN PROGRESS — T01 COMPLETE (T02–T08 NOT STARTED) |
+| **Status** | IN PROGRESS — T01 COMPLETE, T02 COMPLETE (T03–T08 NOT STARTED) |
 | **Planning Gate** | PASS / ACCEPTED (Revision 5) |
-| **Implementation Status** | IN PROGRESS — T01 COMPLETE |
+| **Implementation Status** | IN PROGRESS — T01 COMPLETE, T02 COMPLETE |
 | **Closure Status** | OPEN |
 | **Retrospective Outcome** | OPEN - SPRINT IN PROGRESS (Section 12) |
 
@@ -57,7 +57,7 @@ Sprint 13 only **adds** tests; the 313-test baseline must be preserved throughou
 | Task | Title | Status |
 |---|---|---|
 | T01 | Purchasing Test Support Foundation | COMPLETE |
-| T02 | CreatePurchaseOrderHandler + Validator Tests | NOT STARTED |
+| T02 | CreatePurchaseOrderHandler + Validator Tests | COMPLETE |
 | T03 | Workflow Transition Handler Tests (Submit/Approve) | NOT STARTED |
 | T04 | ReceivePurchaseOrderHandler Tests | NOT STARTED |
 | T05 | Purchase Order Query Handler Tests | NOT STARTED |
@@ -155,6 +155,55 @@ Artifact/commit-treatment observation (evidence-based only): `graphify-out/` is 
 
 **Git operations:** none. **Production changes:** none. **T02–T08:** remain NOT STARTED.
 
+### T02 — CreatePurchaseOrderHandler + Validator Tests (COMPLETE)
+
+**Date:** September 7, 2026
+
+**Objective:** Cover the accepted source-grounded contract for `CreatePurchaseOrderHandler`, `CreatePurchaseOrderValidator`, `CreatePurchaseOrderItemValidator`, and the `PurchaseOrderErrors` values used by this workflow, per the T02 contract matrix (planning report §12.1), consuming the accepted T01 shared support.
+
+**Mandatory investigation performed (per `knowledge.md`):** scoped `graphify query` first, then inspected the exact identified source files: `CreatePurchaseOrderHandler.cs`, `CreatePurchaseOrderRequest.cs`, `CreatePurchaseOrderItemRequest.cs`, `CreatePurchaseOrderResponse.cs`, `CreatePurchaseOrderValidator.cs`, `CreatePurchaseOrderItemValidator.cs`, `PurchaseOrderErrors.cs`, `IPurchaseOrderRepository`/`ISupplierRepository`/`IProductRepository`/`IUnitOfWork`, `PurchaseOrder`/`PurchaseOrderItem`/`Supplier`/`Product`, `DomainException`, `Result`/`Result<T>`/`Error`, and all four T01 shared support files. All accepted contracts confirmed in current source. No discrepancy with the accepted task breakdown was found; no STOP condition triggered; no production change required.
+
+**Files created:**
+
+- `tests/InventoryPlatform.UnitTests/Application/Purchasing/CreatePurchaseOrderHandlerTests.cs` — 15 `[Fact]` methods = 15 discovered cases (+ local/private `FakeSupplierRepository` and `FakeProductRepository` implementing the full current interfaces with fail-fast unsupported members)
+- `tests/InventoryPlatform.UnitTests/Application/Purchasing/CreatePurchaseOrderValidatorTests.cs` — 11 `[Fact]` + 1 `[Theory]` (3 `[InlineData]` rows) = 12 methods = 14 discovered cases
+- `tests/InventoryPlatform.UnitTests/Application/Purchasing/CreatePurchaseOrderItemValidatorTests.cs` — 5 `[Fact]` + 3 `[Theory]` (8 `[InlineData]` rows) = 8 methods = 13 discovered cases
+- `tests/InventoryPlatform.UnitTests/Application/Purchasing/PurchaseOrderErrorsTests.cs` — 4 `[Fact]` + 2 `[Theory]` (6 `[InlineData]` rows) = 6 methods = 10 discovered cases
+
+Per-file test-method vs discovered-case inventory (corrected during external review; verified by `dotnet test --list-tests`):
+
+| File | Fact methods | Theory methods | InlineData rows | Test methods | Discovered cases |
+|---|---|---|---|---|---|
+| CreatePurchaseOrderHandlerTests.cs | 15 | 0 | 0 | 15 | 15 |
+| CreatePurchaseOrderValidatorTests.cs | 11 | 1 | 3 | 12 | 14 |
+| CreatePurchaseOrderItemValidatorTests.cs | 5 | 3 | 8 | 8 | 13 |
+| PurchaseOrderErrorsTests.cs | 4 | 2 | 6 | 6 | 10 |
+| **Total** | **35** | **6** | **17** | **41** | **52** |
+
+Note (external-review correction): the original T02 record listed per-file counts of 16/12/14/8 (= 50) — those figures were neither method counts nor discovered-case counts and were inaccurate. The authoritative inventory is 41 test methods expanding to **52 discovered test cases** (35 `[Fact]` + 6 `[Theory]` whose 17 `[InlineData]` data rows each execute as separate cases). The targeted-filter run of 42 covered only the three `CreatePurchaseOrder*` classes (15 + 14 + 13); `PurchaseOrderErrorsTests` contributes the remaining 10 discovered cases. No test-source change was required — only this record was corrected.
+
+**Files modified:** this retrospective, plus the Graphify generated artifacts refreshed by `graphify update .` after the test-source changes.
+
+**Behavior coverage (as implemented, evidence-grounded):** supplier not found (exact `PurchaseOrderErrors.SupplierNotFound` code/message; no product lookup, no add, no save); supplier inactive (`SupplierInactive`; no add/save); product not found (`ProductNotFound(productId)` parameterized; no add/save); product inactive (`ProductInactive(productId)`; no add/save); multi-item success (each item's product queried, both IDs recorded); second-item product-not-found short-circuit (no add/save); duplicate-product `DomainException` propagation (two product lookups occur — one per item — then the aggregate `AddItem` throws; no add/save; handler does not map the exception); successful creation (success result, `Draft` status, SupplierId/ExpectedDeliveryDate/Remarks/ProductId/Quantity/UnitCost preserved on the added aggregate, single add + single save); add-before-save ordering via the T01 instance-scoped `CallOrder` (one instance per test, shared with participating fakes; supplier/product lookups, `PurchaseOrderRepository.AddAsync` before `UnitOfWork.SaveChangesAsync`; failure path records no add/save); parent validator rules (SupplierId > 0 with exact message, ExpectedDeliveryDate NotEmpty via `DateOnly.MinValue`, Remarks ≤ 500 boundary, Items NotEmpty with exact message, per-item child validation through `RuleForEach` + `SetValidator` with `Items[n].ProductId` property paths); item validator rules (ProductId > 0 with exact message, Quantity > 0, UnitCost >= 0 with zero valid and negatives invalid); `PurchaseOrderErrors` codes/messages verified exactly for all four T02-used members including parameterized variants.
+
+**T01 support usage:** `FakePurchaseOrderRepository`, `FakeUnitOfWork` (with instance-scoped `CallOrder`), `PurchasingTestData` (supplier/product builders, inactive variants via real `Deactivate()`), `EntityIdHelper`. **No T01 support correction was needed; no shared fakes were modified; no shared Supplier/Product fake was introduced** — both local fakes remain private to the T02 handler test file per the accepted disposition.
+
+**Production changes:** none. **Test changes:** the four new test files above — 41 test methods = **52 new discovered test cases**. **Database/migration/seed changes:** none. **Package changes:** none. **CI changes:** none. **WebApplicationFactory:** not introduced. **EditStatus/T07:** untouched.
+
+**Tests executed:** targeted T02 filter (`FullyQualifiedName~...Application.Purchasing.CreatePurchaseOrder`) — 42 passed, 0 failed, 0 skipped (the three `CreatePurchaseOrder*` classes only: 15 + 14 + 13); full solution suite (`dotnet test src/InventoryPlatform/InventoryPlatform.slnx`) — UnitTests **271 passed**, IntegrationTests **61 passed**, Web.Tests **33 passed**; total **365 passed, 0 failed, 0 skipped**. Baseline 313 preserved; **+52 new T02 discovered test cases** (arithmetic: 219 + 52 = 271 UnitTests; 313 + 52 = 365 total; per-class discovery 15 + 14 + 13 + 10 = 52, verified by `dotnet test --list-tests`).
+
+**Build result:** incremental build succeeded, **0 warnings, 0 errors** (T02 files introduce no warnings; the earlier CS8602 in the handler test file was fixed with null-forgiving assertions before the gate). Full rebuild (`--no-incremental`) succeeded with **28 warnings, 0 errors** — warning baseline unchanged; all 28 are pre-existing production warnings, none originate in T02 files.
+
+**Acceptance criteria status:** all 43 T02 criteria satisfied (see task completion report).
+
+**Graphify update status:** `graphify update .` executed after the test-source changes — **success** (AST re-extraction, 9 uncached files; graph now 6255 nodes, 10698 edges, 493 communities; `graph.json`/`graph.html`/`GRAPH_REPORT.md` refreshed).
+
+**Git operations:** none.
+
+**Deferred work:** T03–T08; `FakeInventoryTransactionRepository` remains for T04.
+
+**Newly discovered issues:** none in production behavior. One T02-internal test-authoring correction recorded honestly: an initial draft asserted `AddAsyncCallCount == 1` for the second-item-product-not-found path, but the handler short-circuits before `AddAsync` (add happens only after ALL items validate); the assertion was corrected to `0` to match the confirmed source contract. Also confirmed: the handler queries each item's product once per item (duplicate-product requests therefore cause two product lookups before the aggregate throws), and the created aggregate's Id remains 0 in unit scope (persistence-assigned; the response echoes the aggregate's current Id). No production change was made or needed.
+
 ## 8. Findings / Decisions
 
 **T01 findings (September 7, 2026):**
@@ -187,6 +236,6 @@ Artifact/commit-treatment observation (evidence-based only): `graphify-out/` is 
 
 ## 12. Retrospective Outcome
 
-**OPEN - SPRINT IN PROGRESS (T01 COMPLETE; T02–T08 NOT STARTED)**
+**OPEN - SPRINT IN PROGRESS (T01 COMPLETE, T02 COMPLETE; T03–T08 NOT STARTED)**
 
 *(To be finalized during T08 after Sprint 13 execution and verification are actually complete.)*
