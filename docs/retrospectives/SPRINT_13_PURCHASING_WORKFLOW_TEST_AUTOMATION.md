@@ -1,8 +1,8 @@
 # Sprint 13 Retrospective — Purchasing Workflow Test Automation
 
-> **SPRINT 13 STATUS: IN PROGRESS — T01 COMPLETE, T02 COMPLETE, T03 COMPLETE (T04–T08 NOT STARTED)**
+> **SPRINT 13 STATUS: IN PROGRESS — T01–T04 COMPLETE (T05–T08 NOT STARTED)**
 >
-> This document is the Sprint 13 **retrospective baseline**, created only after the Sprint 13 planning report (`plan/SPRINT_13_PLANNING_REPORT.md`, Revision 5) was explicitly accepted. At baseline creation it claimed no completed Sprint 13 work; execution updates are appended below as tasks actually complete (currently: **T01 complete, T02 complete, T03 complete**; T04–T08 not started). It will be **updated during execution** (task status table and execution log) and **finalized during T08** (Documentation Synchronization & Sprint 13 Closure).
+> This document is the Sprint 13 **retrospective baseline**, created only after the Sprint 13 planning report (`plan/SPRINT_13_PLANNING_REPORT.md`, Revision 5) was explicitly accepted. At baseline creation it claimed no completed Sprint 13 work; execution updates are appended below as tasks actually complete (currently: **T01–T04 complete**; T05–T08 not started). It will be **updated during execution** (task status table and execution log) and **finalized during T08** (Documentation Synchronization & Sprint 13 Closure).
 >
 > Authoritative planning baseline: `plan/SPRINT_13_PLANNING_REPORT.md` (Revision 5, accepted). Executable sprint control: `plan/SPRINT_13_TASK_BREAKDOWN.md` (external planning/control artifact — not intended for repository commit).
 
@@ -14,9 +14,9 @@
 |---|---|
 | **Sprint** | 13 |
 | **Sprint title** | Purchasing Workflow Test Automation |
-| **Status** | IN PROGRESS — T01 COMPLETE, T02 COMPLETE, T03 COMPLETE (T04–T08 NOT STARTED) |
+| **Status** | IN PROGRESS — T01–T04 COMPLETE (T05–T08 NOT STARTED) |
 | **Planning Gate** | PASS / ACCEPTED (Revision 5) |
-| **Implementation Status** | IN PROGRESS — T01 COMPLETE, T02 COMPLETE, T03 COMPLETE |
+| **Implementation Status** | IN PROGRESS — T01–T04 COMPLETE |
 | **Closure Status** | OPEN |
 | **Retrospective Outcome** | OPEN - SPRINT IN PROGRESS (Section 12) |
 
@@ -59,7 +59,7 @@ Sprint 13 only **adds** tests; the 313-test baseline must be preserved throughou
 | T01 | Purchasing Test Support Foundation | COMPLETE |
 | T02 | CreatePurchaseOrderHandler + Validator Tests | COMPLETE |
 | T03 | Workflow Transition Handler Tests (Submit/Approve) | COMPLETE |
-| T04 | ReceivePurchaseOrderHandler Tests | NOT STARTED |
+| T04 | ReceivePurchaseOrderHandler Tests | COMPLETE |
 | T05 | Purchase Order Query Handler Tests | NOT STARTED |
 | T06 | PurchaseOrderRepository Integration Tests | NOT STARTED |
 | T07 | Integrated Verification | NOT STARTED |
@@ -249,6 +249,40 @@ Note (external-review correction): the original T02 record listed per-file count
 
 **Newly discovered issues:** none in production behavior. The handlers match the accepted contract exactly; both `DomainException` propagation paths and the no-save-on-exception behavior were confirmed in current source and are now protected by tests. No production change was made or needed.
 
+### T04 — ReceivePurchaseOrderHandler Tests (COMPLETE)
+
+**Date:** September 7, 2026
+
+**Objective:** Cover the accepted source-grounded orchestration contract for `ReceivePurchaseOrderHandler` (PO load → Product load → aggregate `Receive` → `IncreaseStock` → `InventoryTransaction` creation → transaction `AddAsync` → save → success response), including `DomainException` propagation on all invalid paths, the separately loaded Product's stock mutation, the created transaction's fields, and observable cross-dependency ordering, per the T04 contract matrix (planning report §12.1), consuming the accepted T01 shared support.
+
+**Mandatory investigation performed (per `knowledge.md`):** scoped `graphify query` first, then inspected the exact identified source files: `ReceivePurchaseOrderHandler.cs`, `ReceivePurchaseOrderRequest.cs`, `ReceivePurchaseOrderResponse.cs`, `PurchaseOrderErrors.cs`, `IProductRepository.cs`, `IInventoryTransactionRepository.cs`, `IUnitOfWork.cs`, `InventoryTransaction.cs`, `TransactionType.cs`, `PurchaseOrder.cs` (`Receive` preconditions unchanged from T02/T03 inspection), `DomainException.cs`, all four T01 support files, and the T02/T03 Purchasing test conventions. Handler contract confirmed exactly as accepted, including the critical fact that the stock-mutated Product is loaded separately through `IProductRepository.GetByIdAsync(request.ProductId)` — not the repository's Include-chain navigation. Source-level details verified for the tests: the handler's namespace is `...ReceivePurchaseOrder` (folder `ReceivingPurchaseOrder`); the response property is `PurchaseOrderId` (not `Id`); `InventoryTransaction` ctor is `(productId, transactionType, quantity, referenceNumber, remarks, transactionDateUtc)` with exact strings `"PO-{Id}"` / `"Purchase Order {Id} receiving"` and `TransactionType.StockIn`; the `TransactionType` enum is declared in the global namespace (like `Supplier`, no using required). No discrepancy with the accepted task breakdown; no STOP condition; no production change required.
+
+**Files created:**
+
+- `tests/InventoryPlatform.UnitTests/Application/Purchasing/ReceivePurchaseOrderHandlerTests.cs` — 14 `[Fact]` methods = 14 discovered cases, with local/private nested `FakeProductRepository` (GetByIdAsync + id/call recording, fail-fast otherwise) and `FakeInventoryTransactionRepository` (AddAsync + payload/call recording, fail-fast otherwise)
+
+**Files modified:** this retrospective, plus the Graphify generated artifacts refreshed by `graphify update .` after the test-source changes.
+
+**Behavior coverage (as implemented, evidence-grounded):** PO not found (exact `PurchaseOrderErrors.NotFound` code/message; Product lookup short-circuits — zero product-repository calls; no transaction; no save); Product not found (exact parameterized `ProductNotFound(999)` code/message; aggregate state unchanged; no transaction; no save); invalid state via real Domain transitions (Draft-with-item and Submitted both throw "Only approved"; stock unchanged; no transaction; no save); missing PurchaseOrder item (approved order contains only product 10, request targets separately existing product 20 → "not found"; loaded product's stock unchanged; no transaction; no save); zero quantity ("greater than zero"; nothing mutated/persisted); negative quantity (same guard; nothing mutated/persisted); over-receiving (11 > remaining 10 → "cannot exceed"; stock unchanged; nothing persisted); cumulative over-receiving (prior partial receive of 6, then 5 more → 11 > 10 → "cannot exceed"; only the in-arrangement receive reflected; nothing persisted); successful partial receive (approved order for 10, receive 4 → success, response `PurchaseOrderId`=7/`Receiving`, aggregate `Receiving`, item ReceivedQuantity 4/RemainingQuantity 6/not fully received, product stock exactly 4, exactly one transaction with ProductId 10/`StockIn`/quantity 4/`PO-7`/`"Purchase Order 7 receiving"`, one save); successful full receive (receive all 10 → `Completed` on response and aggregate, item fully received/remaining 0, stock exactly 10, one transaction, one save); final-full-receive-after-partial via real transitions (prior 6 then handler receives remaining 4 → `Completed`, stock exactly 4 — only the handler's receive touches the separately loaded product); observable ordering via the T01 instance-scoped `CallOrder` (one instance per test, shared with all four participating fakes): exact sequence `PurchaseOrderRepository.GetByIdAsync` → `ProductRepository.GetByIdAsync` → `InventoryTransactionRepository.AddAsync` → `UnitOfWork.SaveChangesAsync` on success, and only the two load events on the product-not-found path. No exact `DateTime.UtcNow` assertion — the transaction timestamp is production-created and was deliberately not asserted flakily.
+
+**T01 support usage:** `FakePurchaseOrderRepository` (configurable `GetByIdAsync` result + call/id recording + `CallOrder` recording), `FakeUnitOfWork` (save-count + `CallOrder` recording), `PurchasingTestData` (`CreateApprovedPurchaseOrder`, `CreateDraftPurchaseOrderWithItem`, `CreateSubmittedPurchaseOrder`, `CreateProduct`), `EntityIdHelper` (via the builders), instance-scoped `CallOrder`. **No T01 support correction was needed; no new shared fake was introduced** — the Product and InventoryTransaction fakes remain private/nested in the T04 test file per the accepted disposition.
+
+**Production changes:** none. **Test changes:** the one new test file above — 14 test methods = 14 discovered test cases (all `[Fact]`, no theories). **Database/migration/seed changes:** none. **Package changes:** none. **CI changes:** none. **WebApplicationFactory:** not introduced. **EditStatus/T07:** untouched.
+
+**Tests executed:** targeted T04 filter (`FullyQualifiedName~...Application.Purchasing.ReceivePurchaseOrderHandlerTests`) — 14 passed, 0 failed, 0 skipped; discovery via `dotnet test --list-tests` confirmed 14 discovered cases in the T04 class; full solution suite (`dotnet test src/InventoryPlatform/InventoryPlatform.slnx`) — UnitTests **298 passed**, IntegrationTests **61 passed**, Web.Tests **33 passed**; total **392 passed, 0 failed, 0 skipped**. Baseline 378 preserved; **+14 new T04 discovered test cases** (arithmetic: 284 + 14 = 298 UnitTests; 378 + 14 = 392 total).
+
+**Build result:** incremental build succeeded, **0 warnings, 0 errors**. Full rebuild (`--no-incremental`) succeeded with **28 warnings, 0 errors** — warning baseline unchanged; verified none of the 28 originate in the T04 test file (grep over full-rebuild output for the T04 file name returned no warnings).
+
+**Acceptance criteria status:** all 51 T04 criteria satisfied (see task completion report).
+
+**Graphify update status:** `graphify update .` executed after the test-source changes — **success** (graph now 6327 nodes, 11112 edges, 498 communities; `graph.json`/`graph.html`/`GRAPH_REPORT.md` refreshed).
+
+**Git operations:** none.
+
+**Deferred work:** T05–T08.
+
+**Newly discovered issues:** none in production behavior. The handler matches the accepted contract exactly, including the separately-loaded-Product stock mutation and the exact transaction reference/description strings. All `DomainException` paths leave stock unchanged, add no transaction, and never save — confirmed in current source and now test-protected. No production change was made or needed.
+
 ## 8. Findings / Decisions
 
 **T01 findings (September 7, 2026):**
@@ -281,6 +315,6 @@ Note (external-review correction): the original T02 record listed per-file count
 
 ## 12. Retrospective Outcome
 
-**OPEN - SPRINT IN PROGRESS (T01 COMPLETE, T02 COMPLETE, T03 COMPLETE; T04–T08 NOT STARTED)**
+**OPEN - SPRINT IN PROGRESS (T01–T04 COMPLETE; T05–T08 NOT STARTED)**
 
 *(To be finalized during T08 after Sprint 13 execution and verification are actually complete.)*
