@@ -1,8 +1,8 @@
 # Sprint 13 Retrospective — Purchasing Workflow Test Automation
 
-> **SPRINT 13 STATUS: IN PROGRESS — T01–T05 COMPLETE (T06–T08 NOT STARTED)**
+> **SPRINT 13 STATUS: IN PROGRESS — T01–T06 COMPLETE (T07–T08 NOT STARTED)**
 >
-> This document is the Sprint 13 **retrospective baseline**, created only after the Sprint 13 planning report (`plan/SPRINT_13_PLANNING_REPORT.md`, Revision 5) was explicitly accepted. At baseline creation it claimed no completed Sprint 13 work; execution updates are appended below as tasks actually complete (currently: **T01–T05 complete**; T06–T08 not started). It will be **updated during execution** (task status table and execution log) and **finalized during T08** (Documentation Synchronization & Sprint 13 Closure).
+> This document is the Sprint 13 **retrospective baseline**, created only after the Sprint 13 planning report (`plan/SPRINT_13_PLANNING_REPORT.md`, Revision 5) was explicitly accepted. At baseline creation it claimed no completed Sprint 13 work; execution updates are appended below as tasks actually complete (currently: **T01–T06 complete**; T07–T08 not started). It will be **updated during execution** (task status table and execution log) and **finalized during T08** (Documentation Synchronization & Sprint 13 Closure).
 >
 > Authoritative planning baseline: `plan/SPRINT_13_PLANNING_REPORT.md` (Revision 5, accepted). Executable sprint control: `plan/SPRINT_13_TASK_BREAKDOWN.md` (external planning/control artifact — not intended for repository commit).
 
@@ -14,9 +14,9 @@
 |---|---|
 | **Sprint** | 13 |
 | **Sprint title** | Purchasing Workflow Test Automation |
-| **Status** | IN PROGRESS — T01–T05 COMPLETE (T06–T08 NOT STARTED) |
+| **Status** | IN PROGRESS — T01–T06 COMPLETE (T07–T08 NOT STARTED) |
 | **Planning Gate** | PASS / ACCEPTED (Revision 5) |
-| **Implementation Status** | IN PROGRESS — T01–T05 COMPLETE |
+| **Implementation Status** | IN PROGRESS — T01–T06 COMPLETE |
 | **Closure Status** | OPEN |
 | **Retrospective Outcome** | OPEN - SPRINT IN PROGRESS (Section 12) |
 
@@ -61,7 +61,7 @@ Sprint 13 only **adds** tests; the 313-test baseline must be preserved throughou
 | T03 | Workflow Transition Handler Tests (Submit/Approve) | COMPLETE |
 | T04 | ReceivePurchaseOrderHandler Tests | COMPLETE |
 | T05 | Purchase Order Query Handler Tests | COMPLETE |
-| T06 | PurchaseOrderRepository Integration Tests | NOT STARTED |
+| T06 | PurchaseOrderRepository Integration Tests | COMPLETE |
 | T07 | Integrated Verification | NOT STARTED |
 | T08 | Documentation Synchronization & Sprint 13 Closure | NOT STARTED |
 
@@ -328,6 +328,58 @@ Per-file inventory (verified by `dotnet test --list-tests`; all `[Fact]`, no the
 
 **Newly discovered issues:** none in production behavior. Both handlers match the accepted contract exactly, including the no-failure-branch fact of `GetPurchaseOrdersHandler` and the `PurchaseOrders`-property response shape. One T05-internal test-authoring correction recorded honestly: the initial draft of the populated-page summary test arranged aggregates without items and asserted non-zero totals; the totals are aggregate-derived (`Items.Sum(Quantity * UnitCost)`), so the fixture was corrected to add items before the gate. Two pre-existing observations remain recorded-only (Section 8): `PagedQuery.Status` is typed `ProductStatusFilter` and is not copied by the list handler (current-source behavior, tested as-is), and the Supplier/Product navigation attach requires test-only reflection (no production change authorized). No production change was made or needed.
 
+### T06 — PurchaseOrderRepository Integration Tests (COMPLETE)
+
+**Date:** September 8, 2026
+
+**Objective:** Cover the real current `PurchaseOrderRepository` (aggregate loading/Includes, query filters, sorting, paging, AsNoTracking where observable, persistence round-trip) using the existing IntegrationTests project and its EF Core InMemory pattern, with the mandatory fresh-context isolation pattern for navigation-loading and round-trip assertions. No T07 verification scope.
+
+**Mandatory investigation performed (per `knowledge.md`):** scoped `graphify query` first, then inspected the exact identified source files: `PurchaseOrderRepository.cs`, `Repository.cs` (base), `IPurchaseOrderRepository.cs`, `IRepository.cs`, `ApplicationDBContext.cs`, `PurchaseOrderConfiguration.cs`, `PurchaseOrderItemConfiguration.cs`, `SupplierConfiguration.cs`, `ProductConfiguration.cs`, `Category.cs`, `Unit.cs`, `PagedQuery.cs`, `PagedRequest.cs`, `PagedResult.cs`, `PurchaseOrderSortFields.cs`, the IntegrationTests project file, and both existing repository-test precedents (`CapabilityRepositoryTests`, `AuthorizationGroupRepositoryTests`). All accepted contracts confirmed in current source: `GetByIdAsync` overrides the base with `Include(Supplier).Include(Items).ThenInclude(Product)` + `FirstOrDefaultAsync` and is **tracked** (no AsNoTracking); `GetPagedAsync` uses `AsNoTracking().Include(Supplier).Include(Items)`, trims search then branches numeric (`po.Id == parsedId || Supplier.Name.Contains(search)`) vs name-contains, applies `fromDate >=` / `toDate <=` / exact-status filters, counts before sorting, sorts via `ApplySorting` on `PurchaseOrderSortFields` (Id/Supplier/OrderDate/Status/TotalAmount, asc/desc; fallback `OrderDate desc, Id desc`), pages with `Skip((PageNum-1)*PageSize).Take(PageSize)`, and echoes `Page = query.PageNum`, `PageSize`, `TotalCount`. No discrepancy with the accepted task breakdown; no STOP condition; no production change required.
+
+**Files created:**
+
+- `tests/InventoryPlatform.IntegrationTests/Purchasing/PurchaseOrderRepositoryTests.cs` — 24 `[Fact]` methods = 24 discovered cases (verified by `dotnet test --list-tests`)
+
+Coverage areas (24 methods): GetByIdAsync not-found (1); GetByIdAsync Includes from fresh query context — single-item aggregate with Supplier/Items/ThenInclude(Product) + full header shape (1), multi-item with per-item Product/Quantity/UnitCost (1); GetPagedAsync search — supplier-name match (1), numeric id match (1), numeric OR-branch via supplier name containing digits (1), no-match empty page (1), whitespace search ignored (1); FromDate inclusive boundary (1), ToDate inclusive boundary (1), combined range (1); status filter (1); sorting — Id asc (1), Id desc (1), Supplier name (1), OrderDate (1), Status (1), TotalAmount by `Items.Sum(Quantity * UnitCost)` (1), default `OrderDate desc, Id desc` fallback with distinct seeded dates (1); paging — page slicing incl. out-of-range page (1), Page/PageSize/TotalCount metadata (1); composed filter+sort+page (1); AsNoTracking via fresh-context ChangeTracker (`EntityState.Detached` on purchase orders and items) (1); persistence round-trip — repository `AddAsync` + first save → first context disposal → fresh `GetByIdAsync` reload (full aggregate-shape assertions, Draft status) → real `Submit()` mutation on the freshly loaded aggregate → `Update` + second save → second context disposal → final fresh `GetByIdAsync` reload asserting persisted `Submitted` state (1; corrected during external review — see the T06 review record below).
+
+**Files modified:** this retrospective, plus the Graphify generated artifacts refreshed by `graphify update .` after the test-source changes.
+
+**Fresh-context isolation evidence (as implemented):** the test class constructor generates a unique database name per test instance (`$"PORepoTest_{Guid.NewGuid():N}"` — xUnit creates a new class instance per test, so every test gets its own isolated InMemory database). Every navigation-loading and round-trip test: (1) arranges data through one or more short-lived arrange contexts, (2) saves and disposes them (`using` scopes), (3) creates a fresh query context against the same database name, (4) constructs the real `PurchaseOrderRepository` on the fresh context, (5) executes the repository query, and (6) asserts. Because the arrange contexts are disposed, their change trackers cannot fix up navigations into the query results — only the repository's Include chain can populate `Supplier`, `Items`, and `Item.Product`, so the Include assertions cannot be satisfied by arrange-context fix-up. The isolation reason is documented in the test-class XML doc header, per the accepted task breakdown.
+
+**Fixture design notes (test-side, no production impact):** dependency entities are persisted before aggregates that reference them — the Product constructor guard-rejects zero/negative category/unit ids, so Category/Unit are saved first and the Product is built with persistence-assigned ids; `PurchaseOrder.Create` is called with the persisted SupplierId and items are added with persisted ProductIds (no private-setter writes, no reflection in T06). `Repository.AddAsync` does not save, so round-trip tests call `SaveChangesAsync` explicitly, mirroring the established repository-test precedent. Seeded fixtures use distinct suppliers/dates/statuses/totals so search, filter, sort, and paging assertions stay unambiguous.
+
+**InMemory limitation (recorded as required):** EF Core InMemory does NOT prove SQL Server SQL translation, collation behavior, FK/unique constraint enforcement, transaction semantics, provider-specific date/string behavior, or relational performance/query-plan behavior. These tests provide repository wiring and query-shape regression coverage only, consistent with `docs/TESTING_CONVENTIONS.md` and the accepted planning report.
+
+**Production changes:** none. **Test changes:** the one new test file above — 24 test methods = 24 discovered test cases (all `[Fact]`, no theories). **Database/migration/seed changes:** none (runtime-only isolated InMemory databases; no EnsureCreated needed for the InMemory provider). **Package changes:** none (existing `Microsoft.EntityFrameworkCore.InMemory` reference reused). **CI changes:** none. **WebApplicationFactory:** not introduced. **EditStatus/T07:** untouched.
+
+**Tests executed:** targeted T06 filter (`FullyQualifiedName~InventoryPlatform.IntegrationTests.Purchasing`) — 24 passed, 0 failed, 0 skipped; discovery via `dotnet test --list-tests` confirmed 24 discovered cases in the T06 class; IntegrationTests project — **85 passed**, 0 failed, 0 skipped; full solution suite (`dotnet test src/InventoryPlatform/InventoryPlatform.slnx`) — UnitTests **314 passed**, IntegrationTests **85 passed**, Web.Tests **33 passed**; total **432 passed, 0 failed, 0 skipped**. Baseline 408 preserved; **+24 new T06 discovered test cases** (arithmetic: 61 + 24 = 85 IntegrationTests; 408 + 24 = 432 total).
+
+**Build result:** incremental build succeeded, **0 warnings, 0 errors**. Full rebuild (`--no-incremental`) succeeded with **28 warnings, 0 errors** — warning baseline unchanged; grep over full-rebuild output confirmed no warning originates in the T06 test file.
+
+**Acceptance criteria status:** all 58 T06 criteria satisfied (see task completion report).
+
+**Graphify update status:** `graphify update .` executed after the test-source changes — **success** (graph now 6391 nodes, 11513 edges, 499 communities; `graph.json`/`graph.html`/`GRAPH_REPORT.md` refreshed).
+
+**Git operations:** none.
+
+**Deferred work:** T07–T08.
+
+**Newly discovered issues:** none in production behavior. The repository matches the accepted contract exactly (Includes, search semantics, date/status filters, all five sort fields plus the default fallback, paging math, metadata echo, AsNoTracking on GetPagedAsync only). Two T06-internal test-authoring corrections recorded honestly, both fixed before the green gate: (1) the initial draft constructed `Product` with unsaved Category/Unit ids (still 0), tripping the Domain guard — fixed by saving Category/Unit before constructing the Product; (2) an earlier draft used placeholder-item add/remove gymnastics and wrote `SupplierId` (private setter) — replaced by the create-after-dependency-save pattern. No production change was made or needed.
+
+### T06 External Review — Persistence Round-Trip Correction (COMPLETE)
+
+**Date:** September 8, 2026
+
+**Review finding:** the original T06 round-trip test (`AddAndSave_ThenFreshContextReload_ReturnsPersistedAggregate`) persisted an aggregate that was **already Approved before insertion** (`Submit()` + `Approve()` called in the arrange phase) and then only re-read it. That proves creation/reload and aggregate-shape persistence, but not the accepted planning-baseline requirement: a domain mutation performed on an aggregate **loaded by the real repository** must survive a subsequent save and a further fresh-context reload. Case B applied — the test was corrected.
+
+**Correction (test-only):** the round-trip test was replaced with `AddAndSave_ThenFreshReload_SubmitAndSave_ThenFreshReload_PersistsSubmittedState`, which executes the exact accepted sequence: `PurchaseOrder.Create` (Draft at insertion) + `AddItem` → real `PurchaseOrderRepository.AddAsync` → first `SaveChangesAsync` → **first context disposal** → fresh context + real repository `GetByIdAsync` (aggregate-shape assertions preserved: Supplier navigation, single item, Product navigation, Quantity 7, UnitCost 12.50, TotalAmount 87.50, status **Draft**) → real `Submit()` executed on the freshly loaded aggregate (in-memory status asserted `Submitted`) → real `Update` + second `SaveChangesAsync` → **second context disposal** → another fresh context + `GetByIdAsync` → asserts persisted `PurchaseOrderStatus.Submitted` (plus Items/Supplier/Product navigations intact). The forbidden substitutes are all absent: the aggregate is not already-Submitted/Approved at insertion, no reflection state write, no same-context tracked-entity check, no `ChangeTracker.Clear()`, no production modification. Test count unchanged: still 24 methods = 24 discovered cases (one method renamed/replaced, none added or removed).
+
+**Re-verification after the correction:** incremental build succeeded (initially 1 error CS4008 `await` on void `Update` + 1 warning CS8600, then 1 warning CS1717 from an intermediate null-forgiving assignment — all T06-internal, each fixed immediately; final state 0 errors, 0 warnings from T06 files). Targeted round-trip test: 1 passed. IntegrationTests project: **85 passed**, 0 failed, 0 skipped. Full solution suite: UnitTests **314** / IntegrationTests **85** / Web.Tests **33** = **432 passed, 0 failed, 0 skipped** — totals unchanged from the original T06 gate (baseline 408 + 24 preserved). Full rebuild (`--no-incremental`): **28 warnings, 0 errors** — baseline unchanged; grep confirmed no warning originates in the T06 test file.
+
+**Graphify update status (post-correction):** `graphify update .` re-run after the test-source change — **success** (`graph.json`/`graph.html`/`GRAPH_REPORT.md` refreshed).
+
+**Git operations:** none. **Production changes:** none. **T07–T08:** remain NOT STARTED.
+
 ## 8. Findings / Decisions
 
 **T01 findings (September 7, 2026):**
@@ -360,6 +412,6 @@ Per-file inventory (verified by `dotnet test --list-tests`; all `[Fact]`, no the
 
 ## 12. Retrospective Outcome
 
-**OPEN - SPRINT IN PROGRESS (T01–T05 COMPLETE; T06–T08 NOT STARTED)**
+**OPEN - SPRINT IN PROGRESS (T01–T06 COMPLETE; T07–T08 NOT STARTED)**
 
 *(To be finalized during T08 after Sprint 13 execution and verification are actually complete.)*
