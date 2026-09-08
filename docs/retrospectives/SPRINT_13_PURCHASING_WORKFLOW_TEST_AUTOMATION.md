@@ -1,8 +1,8 @@
 # Sprint 13 Retrospective — Purchasing Workflow Test Automation
 
-> **SPRINT 13 STATUS: IN PROGRESS — T01–T07 COMPLETE (T08 NOT STARTED)**
+> **SPRINT 13 STATUS: COMPLETED — CLOSED (T08, SEPTEMBER 9, 2026)** — all eight tasks (T01–T08) complete; final verified state 432 passed / 0 failed / 0 skipped.
 >
-> This document is the Sprint 13 **retrospective baseline**, created only after the Sprint 13 planning report (`plan/SPRINT_13_PLANNING_REPORT.md`, Revision 5) was explicitly accepted. At baseline creation it claimed no completed Sprint 13 work; execution updates are appended below as tasks actually complete (currently: **T01–T07 complete**; T08 not started). It will be **updated during execution** (task status table and execution log) and **finalized during T08** (Documentation Synchronization & Sprint 13 Closure).
+> This document is the Sprint 13 **retrospective baseline**, created only after the Sprint 13 planning report (`plan/SPRINT_13_PLANNING_REPORT.md`, Revision 5) was explicitly accepted. At baseline creation it claimed no completed Sprint 13 work; execution updates are appended below as tasks actually complete (currently: **T01–T08 complete — sprint closed**). It will be **updated during execution** (task status table and execution log) and **finalized during T08** (Documentation Synchronization & Sprint 13 Closure).
 >
 > Authoritative planning baseline: `plan/SPRINT_13_PLANNING_REPORT.md` (Revision 5, accepted). Executable sprint control: `plan/SPRINT_13_TASK_BREAKDOWN.md` (external planning/control artifact — not intended for repository commit).
 
@@ -14,11 +14,11 @@
 |---|---|
 | **Sprint** | 13 |
 | **Sprint title** | Purchasing Workflow Test Automation |
-| **Status** | IN PROGRESS — T01–T07 COMPLETE (T08 NOT STARTED) |
+| **Status** | COMPLETED — CLOSED (T08, September 9, 2026) |
 | **Planning Gate** | PASS / ACCEPTED (Revision 5) |
-| **Implementation Status** | IN PROGRESS — T01–T07 COMPLETE |
-| **Closure Status** | OPEN |
-| **Retrospective Outcome** | OPEN - SPRINT IN PROGRESS (Section 12) |
+| **Implementation Status** | COMPLETE — T01–T08 |
+| **Closure Status** | CLOSED (September 9, 2026) |
+| **Retrospective Outcome** | POSITIVE - SPRINT COMPLETE (Section 12) |
 
 ## 2. Objective
 
@@ -63,7 +63,7 @@ Sprint 13 only **adds** tests; the 313-test baseline must be preserved throughou
 | T05 | Purchase Order Query Handler Tests | COMPLETE |
 | T06 | PurchaseOrderRepository Integration Tests | COMPLETE |
 | T07 | Integrated Verification | COMPLETE |
-| T08 | Documentation Synchronization & Sprint 13 Closure | NOT STARTED |
+| T08 | Documentation Synchronization & Sprint 13 Closure | COMPLETE |
 
 ## 5. Accepted Boundaries
 
@@ -409,6 +409,30 @@ Coverage areas (24 methods): GetByIdAsync not-found (1); GetByIdAsync Includes f
 
 **Newly discovered issues:** none.
 
+### T08 — Documentation Synchronization & Sprint 13 Closure (COMPLETE)
+
+**Date:** September 9, 2026
+
+**Objective:** Update and finalize this retrospective (not first-create it) and synchronize the established documentation set with the actual executed Sprint 13 results, per the T08 section of the accepted task breakdown.
+
+**Documentation synchronized (audit-driven — each target inspected, edited only where stale):**
+
+- this retrospective — finalized: task table T01–T08 all COMPLETE; execution log complete (T08 entry added); §9 final verification evidence preserved; §10 closure recorded; §12 outcome finalized
+- `docs/TESTING_CONVENTIONS.md` — Purchasing coverage tables added (UnitTests Purchasing rows, IntegrationTests Purchasing row); totals updated 313 → 432 (314/85/33); Sprint 13 reusable conventions added: test methods vs discovered test cases (Theory/InlineData reconciliation), per-test instance-scoped fake state over static/global state, EF Core InMemory fresh-context isolation for Include/ThenInclude verification, fake-based handler/query tests separated from real-repository integration coverage
+- `CHANGELOG.md` — `[Sprint 13]` entry added per established convention (non-release sprint; no version invented)
+- `PROJECT_STATUS.md` — status line and milestone block synchronized to Sprint 13 Complete / 432 tests; v1.6.0 release baseline preserved
+- `README.md` — development status line, testing modules list, and sprint-history Current section synchronized; release section untouched
+- `ROADMAP.md` — timeline note and Sprint 13 section added (Complete, non-release); Next Sprint Planning pointer updated (no Sprint 14 scope defined or invented)
+- `docs/ENGINEERING_JOURNAL.md` — Current Release State header updated; Sprint 13 section added with evidence-backed engineering lessons
+- `docs/FEATURES.md` — stale Sprint 10-era "Known Findings (Deferred)" list corrected: DF1/DF2 (resolved via authorized Phase 25 database remediation) and Categories/Edit (remediated Sprint 12 T05) no longer presented as open; still-deferred items preserved as deferred
+- `docs/DESIGN_DECISIONS.md` — inspected; **no change** (Sprint 13 introduced no new enduring design/architecture decision; testing work does not constitute ADR material)
+
+**Verification:** T08 did not rerun the suites because it was documentation-only; final technical closure evidence is the externally accepted T07 verification result (432 passed / 0 failed / 0 skipped; full rebuild 28 warnings / 0 errors). No source/test-source file was touched during T08, so the T07 evidence remains authoritative.
+
+**Boundary compliance:** no production changes; no test/test-support changes; no package/project-reference changes; no database/migration/seed changes; no CI changes; no WebApplicationFactory work; no authorization remediation; no release/version/tag created; no Sprint 14 planning; no Git operations. Graphify update not required (documentation-only).
+
+**Newly discovered issues:** none.
+
 ## 8. Findings / Decisions
 
 **T01 findings (September 7, 2026):**
@@ -422,7 +446,7 @@ Coverage areas (24 methods): GetByIdAsync not-found (1); GetByIdAsync Includes f
 
 ## 9. Final Verification
 
-**RECORDED BY T07 (September 9, 2026). Documentation synchronization and sprint closure remain T08 (NOT STARTED).**
+**RECORDED BY T07 (September 9, 2026).** Documentation synchronization and sprint closure were completed by T08 on the same date (see Execution Log, T08).
 
 | Verification | Result |
 |---|---|
@@ -440,9 +464,13 @@ Coverage areas (24 methods): GetByIdAsync not-found (1); GetByIdAsync Includes f
 
 ## 10. Final Documentation / Closure
 
-**PENDING T08**
+**RECORDED BY T08 (September 9, 2026) — SPRINT 13 CLOSED.**
 
-*(This section will record the T08 documentation synchronization and sprint closure: retrospective finalization, TESTING_CONVENTIONS / CHANGELOG / PROJECT_STATUS / README / ROADMAP / ENGINEERING_JOURNAL updates, FEATURES.md stale deferred-findings audit, and the DESIGN_DECISIONS.md inspection outcome.)*
+- Retrospective finalized (this document): task table T01–T08 COMPLETE; execution log complete; §12 outcome recorded.
+- Documentation set synchronized: TESTING_CONVENTIONS, CHANGELOG, PROJECT_STATUS, README, ROADMAP, ENGINEERING_JOURNAL, FEATURES (stale deferred-findings audit), DESIGN_DECISIONS (inspected — no change required).
+- No release, version, tag, or GitHub Release created — Sprint 13 is a non-release sprint; v1.6.0 remains the current release baseline.
+- No Sprint 14 scope defined, named, or committed; the next activity is a separate Sprint Planning session.
+- Deferred items carried forward unchanged: EditStatus/T07 behavioral decision (owner decision required), WebApplicationFactory/HTTP-pipeline testing, CI provider establishment, 28 pre-existing build warnings (warning cleanup), product features requiring deep planning.
 
 ## 11. Baseline References
 
@@ -453,6 +481,37 @@ Coverage areas (24 methods): GetByIdAsync not-found (1); GetByIdAsync Includes f
 
 ## 12. Retrospective Outcome
 
-**OPEN - SPRINT IN PROGRESS (T01–T07 COMPLETE; T08 NOT STARTED)**
+**POSITIVE - SPRINT COMPLETE - CLOSED (T01–T08 COMPLETE, SEPTEMBER 9, 2026)**
 
-*(To be finalized during T08 after Sprint 13 execution and verification are actually complete.)*
+### What Went Well
+
+- The 313-test baseline was preserved through every task gate; the suite grew arithmetically reconciled at each gate (313 → 365 → 378 → 392 → 408 → 432) with 0 failed and 0 skipped at every step.
+- A testing sprint delivered its scope with zero production changes, zero new packages, and zero database/CI changes; the 28-warning full-rebuild baseline was verified unchanged at T07 with no warnings originating in test projects.
+- External reviews caught record-level and design-level errors early (T01 static CallOrder, T02 count inventory, T06 round-trip fidelity) and corrections were made without test-count churn or weakened assertions.
+- T07 independently re-executed the integrated verification instead of repeating prior reports' numbers; observed results matched the accepted baseline exactly.
+- Findings were preserved as findings (T05 `PagedRequest.Status` pass-through; EditStatus left untouched) rather than silently remediated — G1 discipline held for the entire sprint.
+
+### What Could Improve
+
+- Initial T02 per-file counts were neither method counts nor discovered-case counts; `dotnet test --list-tests`-verified methods-vs-discovered accounting should be the default from the first report, not a review correction.
+- The initial T06 round-trip test re-read an already-Approved aggregate instead of proving a repository-loaded mutation survives save + reload; arranging the accepted evidence sequence first would have avoided the review-cycle rework.
+- Early execution records omitted Graphify artifact changes from their modified-file inventories; complete inventories should be recorded at task completion, not reconstructed during review.
+
+### Lessons Learned
+
+- **Test methods ≠ discovered test cases.** xUnit `[Theory]` + `[InlineData]` rows each execute as separate cases; 41 T02 methods expand to 52 cases. Suite totals must state which unit they report.
+- **Per-test instance-scoped fake state, never static/global mutable state.** xUnit runs test classes in parallel; the T01 `CallOrder` recorder correction (static fields → per-test instance) is the reusable pattern.
+- **Fresh-context isolation is mandatory when asserting Include/ThenInclude behavior under EF Core InMemory.** Disposed arrange contexts prevent relationship fix-up from masking a missing Include; only the repository's query shape can satisfy the assertions.
+- **Fake-based handler/query tests and real-repository integration tests verify different layers.** T05 proves mapping/pass-through orchestration with fakes; T06 proves actual query shape, Includes, sorting/paging, and persistence round-trips. Neither substitutes for the other, and documentation must not claim more than the layer under test proves (T06 proves nothing about SQL Server relational behavior).
+- **Test real `DomainException` propagation where that is actual behavior** (T03/T04 invalid-state paths, including the no-save-after-exception guarantee) rather than shielding handlers from aggregate exceptions.
+- **Do not assert exact `DateTime.UtcNow` values where timing is not the contract** (T04 transaction timestamp left unasserted deliberately).
+- **A verification-only gate must execute, not assume** (T07), and **sprint completion is not a release** (T08 created no version/tag).
+
+### Follow-up / Deferred Work (not sprint-assigned)
+
+- EditStatus role-conditioned self-deactivation guard — deferred, blocked on an explicit owner behavioral decision (Sprint 12 finding; untouched by Sprint 13)
+- T05 recorded finding: `GetPurchaseOrdersHandler` does not copy `PagedRequest.Status` into `PagedQuery` — recorded only; no production remediation was authorized or performed
+- WebApplicationFactory / Razor-page HTTP-pipeline testing — requires package decision, provider substitution, seeding strategy, and a `Program` accessibility seam
+- CI provider establishment — blocked on hosting/provider decision
+- 28 pre-existing full-rebuild warnings (member-hiding `CS0108`/`CS0114`, nullable `CS86xx`) — bounded future cleanup task
+- Product features (Sales Module, Audit/Activity Logging, Bulk Import/Export, Barcode/QR completion, REST API v2.0) — none implementation-ready; each requires its own deep planning
