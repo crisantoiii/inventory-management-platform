@@ -44,7 +44,7 @@ The focus is not only on implementing business features but also on applying pro
 
 **Current Version:** v1.6.0 - Dynamic Capability-Based Authorization
 
-**Current Development Status:** Sprint 12 Authorization Refinement — Complete. 313 automated tests established (219 UnitTests, 61 IntegrationTests, 33 Web.Tests). Not a release sprint — v1.6.0 remains the current release baseline. T07 (EditStatus `IsInRole` cleanup) remains Blocked/Deferred — the remaining check is a reachable, behavior-affecting guard, not dead code.
+**Current Development Status:** Sprint 13 Purchasing Workflow Test Automation — Complete. 432 automated tests established (314 UnitTests, 85 IntegrationTests, 33 Web.Tests; 0 failed, 0 skipped). Not a release sprint — v1.6.0 remains the current release baseline. T07 (EditStatus `IsInRole` cleanup) remains Blocked/Deferred — the remaining check is a reachable, behavior-affecting guard, not dead code.
 
 ## Completed Modules
 
@@ -57,8 +57,9 @@ The focus is not only on implementing business features but also on applying pro
 - ✅ Dashboard
 - ✅ Authentication & Authorization
 - ✅ Dynamic Capability-Based Authorization
-- ✅ Automated Testing (Sprint 11 — 280 tests, xUnit, EF Core InMemory)
-- ✅ Web Authorization Handler Testing (Sprint 12 — 33 Web.Tests total, 313 project-wide, no mocking framework)
+- ✅ Automated Testing (Sprint 11 — foundation, xUnit, EF Core InMemory)
+- ✅ Web Authorization Handler Testing (Sprint 12 — 33 Web.Tests, no mocking framework)
+- ✅ Purchasing Workflow Test Automation (Sprint 13 — handlers, validators, repository integration; 432 project-wide)
 - ✅ User Management
 - ✅ Account Management
 - ✅ Purchasing (Core Workflow + Sprint 8 P1-P7 Enhancements Complete)
@@ -917,9 +918,10 @@ Development Tools
 
 ## Current
 
-- Sprint 12 - Authorization Refinement - Complete (handler tests + authorization boundary fixes; 313 automated tests; T07 EditStatus cleanup deferred/blocked)
+- Sprint 13 - Purchasing Workflow Test Automation - Complete (Application handler/validator/query tests + PurchaseOrderRepository integration tests; 432 automated tests; no production changes)
+- Sprint 12 - Authorization Refinement - Complete (handler tests + authorization boundary fixes; T07 EditStatus cleanup deferred/blocked)
 - Sprint 10 - Dynamic Capability-Based Authorization - Complete
-- v1.6.0 released (v1.6.0 remains the current release baseline; Sprint 12 is not a release sprint)
+- v1.6.0 released (v1.6.0 remains the current release baseline; Sprints 11-13 are non-release sprints)
 
 ## Sprint 10 Closure State
 

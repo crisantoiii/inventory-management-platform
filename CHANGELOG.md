@@ -1,5 +1,44 @@
 # Changelog
 
+## [Sprint 13] - Purchasing Workflow Test Automation
+
+### Summary
+
+Expanded automated coverage of the purchasing workflow — the platform's most business-critical process — across the Application layer (handlers, validators, error contracts) and the `PurchaseOrderRepository` persistence layer, without any production code change. Not a release sprint — v1.6.0 remains the current release baseline.
+
+### Added
+
+- Shared Purchasing test support: `FakePurchaseOrderRepository`, `FakeUnitOfWork` (per-test instance-scoped interaction recording — no static test state), `PurchasingTestData`, `EntityIdHelper`
+- `CreatePurchaseOrderHandler` tests (15): supplier missing/inactive, product missing/inactive, duplicate-product `DomainException` propagation, successful Draft creation with aggregate/item mapping, add-before-save ordering
+- `CreatePurchaseOrderValidator` (14 discovered cases) and `CreatePurchaseOrderItemValidator` (13 discovered cases) tests: parent rules, per-item child validation, quantity/unit-cost boundaries
+- `PurchaseOrderErrors` contract tests (10→11 discovered cases across T02/T03, including the parameterized variants)
+- `SubmitPurchaseOrderHandler` (6) and `ApprovePurchaseOrderHandler` (6) tests: not-found failures, valid transitions, response mapping, load-before-save ordering, invalid-state `DomainException` propagation with no save
+- `ReceivePurchaseOrderHandler` tests (14): PO/product missing, invalid states, missing PO item, zero/negative/over/cumulative-over receiving, partial and full completion, stock increase via the separately loaded `IProductRepository` product, `StockIn` inventory-transaction creation, observable ordering across participating fakes
+- `GetPurchaseOrderHandler` (7) and `GetPurchaseOrdersHandler` (9) query-handler tests: DTO/header/item mapping, received/remaining quantities, paging/search/sort/date/status request pass-through as actually implemented, `PageNum`/`PageSize` clamping, empty pages and paging metadata (fake-based)
+- `PurchaseOrderRepositoryTests` (24 IntegrationTests, EF Core InMemory): `GetByIdAsync` Includes/`ThenInclude` verified from fresh contexts (relationship fix-up cannot mask a missing Include), search numeric/name branches, inclusive date boundaries, status filtering, all supported sorts plus the default fallback, paging/metadata/`TotalCount`, `AsNoTracking` on `GetPagedAsync`, and a persistence round-trip proving a repository-loaded aggregate mutation survives save and a further fresh-context reload
+
+### Changed
+
+- No production code, test-support behavior, package, database/migration/seed, CI, or authorization changes. Test suites only.
+
+### Verified
+
+- Build: SUCCESS (0 errors; full non-incremental rebuild reports the unchanged baseline of 28 pre-existing warnings — none from test projects)
+- UnitTests: 314 passed
+- IntegrationTests: 85 passed
+- Web.Tests: 33 passed
+- Total: 432 passed, 0 failed, 0 skipped (314 + 85 + 33; integrated verification T07)
+- The 313-test pre-sprint baseline was preserved throughout; every task gate grew the suite arithmetically (313 → 365 → 378 → 392 → 408 → 432)
+
+### Known/Deferred (recorded, not remediated)
+
+- `GetPurchaseOrdersHandler` does not copy `PagedRequest.Status` into `PagedQuery` (T05 recorded finding; current-source behavior, tested as-is)
+- Repository integration tests use EF Core InMemory: they provide repository wiring/query-shape regression coverage only and do NOT prove SQL Server SQL translation, collation, relational FK/unique constraints, transaction semantics, provider-specific date/string behavior, or query-plan/performance characteristics
+- Sprint 12 EditStatus self-deactivation guard remains deferred (behavioral decision pending); untouched by Sprint 13
+- WebApplicationFactory integration testing and CI provider establishment remain deferred
+
+---
+
 ## [Sprint 12] - Authorization Refinement
 
 ### Summary

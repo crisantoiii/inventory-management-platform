@@ -30,7 +30,7 @@ Account Management
 
 **Latest Release:** v1.6.0 — Sprint 10 Dynamic Capability-Based Authorization
 
-**Project Status:** Sprint 12 Authorization Refinement — Complete. 313 automated tests established (219 UnitTests, 61 IntegrationTests, 33 Web.Tests). T07 (EditStatus `IsInRole` cleanup) remains Blocked/Deferred — the remaining check is a reachable, behavior-affecting guard, not dead code.
+**Project Status:** Sprint 13 Purchasing Workflow Test Automation — Complete. 432 automated tests established (314 UnitTests, 85 IntegrationTests, 33 Web.Tests; 0 failed, 0 skipped). T07 (EditStatus `IsInRole` cleanup) remains Blocked/Deferred — the remaining check is a reachable, behavior-affecting guard, not dead code.
 
 **Last Updated:** September 2026
 
@@ -134,9 +134,9 @@ Verified:
 
 - **Completed Modules:** 11
 - **Architecture Status:** Validated
-- **Current Milestone:** Sprint 12 — Authorization Refinement (Complete; not a release sprint — v1.6.0 remains the current release baseline)
-- **Next Milestone:** TBD — separate Sprint Planning session pending; no Sprint 13 scope defined
-- **Automated Tests:** 313 passing (219 UnitTests, 61 IntegrationTests, 33 Web.Tests)
+- **Current Milestone:** Sprint 13 — Purchasing Workflow Test Automation (Complete; not a release sprint — v1.6.0 remains the current release baseline)
+- **Next Milestone:** TBD — separate Sprint Planning session pending; no Sprint 14 scope defined
+- **Automated Tests:** 432 passing (314 UnitTests, 85 IntegrationTests, 33 Web.Tests; 0 failed, 0 skipped)
 
 ---
 
@@ -822,7 +822,7 @@ Final verification covered normal application regression, reporting workflows, e
 
 # Current Focus
 
-Sprint 12 Authorization Refinement is complete. 313 automated tests established. T07 (EditStatus `IsInRole` cleanup) remains blocked/deferred pending an explicit behavioral decision. The next activity is a separate Sprint Planning session; no Sprint 13 scope is defined yet.
+Sprint 13 Purchasing Workflow Test Automation is complete. 432 automated tests established (314 UnitTests, 85 IntegrationTests, 33 Web.Tests; 0 failed, 0 skipped) covering the Purchasing Application layer (handlers, validators, error contracts) and `PurchaseOrderRepository` integration behavior (EF Core InMemory). No production changes were made by the sprint. T07 (EditStatus `IsInRole` cleanup) remains blocked/deferred pending an explicit behavioral decision. The next activity is a separate Sprint Planning session; no Sprint 14 scope is defined.
 
 Completed in Sprint 8:
 

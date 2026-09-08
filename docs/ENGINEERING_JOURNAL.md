@@ -24,9 +24,52 @@ Rather than documenting daily work, it captures important architectural decision
 
 # Current Release State
 
-**Current Version:** Sprint 12 Authorization Refinement (non-release sprint; v1.6.0 remains the release baseline)
+**Current Version:** Sprint 13 Purchasing Workflow Test Automation (non-release sprint; v1.6.0 remains the release baseline)
 
-Sprint 12 Authorization Refinement is complete. 313 automated tests established across Domain, Application, Infrastructure, and Web authorization layers (219 UnitTests, 61 IntegrationTests, 33 Web.Tests). Sprint 11's 280-test foundation remains intact beneath it.
+Sprint 13 Purchasing Workflow Test Automation is complete. 432 automated tests established across Domain, Application, Infrastructure, and Web layers (314 UnitTests, 85 IntegrationTests, 33 Web.Tests; 0 failed, 0 skipped). The Sprint 12 three-project foundation and Sprint 11's original 280-test baseline remain intact beneath it. The sprint made no production changes.
+
+# Sprint 13 - Purchasing Workflow Test Automation
+
+## Summary
+
+Extended the risk-based automated testing program to the platform's most business-critical workflow — the Purchase Order lifecycle with inventory synchronization — with layered automated coverage of the Purchasing Application layer (handlers, validators, error contracts) and the `PurchaseOrderRepository` persistence layer. No production code, package, database, or CI change; the 28-warning full-rebuild baseline was preserved exactly.
+
+## Implementation
+
+- Shared Purchasing test support: `FakePurchaseOrderRepository`, `FakeUnitOfWork`, `PurchasingTestData`, `EntityIdHelper` — hand-written fakes with per-test instance-scoped interaction recording (no static/global mutable state, safe under xUnit's parallel test-class execution)
+- CreatePurchaseOrder handler + validator + item-validator + error-contract tests (52 discovered cases): error mapping, validation short-circuits, duplicate-product `DomainException` propagation, add-before-save ordering
+- Submit/Approve transition handler tests (13 discovered cases): not-found failures, valid transitions, load-before-save ordering, invalid-state `DomainException` propagation with no save
+- ReceivePurchaseOrderHandler tests (14): over/cumulative-over receiving guards, partial/full completion, stock increase through the separately loaded `IProductRepository` product (not the `PurchaseOrderItem.Product` navigation), `StockIn` transaction creation, observable cross-fake ordering
+- GetPurchaseOrder/GetPurchaseOrders query handler tests (16): DTO mapping, navigation-derived fields, request pass-through as actually implemented, paging metadata
+- PurchaseOrderRepository integration tests (24, EF Core InMemory): Includes/ThenInclude verified from fresh contexts, search numeric/name branches, inclusive date boundaries, status filter, all supported sorts + default fallback, paging/`TotalCount`, AsNoTracking, persistence round-trip
+
+## Engineering Lessons
+
+- **Test methods ≠ discovered test cases.** A `[Theory]` with N `[InlineData]` rows executes as N cases (T02: 41 methods → 52 cases). Suite totals must state which unit they report — the initial T02 record did not, and the correction cost a review cycle.
+- **Instance-scoped fake state beats static state.** The shared `CallOrder` interaction recorder was corrected from static fields to a per-test instance before the first gate; parallel test execution would otherwise corrupt ordering evidence.
+- **Fresh-context isolation is the only trustworthy Include assertion under InMemory.** Disposing the arrange contexts prevents EF relationship fix-up from silently masking a missing `Include`/`ThenInclude`; only the repository's query shape can populate the navigations.
+- **Fake-based tests and repository integration tests verify different layers.** Handler tests prove orchestration and mapping with fakes; repository tests prove actual query shape and persistence round-trips. Neither substitutes for the other, and InMemory proves nothing about SQL Server relational behavior.
+- **Findings are preserved, not silently remediated.** The T05 observation that `GetPurchaseOrdersHandler` does not copy `PagedRequest.Status` into `PagedQuery` was recorded as a finding and tested as-is; the sprint's G1 no-remediation discipline held end to end.
+- **Verification must execute, not assume.** T07 independently re-ran the build and all three suites instead of repeating T01–T06 numbers; observed results matched the accepted baseline exactly (432 / 0 / 0; 28 warnings).
+
+## Validation
+
+```text
+Build:             SUCCESS (0 errors; full rebuild: 28 pre-existing warnings, none from test projects)
+UnitTests:         314 passed
+IntegrationTests:   85 passed
+Web.Tests:          33 passed
+Total:             432 passed, 0 failed, 0 skipped
+```
+
+Suite growth was reconciled at every task gate: 313 → 365 (T02) → 378 (T03) → 392 (T04) → 408 (T05) → 432 (T06); T07 re-verified the integrated state.
+
+## Deferred
+
+- EditStatus role-conditioned self-deactivation guard — blocked pending an explicit behavioral decision (Sprint 12 finding; untouched by Sprint 13)
+- `GetPurchaseOrdersHandler` does not copy `PagedRequest.Status` into `PagedQuery` — T05 recorded finding; no remediation authorized
+- WebApplicationFactory / Razor-page HTTP-pipeline testing; CI provider establishment; SQL Server relational verification beyond InMemory
+
 
 # Sprint 12 - Authorization Refinement
 

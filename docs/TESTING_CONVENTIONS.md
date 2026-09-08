@@ -1,6 +1,6 @@
 # Testing Conventions
 
-This document establishes the automated testing conventions for the Inventory Platform. These conventions are derived from Sprint 11 and Sprint 12 implementations and are authoritative for current test authoring.
+This document establishes the automated testing conventions for the Inventory Platform. These conventions are derived from Sprint 11, Sprint 12, and Sprint 13 implementations and are authoritative for current test authoring.
 
 ---
 
@@ -83,6 +83,11 @@ Use UnitTests for behavior that does NOT require database access:
 - `AuthorizationGroupTests` — capability/user assignment
 - `CapabilityAuthorizationServiceTests` — authorization resolution with hand-written fakes
 
+**Examples from Sprint 13:**
+- `CreatePurchaseOrderHandlerTests` / `SubmitPurchaseOrderHandlerTests` / `ApprovePurchaseOrderHandlerTests` / `ReceivePurchaseOrderHandlerTests` — Application handler orchestration (error mapping, validation short-circuits, save behavior, observable ordering) with hand-written fakes
+- `CreatePurchaseOrderValidatorTests` / `CreatePurchaseOrderItemValidatorTests` — FluentValidation rules via direct instantiation
+- `GetPurchaseOrderHandlerTests` / `GetPurchaseOrdersHandlerTests` — query mapping and repository-argument pass-through with fakes
+
 ### IntegrationTests
 
 Use IntegrationTests where persistence or Infrastructure behavior is the subject:
@@ -97,6 +102,7 @@ Use IntegrationTests where persistence or Infrastructure behavior is the subject
 - `AuthorizationSeederTests` — seed data creation and idempotency
 - `CapabilityRepositoryTests` — repository query behavior
 - `AuthorizationGroupRepositoryTests` — aggregate loading, relationship traversal
+- `PurchaseOrderRepositoryTests` (Sprint 13) — real `PurchaseOrderRepository` query shape (Includes/ThenInclude, search, date/status filters, sorting, paging, AsNoTracking) and persistence round-trip under EF Core InMemory with fresh-context isolation
 
 ### Web.Tests
 
@@ -166,12 +172,30 @@ tests/
         AuthorizationGroupTests.cs
     Application/
       CapabilityAuthorizationServiceTests.cs
+      Purchasing/
+        CreatePurchaseOrderHandlerTests.cs
+        CreatePurchaseOrderValidatorTests.cs
+        CreatePurchaseOrderItemValidatorTests.cs
+        PurchaseOrderErrorsTests.cs
+        SubmitPurchaseOrderHandlerTests.cs
+        ApprovePurchaseOrderHandlerTests.cs
+        ReceivePurchaseOrderHandlerTests.cs
+        GetPurchaseOrderHandlerTests.cs
+        GetPurchaseOrdersHandlerTests.cs
+    TestSupport/
+      Purchasing/
+        FakePurchaseOrderRepository.cs
+        FakeUnitOfWork.cs
+        PurchasingTestData.cs
+        EntityIdHelper.cs
 
   InventoryPlatform.IntegrationTests/
     Authorization/
       AuthorizationSeederTests.cs
       CapabilityRepositoryTests.cs
       AuthorizationGroupRepositoryTests.cs
+    Purchasing/
+      PurchaseOrderRepositoryTests.cs
 
   InventoryPlatform.Web.Tests/
     Authorization/
@@ -379,7 +403,7 @@ No CI provider is currently configured in the repository. The complete test suit
 
 ## Current Test Coverage
 
-### UnitTests (219 tests)
+### UnitTests (314 tests)
 
 | Area | Subject | Tests |
 |------|---------|-------|
@@ -389,18 +413,30 @@ No CI provider is currently configured in the repository. The complete test suit
 | Domain | Capability domain | 15 |
 | Domain | AuthorizationGroup domain | 31 |
 | Application | CapabilityAuthorizationService | 15 |
+| Application | Purchasing — CreatePurchaseOrder handler (Sprint 13 T02) | 15 |
+| Application | Purchasing — CreatePurchaseOrder validator (T02) | 14 discovered cases |
+| Application | Purchasing — CreatePurchaseOrderItem validator (T02) | 13 discovered cases |
+| Application | Purchasing — PurchaseOrderErrors contracts (T02/T03) | 11 discovered cases |
+| Application | Purchasing — Submit handler (T03) | 6 |
+| Application | Purchasing — Approve handler (T03) | 6 |
+| Application | Purchasing — Receive handler (T04) | 14 |
+| Application | Purchasing — GetPurchaseOrder handler (T05) | 7 |
+| Application | Purchasing — GetPurchaseOrders handler (T05) | 9 |
 | Infrastructure | Placeholder | 1 |
-| **Total** | | **219** |
+| **Total** | | **314** |
 
-### IntegrationTests (61 tests)
+Rows marked "discovered cases" contain `[Theory]` methods whose `[InlineData]` rows each execute as a separate case; unmarked rows are `[Fact]` methods where methods and discovered cases are equal.
+
+### IntegrationTests (85 tests)
 
 | Area | Subject | Tests |
 |------|---------|-------|
 | Authorization | AuthorizationSeeder | 24 |
 | Authorization | CapabilityRepository | 12 |
 | Authorization | AuthorizationGroupRepository | 24 |
+| Purchasing | PurchaseOrderRepository (Sprint 13 T06) | 24 |
 | Infrastructure | Placeholder | 1 |
-| **Total** | | **61** |
+| **Total** | | **85** |
 
 ### Web.Tests (33 tests)
 
@@ -412,9 +448,21 @@ No CI provider is currently configured in the repository. The complete test suit
 | Infrastructure | Placeholder | 1 |
 | **Total** | | **33** |
 
-**Total: 313 tests, 313 passed, 0 failures**
+**Total: 432 tests, 432 passed, 0 failures, 0 skipped** (314 + 85 + 33; Sprint 13 integrated verification, T07)
 
 The Web.Tests verification tests confirm that the `FakeCapabilityAuthorizationService` compiles against the real `ICapabilityAuthorizationService` interface and produces controlled authorization results. The T03/T04 handler tests exercise the actual `CapabilityAuthorizationHandler` and `MultiCapabilityAuthorizationHandler` production sources directly (authentication gate, NameIdentifier extraction/parsing, service delegation, succeed/do-not-succeed outcomes, OR semantics with short-circuit, requirement constructor validation). Handler testing is source-level/unit-level; Razor Page authorization boundaries (Categories/Edit, Suppliers/Create) were verified at source level and by the remediations themselves — no HTTP-pipeline or browser testing exists or is claimed.
+
+---
+
+## Sprint 13 Conventions (Reusable)
+
+Established by the Sprint 13 Purchasing test automation and reusable for future test authoring:
+
+1. **Distinguish test methods from discovered test cases.** A `[Fact]` is one method = one case; a `[Theory]` with N `[InlineData]` rows is one method = N cases. Suite totals must state which unit they report, and counts must reconcile (verified with `dotnet test --list-tests` where needed).
+2. **Per-test instance-scoped fake state — never static/global mutable state.** xUnit executes test classes in parallel; recording interaction order (a `CallOrder` instance created per test and shared explicitly with the participating fakes) is safe only when the state is per-test.
+3. **Fresh-context isolation when asserting Include/ThenInclude under EF Core InMemory.** Arrange data through short-lived contexts that are saved and disposed, then query through a fresh context so relationship fix-up cannot mask a missing Include — only the repository's query shape can populate the navigations.
+4. **Separate fake-based handler/query tests from repository integration coverage.** Fakes prove orchestration, mapping, and pass-through; the real repository on InMemory proves query shape, Includes, sorting/paging, and persistence round-trips. Neither substitutes for the other, and neither proves SQL Server relational behavior (see "What InMemory Does NOT Validate").
+5. **Test real `DomainException` propagation where that is actual behavior**, including the no-save-after-exception guarantee, rather than shielding handlers from aggregate exceptions. Do not assert exact `DateTime.UtcNow` values where timing is not the contract.
 
 ---
 
@@ -435,6 +483,22 @@ Completed:
 Blocked/deferred:
 
 - EditStatus `User.IsInRole` cleanup (T07) — the remaining occurrence (`Pages/Administrator/Users/EditStatus.cshtml.cs`, line 61) is a reachable, behavior-affecting self-deactivation guard for supported multi-role users, NOT dead code. Removing it would change observable behavior; T07 remains blocked/deferred pending an explicit behavioral decision.
+
+### Sprint 13 Outcome
+
+Completed:
+
+- Shared Purchasing test support (T01): `FakePurchaseOrderRepository`, `FakeUnitOfWork`, `PurchasingTestData`, `EntityIdHelper` (per-test instance-scoped interaction recording; no static test state)
+- Purchasing Application-layer coverage (T02–T05): Create/Submit/Approve/Receive handlers, Create validators, `PurchaseOrderErrors` contracts, `GetPurchaseOrder`/`GetPurchaseOrders` query handlers — 95 new UnitTests (all discovered-case counts reconciled)
+- `PurchaseOrderRepository` integration coverage (T06): Includes/ThenInclude with fresh-context isolation, search (numeric + name branches), inclusive date boundaries, status filter, all supported sorts plus default fallback, paging/metadata, AsNoTracking, persistence round-trip — 24 new IntegrationTests (EF Core InMemory)
+- Integrated verification (T07): **432 passed, 0 failed, 0 skipped** (314/85/33); full rebuild 28 warnings / 0 errors — baseline preserved, no warnings from test projects
+
+Still deferred (unchanged by Sprint 13):
+
+- EditStatus self-deactivation guard (above) — untouched by Sprint 13
+- `GetPurchaseOrdersHandler` does not copy `PagedRequest.Status` into `PagedQuery` (T05 recorded finding; no remediation authorized)
+- SQL Server relational verification beyond InMemory (FK/unique constraints, transactions, SQL translation, collation, provider-specific behavior)
+- WebApplicationFactory / Razor-page HTTP-pipeline testing; CI provider establishment
 
 ### Future Considerations
 
@@ -465,3 +529,4 @@ Blocked/deferred:
 9. **No production changes:** Test infrastructure does not alter production code
 10. **Provider-neutral CI:** Tests are locally reproducible; no CI provider is configured
 11. **Behavior-focused coverage:** Tests verify business behavior, not implementation details
+12. **Discovered-case accounting:** State whether a reported count is test methods or discovered test cases (`[Theory]` × `[InlineData]` rows); reconcile suite totals against actual execution

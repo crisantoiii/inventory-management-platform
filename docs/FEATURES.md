@@ -1005,13 +1005,15 @@ All admin pages require `Administration.Access` capability.
 - ✅ Database: 39 capabilities, 3 groups, 3 assignments verified
 - ✅ AccessDenied page renders correctly
 
-### Known Findings (Deferred)
+### Known Findings (Deferred) — status synchronized at Sprint 13 closure (September 2026)
 
-- InventoryManager group includes Administration.Access (seed data issue)
-- InventoryManagement OR-composite grants broad access via single capability
-- Categories/Edit missing [Authorize] attribute (pre-existing gap)
-- Viewer has User.View capability (seed filter includes all *.View)
-- Reports unrestricted (design decision pending)
+- InventoryManager group includes Administration.Access (seed data issue) — **RESOLVED**: stale database relationship removed via authorized Phase 25 remediation; runtime reverification confirmed 0 rows
+- Categories/Edit missing [Authorize] attribute — **RESOLVED**: remediated in Sprint 12 (now requires the `InventoryManagement` capability policy)
+- InventoryManagement OR-composite grants broad access via single capability — **deferred** (accepted policy design; single capability maps to a 9-capability OR-composite)
+- Viewer has User.View capability (seed filter includes all *.View) — **deferred** (by design)
+- Reports unrestricted (design decision pending) — **deferred** (owner decision pending)
+
+Findings recorded after the list above was written: the Sprint 12 `EditStatus` `User.IsInRole(InventoryManager)` self-deactivation guard remains deferred pending an explicit behavioral decision; the Sprint 13 T05 investigation recorded that `GetPurchaseOrdersHandler` does not copy `PagedRequest.Status` into `PagedQuery` (finding only; no remediation authorized). Sprint 13 itself made no production changes.
 
 
 ## User Administration

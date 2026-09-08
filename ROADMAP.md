@@ -22,7 +22,7 @@ v1.3  Account Management       ✅
 v1.4  Additional Reporting     ✅
 v1.5  Purchasing Enhancements  ✅
 v1.6  Dynamic Capability Auth  ✅
-(Sprint 11 Automated Testing ✅ — non-release; Sprint 12 Authorization Refinement ✅ — non-release)
+(Sprint 11 Automated Testing ✅ — non-release; Sprint 12 Authorization Refinement ✅ — non-release; Sprint 13 Purchasing Workflow Test Automation ✅ — non-release)
 
 ---
 
@@ -207,9 +207,42 @@ Total:            313 passed, 0 failed, 0 skipped
 Build:             0 errors (full rebuild: 28 pre-existing warnings)
 ```
 
+## Sprint 13 - Purchasing Workflow Test Automation
+
+**Status:** Complete
+
+Sprint 13 extended the established risk-based automated testing program to the Purchasing workflow with layered automated coverage: the Purchasing Application layer (six handlers, two Create validators, the `PurchaseOrderErrors` contract) as primary scope, plus `PurchaseOrderRepository` integration verification as supporting scope. No production code was changed by the sprint.
+
+### Completed
+
+- T01: Purchasing Test Support Foundation (`FakePurchaseOrderRepository`, `FakeUnitOfWork`, `PurchasingTestData`, `EntityIdHelper`)
+- T02: CreatePurchaseOrderHandler + Validator Tests (52 discovered cases)
+- T03: Workflow Transition Handler Tests — Submit/Approve (13 discovered cases)
+- T04: ReceivePurchaseOrderHandler Tests (14 tests)
+- T05: Purchase Order Query Handler Tests (16 tests)
+- T06: PurchaseOrderRepository Integration Tests (24 tests, EF Core InMemory with fresh-context isolation)
+- T07: Integrated Verification — 432 passed / 0 failed / 0 skipped (314 UnitTests, 85 IntegrationTests, 33 Web.Tests); full rebuild 28 warnings / 0 errors, baseline preserved
+- T08: Documentation Synchronization & Sprint 13 Closure
+
+### Final Test Baseline
+
+```text
+UnitTests:        314 passed
+IntegrationTests:  85 passed
+Web.Tests:         33 passed
+Total:            432 passed, 0 failed, 0 skipped
+Build:             0 errors (full rebuild: 28 pre-existing warnings)
+```
+
+### Boundaries Held
+
+- No production changes, no new packages, no database/migration/seed changes, no CI changes, no WebApplicationFactory
+- Repository integration tests use EF Core InMemory: repository wiring/query-shape regression coverage only — not SQL Server integration testing
+- Sprint 12 EditStatus item and the T05 `PagedRequest.Status` pass-through finding remain deferred, untouched
+
 ## Next Sprint Planning
 
-Sprint 11 and Sprint 12 are complete. Sprint 12 achieved its core authorization-refinement objective; the blocked T07 cleanup is a deferred code-quality item requiring an explicit behavioral decision, not a closure blocker. The next activity is a separate Sprint Planning session; no Sprint 13 scope is defined.
+Sprint 11, Sprint 12, and Sprint 13 are complete. Sprint 13 achieved its Purchasing-test-automation objective with the full suite green and all sprint boundaries held. The next activity is a separate Sprint Planning session; no Sprint 14 scope is defined.
 
 ## D1 - Documentation Synchronization
 
