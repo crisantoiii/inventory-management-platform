@@ -1,8 +1,8 @@
 # Sprint 13 Retrospective — Purchasing Workflow Test Automation
 
-> **SPRINT 13 STATUS: IN PROGRESS — T01–T04 COMPLETE (T05–T08 NOT STARTED)**
+> **SPRINT 13 STATUS: IN PROGRESS — T01–T05 COMPLETE (T06–T08 NOT STARTED)**
 >
-> This document is the Sprint 13 **retrospective baseline**, created only after the Sprint 13 planning report (`plan/SPRINT_13_PLANNING_REPORT.md`, Revision 5) was explicitly accepted. At baseline creation it claimed no completed Sprint 13 work; execution updates are appended below as tasks actually complete (currently: **T01–T04 complete**; T05–T08 not started). It will be **updated during execution** (task status table and execution log) and **finalized during T08** (Documentation Synchronization & Sprint 13 Closure).
+> This document is the Sprint 13 **retrospective baseline**, created only after the Sprint 13 planning report (`plan/SPRINT_13_PLANNING_REPORT.md`, Revision 5) was explicitly accepted. At baseline creation it claimed no completed Sprint 13 work; execution updates are appended below as tasks actually complete (currently: **T01–T05 complete**; T06–T08 not started). It will be **updated during execution** (task status table and execution log) and **finalized during T08** (Documentation Synchronization & Sprint 13 Closure).
 >
 > Authoritative planning baseline: `plan/SPRINT_13_PLANNING_REPORT.md` (Revision 5, accepted). Executable sprint control: `plan/SPRINT_13_TASK_BREAKDOWN.md` (external planning/control artifact — not intended for repository commit).
 
@@ -14,9 +14,9 @@
 |---|---|
 | **Sprint** | 13 |
 | **Sprint title** | Purchasing Workflow Test Automation |
-| **Status** | IN PROGRESS — T01–T04 COMPLETE (T05–T08 NOT STARTED) |
+| **Status** | IN PROGRESS — T01–T05 COMPLETE (T06–T08 NOT STARTED) |
 | **Planning Gate** | PASS / ACCEPTED (Revision 5) |
-| **Implementation Status** | IN PROGRESS — T01–T04 COMPLETE |
+| **Implementation Status** | IN PROGRESS — T01–T05 COMPLETE |
 | **Closure Status** | OPEN |
 | **Retrospective Outcome** | OPEN - SPRINT IN PROGRESS (Section 12) |
 
@@ -60,7 +60,7 @@ Sprint 13 only **adds** tests; the 313-test baseline must be preserved throughou
 | T02 | CreatePurchaseOrderHandler + Validator Tests | COMPLETE |
 | T03 | Workflow Transition Handler Tests (Submit/Approve) | COMPLETE |
 | T04 | ReceivePurchaseOrderHandler Tests | COMPLETE |
-| T05 | Purchase Order Query Handler Tests | NOT STARTED |
+| T05 | Purchase Order Query Handler Tests | COMPLETE |
 | T06 | PurchaseOrderRepository Integration Tests | NOT STARTED |
 | T07 | Integrated Verification | NOT STARTED |
 | T08 | Documentation Synchronization & Sprint 13 Closure | NOT STARTED |
@@ -283,6 +283,51 @@ Note (external-review correction): the original T02 record listed per-file count
 
 **Newly discovered issues:** none in production behavior. The handler matches the accepted contract exactly, including the separately-loaded-Product stock mutation and the exact transaction reference/description strings. All `DomainException` paths leave stock unchanged, add no transaction, and never save — confirmed in current source and now test-protected. No production change was made or needed.
 
+### T05 — Purchase Order Query Handler Tests (COMPLETE)
+
+**Date:** September 8, 2026
+
+**Objective:** Cover the accepted source-grounded mapping and pass-through contract for `GetPurchaseOrderHandler` (detail query) and `GetPurchaseOrdersHandler` (paged list query) per the T05 contract matrix (planning report §12.1), consuming the accepted T01 shared support. No T06 repository integration scope.
+
+**Mandatory investigation performed (per `knowledge.md`):** scoped `graphify query` first, then inspected the exact identified source files: `GetPurchaseOrderHandler.cs`, `GetPurchaseOrderRequest.cs`, `GetPurchaseOrderResponse.cs`, `GetPurchaseOrderItemResponse.cs`, `GetPurchaseOrdersHandler.cs`, `GetPurchaseOrdersRequest.cs`, `GetPurchaseOrdersResponse.cs`, `GetPurchaseOrderSummaryResponse.cs`, `PurchaseOrderErrors.cs`, `IPurchaseOrderRepository.cs`, `PagedQuery.cs`, `PagedRequest.cs`, `PagedResult.cs`, `Result.cs`, `ResultOfT.cs`, `Error.cs`, `PurchaseOrder.cs`, `PurchaseOrderItem.cs`, `Supplier.cs`, `Product.cs`, `PurchaseOrderStatus.cs`, `BaseEntity.cs`, all four T01 support files, and the T02–T04 Purchasing test conventions. All accepted contracts confirmed in current source: the detail handler maps Id/SupplierId/`Supplier.Name`/OrderDate/ExpectedDeliveryDate/Status/Remarks/TotalAmount plus per-item ProductId/`Product.Sku`/`Product.Name`/Quantity/UnitCost/LineTotal/ReceivedQuantity/RemainingQuantity/IsFullyReceived; the list handler constructs `PagedQuery { PageNum, PageSize, Search, SortBy, Descending }` (it does NOT copy `PagedRequest.Status` — consistent with the recorded T01 finding about the Product-oriented `ProductStatusFilter`), forwards `GetPagedAsync(query, FromDate, ToDate, PurchaseOrderStatus, ct)`, copies `Page/PageSize/TotalCount` from the repository result, and has **no failure branch**. Two current-source facts additionally verified: `GetPurchaseOrdersResponse` exposes the page as property `PurchaseOrders` (not `Items`), and `PagedRequest` clamps `PageNum < 1` to 1 and `PageSize > 100` to 100 at init time. No discrepancy with the accepted task breakdown; no STOP condition; no production change required.
+
+**Files created:**
+
+- `tests/InventoryPlatform.UnitTests/Application/Purchasing/GetPurchaseOrderHandlerTests.cs` — 7 `[Fact]` methods = 7 discovered cases
+- `tests/InventoryPlatform.UnitTests/Application/Purchasing/GetPurchaseOrdersHandlerTests.cs` — 9 `[Fact]` methods = 9 discovered cases
+
+Per-file inventory (verified by `dotnet test --list-tests`; all `[Fact]`, no theories):
+
+| File | Test methods | Discovered cases |
+|---|---|---|
+| GetPurchaseOrderHandlerTests.cs | 7 | 7 |
+| GetPurchaseOrdersHandlerTests.cs | 9 | 9 |
+| **Total** | **16** | **16** |
+
+**Files modified:** this retrospective, plus the Graphify generated artifacts refreshed by `graphify update .` after the test-source changes.
+
+**Behavior coverage (as implemented, evidence-grounded):** detail handler — not-found (exact `PurchaseOrderErrors.NotFound` code/message, repository requested the exact id, `Value` null, no fabricated response); full header mapping (Id 7, SupplierId 3, `Supplier.Name` "Acme Supplies", OrderDate, ExpectedDeliveryDate, Draft status, Remarks, TotalAmount 125.00 = 5×25); optional-field absence (null ExpectedDeliveryDate/Remarks still mapped, Supplier navigation still populated); item mapping including navigation-derived fields (ProductId, ProductSku "SKU-10", ProductName "Standard Widget", Quantity, UnitCost, LineTotal 125.00, ReceivedQuantity 0, RemainingQuantity 5, IsFullyReceived false); multi-item mapping (2 items, TotalAmount 155.00 = 125+30, per-item navigation fields); partial-receive state via real Domain transitions (Approved 10×25 → Receive(4) → response status `Receiving`, item ReceivedQuantity 4/RemainingQuantity 6/IsFullyReceived false, TotalAmount unchanged 250.00); fully-received state via real Domain transitions (Receive(10) → response status `Completed`, ReceivedQuantity 10/RemainingQuantity 0/IsFullyReceived true). List handler — non-default pass-through (PageNum 3, PageSize 25, Search "widget", SortBy "Supplier", Descending true, FromDate, ToDate, status `Approved`, all recorded via the fake's `GetPagedAsyncCall`); null-filter pass-through; canonical `PageNum` contract preserved (request `PageNum = 0` clamps to 1 by `PagedRequest` and the clamped value is forwarded); oversized `PageSize` clamped to 100 and forwarded; summary mapping with populated Supplier navigation (Id, SupplierName, OrderDate, Draft status, TotalAmount per aggregate); summary TotalAmount reflects aggregate line-total sums (155.00); paged metadata copied verbatim from the repository result (Page 2/PageSize 20/TotalCount 57, Items mapped); empty result page (handler succeeds, Items empty, metadata preserved, TotalCount 0, no failure invented); unconfigured-fake empty page (the fake's truthful default empty page flows through as success). **T05 does NOT verify real EF Includes, `AsNoTracking`, SQL translation, real filtering/sorting/paging, or persistence round-trips — those belong to T06.**
+
+**Navigation fixture rules (as implemented):** the handlers dereference `po.Supplier.Name` and `item.Product.Sku/Name`, but `PurchaseOrder.Supplier` and `PurchaseOrderItem.Product` expose private setters with no public attach API (EF Core populates them). Per the accepted Navigation Fixture Rules: Domain construction/test precedent was inspected first (no existing precedent populates these navigations), real relationship setup is not available through public Domain APIs, so the smallest test-only mechanism was used — reflection helpers **private to each T05 test file** (`AttachSupplier`/`AttachProduct` and the `CreateSummaryPurchaseOrder` helper), mirroring the established `EntityIdHelper` precedent. No production visibility or setter was changed; no shared-support expansion was made.
+
+**T01 support usage:** `FakePurchaseOrderRepository` (configured `GetByIdAsync` result + call/id recording; configured `PagedResult<PurchaseOrder>` + full `GetPagedAsyncCall` argument recording; truthful empty-page default), `PurchasingTestData` (`CreateDraftPurchaseOrder`/`CreateDraftPurchaseOrderWithItem`/`CreateApprovedPurchaseOrder`/`CreateSupplier`/`CreateProduct`, `DefaultOrderDate`), `EntityIdHelper` (via the builders). **No T01 support correction was needed; no new shared fake was introduced** — the fake already supported everything T05 needs, exactly as T01 designed it.
+
+**Production changes:** none. **Test changes:** the two new test files above — 16 test methods = 16 discovered test cases (all `[Fact]`, no theories). **Database/migration/seed changes:** none. **Package changes:** none. **CI changes:** none. **WebApplicationFactory:** not introduced. **EditStatus/T07:** untouched.
+
+**Tests executed:** targeted T05 filter (`FullyQualifiedName~...Application.Purchasing.GetPurchaseOrder`) — 16 passed, 0 failed, 0 skipped; discovery via `dotnet test --list-tests` confirmed 16 discovered cases (7 + 9); full solution suite (`dotnet test src/InventoryPlatform/InventoryPlatform.slnx`) — UnitTests **314 passed**, IntegrationTests **61 passed**, Web.Tests **33 passed**; total **408 passed, 0 failed, 0 skipped**. Baseline 392 preserved; **+16 new T05 discovered test cases** (arithmetic: 298 + 16 = 314 UnitTests; 392 + 16 = 408 total).
+
+**Build result:** incremental build succeeded, **0 warnings, 0 errors**. Full rebuild (`--no-incremental`) succeeded with **28 warnings, 0 errors** — warning baseline unchanged; verified none of the 28 originate in the T05 test files (grep over full-rebuild output for the T05 file names returned no warnings).
+
+**Acceptance criteria status:** all 60 T05 criteria satisfied (see task completion report).
+
+**Graphify update status:** `graphify update .` executed after the test-source changes — **success** (graph now 6356 nodes, 11287 edges, 493 communities; `graph.json`/`graph.html`/`GRAPH_REPORT.md` refreshed).
+
+**Git operations:** none.
+
+**Deferred work:** T06–T08. The T05 fake-based tests deliberately do not verify real EF repository behavior (Includes, filtering, sorting, paging, persistence) — that verification belongs to T06.
+
+**Newly discovered issues:** none in production behavior. Both handlers match the accepted contract exactly, including the no-failure-branch fact of `GetPurchaseOrdersHandler` and the `PurchaseOrders`-property response shape. One T05-internal test-authoring correction recorded honestly: the initial draft of the populated-page summary test arranged aggregates without items and asserted non-zero totals; the totals are aggregate-derived (`Items.Sum(Quantity * UnitCost)`), so the fixture was corrected to add items before the gate. Two pre-existing observations remain recorded-only (Section 8): `PagedQuery.Status` is typed `ProductStatusFilter` and is not copied by the list handler (current-source behavior, tested as-is), and the Supplier/Product navigation attach requires test-only reflection (no production change authorized). No production change was made or needed.
+
 ## 8. Findings / Decisions
 
 **T01 findings (September 7, 2026):**
@@ -315,6 +360,6 @@ Note (external-review correction): the original T02 record listed per-file count
 
 ## 12. Retrospective Outcome
 
-**OPEN - SPRINT IN PROGRESS (T01–T04 COMPLETE; T05–T08 NOT STARTED)**
+**OPEN - SPRINT IN PROGRESS (T01–T05 COMPLETE; T06–T08 NOT STARTED)**
 
 *(To be finalized during T08 after Sprint 13 execution and verification are actually complete.)*
