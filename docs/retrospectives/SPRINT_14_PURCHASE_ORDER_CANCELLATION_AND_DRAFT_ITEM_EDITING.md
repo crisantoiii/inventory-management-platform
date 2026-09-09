@@ -94,8 +94,8 @@ Manual browser verification is mandatory before Sprint 14 closure.
 - T10 - Documentation Synchronization and Sprint 14 Closure
 
 ## Task Progress
-- T01 - NOT STARTED
-- T02 - NOT STARTED
+- T01 - COMPLETE - implementation readiness verified and externally accepted
+- T02 - COMPLETE - Domain cancellation transition implemented and verified
 - T03 - NOT STARTED
 - T04 - NOT STARTED
 - T05 - NOT STARTED
@@ -116,6 +116,19 @@ Placeholders only. No actual verification values are recorded yet.
 - Errors: pending
 - Manual browser verification: pending
 - Provider verification: pending
+
+## T02 Execution Evidence
+
+- `PurchaseOrder.Cancel()` allows `Draft -> Cancelled` and `Submitted -> Cancelled`.
+- `Approved`, `Receiving`, `Completed`, and `Cancelled` orders reject cancellation with `DomainException`.
+- Cancelled orders reject Submit, Approve, Receive, UpdateItem, and RemoveItem through the existing Domain guards.
+- Targeted PurchaseOrder Domain tests: 83 passed, 0 failed, 0 skipped.
+- Full UnitTests: 325 passed, 0 failed, 0 skipped.
+- Full solution tests: 443 passed, 0 failed, 0 skipped.
+- Normal solution build: passed.
+- Full non-incremental solution build: passed with 28 warnings and 0 errors, matching the accepted warning baseline.
+- Graphify refresh: passed; code graph rebuilt with 6654 nodes, 11817 edges, and 518 communities.
+- No Application, authorization, repository, migration, package, Web.Tests, or IntegrationTests source changes were made.
 
 ## Key Decisions
 - Cancellation is limited to Draft and Submitted states.
@@ -146,7 +159,15 @@ Placeholder. This section will be completed after verification and implementatio
 Placeholder. This section will be completed after verification and implementation work.
 
 ## Final Test Baseline
-Placeholder. No values are recorded until implementation and verification are complete.
+T02 verification results:
+
+- UnitTests: 325 passed, 0 failed, 0 skipped
+- IntegrationTests: 85 passed, 0 failed, 0 skipped
+- Web.Tests: 33 passed, 0 failed, 0 skipped
+- Total: 443 passed, 0 failed, 0 skipped
+- Full solution test-build warning output: 26 warnings, 0 errors
+- Accepted incoming baseline: 432 tests, 28 full-rebuild warnings, 0 errors
+- Manual browser verification: pending for T09
 
 ## Release Decision
 `Not decided. Sprint 14 is likely feature-release-worthy, but semantic version/tag/release decisions occur separately after successful sprint closure.`
