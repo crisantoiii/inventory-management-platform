@@ -97,7 +97,7 @@ Manual browser verification is mandatory before Sprint 14 closure.
 - T01 - COMPLETE - implementation readiness verified and externally accepted
 - T02 - COMPLETE - Domain cancellation transition implemented and verified
 - T03 - COMPLETE - Application cancellation workflow implemented and verified
-- T04 - NOT STARTED
+- T04 - COMPLETE - Application draft item editing workflow implemented and verified
 - T05 - NOT STARTED
 - T06 - NOT STARTED
 - T07 - NOT STARTED
@@ -144,6 +144,23 @@ Placeholders only. No actual verification values are recorded yet.
 - Graphify refresh: passed; 9 uncached code files re-extracted and graph rebuilt with 6677 nodes, 11888 edges, and 519 communities.
 - No Domain, repository, Infrastructure, authorization, Web, IntegrationTests, migration, package, or project-reference changes were made.
 
+## T04 Execution Evidence
+
+- Added `UpdatePurchaseOrderItemRequest` / `UpdatePurchaseOrderItemResponse` / `UpdatePurchaseOrderItemHandler` and `RemovePurchaseOrderItemRequest` / `RemovePurchaseOrderItemResponse` / `RemovePurchaseOrderItemHandler` following the existing Submit/Approve/Cancel lifecycle handler conventions (positional `sealed record` contracts, `Result<TResponse>` returns).
+- Both handlers load the aggregate via the existing `IPurchaseOrderRepository.GetByIdAsync`, return the existing `PurchaseOrderErrors.NotFound` when the Purchase Order is absent, delegate every item rule to the aggregate (`PurchaseOrder.UpdateItem` / `PurchaseOrder.RemoveItem`), and call `SaveChangesAsync` exactly once on success.
+- Application duplicates no Domain rule: Draft-only enforcement, `ProductId` lookup, quantity/unit-cost invariants, item-not-found, and final-item-removal behavior remain exclusively in the `PurchaseOrder` aggregate. No repository `Update(...)` call, no manual item mutation, no totals recalculation in Application code.
+- Failure paths verified with 0 saves: missing Purchase Order (NotFound result), unknown `ProductId`, Submitted order, Cancelled order, quantity <= 0, negative unit cost. Exact Domain exception messages preserved ("Purchase order item was not found.", "Only draft purchase orders can be modified.", "Quantity must be greater than zero.", "Unit cost cannot be negative.").
+- Final-item removal succeeds and saves once; the empty-Draft and `Submit()` invariants remain Domain-owned and untouched.
+- DI registration deliberately not added: the accepted T03 precedent left `CancelPurchaseOrderHandler` unregistered, and handler wiring belongs to the Web tasks (T07/T08). No project or package changes were made.
+- Added 14 Application handler tests (8 Update + 6 Remove) reusing `FakePurchaseOrderRepository`, `FakeUnitOfWork`, `CallOrder`, and `PurchasingTestData` unchanged; no test-support modification was required.
+- Targeted T04 tests: 14 passed, 0 failed, 0 skipped.
+- Full UnitTests: 346 passed, 0 failed, 0 skipped.
+- Full solution tests: 464 passed (346 UnitTests, 85 IntegrationTests, 33 Web.Tests), 0 failed, 0 skipped.
+- Normal solution build: passed with 0 errors.
+- Full non-incremental solution build: passed with 28 warnings and 0 errors, matching the accepted baseline; no T04-caused warnings (new files are warning-free).
+- Graphify refresh: passed; 14 uncached code files re-extracted and graph rebuilt with 6803 nodes, 12153 edges, and 523 communities.
+- No Domain, repository, Infrastructure, authorization, Web, IntegrationTests, migration, package, or project-reference changes were made.
+
 ## Key Decisions
 - Cancellation is limited to Draft and Submitted states.
 - Cancelled is terminal in Sprint 14.
@@ -173,14 +190,14 @@ Placeholder. This section will be completed after verification and implementatio
 Placeholder. This section will be completed after verification and implementation work.
 
 ## Final Test Baseline
-T02 verification results:
+T04 verification results (accepted incoming T03 baseline: 450 tests, 28 full-rebuild warnings, 0 errors):
 
-- UnitTests: 332 passed, 0 failed, 0 skipped
+- UnitTests: 346 passed, 0 failed, 0 skipped (332 accepted T03 baseline + 14 legitimate T04 tests)
 - IntegrationTests: 85 passed, 0 failed, 0 skipped
 - Web.Tests: 33 passed, 0 failed, 0 skipped
-- Total: 450 passed, 0 failed, 0 skipped
-- Full solution test-build warning output: 26 warnings, 0 errors
-- Accepted incoming T03 baseline: 443 tests, 28 full-rebuild warnings, 0 errors
+- Total: 464 passed, 0 failed, 0 skipped
+- Normal build: passed, 0 errors
+- Full non-incremental build: 28 warnings, 0 errors (matches the accepted warning baseline; no T04 regression)
 - Manual browser verification: pending for T09
 
 ## Release Decision
