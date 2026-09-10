@@ -96,7 +96,7 @@ Manual browser verification is mandatory before Sprint 14 closure.
 ## Task Progress
 - T01 - COMPLETE - implementation readiness verified and externally accepted
 - T02 - COMPLETE - Domain cancellation transition implemented and verified
-- T03 - NOT STARTED
+- T03 - COMPLETE - Application cancellation workflow implemented and verified
 - T04 - NOT STARTED
 - T05 - NOT STARTED
 - T06 - NOT STARTED
@@ -130,6 +130,20 @@ Placeholders only. No actual verification values are recorded yet.
 - Graphify refresh: passed; code graph rebuilt with 6654 nodes, 11817 edges, and 518 communities.
 - No Application, authorization, repository, migration, package, Web.Tests, or IntegrationTests source changes were made.
 
+## T03 Execution Evidence
+
+- Added the ID-only `CancelPurchaseOrderRequest` and `CancelPurchaseOrderResponse` contracts.
+- Added `CancelPurchaseOrderHandler` using the existing repository, `PurchaseOrderErrors.NotFound`, aggregate `Cancel()`, and one `SaveChangesAsync` call on success.
+- Domain cancellation validation remains exclusively in `PurchaseOrder.Cancel()`.
+- Added 7 Application handler tests covering Draft and Submitted success, not-found handling, all forbidden states, save counts, and call order.
+- Targeted T03 tests: 7 passed, 0 failed, 0 skipped.
+- Full UnitTests: 332 passed, 0 failed, 0 skipped.
+- Full solution tests: 450 passed, 0 failed, 0 skipped.
+- Normal solution build: passed.
+- Full non-incremental solution build: passed with 28 warnings and 0 errors, matching the accepted baseline.
+- Graphify refresh: passed; 9 uncached code files re-extracted and graph rebuilt with 6677 nodes, 11888 edges, and 519 communities.
+- No Domain, repository, Infrastructure, authorization, Web, IntegrationTests, migration, package, or project-reference changes were made.
+
 ## Key Decisions
 - Cancellation is limited to Draft and Submitted states.
 - Cancelled is terminal in Sprint 14.
@@ -161,12 +175,12 @@ Placeholder. This section will be completed after verification and implementatio
 ## Final Test Baseline
 T02 verification results:
 
-- UnitTests: 325 passed, 0 failed, 0 skipped
+- UnitTests: 332 passed, 0 failed, 0 skipped
 - IntegrationTests: 85 passed, 0 failed, 0 skipped
 - Web.Tests: 33 passed, 0 failed, 0 skipped
-- Total: 443 passed, 0 failed, 0 skipped
+- Total: 450 passed, 0 failed, 0 skipped
 - Full solution test-build warning output: 26 warnings, 0 errors
-- Accepted incoming baseline: 432 tests, 28 full-rebuild warnings, 0 errors
+- Accepted incoming T03 baseline: 443 tests, 28 full-rebuild warnings, 0 errors
 - Manual browser verification: pending for T09
 
 ## Release Decision
