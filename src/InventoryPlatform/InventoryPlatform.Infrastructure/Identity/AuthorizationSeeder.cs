@@ -162,9 +162,11 @@ public static class AuthorizationSeeder
 
             PurchaseOrder.View,
             PurchaseOrder.Create,
+            PurchaseOrder.Edit,
             PurchaseOrder.Submit,
             PurchaseOrder.Approve,
-            PurchaseOrder.Receive
+            PurchaseOrder.Receive,
+            PurchaseOrder.Cancel
         ];
 
         public static readonly IReadOnlyList<string> InventoryManager =
@@ -266,9 +268,11 @@ public static class AuthorizationSeeder
         {
             public const string View = "PurchaseOrder.View";
             public const string Create = "PurchaseOrder.Create";
+            public const string Edit = "PurchaseOrder.Edit";
             public const string Submit = "PurchaseOrder.Submit";
             public const string Approve = "PurchaseOrder.Approve";
             public const string Receive = "PurchaseOrder.Receive";
+            public const string Cancel = "PurchaseOrder.Cancel";
         }
     }
 }
