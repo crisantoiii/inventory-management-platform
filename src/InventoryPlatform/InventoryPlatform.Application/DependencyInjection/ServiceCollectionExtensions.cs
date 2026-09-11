@@ -41,7 +41,9 @@ using InventoryPlatform.Application.Features.Purchasing.CreatePurchaseOrder;
 using InventoryPlatform.Application.Features.Purchasing.GetPurchaseOrder;
 using InventoryPlatform.Application.Features.Purchasing.GetPurchaseOrders;
 using InventoryPlatform.Application.Features.Purchasing.ReceivePurchaseOrder;
+using InventoryPlatform.Application.Features.Purchasing.RemovePurchaseOrderItem;
 using InventoryPlatform.Application.Features.Purchasing.SubmitPurchaseOrder;
+using InventoryPlatform.Application.Features.Purchasing.UpdatePurchaseOrderItem;
 using InventoryPlatform.Application.Features.Reporting.GetInventoryValuation;
 using InventoryPlatform.Application.Features.Reporting.GetPurchaseHistory;
 using InventoryPlatform.Application.Features.Reporting.GetSupplierPurchaseAnalysis;
@@ -148,6 +150,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ApprovePurchaseOrderHandler>();
         services.AddScoped<ReceivePurchaseOrderHandler>();
         services.AddScoped<CancelPurchaseOrderHandler>();
+        services.AddScoped<UpdatePurchaseOrderItemHandler>();
+        services.AddScoped<RemovePurchaseOrderItemHandler>();
 
         services.AddScoped<GetInventoryValuationHandler>();
         services.AddScoped<GetPurchaseHistoryHandler>();
