@@ -101,7 +101,7 @@ Manual browser verification is mandatory before Sprint 14 closure.
 - T05 - COMPLETE - Purchase Order Edit/Cancel authorization implemented and verified
 - T06 - COMPLETE - Purchase Order persistence integration coverage implemented and verified
 - T07 - COMPLETE - Web cancellation workflow implemented and verified
-- T08 - NOT STARTED
+- T08 - COMPLETE - Web Draft item edit workflow implemented and verified
 - T09 - NOT STARTED
 - T10 - NOT STARTED
 
@@ -212,6 +212,42 @@ Placeholders only. No actual verification values are recorded yet.
 - Graphify refresh: passed; 9 uncached code files re-extracted and graph rebuilt with 7042 nodes, 12494 edges, and 539 communities.
 - No Domain, Application handler, repository contract, repository implementation, EF configuration, migration, seed, package, or project-reference changes. The only Application-layer change is the previously-deferred DI registration line.
 
+## T08 Execution Evidence
+
+- Created `Pages/Purchasing/PurchaseOrders/Edit.cshtml` and `Edit.cshtml.cs` — the dedicated Draft item edit page locked by Sprint 14 planning. Class-level `[Authorize(Policy = AuthorizationPolicies.PurchaseOrder.EditPolicy)]` gates the page; both POST handlers additionally perform programmatic `IAuthorizationService.AuthorizeAsync(... ForCapability(PurchaseOrder.Edit))` with `Forbid()` on failure, preserving the established two-layer pattern (no handler-level `[Authorize]`, no new authorization infrastructure). Link visibility on Details is not treated as the authorization boundary.
+- GET loads through the existing `GetPurchaseOrderHandler`; missing Purchase Order → `NotFound()`; non-Draft → redirect to `./Details` (non-Draft is presented as invalid resource state, not an authorization failure; Domain guards remain active). The page renders Purchase Order ID, Supplier, Order Date, Status, and per-item SKU/Product/LineTotal with editable Quantity and UnitCost inputs. Totals come from the existing query contract (`GetPurchaseOrderItemResponse.LineTotal`, `GetPurchaseOrderResponse.TotalAmount`) — no pricing or Domain logic in Razor, no new lower-layer contracts.
+- `OnPostUpdateItemAsync` and `OnPostRemoveItemAsync` reuse the T04 `UpdatePurchaseOrderItemHandler` / `RemovePurchaseOrderItemHandler` unchanged, with `ProductId` as the item key. Update modifies only Quantity and UnitCost; Product replacement is not offered or possible. The Web layer performs no entity mutation, no repository/`DbContext` access, and duplicates no Draft-state rules. Success → `TempData["SuccessMessage"]` + PRG redirect back to `./Edit` preserving Search/FromDate/ToDate/Status/SortBy/Descending/PageNum/PageSize via the established `[BindProperty(SupportsGet = true)]` + hidden-field pattern (same mechanism as T07).
+- Failure handling uses the canonical message convention: `DomainException` from the aggregate (propagated through the unchanged T04 handlers exactly as the Submit/Approve/Receive guards propagate) is rendered verbatim via `ModelState.AddModelError(string.Empty, ...)` with page data reloaded through `GetPurchaseOrderHandler` and `Page()`; handler `Result` failure (missing Purchase Order) → `NotFound()`. A failure re-render for a Purchase Order that is no longer Draft redirects to `./Details` instead of rendering edit UI. No replacement business messages were fabricated. Quantity > 0 / UnitCost >= 0 remain Domain-owned (no FluentValidation validators exist for the T04 contracts; Domain is the accepted validation authority).
+- Remove confirmation uses the established inline `onsubmit="return confirm('Remove this item from the purchase order?');"` pattern (as in T07 and `TwoFactorAuthentication.cshtml`). Final-item removal is not blocked; the empty Draft renders an info empty-state message and remains navigable; `Submit()` remains Domain-owned for rejecting empty POs.
+- `Details.cshtml`: added a Draft-only "Edit Items" link (grouped with the existing Submit form, navigation state carried on the link) and a `ModelOnly` validation summary. The validation summary restores render visibility for Application/Domain error feedback that existing Details POST handlers (including the accepted T07 Cancel handler) add to ModelState but that previously had no summary markup on the page; no T07 behavior was changed.
+- DI: `UpdatePurchaseOrderItemHandler` and `RemovePurchaseOrderItemHandler` registered (`AddScoped`) in `Application/DependencyInjection/ServiceCollectionExtensions.cs` following the deferred-wiring precedent used for `CancelPurchaseOrderHandler` in T07. Handler classes untouched.
+- Web.Tests: no new tests added. The accepted Sprint 14 Web.Tests Option B remains in force — PageModels depend on sealed concrete Application handler classes with no valid seam, no WebApplicationFactory or browser automation is authorized, and no natural independently-testable Web component was introduced; creating abstractions solely for test-count growth is forbidden. Edit capability/policy registration was already covered by the T05 `PurchaseOrderCapabilityPolicyRegistrationTests`. Update/Remove authorization enforcement, validation feedback, PRG, totals, empty-Draft rendering, and confirmation UX are preserved as T09 manual browser verification scenarios (below).
+- Focused verification: no new automated tests exist to run; Web.Tests Option B applies.
+- Full solution tests: 477 passed (346 UnitTests, 92 IntegrationTests, 39 Web.Tests), 0 failed, 0 skipped — no test-count change; T08 adds production workflow wiring, not new test cases.
+- Normal solution build: passed, 0 errors.
+- Full non-incremental solution build: passed with 28 warnings and 0 errors, matching the accepted baseline; zero warnings originate from T08-touched files (`Edit.cshtml`, `Edit.cshtml.cs`, `Details.cshtml`, DI `ServiceCollectionExtensions`).
+- Graphify refresh: passed; 10 uncached code files re-extracted and graph rebuilt with 7108 nodes, 12597 edges, and 549 communities (graph.json, graph.html, GRAPH_REPORT.md updated; curated-graph backup created).
+- No Domain, T04 handler logic, repository contract/implementation, EF configuration, migration, seed, T07 cancellation behavior, package, or project-reference changes. The only Application-layer change is the two previously-deferred DI registration lines.
+
+### T09 Manual Verification Deferred (T08 portion)
+
+- Draft exposes Edit when authorized
+- non-Draft does not expose Edit
+- direct non-Draft Edit navigation does not permit mutation
+- quantity update persists
+- UnitCost update persists
+- combined update persists correctly
+- invalid quantity displays feedback
+- invalid UnitCost displays feedback
+- item removal persists
+- final-item removal succeeds
+- empty Draft Edit page renders correctly
+- totals recalculate after mutation
+- navigation/PRG works
+- Cancelled cannot edit
+- unauthorized persona is denied
+- no stale state after mutation
+
 ## Key Decisions
 - Cancellation is limited to Draft and Submitted states.
 - Cancelled is terminal in Sprint 14.
@@ -241,6 +277,16 @@ Placeholder. This section will be completed after verification and implementatio
 Placeholder. This section will be completed after verification and implementation work.
 
 ## Final Test Baseline
+T08 verification results (accepted incoming T07 baseline: 477 tests, 28 full-rebuild warnings, 0 errors):
+
+- UnitTests: 346 passed, 0 failed, 0 skipped
+- IntegrationTests: 92 passed, 0 failed, 0 skipped
+- Web.Tests: 39 passed, 0 failed, 0 skipped
+- Total: 477 passed, 0 failed, 0 skipped
+- Normal build: passed, 0 errors
+- Full non-incremental build: 28 warnings, 0 errors (matches the accepted warning baseline; no T08 regression)
+- Manual browser verification: pending for T09
+
 T07 verification results (accepted incoming T06 baseline: 478 tests, 28 full-rebuild warnings, 0 errors):
 
 - UnitTests: 346 passed, 0 failed, 0 skipped
