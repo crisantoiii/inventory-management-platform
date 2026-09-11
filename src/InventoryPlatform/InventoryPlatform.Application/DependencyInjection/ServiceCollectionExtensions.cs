@@ -36,6 +36,7 @@ using InventoryPlatform.Application.Features.Products.GetProduct;
 using InventoryPlatform.Application.Features.Products.GetProducts;
 using InventoryPlatform.Application.Features.Products.UpdateProduct;
 using InventoryPlatform.Application.Features.Purchasing.ApprovePurchaseOrder;
+using InventoryPlatform.Application.Features.Purchasing.CancelPurchaseOrder;
 using InventoryPlatform.Application.Features.Purchasing.CreatePurchaseOrder;
 using InventoryPlatform.Application.Features.Purchasing.GetPurchaseOrder;
 using InventoryPlatform.Application.Features.Purchasing.GetPurchaseOrders;
@@ -146,6 +147,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<SubmitPurchaseOrderHandler>();
         services.AddScoped<ApprovePurchaseOrderHandler>();
         services.AddScoped<ReceivePurchaseOrderHandler>();
+        services.AddScoped<CancelPurchaseOrderHandler>();
 
         services.AddScoped<GetInventoryValuationHandler>();
         services.AddScoped<GetPurchaseHistoryHandler>();

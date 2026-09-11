@@ -73,6 +73,27 @@
                     </form>
                 }
 
+                @if (Model.PurchaseOrder.Status == PurchaseOrderStatus.Draft ||
+                     Model.PurchaseOrder.Status == PurchaseOrderStatus.Submitted)
+                {
+                    <form method="post"
+                          asp-page-handler="Cancel"
+                          onsubmit="return confirm('Cancel this purchase order? It will be marked as Cancelled and cannot be reopened.');">
+                        <input type="hidden" name="id" value="@Model.PurchaseOrder.Id" />
+                        <input type="hidden" name="Search" value="@Model.Search" />
+                        <input type="hidden" name="FromDate" value="@Model.FromDate" />
+                        <input type="hidden" name="ToDate" value="@Model.ToDate" />
+                        <input type="hidden" name="Status" value="@Model.Status" />
+                        <input type="hidden" name="SortBy" value="@Model.SortBy" />
+                        <input type="hidden" name="Descending" value="@Model.Descending" />
+                        <input type="hidden" name="PageNum" value="@Model.PageNum" />
+                        <input type="hidden" name="PageSize" value="@Model.PageSize" />
+                        <button type="submit" class="btn btn-outline-danger">
+                            Cancel Purchase Order
+                        </button>
+                    </form>
+                }
+
             </div>
 
             <div class="card-body">

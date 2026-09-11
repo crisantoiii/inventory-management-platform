@@ -1,4 +1,5 @@
 using InventoryPlatform.Application.Features.Purchasing.ApprovePurchaseOrder;
+using InventoryPlatform.Application.Features.Purchasing.CancelPurchaseOrder;
 using InventoryPlatform.Application.Features.Purchasing.GetPurchaseOrder;
 using InventoryPlatform.Application.Features.Purchasing.ReceivePurchaseOrder;
 using InventoryPlatform.Application.Features.Purchasing.SubmitPurchaseOrder;
@@ -17,6 +18,7 @@ public class DetailsModel : PageModel
     private readonly SubmitPurchaseOrderHandler _submitHandler;
     private readonly ApprovePurchaseOrderHandler _approveHandler;
     private readonly ReceivePurchaseOrderHandler _receiveHandler;
+    private readonly CancelPurchaseOrderHandler _cancelHandler;
     private readonly IAuthorizationService _authorizationService;
 
     public DetailsModel(
@@ -24,12 +26,14 @@ public class DetailsModel : PageModel
         SubmitPurchaseOrderHandler submitHandler,
         ApprovePurchaseOrderHandler approveHandler,
         ReceivePurchaseOrderHandler receiveHandler,
+        CancelPurchaseOrderHandler cancelHandler,
         IAuthorizationService authorizationService)
     {
         _handler = handler;
         _submitHandler = submitHandler;
         _approveHandler = approveHandler;
         _receiveHandler = receiveHandler;
+        _cancelHandler = cancelHandler;
         _authorizationService = authorizationService;
     }
 
@@ -248,6 +252,65 @@ public class DetailsModel : PageModel
             new
             {
                 id = result.Value.PurchaseOrderId,
+                Search,
+                FromDate,
+                ToDate,
+                Status,
+                SortBy,
+                Descending,
+                PageNum,
+                PageSize
+            });
+    }
+
+    public async Task<IActionResult> OnPostCancelAsync(
+        int id,
+        CancellationToken cancellationToken)
+    {
+        var authResult = await _authorizationService.AuthorizeAsync(
+            User,
+            resource: null,
+            AuthorizationPolicies.ForCapability(
+                AuthorizationPolicies.PurchaseOrder.Cancel));
+
+        if (!authResult.Succeeded)
+        {
+            return Forbid();
+        }
+
+        var result = await _cancelHandler.HandleAsync(
+            new CancelPurchaseOrderRequest(id),
+            cancellationToken);
+
+        if (result.IsFailure)
+        {
+            ModelState.AddModelError(
+                string.Empty,
+                result.Error.Message);
+
+            var purchaseOrderResult = await _handler.HandleAsync(
+                new GetPurchaseOrderRequest(id),
+                cancellationToken);
+
+            if (purchaseOrderResult.IsFailure ||
+                purchaseOrderResult.Value is null)
+            {
+                return NotFound();
+            }
+
+            PurchaseOrder = purchaseOrderResult.Value;
+
+            return Page();
+        }
+
+        TempData["SuccessMessage"] =
+            $"Purchase Order '{result.Value!.Id}' was cancelled successfully.";
+
+        return RedirectToPage(
+            "./Details",
+            new
+            {
+                id = result.Value.Id,
                 Search,
                 FromDate,
                 ToDate,
