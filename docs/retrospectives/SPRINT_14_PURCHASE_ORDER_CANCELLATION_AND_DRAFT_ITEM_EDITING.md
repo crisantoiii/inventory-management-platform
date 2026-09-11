@@ -99,7 +99,7 @@ Manual browser verification is mandatory before Sprint 14 closure.
 - T03 - COMPLETE - Application cancellation workflow implemented and verified
 - T04 - COMPLETE - Application draft item editing workflow implemented and verified
 - T05 - COMPLETE - Purchase Order Edit/Cancel authorization implemented and verified
-- T06 - NOT STARTED
+- T06 - COMPLETE - Purchase Order persistence integration coverage implemented and verified
 - T07 - NOT STARTED
 - T08 - NOT STARTED
 - T09 - NOT STARTED
@@ -179,6 +179,24 @@ Placeholders only. No actual verification values are recorded yet.
 - Graphify refresh: passed; 11 uncached code files re-extracted and graph rebuilt with 6888 nodes, 12260 edges, and 530 communities.
 - No Domain, Application workflow, repository, EF mapping, migration, package, project-reference, or Razor/Web page changes were made.
 
+## T06 Execution Evidence
+
+- Added `tests/InventoryPlatform.IntegrationTests/Purchasing/PurchaseOrderLifecyclePersistenceTests.cs` with 5 fresh-context persistence tests using the real `PurchaseOrderRepository`, the real `UnitOfWork` (`IUnitOfWork.SaveChangesAsync` — the production persistence boundary used by the T03/T04 handlers), and the existing EF Core InMemory per-test-database pattern. No new provider, package, fixture framework, or test-support abstraction was created.
+- Persistence scenarios proven (each following the mandatory lifecycle: arrange + save → dispose context → fresh repository reload → real Domain mutation (`Cancel()` / `UpdateItem` / `RemoveItem`) → save via `UnitOfWork` → dispose mutation context → final fresh-context reload → assert):
+  - `Cancel_DraftPurchaseOrder_PersistsCancelledStatus` — Draft → `PurchaseOrderStatus.Cancelled` after fresh reload.
+  - `Cancel_SubmittedPurchaseOrder_PersistsCancelledStatus` — real `Submit()` baseline, then Submitted → `Cancelled` after fresh reload.
+  - `UpdateItem_PersistsQuantityAndUnitCost` — combined quantity (3 → 7.25) and unit cost (10.00 → 4.50) update; baseline values verified from a fresh context before mutation; both new values explicitly proven after fresh reload (both-differences-in-one-test is the accepted combined-scenario form).
+  - `RemoveItem_PersistsChildDeletion` — two-item Draft, one item removed by `ProductId`; after fresh reload: PO exists, remaining item present, removed `ProductId` absent, count decreased 2 → 1; plus direct child-set verification through `DbContext.PurchaseOrderItems` confirming the deleted child row no longer exists.
+  - `RemoveItem_FinalItem_PersistsEmptyDraft` — single-item Draft; after fresh reload: PO exists, status remains Draft, `Items` empty, and direct child-set count through `DbContext.PurchaseOrderItems` is 0. Domain behavior unchanged — `Submit()` remains responsible for rejecting empty POs.
+- Every persistence assertion used a context different from the one that performed the mutation; EF change-tracker state was never the evidence.
+- Targeted T06 tests (`FullyQualifiedName~PurchaseOrderLifecyclePersistenceTests`): 5 passed, 0 failed, 0 skipped.
+- Full solution tests: 478 passed (346 UnitTests, 92 IntegrationTests, 39 Web.Tests — 87 accepted T05 IntegrationTests baseline + 5 legitimate T06 tests), 0 failed, 0 skipped.
+- Normal solution build: passed with 0 warnings and 0 errors.
+- Full non-incremental solution build: passed with 28 warnings and 0 errors, matching the accepted baseline; no T06 warning regression.
+- Graphify refresh: passed; 7 uncached code files re-extracted and graph rebuilt with 6977 nodes, 12417 edges, and 539 communities.
+- Production changes: None. No Domain, Application, repository contract, EF configuration, Web, schema, migration, seed, package, or project-reference changes.
+- EF Core InMemory limitation: these tests prove repository wiring, aggregate round-trip behavior, change tracking across fresh contexts, and delete persistence in the configured model. They do NOT prove SQL Server SQL translation, FK/cascade constraint enforcement at the relational level, transaction semantics, or provider-specific behavior. Provider-specific verification remains the T09 manual concern.
+
 ## Key Decisions
 - Cancellation is limited to Draft and Submitted states.
 - Cancelled is terminal in Sprint 14.
@@ -208,14 +226,14 @@ Placeholder. This section will be completed after verification and implementatio
 Placeholder. This section will be completed after verification and implementation work.
 
 ## Final Test Baseline
-T05 verification results (accepted incoming T04 baseline: 464 tests, 28 full-rebuild warnings, 0 errors):
+T06 verification results (accepted incoming T05 baseline: 472 tests, 28 full-rebuild warnings, 0 errors):
 
 - UnitTests: 346 passed, 0 failed, 0 skipped
-- IntegrationTests: 87 passed, 0 failed, 0 skipped (85 accepted T04 baseline + 2 legitimate T05 tests)
-- Web.Tests: 39 passed, 0 failed, 0 skipped (33 accepted T04 baseline + 6 legitimate T05 tests)
-- Total: 472 passed, 0 failed, 0 skipped
+- IntegrationTests: 92 passed, 0 failed, 0 skipped (87 accepted T05 baseline + 5 legitimate T06 tests)
+- Web.Tests: 39 passed, 0 failed, 0 skipped
+- Total: 478 passed, 0 failed, 0 skipped
 - Normal build: passed, 0 errors
-- Full non-incremental build: 28 warnings, 0 errors (matches the accepted warning baseline; no T05 regression)
+- Full non-incremental build: 28 warnings, 0 errors (matches the accepted warning baseline; no T06 regression)
 - Manual browser verification: pending for T09
 
 - UnitTests: 346 passed, 0 failed, 0 skipped (332 accepted T03 baseline + 14 legitimate T04 tests)
