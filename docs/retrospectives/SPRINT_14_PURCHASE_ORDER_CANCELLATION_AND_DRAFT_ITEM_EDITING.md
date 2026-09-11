@@ -100,7 +100,7 @@ Manual browser verification is mandatory before Sprint 14 closure.
 - T04 - COMPLETE - Application draft item editing workflow implemented and verified
 - T05 - COMPLETE - Purchase Order Edit/Cancel authorization implemented and verified
 - T06 - COMPLETE - Purchase Order persistence integration coverage implemented and verified
-- T07 - NOT STARTED
+- T07 - COMPLETE - Web cancellation workflow implemented and verified
 - T08 - NOT STARTED
 - T09 - NOT STARTED
 - T10 - NOT STARTED
@@ -190,12 +190,27 @@ Placeholders only. No actual verification values are recorded yet.
   - `RemoveItem_FinalItem_PersistsEmptyDraft` — single-item Draft; after fresh reload: PO exists, status remains Draft, `Items` empty, and direct child-set count through `DbContext.PurchaseOrderItems` is 0. Domain behavior unchanged — `Submit()` remains responsible for rejecting empty POs.
 - Every persistence assertion used a context different from the one that performed the mutation; EF change-tracker state was never the evidence.
 - Targeted T06 tests (`FullyQualifiedName~PurchaseOrderLifecyclePersistenceTests`): 5 passed, 0 failed, 0 skipped.
-- Full solution tests: 478 passed (346 UnitTests, 92 IntegrationTests, 39 Web.Tests — 87 accepted T05 IntegrationTests baseline + 5 legitimate T06 tests), 0 failed, 0 skipped.
+- Full solution tests: 477 passed (346 UnitTests, 92 IntegrationTests, 39 Web.Tests — 87 accepted T05 IntegrationTests baseline + 5 legitimate T06 tests; total corrected during T07 from the previously recorded 478, which was an arithmetic slip — 346 + 92 + 39 = 477), 0 failed, 0 skipped.
 - Normal solution build: passed with 0 warnings and 0 errors.
 - Full non-incremental solution build: passed with 28 warnings and 0 errors, matching the accepted baseline; no T06 warning regression.
 - Graphify refresh: passed; 7 uncached code files re-extracted and graph rebuilt with 6977 nodes, 12417 edges, and 539 communities.
 - Production changes: None. No Domain, Application, repository contract, EF configuration, Web, schema, migration, seed, package, or project-reference changes.
 - EF Core InMemory limitation: these tests prove repository wiring, aggregate round-trip behavior, change tracking across fresh contexts, and delete persistence in the configured model. They do NOT prove SQL Server SQL translation, FK/cascade constraint enforcement at the relational level, transaction semantics, or provider-specific behavior. Provider-specific verification remains the T09 manual concern.
+
+## T07 Execution Evidence
+
+- Added `OnPostCancelAsync` to `DetailsModel` (`Pages/Purchasing/PurchaseOrders/Details.cshtml.cs`) following the established Submit/Approve/Receive programmatic authorization pattern exactly: class-level `[Authorize(Policy = ViewPolicy)]` page gate remains intact; the handler first evaluates `AuthorizationPolicies.ForCapability(AuthorizationPolicies.PurchaseOrder.Cancel)` via `IAuthorizationService.AuthorizeAsync(User, null, policy)` and returns `Forbid()` on failure; no handler-level `[Authorize]` attribute, no new authorization mechanism.
+- The POST handler reuses the T03 `CancelPurchaseOrderHandler` (`CancelPurchaseOrderRequest(id)`) — the Web layer never calls `PurchaseOrder.Cancel()` directly, never touches repositories or `DbContext`, and never duplicates lifecycle rules. Call path: `Razor Page -> Application Handler -> Repository/UnitOfWork -> Domain`.
+- Result handling matches existing purchasing convention exactly: failure → `ModelState.AddModelError` with the Application error message, re-fetch via `GetPurchaseOrderHandler`, `NotFound()` if the PO is missing, otherwise `Page()` (renders validation summary); success → `TempData["SuccessMessage"] = "Purchase Order '{Id}' was cancelled successfully."` + `RedirectToPage("./Details", ...)` preserving Search/FromDate/ToDate/Status/SortBy/Descending/PageNum/PageSize (established PRG pattern).
+- `CancelPurchaseOrderHandler` DI registration added to `Application/DependencyInjection/ServiceCollectionExtensions.cs` (`AddScoped<CancelPurchaseOrderHandler>()`). This is the wiring explicitly deferred by T03/T04 to the Web tasks; the handler class itself is unchanged. The T05-verified `PurchaseOrder.Cancel` capability, policy constant, policy registration, and seed matrix are reused unchanged.
+- `Details.cshtml` adds a Cancel form visible only when `Status is Draft or Submitted` (mirroring the status-gated Submit/Approve forms), styled `btn-outline-danger`, posting to the `Cancel` handler with the same hidden list-state fields. Confirmation UX uses the established project pattern (inline `onsubmit="return confirm(...);"` as in `TwoFactorAuthentication.cshtml`): "Cancel this purchase order? It will be marked as Cancelled and cannot be reopened." No new JavaScript framework or UI dependency. UI visibility is not the security boundary — the POST handler authorizes independently, so a direct POST from an unauthorized user still receives `Forbid()` and an invalid-state POST still surfaces the Domain error through the Application result.
+- Cancelled presentation required no changes: Details and Index render `Status` directly in badges ("Cancelled" displays as-is), and Index `StatusOptions` plus the `GetPagedAsync` status filter already include `Cancelled`. Terminal UI behavior holds naturally: a Cancelled PO matches none of the status gates (Draft → Submit, Submitted → Approve, Approved/Receiving → Receive, Draft/Submitted → Cancel), so no workflow action forms render.
+- Web.Tests: no new tests added. The accepted Sprint 14 Web.Tests Option B remains in force — PageModels depend on sealed concrete Application handler classes, so there is no valid seam for PageModel behavior testing without WebApplicationFactory/browser automation (both explicitly out of scope) or distorting production design for testability (forbidden). Cancel capability/policy registration was already covered by the T05 `PurchaseOrderCapabilityPolicyRegistrationTests` (not duplicated). Cancellation authorization enforcement, redirect/result behavior, NotFound handling, UI visibility, and confirmation UX are therefore preserved as T09 manual browser verification scenarios.
+- Full solution tests: 477 passed (346 UnitTests, 92 IntegrationTests, 39 Web.Tests), 0 failed, 0 skipped — no test-count change; T07 adds production workflow wiring, not new test cases.
+- Normal solution build: passed, 0 errors.
+- Full non-incremental solution build: passed with 28 warnings and 0 errors, matching the accepted baseline; zero warnings originate from T07-touched files (`Details.cshtml`, `Details.cshtml.cs`, `CancelPurchaseOrderHandler`, DI `ServiceCollectionExtensions`).
+- Graphify refresh: passed; 9 uncached code files re-extracted and graph rebuilt with 7042 nodes, 12494 edges, and 539 communities.
+- No Domain, Application handler, repository contract, repository implementation, EF configuration, migration, seed, package, or project-reference changes. The only Application-layer change is the previously-deferred DI registration line.
 
 ## Key Decisions
 - Cancellation is limited to Draft and Submitted states.
@@ -226,7 +241,15 @@ Placeholder. This section will be completed after verification and implementatio
 Placeholder. This section will be completed after verification and implementation work.
 
 ## Final Test Baseline
-T06 verification results (accepted incoming T05 baseline: 472 tests, 28 full-rebuild warnings, 0 errors):
+T07 verification results (accepted incoming T06 baseline: 478 tests, 28 full-rebuild warnings, 0 errors):
+
+- UnitTests: 346 passed, 0 failed, 0 skipped
+- IntegrationTests: 92 passed, 0 failed, 0 skipped
+- Web.Tests: 39 passed, 0 failed, 0 skipped
+- Total: 477 passed, 0 failed, 0 skipped
+- Normal build: passed, 0 errors
+- Full non-incremental build: 28 warnings, 0 errors (matches the accepted warning baseline; no T07 regression)
+- Manual browser verification: pending for T09
 
 - UnitTests: 346 passed, 0 failed, 0 skipped
 - IntegrationTests: 92 passed, 0 failed, 0 skipped (87 accepted T05 baseline + 5 legitimate T06 tests)
