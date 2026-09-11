@@ -98,7 +98,7 @@ Manual browser verification is mandatory before Sprint 14 closure.
 - T02 - COMPLETE - Domain cancellation transition implemented and verified
 - T03 - COMPLETE - Application cancellation workflow implemented and verified
 - T04 - COMPLETE - Application draft item editing workflow implemented and verified
-- T05 - NOT STARTED
+- T05 - COMPLETE - Purchase Order Edit/Cancel authorization implemented and verified
 - T06 - NOT STARTED
 - T07 - NOT STARTED
 - T08 - NOT STARTED
@@ -161,6 +161,24 @@ Placeholders only. No actual verification values are recorded yet.
 - Graphify refresh: passed; 14 uncached code files re-extracted and graph rebuilt with 6803 nodes, 12153 edges, and 523 communities.
 - No Domain, repository, Infrastructure, authorization, Web, IntegrationTests, migration, package, or project-reference changes were made.
 
+## T05 Execution Evidence
+
+- Added `PurchaseOrder.Edit` and `PurchaseOrder.Cancel` constants plus `EditPolicy` / `CancelPolicy` ("Capability:" + capability) to `AuthorizationPolicies.PurchaseOrder` in `InventoryPlatform.Web/Authorization/AuthorizationPolicies.cs`, preserving the exact singular `PurchaseOrder.<Action>` convention.
+- Added both capabilities to the canonical catalog (`CapabilityCatalog.All` and the nested `PurchaseOrder` constant class) in `InventoryPlatform.Infrastructure/Identity/AuthorizationSeeder.cs`. This is the single capability source used by policy seeding and group assignment; seed rules themselves were untouched.
+- Registered both policies in `AddWeb` (`InventoryPlatform.Web/Extensions/ServiceCollectionExtensions.cs`) using the existing `options.AddCapabilityPolicy(AuthorizationPolicies.ForCapability(...), ...)` mechanism. No new handlers, requirements, middleware, or composite authorization were added.
+- Group assignment matrix emerged automatically from the existing filter-derived seed rules (no special-case seed logic): Administrator = all 41 catalog capabilities; InventoryManager = 23 (catalog minus User.*, activation/deactivation, Unit.Create, Administration.Access — none of which affect PurchaseOrder.*); Viewer = 15 (7 `.View`-suffixed capabilities + 7 `PurchaseOrder.*` + `User.View`). Group-capability relationships grew 73 → 79 (2 capabilities × 3 groups).
+- Seed data changes only: additive `Capabilities` rows inserted by the existing idempotent `EnsureCapabilitiesAsync` mechanism on next startup. No schema change, no migration, no backfill.
+- Test updates (expected-data updates preferred over repetitive one-off tests, per the task's test design rule):
+  - `tests/InventoryPlatform.IntegrationTests/Authorization/AuthorizationSeederTests.cs`: updated expected capability/relationship/group counts (41 capabilities, 79 relationships, Administrator 41, InventoryManager 23, Viewer 15), extended the three PurchaseOrder capability-name arrays with Edit/Cancel, and added `SeedAsync_InventoryManagerReceivesPurchaseOrderEdit` / `SeedAsync_InventoryManagerReceivesPurchaseOrderCancel` proving the InventoryManager row of the matrix.
+  - `tests/InventoryPlatform.Web.Tests/Authorization/PurchaseOrderCapabilityPolicyRegistrationTests.cs` (NEW, 6 tests): proves the Edit/Cancel capability constants exist with the exact singular naming, the EditPolicy/CancelPolicy constants follow the `Capability:<capability>` convention, and both policies resolve from the real `AddWeb` registration (`AuthorizationOptions` via `IOptionsFactory`) as a single `CapabilityRequirement` carrying the exact capability name.
+- Targeted authorization tests: IntegrationTests `FullyQualifiedName~Authorization` filter — 62 passed, 0 failed, 0 skipped; Web.Tests (all authorization infrastructure tests) — 39 passed, 0 failed, 0 skipped (33 accepted T04 baseline + 6 legitimate T05 tests).
+- Full UnitTests: 346 passed, 0 failed, 0 skipped.
+- Full solution tests: 472 passed (346 UnitTests, 87 IntegrationTests, 39 Web.Tests), 0 failed, 0 skipped.
+- Normal solution build: passed with 0 errors.
+- Full non-incremental solution build: passed with 28 warnings and 0 errors, matching the accepted baseline. Two xUnit2000 warnings were transiently introduced by the new test file and corrected before final verification (expected/actual argument order); no T05 warning regression remains.
+- Graphify refresh: passed; 11 uncached code files re-extracted and graph rebuilt with 6888 nodes, 12260 edges, and 530 communities.
+- No Domain, Application workflow, repository, EF mapping, migration, package, project-reference, or Razor/Web page changes were made.
+
 ## Key Decisions
 - Cancellation is limited to Draft and Submitted states.
 - Cancelled is terminal in Sprint 14.
@@ -190,7 +208,15 @@ Placeholder. This section will be completed after verification and implementatio
 Placeholder. This section will be completed after verification and implementation work.
 
 ## Final Test Baseline
-T04 verification results (accepted incoming T03 baseline: 450 tests, 28 full-rebuild warnings, 0 errors):
+T05 verification results (accepted incoming T04 baseline: 464 tests, 28 full-rebuild warnings, 0 errors):
+
+- UnitTests: 346 passed, 0 failed, 0 skipped
+- IntegrationTests: 87 passed, 0 failed, 0 skipped (85 accepted T04 baseline + 2 legitimate T05 tests)
+- Web.Tests: 39 passed, 0 failed, 0 skipped (33 accepted T04 baseline + 6 legitimate T05 tests)
+- Total: 472 passed, 0 failed, 0 skipped
+- Normal build: passed, 0 errors
+- Full non-incremental build: 28 warnings, 0 errors (matches the accepted warning baseline; no T05 regression)
+- Manual browser verification: pending for T09
 
 - UnitTests: 346 passed, 0 failed, 0 skipped (332 accepted T03 baseline + 14 legitimate T04 tests)
 - IntegrationTests: 85 passed, 0 failed, 0 skipped
