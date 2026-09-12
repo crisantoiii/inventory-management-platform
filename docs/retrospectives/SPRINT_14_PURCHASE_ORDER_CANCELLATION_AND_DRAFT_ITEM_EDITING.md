@@ -102,7 +102,7 @@ Manual browser verification is mandatory before Sprint 14 closure.
 - T06 - COMPLETE - Purchase Order persistence integration coverage implemented and verified
 - T07 - COMPLETE - Web cancellation workflow implemented and verified
 - T08 - COMPLETE - Web Draft item edit workflow implemented and verified
-- T09 - NOT STARTED
+- T09 - COMPLETE - integrated and manual verification executed successfully
 - T10 - NOT STARTED
 
 ## Verification Ledger
@@ -248,6 +248,62 @@ Placeholders only. No actual verification values are recorded yet.
 - unauthorized persona is denied
 - no stale state after mutation
 
+## T09 Execution Evidence
+
+T09 was verification-only: no production or test source was created or modified; no migration was created; no package/project changes were made. All manual scenarios were executed against the running application (Development environment, https profile) connected to the configured SQL Server database (`localhost`, trusted connection) — real provider persistence, not EF Core InMemory.
+
+### Automated regression (re-executed)
+
+- UnitTests: 346 passed, 0 failed, 0 skipped.
+- IntegrationTests: 92 passed, 0 failed, 0 skipped.
+- Web.Tests: 39 passed, 0 failed, 0 skipped.
+- Total: 477 passed, 0 failed, 0 skipped — accepted post-T08 baseline exactly preserved.
+- Normal solution build: passed, 0 errors.
+- Full non-incremental solution build: passed, 28 warnings, 0 errors — accepted warning baseline matched; no Sprint 14 warning regression.
+
+### Application startup and database verification
+
+- Application started successfully and served authenticated traffic against the configured SQL Server database (the `localhost` default instance; the machine's LocalDB instance is not the configured target and was not used).
+- Startup seeding ran idempotently: the `Capabilities` table grew 39 → 41 with `PurchaseOrder.Edit` and `PurchaseOrder.Cancel` appearing — additive T05 seed behavior exactly as accepted. No migration, no schema change, no schema drift, no data backfill.
+
+### Cancellation manual verification
+
+| Status | Cancel Visible | Cancel Attempt Result |
+|---|---|---|
+| Draft (PO 10) | Yes | Confirmation prompt shown; cancel succeeded (302 PRG); success feedback; badge `Cancelled`; status 6 persisted; no workflow actions remain |
+| Submitted (PO 11) | Yes | Confirmation prompt shown; cancel succeeded; badge `Cancelled`; status 6 persisted; no workflow actions remain |
+| Approved (PO 3) | No | No Cancel form rendered; crafted POST rejected by Domain |
+| Receiving (PO 8) | No | No Cancel form rendered |
+| Completed (PO 1) | No | No Cancel form rendered |
+| Cancelled (PO 11) | No | No Cancel / Submit / Approve / Receive / Edit rendered (0 occurrences of each) |
+
+- Cancelled presentation: Details and Index render the status as text in badges; no raw numeric enum value appears anywhere.
+- Cancelled filter: Index filtered by `Cancelled` returned exactly the two cancelled POs (10, 11) and excluded all others; filter/paging state remained functional.
+
+### Draft item editing manual verification
+
+- Edit visibility: `Edit Items` appears on Details only for Draft; direct `Edit/{id}` navigation for Submitted/Approved/Receiving/Completed POs redirects (302) to Details. PO 6 (Draft) Edit page loads with SKU, product name, editable Quantity/UnitCost inputs, line totals, PO total, and a Back-to-Details link carrying navigation state.
+- Quantity update (PO 6): before 10.00 → posted 12.00 → SQL-persisted 12.00 → later 15.00; success feedback rendered; PRG verified (302 with preserved `Search=running&Descending=True&PageNum=2&PageSize=10`).
+- UnitCost update (PO 6): before 50.00 → 55.00 → 60.00, SQL-persisted at each step.
+- Combined update: both fields changed in single posts; line total and PO total recalculated from persisted data (500.00 → 660.00 → 900.00) — posted form values were never treated as proof; SQL row inspection was used.
+- Invalid quantity (0): POST returned the page with `Quantity must be greater than zero.` (canonical Domain message) in the validation summary; SQL row unchanged (no persistence).
+- Invalid unit cost (-1): `Unit cost cannot be negative.` displayed; SQL row unchanged.
+- Item removal (PO 10, two items): confirmation UX present (`Remove this item from the purchase order?`); removal succeeded (302 PRG, success feedback); SQL showed item count 2 → 1, removed product absent, remaining item intact; total recalculated 400.00 → 100.00.
+- Final-item removal (PO 10): succeeded; SQL showed 0 items, PO still present and Draft; Edit page reloaded with the empty-state message and no crash.
+- Empty-Draft submit guard (PO 10): Submit form still offered (pre-existing Details behavior); submission prevented with the canonical message `A purchase order must contain at least one item.`; status remained Draft (1).
+- Provider-level persistence (SQL Server, not InMemory): updates/removals/cancellations persisted across page reloads AND a full application stop/start; no stale values restored after restart (verified through the UI and direct row inspection).
+
+### Authorization and crafted-request verification
+
+- Authorized persona: `viewer` (possesses all `PurchaseOrder.*` capabilities per the accepted T05 matrix) — Details and Edit load (200); quantity update persisted and was reverted through the UI; both Edit and Cancel workflows function.
+- Denied persona: all readily available seeded purchasing personas hold the capability, and the remaining no-group account (`crisandrew`) has two-factor authentication enabled, so a dedicated no-capability user (`t09denied`, no authorization-group membership) was created through the application's own Administrator UI without any seed-matrix change — the limitation path explicitly allowed by the T09 contract.
+- Denied results: direct GET to Details/Edit → redirect to `Identity/Account/AccessDenied`; crafted UpdateItem and Cancel POSTs carrying the denied user's own valid antiforgery token → redirect to `Identity/Account/AccessDenied`; SQL rows unchanged (quantity still 15.00, status Draft).
+- UI hiding is not the protection: a crafted UpdateItem POST (admin session, valid token, Approved PO 3) returned a redirect with the Domain-originated failure and the SQL row remained 8.00 (posted value 99 was never persisted); a crafted Cancel POST on the same Approved PO was rejected by the Domain guard (`Only draft or submitted purchase orders can be cancelled.`); no silent remediation was performed or needed.
+
+### Known limitation (deferred observation, pre-existing convention)
+
+- When an Application/Domain failure reaches a Details POST handler (Submit/Approve/Receive/Cancel — including the T08 empty-Draft Submit attempt), the canonical message is displayed via ModelState, but the uncaught `DomainException` produces HTTP 500 with the message rendered by the Development developer-exception page. This is the application's pre-existing convention (the Web layer contains no `catch` anywhere and T07 did not alter it); the Sprint 14 Edit page renders equivalent Domain failures inline as accepted. Recorded here for external review; a possible remediation (catching `DomainException` in Details POST handlers) would be a separate task and was intentionally not made during T09.
+
 ## Key Decisions
 - Cancellation is limited to Draft and Submitted states.
 - Cancelled is terminal in Sprint 14.
@@ -277,6 +333,17 @@ Placeholder. This section will be completed after verification and implementatio
 Placeholder. This section will be completed after verification and implementation work.
 
 ## Final Test Baseline
+T09 verification results (accepted incoming T08 baseline: 477 tests, 28 full-rebuild warnings, 0 errors):
+
+- UnitTests: 346 passed, 0 failed, 0 skipped
+- IntegrationTests: 92 passed, 0 failed, 0 skipped
+- Web.Tests: 39 passed, 0 failed, 0 skipped
+- Total: 477 passed, 0 failed, 0 skipped
+- Normal build: passed, 0 errors
+- Full non-incremental build: 28 warnings, 0 errors (matches the accepted warning baseline; no Sprint 14 regression)
+- Application startup against SQL Server: successful
+- Manual browser/provider verification: passed (all T09 scenarios)
+
 T08 verification results (accepted incoming T07 baseline: 477 tests, 28 full-rebuild warnings, 0 errors):
 
 - UnitTests: 346 passed, 0 failed, 0 skipped
