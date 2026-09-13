@@ -1,0 +1,286 @@
+@page "{id:int}"
+@model InventoryPlatform.Web.Pages.Purchasing.PurchaseOrders.EditModel
+
+@{
+    ViewData["Title"] = "Edit Purchase Order";
+}
+
+<div class="container-fluid">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-1">Edit Purchase Order</h1>
+            <p class="text-muted mb-0">
+                Update item quantities and unit costs or remove items while the purchase order is in Draft.
+            </p>
+        </div>
+
+        <a asp-page="./Details"
+           asp-route-id="@Model.PurchaseOrder?.Id"
+           asp-route-Search="@Model.Search"
+           asp-route-FromDate="@Model.FromDate?.ToString("yyyy-MM-dd")"
+           asp-route-ToDate="@Model.ToDate?.ToString("yyyy-MM-dd")"
+           asp-route-Status="@Model.Status"
+           asp-route-SortBy="@Model.SortBy"
+           asp-route-Descending="@Model.Descending"
+           asp-route-PageNum="@Model.PageNum"
+           asp-route-PageSize="@Model.PageSize"
+           class="btn btn-outline-secondary">
+            Back to Details
+        </a>
+    </div>
+
+    @if (Model.PurchaseOrder is not null)
+    {
+        @if (TempData["SuccessMessage"] is string successMessage)
+        {
+            <div class="alert alert-success" role="alert">
+                @successMessage
+            </div>
+        }
+
+        <div asp-validation-summary="ModelOnly"
+             class="text-danger mb-3"></div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Purchase Order Information</h5>
+            </div>
+
+            <div class="card-body">
+                <div class="row g-3">
+
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">ID</label>
+                        <div class="fw-semibold">
+                            @Model.PurchaseOrder.Id
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Supplier</label>
+                        <div class="fw-semibold">
+                            @Model.PurchaseOrder.SupplierName
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Order Date</label>
+                        <div>
+                            @Model.PurchaseOrder.OrderDate.ToString("MMM dd, yyyy")
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Status</label>
+                        <div>
+                            <span class="badge bg-secondary">
+                                @Model.PurchaseOrder.Status
+                            </span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Purchase Order Items</h5>
+            </div>
+
+            <div class="card-body p-0">
+                @if (Model.PurchaseOrder.Items.Count == 0)
+                {
+                    <div class="p-3">
+                        <div class="alert alert-info mb-0">
+                            This purchase order has no items. A purchase order must contain at least one item before it can be submitted.
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>SKU</th>
+                                    <th>Product</th>
+                                    <th class="text-end">Line Total</th>
+                                    <th>Update Item</th>
+                                    <th class="text-end">Remove</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                @foreach (var item in Model.PurchaseOrder.Items)
+                                {
+                                    <tr>
+                                        <td>
+                                            @item.ProductSku
+                                        </td>
+
+                                        <td>
+                                            @item.ProductName
+                                        </td>
+
+                                        <td class="text-end">
+                                            @item.LineTotal.ToString("N2")
+                                        </td>
+
+                                        <td>
+                                            <form method="post"
+                                                  asp-page-handler="UpdateItem"
+                                                  class="d-flex align-items-center gap-2">
+
+                                                <input type="hidden"
+                                                       name="id"
+                                                       value="@Model.PurchaseOrder.Id" />
+
+                                                <input type="hidden"
+                                                       name="productId"
+                                                       value="@item.ProductId" />
+
+                                                <input type="hidden"
+                                                       name="Search"
+                                                       value="@Model.Search" />
+
+                                                <input type="hidden"
+                                                       name="FromDate"
+                                                       value="@Model.FromDate" />
+
+                                                <input type="hidden"
+                                                       name="ToDate"
+                                                       value="@Model.ToDate" />
+
+                                                <input type="hidden"
+                                                       name="Status"
+                                                       value="@Model.Status" />
+
+                                                <input type="hidden"
+                                                       name="SortBy"
+                                                       value="@Model.SortBy" />
+
+                                                <input type="hidden"
+                                                       name="Descending"
+                                                       value="@Model.Descending" />
+
+                                                <input type="hidden"
+                                                       name="PageNum"
+                                                       value="@Model.PageNum" />
+
+                                                <input type="hidden"
+                                                       name="PageSize"
+                                                       value="@Model.PageSize" />
+
+                                                <label class="form-label text-muted small mb-0">
+                                                    Qty
+                                                </label>
+
+                                                <input type="number"
+                                                       name="quantity"
+                                                       value="@item.Quantity"
+                                                       step="0.01"
+                                                       class="form-control form-control-sm"
+                                                       style="width: 110px;"
+                                                       aria-label="Quantity for @item.ProductName" />
+
+                                                <label class="form-label text-muted small mb-0">
+                                                    Cost
+                                                </label>
+
+                                                <input type="number"
+                                                       name="unitCost"
+                                                       value="@item.UnitCost"
+                                                       step="0.01"
+                                                       min="0"
+                                                       class="form-control form-control-sm"
+                                                       style="width: 110px;"
+                                                       aria-label="Unit cost for @item.ProductName" />
+
+                                                <button type="submit"
+                                                        class="btn btn-sm btn-primary">
+                                                    Update
+                                                </button>
+                                            </form>
+                                        </td>
+
+                                        <td class="text-end">
+                                            <form method="post"
+                                                  asp-page-handler="RemoveItem"
+                                                  onsubmit="return confirm('Remove this item from the purchase order?');">
+
+                                                <input type="hidden"
+                                                       name="id"
+                                                       value="@Model.PurchaseOrder.Id" />
+
+                                                <input type="hidden"
+                                                       name="productId"
+                                                       value="@item.ProductId" />
+
+                                                <input type="hidden"
+                                                       name="Search"
+                                                       value="@Model.Search" />
+
+                                                <input type="hidden"
+                                                       name="FromDate"
+                                                       value="@Model.FromDate" />
+
+                                                <input type="hidden"
+                                                       name="ToDate"
+                                                       value="@Model.ToDate" />
+
+                                                <input type="hidden"
+                                                       name="Status"
+                                                       value="@Model.Status" />
+
+                                                <input type="hidden"
+                                                       name="SortBy"
+                                                       value="@Model.SortBy" />
+
+                                                <input type="hidden"
+                                                       name="Descending"
+                                                       value="@Model.Descending" />
+
+                                                <input type="hidden"
+                                                       name="PageNum"
+                                                       value="@Model.PageNum" />
+
+                                                <input type="hidden"
+                                                       name="PageSize"
+                                                       value="@Model.PageSize" />
+
+                                                <button type="submit"
+                                                        class="btn btn-sm btn-outline-danger">
+                                                    Remove
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+
+                            <tfoot>
+                                <tr>
+                                    <th colspan="2" class="text-end">
+                                        Total
+                                    </th>
+
+                                    <th class="text-end">
+                                        @Model.PurchaseOrder.TotalAmount.ToString("N2")
+                                    </th>
+
+                                    <th colspan="2"></th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

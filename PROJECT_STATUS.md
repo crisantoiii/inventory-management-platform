@@ -30,7 +30,7 @@ Account Management
 
 **Latest Release:** v1.6.0 — Sprint 10 Dynamic Capability-Based Authorization
 
-**Project Status:** Sprint 13 Purchasing Workflow Test Automation — Complete. 432 automated tests established (314 UnitTests, 85 IntegrationTests, 33 Web.Tests; 0 failed, 0 skipped). T07 (EditStatus `IsInRole` cleanup) remains Blocked/Deferred — the remaining check is a reachable, behavior-affecting guard, not dead code.
+**Project Status:** Sprint 14 Purchase Order Cancellation and Draft Item Editing — Complete. 477 automated tests passing (346 UnitTests, 92 IntegrationTests, 39 Web.Tests; 0 failed, 0 skipped). Not a release sprint — v1.6.0 remains the current release baseline. T07 (EditStatus `IsInRole` cleanup) remains Blocked/Deferred — the remaining check is a reachable, behavior-affecting guard, not dead code.
 
 **Last Updated:** September 2026
 
@@ -134,9 +134,9 @@ Verified:
 
 - **Completed Modules:** 11
 - **Architecture Status:** Validated
-- **Current Milestone:** Sprint 13 — Purchasing Workflow Test Automation (Complete; not a release sprint — v1.6.0 remains the current release baseline)
-- **Next Milestone:** TBD — separate Sprint Planning session pending; no Sprint 14 scope defined
-- **Automated Tests:** 432 passing (314 UnitTests, 85 IntegrationTests, 33 Web.Tests; 0 failed, 0 skipped)
+- **Current Milestone:** Sprint 14 — Purchase Order Cancellation and Draft Item Editing (Complete; not a release sprint — v1.6.0 remains the current release baseline)
+- **Next Milestone:** Ready for PR/release decision — separate Sprint Planning session pending; no Sprint 15 scope defined
+- **Automated Tests:** 477 passing (346 UnitTests, 92 IntegrationTests, 39 Web.Tests; 0 failed, 0 skipped)
 
 ---
 
@@ -822,7 +822,7 @@ Final verification covered normal application regression, reporting workflows, e
 
 # Current Focus
 
-Sprint 13 Purchasing Workflow Test Automation is complete. 432 automated tests established (314 UnitTests, 85 IntegrationTests, 33 Web.Tests; 0 failed, 0 skipped) covering the Purchasing Application layer (handlers, validators, error contracts) and `PurchaseOrderRepository` integration behavior (EF Core InMemory). No production changes were made by the sprint. T07 (EditStatus `IsInRole` cleanup) remains blocked/deferred pending an explicit behavioral decision. The next activity is a separate Sprint Planning session; no Sprint 14 scope is defined.
+Sprint 14 Purchase Order Cancellation and Draft Item Editing is complete. 477 automated tests passing (346 UnitTests, 92 IntegrationTests, 39 Web.Tests; 0 failed, 0 skipped). The sprint delivered authorized cancellation of Draft and Submitted Purchase Orders (Cancelled is terminal), a dedicated Draft item edit page (Quantity/UnitCost update, item removal keyed by `ProductId`, final-item removal allowed, empty-Draft submission still forbidden), and the new `PurchaseOrder.Edit` / `PurchaseOrder.Cancel` capabilities within the existing dynamic capability authorization model (catalog 39 → 41). No schema migration, EF mapping change, or data backfill was required (existing `Cancelled = 6` status). Automated suites, manual browser verification, and real SQL Server provider verification all passed. T07 (EditStatus `IsInRole` cleanup) remains blocked/deferred pending an explicit behavioral decision, and the Details POST `DomainException` handling convention is recorded as a deferred follow-up. The next activity is the external PR/release decision followed by a separate Sprint Planning session; no Sprint 15 scope is defined.
 
 Completed in Sprint 8:
 

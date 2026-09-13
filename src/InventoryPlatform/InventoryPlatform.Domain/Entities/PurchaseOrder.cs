@@ -125,6 +125,18 @@ public sealed class PurchaseOrder : BaseEntity
         Status = PurchaseOrderStatus.Submitted;
     }
 
+    public void Cancel()
+    {
+        if (Status != PurchaseOrderStatus.Draft &&
+            Status != PurchaseOrderStatus.Submitted)
+        {
+            throw new DomainException(
+                "Only draft or submitted purchase orders can be cancelled.");
+        }
+
+        Status = PurchaseOrderStatus.Cancelled;
+    }
+
     public void Approve()
     {
         EnsureSubmitted();

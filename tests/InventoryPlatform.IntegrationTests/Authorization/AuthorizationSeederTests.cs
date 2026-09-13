@@ -36,7 +36,7 @@ public class AuthorizationSeederTests : IDisposable
             .AsNoTracking()
             .ToListAsync();
 
-        Assert.Equal(39, capabilities.Count);
+        Assert.Equal(41, capabilities.Count);
     }
 
     [Fact]
@@ -63,7 +63,7 @@ public class AuthorizationSeederTests : IDisposable
             .AsNoTracking()
             .ToListAsync();
 
-        Assert.Equal(73, relationships.Count);
+        Assert.Equal(79, relationships.Count);
     }
 
     // --- Capability Names ---
@@ -89,7 +89,7 @@ public class AuthorizationSeederTests : IDisposable
             "Unit.View", "Unit.Create", "Unit.Edit", "Unit.Activate", "Unit.Deactivate",
             "InventoryTransaction.View", "InventoryTransaction.Create",
             "User.View", "User.Create", "User.Edit", "User.EditRoles", "User.ResetPassword", "User.EditStatus",
-            "PurchaseOrder.View", "PurchaseOrder.Create", "PurchaseOrder.Submit", "PurchaseOrder.Approve", "PurchaseOrder.Receive"
+            "PurchaseOrder.View", "PurchaseOrder.Create", "PurchaseOrder.Edit", "PurchaseOrder.Submit", "PurchaseOrder.Approve", "PurchaseOrder.Receive", "PurchaseOrder.Cancel"
         };
 
         Assert.Equal(expectedNames.Length, capabilityNames.Count);
@@ -116,13 +116,13 @@ public class AuthorizationSeederTests : IDisposable
     // --- Administrator Coverage ---
 
     [Fact]
-    public async Task SeedAsync_AdministratorReceivesAll39Capabilities()
+    public async Task SeedAsync_AdministratorReceivesAll41Capabilities()
     {
         await AuthorizationSeeder.SeedAsync(_context);
 
         var adminGroup = await GetGroupWithCapabilities("Administrator");
 
-        Assert.Equal(39, adminGroup.Capabilities.Count);
+        Assert.Equal(41, adminGroup.Capabilities.Count);
     }
 
     [Fact]
@@ -158,7 +158,7 @@ public class AuthorizationSeederTests : IDisposable
 
         var adminGroup = await GetGroupWithCapabilities("Administrator");
 
-        var poCapabilities = new[] { "PurchaseOrder.View", "PurchaseOrder.Create", "PurchaseOrder.Submit", "PurchaseOrder.Approve", "PurchaseOrder.Receive" };
+        var poCapabilities = new[] { "PurchaseOrder.View", "PurchaseOrder.Create", "PurchaseOrder.Edit", "PurchaseOrder.Submit", "PurchaseOrder.Approve", "PurchaseOrder.Receive", "PurchaseOrder.Cancel" };
         foreach (var name in poCapabilities)
         {
             var capId = await GetCapabilityId(name);
@@ -169,13 +169,13 @@ public class AuthorizationSeederTests : IDisposable
     // --- InventoryManager Coverage ---
 
     [Fact]
-    public async Task SeedAsync_InventoryManagerReceives21Capabilities()
+    public async Task SeedAsync_InventoryManagerReceives23Capabilities()
     {
         await AuthorizationSeeder.SeedAsync(_context);
 
         var managerGroup = await GetGroupWithCapabilities("InventoryManager");
 
-        Assert.Equal(21, managerGroup.Capabilities.Count);
+        Assert.Equal(23, managerGroup.Capabilities.Count);
     }
 
     [Fact]
@@ -239,6 +239,28 @@ public class AuthorizationSeederTests : IDisposable
     }
 
     [Fact]
+    public async Task SeedAsync_InventoryManagerReceivesPurchaseOrderEdit()
+    {
+        await AuthorizationSeeder.SeedAsync(_context);
+
+        var managerGroup = await GetGroupWithCapabilities("InventoryManager");
+        var poEdit = await GetCapabilityId("PurchaseOrder.Edit");
+
+        Assert.Contains(managerGroup.Capabilities, r => r.CapabilityId == poEdit);
+    }
+
+    [Fact]
+    public async Task SeedAsync_InventoryManagerReceivesPurchaseOrderCancel()
+    {
+        await AuthorizationSeeder.SeedAsync(_context);
+
+        var managerGroup = await GetGroupWithCapabilities("InventoryManager");
+        var poCancel = await GetCapabilityId("PurchaseOrder.Cancel");
+
+        Assert.Contains(managerGroup.Capabilities, r => r.CapabilityId == poCancel);
+    }
+
+    [Fact]
     public async Task SeedAsync_InventoryManagerReceivesDashboardView()
     {
         await AuthorizationSeeder.SeedAsync(_context);
@@ -252,14 +274,14 @@ public class AuthorizationSeederTests : IDisposable
     // --- Viewer Coverage ---
 
     [Fact]
-    public async Task SeedAsync_ViewerReceives13Capabilities()
+    public async Task SeedAsync_ViewerReceives15Capabilities()
     {
         await AuthorizationSeeder.SeedAsync(_context);
 
         var viewerGroup = await GetGroupWithCapabilities("Viewer");
 
-        // 7 .View capabilities + 5 PurchaseOrder.* + User.View (ends with .View) = 13
-        Assert.Equal(13, viewerGroup.Capabilities.Count);
+        // 7 .View capabilities + 7 PurchaseOrder.* + User.View (ends with .View) = 15
+        Assert.Equal(15, viewerGroup.Capabilities.Count);
     }
 
     [Fact]
@@ -290,7 +312,7 @@ public class AuthorizationSeederTests : IDisposable
 
         var viewerGroup = await GetGroupWithCapabilities("Viewer");
 
-        var poCapabilities = new[] { "PurchaseOrder.View", "PurchaseOrder.Create", "PurchaseOrder.Submit", "PurchaseOrder.Approve", "PurchaseOrder.Receive" };
+        var poCapabilities = new[] { "PurchaseOrder.View", "PurchaseOrder.Create", "PurchaseOrder.Edit", "PurchaseOrder.Submit", "PurchaseOrder.Approve", "PurchaseOrder.Receive", "PurchaseOrder.Cancel" };
         foreach (var name in poCapabilities)
         {
             var capId = await GetCapabilityId(name);
@@ -336,7 +358,7 @@ public class AuthorizationSeederTests : IDisposable
             .AsNoTracking()
             .ToListAsync();
 
-        Assert.Equal(39, capabilities.Count);
+        Assert.Equal(41, capabilities.Count);
     }
 
     [Fact]
@@ -362,7 +384,7 @@ public class AuthorizationSeederTests : IDisposable
             .AsNoTracking()
             .ToListAsync();
 
-        Assert.Equal(73, relationships.Count);
+        Assert.Equal(79, relationships.Count);
     }
 
     [Fact]
@@ -372,13 +394,13 @@ public class AuthorizationSeederTests : IDisposable
         await AuthorizationSeeder.SeedAsync(_context);
 
         var adminGroup = await GetGroupWithCapabilities("Administrator");
-        Assert.Equal(39, adminGroup.Capabilities.Count);
+        Assert.Equal(41, adminGroup.Capabilities.Count);
 
         var managerGroup = await GetGroupWithCapabilities("InventoryManager");
-        Assert.Equal(21, managerGroup.Capabilities.Count);
+        Assert.Equal(23, managerGroup.Capabilities.Count);
 
         var viewerGroup = await GetGroupWithCapabilities("Viewer");
-        Assert.Equal(13, viewerGroup.Capabilities.Count);
+        Assert.Equal(15, viewerGroup.Capabilities.Count);
     }
 
     // --- Already Seeded State ---
@@ -396,8 +418,8 @@ public class AuthorizationSeederTests : IDisposable
             .AsNoTracking()
             .ToListAsync();
 
-        // 39 seeded + 1 pre-existing = 40
-        Assert.Equal(40, capabilities.Count);
+        // 41 seeded + 1 pre-existing = 42
+        Assert.Equal(42, capabilities.Count);
         Assert.Contains(capabilities, c => c.Name == "PreExisting.Cap");
     }
 

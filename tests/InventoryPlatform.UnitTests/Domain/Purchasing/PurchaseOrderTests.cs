@@ -441,7 +441,104 @@ public class PurchaseOrderTests
     }
 
     // =====================================================
-    // F. Approve
+    // F. Cancellation
+    // =====================================================
+
+    [Fact]
+    public void Cancel_WhenDraft_ChangesStatusToCancelled()
+    {
+        var order = CreateDraftOrder();
+        AddValidItem(order);
+
+        order.Cancel();
+
+        Assert.Equal(PurchaseOrderStatus.Cancelled, order.Status);
+        Assert.Single(order.Items);
+        Assert.Equal(125m, order.TotalAmount);
+    }
+
+    [Fact]
+    public void Cancel_WhenSubmitted_ChangesStatusToCancelled()
+    {
+        var order = CreateDraftOrder();
+        AddValidItem(order);
+        order.Submit();
+
+        order.Cancel();
+
+        Assert.Equal(PurchaseOrderStatus.Cancelled, order.Status);
+        Assert.Single(order.Items);
+        Assert.Equal(125m, order.TotalAmount);
+    }
+
+    [Fact]
+    public void Cancel_WhenApproved_ThrowsDomainExceptionAndPreservesState()
+    {
+        var order = CreateDraftOrder();
+        AddValidItem(order);
+        order.Submit();
+        order.Approve();
+
+        var ex = Assert.Throws<DomainException>(() => order.Cancel());
+
+        Assert.Equal(
+            "Only draft or submitted purchase orders can be cancelled.",
+            ex.Message);
+        Assert.Equal(PurchaseOrderStatus.Approved, order.Status);
+    }
+
+    [Fact]
+    public void Cancel_WhenReceiving_ThrowsDomainExceptionAndPreservesState()
+    {
+        var order = CreateDraftOrder();
+        AddValidItem(order, quantity: 10m);
+        order.Submit();
+        order.Approve();
+        order.Receive(productId: 10, quantity: 3m);
+
+        var ex = Assert.Throws<DomainException>(() => order.Cancel());
+
+        Assert.Equal(
+            "Only draft or submitted purchase orders can be cancelled.",
+            ex.Message);
+        Assert.Equal(PurchaseOrderStatus.Receiving, order.Status);
+        Assert.Equal(3m, order.Items.First().ReceivedQuantity);
+    }
+
+    [Fact]
+    public void Cancel_WhenCompleted_ThrowsDomainExceptionAndPreservesState()
+    {
+        var order = CreateDraftOrder();
+        AddValidItem(order);
+        order.Submit();
+        order.Approve();
+        order.Receive(productId: 10, quantity: 5m);
+
+        var ex = Assert.Throws<DomainException>(() => order.Cancel());
+
+        Assert.Equal(
+            "Only draft or submitted purchase orders can be cancelled.",
+            ex.Message);
+        Assert.Equal(PurchaseOrderStatus.Completed, order.Status);
+    }
+
+    [Fact]
+    public void Cancel_WhenAlreadyCancelled_ThrowsDomainExceptionAndPreservesState()
+    {
+        var order = CreateDraftOrder();
+        AddValidItem(order);
+        order.Cancel();
+
+        var ex = Assert.Throws<DomainException>(() => order.Cancel());
+
+        Assert.Equal(
+            "Only draft or submitted purchase orders can be cancelled.",
+            ex.Message);
+        Assert.Equal(PurchaseOrderStatus.Cancelled, order.Status);
+    }
+
+    // =====================================================
+    // G. Approve
     // =====================================================
 
     [Fact]
@@ -494,8 +591,34 @@ public class PurchaseOrderTests
         Assert.Contains("Only submitted", ex.Message);
     }
 
+    [Fact]
+    public void Submit_WhenCancelled_ThrowsDomainExceptionAndPreservesState()
+    {
+        var order = CreateDraftOrder();
+        AddValidItem(order);
+        order.Cancel();
+
+        var ex = Assert.Throws<DomainException>(() => order.Submit());
+
+        Assert.Contains("Only draft", ex.Message);
+        Assert.Equal(PurchaseOrderStatus.Cancelled, order.Status);
+    }
+
+    [Fact]
+    public void Approve_WhenCancelled_ThrowsDomainExceptionAndPreservesState()
+    {
+        var order = CreateDraftOrder();
+        AddValidItem(order);
+        order.Cancel();
+
+        var ex = Assert.Throws<DomainException>(() => order.Approve());
+
+        Assert.Contains("Only submitted", ex.Message);
+        Assert.Equal(PurchaseOrderStatus.Cancelled, order.Status);
+    }
+
     // =====================================================
-    // G. Receive
+    // H. Receive
     // =====================================================
 
     [Fact]
@@ -550,6 +673,21 @@ public class PurchaseOrderTests
     }
 
     [Fact]
+    public void Receive_WhenCancelled_ThrowsDomainExceptionAndPreservesState()
+    {
+        var order = CreateDraftOrder();
+        AddValidItem(order);
+        order.Cancel();
+
+        var ex = Assert.Throws<DomainException>(() =>
+            order.Receive(productId: 10, quantity: 1m));
+
+        Assert.Contains("Only approved", ex.Message);
+        Assert.Equal(PurchaseOrderStatus.Cancelled, order.Status);
+        Assert.Equal(0m, order.Items.First().ReceivedQuantity);
+    }
+
+    [Fact]
     public void Receive_NonexistentProduct_ThrowsDomainException()
     {
         var order = CreateDraftOrder();
@@ -591,8 +729,38 @@ public class PurchaseOrderTests
         Assert.Contains("greater than zero", ex.Message);
     }
 
+    [Fact]
+    public void UpdateItem_WhenCancelled_ThrowsDomainExceptionAndPreservesItem()
+    {
+        var order = CreateDraftOrder();
+        AddValidItem(order);
+        order.Cancel();
+
+        var ex = Assert.Throws<DomainException>(() =>
+            order.UpdateItem(productId: 10, quantity: 10m, unitCost: 30m));
+
+        Assert.Contains("Only draft", ex.Message);
+        Assert.Equal(PurchaseOrderStatus.Cancelled, order.Status);
+        Assert.Equal(5m, order.Items.First().Quantity);
+        Assert.Equal(25m, order.Items.First().UnitCost);
+    }
+
+    [Fact]
+    public void RemoveItem_WhenCancelled_ThrowsDomainExceptionAndPreservesItem()
+    {
+        var order = CreateDraftOrder();
+        AddValidItem(order);
+        order.Cancel();
+
+        var ex = Assert.Throws<DomainException>(() => order.RemoveItem(productId: 10));
+
+        Assert.Contains("Only draft", ex.Message);
+        Assert.Equal(PurchaseOrderStatus.Cancelled, order.Status);
+        Assert.Single(order.Items);
+    }
+
     // =====================================================
-    // H. Partial Receiving
+    // I. Partial Receiving
     // =====================================================
 
     [Fact]
@@ -705,7 +873,7 @@ public class PurchaseOrderTests
     }
 
     // =====================================================
-    // I. Full Receiving / Completion
+    // J. Full Receiving / Completion
     // =====================================================
 
     [Fact]
@@ -792,7 +960,7 @@ public class PurchaseOrderTests
     }
 
     // =====================================================
-    // J. Invalid State Transitions (additional)
+    // K. Invalid State Transitions (additional)
     // =====================================================
 
     [Fact]

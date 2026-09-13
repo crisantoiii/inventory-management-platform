@@ -130,6 +130,10 @@ public static class ServiceCollectionExtensions
                 AuthorizationPolicies.PurchaseOrder.Create);
 
             options.AddCapabilityPolicy(
+                AuthorizationPolicies.ForCapability(AuthorizationPolicies.PurchaseOrder.Edit),
+                AuthorizationPolicies.PurchaseOrder.Edit);
+
+            options.AddCapabilityPolicy(
                 AuthorizationPolicies.ForCapability(AuthorizationPolicies.PurchaseOrder.Submit),
                 AuthorizationPolicies.PurchaseOrder.Submit);
 
@@ -140,6 +144,10 @@ public static class ServiceCollectionExtensions
             options.AddCapabilityPolicy(
                 AuthorizationPolicies.ForCapability(AuthorizationPolicies.PurchaseOrder.Receive),
                 AuthorizationPolicies.PurchaseOrder.Receive);
+
+            options.AddCapabilityPolicy(
+                AuthorizationPolicies.ForCapability(AuthorizationPolicies.PurchaseOrder.Cancel),
+                AuthorizationPolicies.PurchaseOrder.Cancel);
         });
 
         services.AddRazorPages();
