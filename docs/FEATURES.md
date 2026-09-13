@@ -75,7 +75,7 @@ The first Reporting vertical slice has also been implemented through Inventory V
 | Unit Management | ✅ Complete |
 | Inventory Transactions | ✅ Complete |
 | Architecture Sprint | ✅ Complete |
-| Purchasing | ✅ Core Workflow + Sprint 8 P1-P7 Enhancements Complete |
+| Purchasing | ✅ Core Workflow + Sprint 8 P1-P7 Enhancements + Sprint 14 Cancellation & Draft Item Editing Complete |
 | Reporting | ✅ Sprint 7 Additional Reporting Complete |
 | Dynamic Capability-Based Authorization | ✅ Sprint 10 Complete — v1.6.0 released |
 
@@ -100,6 +100,8 @@ Completed modules:
 - ✅ Purchase Order Pagination (P5)
 - ✅ Inventory Synchronization During Receiving (P6)
 - ✅ Integrated Purchasing Verification (P7)
+- ✅ Purchase Order Cancellation (Sprint 14)
+- ✅ Draft Purchase Order Item Editing and Removal (Sprint 14)
 - ✅ Reporting
   - ✅ Inventory Valuation
   - ✅ Purchase History
@@ -328,6 +330,9 @@ Each inventory transaction records:
 - ✅ Submit Purchase Order
 - ✅ Approve Purchase Order
 - ✅ Receive Purchase Order
+- ✅ Cancel Purchase Order (Draft and Submitted states — Sprint 14)
+- ✅ Purchase Order Cancellation Terminal State (Sprint 14)
+- ✅ Draft Purchase Order Item Editing and Removal (Sprint 14)
 - ✅ Partial Purchase Order Receiving
 - ✅ Final Purchase Order Receiving
 - ✅ Completed Purchase Order State
@@ -350,6 +355,8 @@ Each inventory transaction records:
 - ✅ Submit Action
 - ✅ Approve Action
 - ✅ Receive Action
+- ✅ Cancel Action (Draft and Submitted states)
+- ✅ Edit Items Action (Draft only, dedicated Edit page)
 
 ## Validation and Feedback
 
@@ -365,15 +372,17 @@ Each inventory transaction records:
 
 ```text
 Draft
-  ↓ Submit
+  ↓ Submit          ↓ Cancel
 Submitted
-  ↓ Approve
+  ↓ Approve         ↓ Cancel
 Approved
   ↓ Receive partial quantity
 Receiving
   ↓ Receive remaining quantity
 Completed
 ```
+
+Cancellation is available from Draft and Submitted states only and is enforced by the `PurchaseOrder.Cancel` capability. `Cancelled` is terminal: a cancelled Purchase Order offers no further workflow actions.
 
 ## Business Rules
 
@@ -385,6 +394,10 @@ Completed
 - Purchase Order completion is determined automatically by the Domain Model.
 - Received quantity cannot exceed the remaining quantity.
 - Received quantity must be greater than zero.
+- Only Draft and Submitted Purchase Orders can be cancelled (Sprint 14).
+- Cancelled is terminal: a cancelled Purchase Order cannot Submit, Approve, Receive, edit items, remove items, return to Draft, or reopen (Sprint 14).
+- Only Draft Purchase Orders can edit or remove items; item mutation is identified by `ProductId`, only Quantity and UnitCost can be updated, and Product replacement is not supported (Sprint 14).
+- Removing the final item is allowed and an empty Draft may exist temporarily; a Purchase Order with no items still cannot be submitted (Sprint 14).
 
 ---
 

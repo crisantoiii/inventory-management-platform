@@ -1,5 +1,37 @@
 # Changelog
 
+## [Sprint 14] - Purchase Order Cancellation and Draft Item Editing
+
+### Summary
+
+Completed the Purchase Order lifecycle by making the existing `Cancelled` state reachable through the full stack and exposing Draft item editing through the Application and Web layers, following the established Clean Architecture, capability-based authorization, and rich-domain conventions. Not a release sprint — no version has been assigned; v1.6.0 remains the current release baseline.
+
+### Added
+
+- Purchase Order cancellation for Draft and Submitted states (`Draft -> Cancelled`, `Submitted -> Cancelled`); cancellation is Domain-rejected for Approved, Receiving, Completed, and already-Cancelled orders
+- `Cancelled` as a terminal state: a cancelled Purchase Order cannot Submit, Approve, Receive, edit items, remove items, or reopen
+- `CancelPurchaseOrderRequest` / `CancelPurchaseOrderResponse` / `CancelPurchaseOrderHandler` (Application cancellation workflow)
+- Dedicated Draft item edit page: `Pages/Purchasing/PurchaseOrders/Edit.cshtml` / `Edit.cshtml.cs` (Quantity/UnitCost update and item removal; `ProductId` is the mutation key; Product replacement is not supported; only Draft orders can be edited; removing the final item is allowed and an empty Draft may temporarily exist — `Submit()` still rejects empty Purchase Orders)
+- Cancellation workflow on the Purchase Order Details page (status-gated visibility, confirmation UX, PRG redirect)
+- `PurchaseOrder.Edit` and `PurchaseOrder.Cancel` capabilities: catalog/seed additions (39 → 41 capabilities) plus `EditPolicy` / `CancelPolicy` constants and capability-policy registration; group assignment follows the existing filter-derived seed rules (Administrator/InventoryManager/Viewer)
+- Draft-only "Edit Items" entry on Details and a `ModelOnly` validation summary restoring render visibility for Application/Domain error feedback
+- `PurchaseOrderLifecyclePersistenceTests` (5 IntegrationTests, EF Core InMemory, fresh-context isolation): Cancelled status, item update, item removal, and final-item removal survive fresh-context reload
+- `PurchaseOrderCapabilityPolicyRegistrationTests` (6 Web.Tests): Edit/Cancel capability constants, policy naming convention, and real `AddWeb` policy registration
+- Application handler tests: 7 cancellation tests (T03) and 14 UpdateItem/RemoveItem tests (T04)
+
+### Changed
+
+- Purchase Order web workflow now exposes cancellation and Draft item editing alongside the existing Submit/Approve/Receive actions; Details POST handlers remain programmatic-authorization and Domain-error propagation per the pre-existing convention
+- Automated baseline: 432 → 477 passed tests (346 UnitTests, 92 IntegrationTests, 39 Web.Tests; 0 failed, 0 skipped); full non-incremental build remains 28 warnings / 0 errors (no new Sprint 14 warnings)
+- Manual application/provider verification against the configured SQL Server database confirmed cancellation, Draft editing, authorization enforcement (authorized and denied personas, crafted requests), and persistence across application restart; manual browser/provider verification remains manual and is not automated end-to-end testing
+
+### Known/Deferred (recorded, not remediated)
+
+- Existing Details POST handlers (Submit/Approve/Receive/Cancel) follow the pre-existing convention where some Domain failures propagate as an uncaught `DomainException` and render through the Development developer-exception page instead of inline validation; the Sprint 14 Edit page handles equivalent failures inline. Deferred follow-up only — not remediated in Sprint 14
+- No schema migration, EF mapping change, or data backfill was required; Sprint 14 uses the existing Purchase Order model and the existing `Cancelled = 6` status
+
+---
+
 ## [Sprint 13] - Purchasing Workflow Test Automation
 
 ### Summary

@@ -22,7 +22,7 @@ v1.3  Account Management       ✅
 v1.4  Additional Reporting     ✅
 v1.5  Purchasing Enhancements  ✅
 v1.6  Dynamic Capability Auth  ✅
-(Sprint 11 Automated Testing ✅ — non-release; Sprint 12 Authorization Refinement ✅ — non-release; Sprint 13 Purchasing Workflow Test Automation ✅ — non-release)
+(Sprint 11 Automated Testing ✅ — non-release; Sprint 12 Authorization Refinement ✅ — non-release; Sprint 13 Purchasing Workflow Test Automation ✅ — non-release; Sprint 14 Purchase Order Cancellation and Draft Item Editing ✅ — non-release)
 
 ---
 
@@ -240,9 +240,45 @@ Build:             0 errors (full rebuild: 28 pre-existing warnings)
 - Repository integration tests use EF Core InMemory: repository wiring/query-shape regression coverage only — not SQL Server integration testing
 - Sprint 12 EditStatus item and the T05 `PagedRequest.Status` pass-through finding remain deferred, untouched
 
+## Sprint 14 - Purchase Order Cancellation and Draft Item Editing
+
+**Status:** Complete
+
+Sprint 14 completed the Purchase Order lifecycle: authorized cancellation is now available from Draft and Submitted states through the full stack (Domain aggregate `Cancel()`, Application cancellation workflow, `PurchaseOrder.Cancel` capability, Razor Pages cancellation workflow on Details), and Draft Purchase Orders support item editing (Quantity/UnitCost) and item removal through the dedicated `Pages/Purchasing/PurchaseOrders/Edit.cshtml` surface backed by `PurchaseOrder.Edit`. `Cancelled` is terminal. Cancellation is forbidden from Approved, Receiving, Completed, and Cancelled states; item mutation is keyed by `ProductId` and only Draft orders can be edited; removing the final item is allowed while empty Purchase Orders still cannot be submitted.
+
+### Completed
+
+- T01: Sprint 14 Contract Verification and Implementation Readiness
+- T02: Domain Cancellation Transition
+- T03: Application Cancellation Workflow
+- T04: Application Draft Item Editing Workflow
+- T05: Purchase Order Edit/Cancel Authorization (`PurchaseOrder.Edit`, `PurchaseOrder.Cancel` — catalog 39 → 41)
+- T06: Purchase Order Persistence Integration Coverage (EF Core InMemory, fresh-context isolation)
+- T07: Web Cancellation Workflow
+- T08: Web Draft Item Edit Workflow (dedicated Edit page)
+- T09: Integrated and Manual Verification — automated suites re-executed plus mandatory manual browser verification against SQL Server
+- T10: Documentation Synchronization and Sprint 14 Closure
+
+### Final Test Baseline
+
+```text
+UnitTests:        346 passed
+IntegrationTests:  92 passed
+Web.Tests:         39 passed
+Total:            477 passed, 0 failed, 0 skipped
+Build:             0 errors (full rebuild: 28 pre-existing warnings; no Sprint 14 warning regression)
+```
+
+### Boundaries Held
+
+- No schema migration, no EF mapping change, no data backfill — the existing `Cancelled = 6` status is used
+- Capability authorization remains additive within the existing dynamic capability model (not role-only authorization)
+- Manual browser/provider verification against SQL Server remains manual — it is not automated end-to-end or SQL Server integration testing
+- No version assigned, no tag created, no release published
+
 ## Next Sprint Planning
 
-Sprint 11, Sprint 12, and Sprint 13 are complete. Sprint 13 achieved its Purchasing-test-automation objective with the full suite green and all sprint boundaries held. The next activity is a separate Sprint Planning session; no Sprint 14 scope is defined.
+Sprint 11 through Sprint 14 are complete. Sprint 14 achieved its lifecycle-completion objective with the full suite green and all sprint boundaries held. The next activity is a separate Sprint Planning session; no Sprint 15 scope is defined and Sprint 15 has not been started.
 
 ## D1 - Documentation Synchronization
 
@@ -541,7 +577,7 @@ Examples:
 
 - T01-T12: Full implementation (domain model, application abstractions, persistence, handlers, policies, admin UI, UI visibility)
 - T13: Runtime verification complete (build success, authorization verified for all 3 seeded users)
-- T14: Documentation synchronization in progress
+- T14: Documentation synchronization complete
 - T15: Final verification, retrospective, and save point — Complete
 
 ### Deferred Findings from T13

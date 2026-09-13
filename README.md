@@ -44,7 +44,7 @@ The focus is not only on implementing business features but also on applying pro
 
 **Current Version:** v1.6.0 - Dynamic Capability-Based Authorization
 
-**Current Development Status:** Sprint 13 Purchasing Workflow Test Automation — Complete. 432 automated tests established (314 UnitTests, 85 IntegrationTests, 33 Web.Tests; 0 failed, 0 skipped). Not a release sprint — v1.6.0 remains the current release baseline. T07 (EditStatus `IsInRole` cleanup) remains Blocked/Deferred — the remaining check is a reachable, behavior-affecting guard, not dead code.
+**Current Development Status:** Sprint 14 Purchase Order Cancellation and Draft Item Editing — Complete. 477 automated tests passing (346 UnitTests, 92 IntegrationTests, 39 Web.Tests; 0 failed, 0 skipped). Not a release sprint — v1.6.0 remains the current release baseline. T07 (EditStatus `IsInRole` cleanup) remains Blocked/Deferred — the remaining check is a reachable, behavior-affecting guard, not dead code.
 
 ## Completed Modules
 
@@ -60,6 +60,7 @@ The focus is not only on implementing business features but also on applying pro
 - ✅ Automated Testing (Sprint 11 — foundation, xUnit, EF Core InMemory)
 - ✅ Web Authorization Handler Testing (Sprint 12 — 33 Web.Tests, no mocking framework)
 - ✅ Purchasing Workflow Test Automation (Sprint 13 — handlers, validators, repository integration; 432 project-wide)
+- ✅ Purchase Order Cancellation and Draft Item Editing (Sprint 14 — `PurchaseOrder.Edit` / `PurchaseOrder.Cancel` capabilities; 477 project-wide)
 - ✅ User Management
 - ✅ Account Management
 - ✅ Purchasing (Core Workflow + Sprint 8 P1-P7 Enhancements Complete)
@@ -439,15 +440,17 @@ The long-term goal is to evolve this project into a complete inventory managemen
 
 ```text
 Draft
-  ↓ Submit
+  ↓ Submit          ↓ Cancel
 Submitted
-  ↓ Approve
+  ↓ Approve         ↓ Cancel
 Approved
   ↓ Receive partial quantity
 Receiving
   ↓ Receive remaining quantity
 Completed
 ```
+
+Cancellation is available from Draft and Submitted states only. Cancelled is terminal: a cancelled Purchase Order cannot Submit, Approve, Receive, edit items, remove items, or reopen. Draft Purchase Orders support item editing (Quantity/UnitCost) and item removal through the dedicated Edit page; item mutation is keyed by `ProductId` and only Draft orders can be edited. Authorization uses the `PurchaseOrder.Edit` and `PurchaseOrder.Cancel` capabilities.
 
 ### Architectural Highlights
 
@@ -918,6 +921,7 @@ Development Tools
 
 ## Current
 
+- Sprint 14 - Purchase Order Cancellation and Draft Item Editing - Complete (Domain cancellation + Application workflows + `PurchaseOrder.Edit`/`PurchaseOrder.Cancel` capabilities + Draft item Edit page; 477 automated tests; no schema/migration change)
 - Sprint 13 - Purchasing Workflow Test Automation - Complete (Application handler/validator/query tests + PurchaseOrderRepository integration tests; 432 automated tests; no production changes)
 - Sprint 12 - Authorization Refinement - Complete (handler tests + authorization boundary fixes; T07 EditStatus cleanup deferred/blocked)
 - Sprint 10 - Dynamic Capability-Based Authorization - Complete

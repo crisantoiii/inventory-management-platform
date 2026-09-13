@@ -24,9 +24,50 @@ Rather than documenting daily work, it captures important architectural decision
 
 # Current Release State
 
-**Current Version:** Sprint 13 Purchasing Workflow Test Automation (non-release sprint; v1.6.0 remains the release baseline)
+**Current Version:** Sprint 14 Purchase Order Cancellation and Draft Item Editing (non-release sprint; v1.6.0 remains the release baseline)
 
-Sprint 13 Purchasing Workflow Test Automation is complete. 432 automated tests established across Domain, Application, Infrastructure, and Web layers (314 UnitTests, 85 IntegrationTests, 33 Web.Tests; 0 failed, 0 skipped). The Sprint 12 three-project foundation and Sprint 11's original 280-test baseline remain intact beneath it. The sprint made no production changes.
+Sprint 14 Purchase Order Cancellation and Draft Item Editing is complete. 477 automated tests passing across Domain, Application, Infrastructure, and Web layers (346 UnitTests, 92 IntegrationTests, 39 Web.Tests; 0 failed, 0 skipped). The sprint made the existing `Cancelled` state reachable through the full stack with terminal semantics, added a dedicated Draft item edit page, and introduced the `PurchaseOrder.Edit` / `PurchaseOrder.Cancel` capabilities (catalog 39 → 41) within the existing dynamic capability model. The Sprint 12/13 three-project test foundation and all earlier baselines remain intact beneath it. No schema migration, EF mapping change, or data backfill was required.
+
+# Sprint 14 - Purchase Order Cancellation and Draft Item Editing
+
+## Summary
+
+Completed the Purchase Order lifecycle: authorized cancellation from Draft and Submitted states, terminal `Cancelled` behavior, and Draft-only item editing (Quantity/UnitCost update, `ProductId`-keyed removal, final-item removal allowed, empty-Draft submission still forbidden) through a dedicated Edit page. Authorization remained additive within the dynamic capability model.
+
+## Implementation
+
+- Domain: `PurchaseOrder.Cancel()` — `Draft -> Cancelled` and `Submitted -> Cancelled` allowed; Approved/Receiving/Completed/Cancelled rejected with `DomainException`; existing guards keep Cancelled orders from Submit/Approve/Receive/UpdateItem/RemoveItem
+- Application: `CancelPurchaseOrderHandler` plus `UpdatePurchaseOrderItemHandler` / `RemovePurchaseOrderItemHandler`, following the established Submit/Approve/Receive handler contract (load → aggregate mutation → single save; `PurchaseOrderErrors.NotFound`; `DomainException` propagation with no save)
+- Authorization: `PurchaseOrder.Edit` and `PurchaseOrder.Cancel` constants, policies, and registration; group assignment emerged from the existing filter-derived seed rules (Administrator 41, InventoryManager 23, Viewer 15; relationships 73 → 79)
+- Web: Cancel action on Details following the programmatic-authorization pattern; dedicated `Pages/Purchasing/PurchaseOrders/Edit.cshtml` with two-layer authorization, PRG, and inline Domain-failure feedback; Details gained a Draft-only "Edit Items" entry and a `ModelOnly` validation summary
+- Persistence: no schema/migration/EF-mapping change — the existing `PurchaseOrderStatus.Cancelled = 6` and cascade-configured item relationship carry the feature; fresh-context InMemory round-trips prove the wiring
+
+## Engineering Lessons
+
+- **The aggregate stays the single rule owner.** Every layer test asserted rules propagate from `PurchaseOrder` unchanged — no Draft-state or quantity/unit-cost invariant was duplicated into Application or Web code, which kept the T08 Edit page thin.
+- **Deferred wiring beats premature registration.** Handler DI registrations were deliberately deferred from T03/T04 to the Web tasks and landed as three `AddScoped` lines without touching handler classes.
+- **Reconciliation arithmetic must be stated, not implied.** The T06 total was recorded as 478 before T07 corrected it to 477 (346 + 92 + 39); writing the arithmetic into evidence made the slip self-detecting.
+- **UI visibility is UX, not the boundary.** Crafted-POST verification against an Approved order proved the Domain guard and programmatic authorization hold even when forms are hidden — the two-layer pattern kept the security boundary server-side.
+- **Provider evidence has a class of its own.** SQL row inspection plus an application stop/start cycle proved persistence beyond InMemory, and it is documented as manual application/provider verification — not automated end-to-end testing.
+
+## Validation
+
+```text
+Build:             SUCCESS (0 errors; full rebuild: 28 pre-existing warnings, no Sprint 14 regression)
+UnitTests:         346 passed
+IntegrationTests:   92 passed
+Web.Tests:          39 passed
+Total:             477 passed, 0 failed, 0 skipped
+```
+
+Automated suites were re-executed in T09; manual browser verification and real SQL Server provider verification (persistence across restart) also passed. T10 documentation synchronization changed no executable file, so this baseline remains authoritative.
+
+## Deferred
+
+- EditStatus role-conditioned self-deactivation guard — blocked pending an explicit behavioral decision (Sprint 12 finding; untouched by Sprint 14)
+- Details POST handlers (Submit/Approve/Receive/Cancel) can propagate uncaught `DomainException` failures to the Development developer-exception page instead of inline validation — T09 deferred observation; the Sprint 14 Edit page handles equivalent failures inline; remediation would be a separate task
+- `GetPurchaseOrdersHandler` does not copy `PagedRequest.Status` into `PagedQuery` — Sprint 13 T05 recorded finding; no remediation authorized
+- WebApplicationFactory / Razor-page HTTP-pipeline testing; CI provider establishment; SQL Server automated integration testing beyond InMemory
 
 # Sprint 13 - Purchasing Workflow Test Automation
 
@@ -3886,7 +3927,7 @@ Completed tasks:
 - T11 — Authorization Administration
 - T12 — Razor Navigation & UI Capability Visibility
 - T13 — Integrated Authorization Verification
-- T14 — Documentation Synchronization & Architecture Validation (in progress)
+- T14 — Documentation Synchronization & Architecture Validation — Complete
 - T15 — Sprint 10 Final Verification, Retrospective & Save Point — Complete
 
 The next development activity is T15 Final Verification, Retrospective & Save Point. No new feature work begins automatically from this closure.

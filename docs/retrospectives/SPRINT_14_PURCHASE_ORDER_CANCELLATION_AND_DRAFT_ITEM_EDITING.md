@@ -1,7 +1,9 @@
 # Sprint 14 - Purchase Order Cancellation and Draft Item Editing Retrospective
 
 ## Sprint Status
-`PLANNED - IMPLEMENTATION NOT STARTED`
+`COMPLETE - CLOSED (T10, September 13, 2026)`
+
+All gates passed: T01-T09 implemented and externally accepted; T10 documentation synchronization and closure complete. No version has been assigned and no tag or release has been created; the sprint is ready for external PR/release decision.
 
 ## Sprint Objective
 Deliver the accepted Sprint 14 lifecycle completion for Purchase Orders:
@@ -103,19 +105,18 @@ Manual browser verification is mandatory before Sprint 14 closure.
 - T07 - COMPLETE - Web cancellation workflow implemented and verified
 - T08 - COMPLETE - Web Draft item edit workflow implemented and verified
 - T09 - COMPLETE - integrated and manual verification executed successfully
-- T10 - NOT STARTED
+- T10 - COMPLETE - documentation synchronized and Sprint 14 closed
 
 ## Verification Ledger
-Placeholders only. No actual verification values are recorded yet.
+Final accepted values (T09, externally accepted; unchanged by T10 — documentation-only):
 
-- Build results: pending
-- UnitTests: pending
-- IntegrationTests: pending
-- Web.Tests: pending
-- Warnings: pending
-- Errors: pending
-- Manual browser verification: pending
-- Provider verification: pending
+- Build results: normal build passed (0 errors); full non-incremental build passed (28 pre-existing warnings, 0 errors; no Sprint 14 warning regression)
+- UnitTests: 346 passed, 0 failed, 0 skipped
+- IntegrationTests: 92 passed, 0 failed, 0 skipped
+- Web.Tests: 39 passed, 0 failed, 0 skipped
+- Total: 477 passed, 0 failed, 0 skipped (346 + 92 + 39)
+- Manual browser verification: passed (all T09 cancellation, draft-editing, and authorization scenarios)
+- Provider verification: passed (real SQL Server persistence confirmed through the running application; manual application/provider verification, not automated SQL Server integration testing)
 
 ## T02 Execution Evidence
 
@@ -324,15 +325,30 @@ T09 was verification-only: no production or test source was created or modified;
 - Sales work is deferred.
 
 ## What Went Well
-Placeholder. This section will be completed after verification and implementation work.
+- The locked planning contract (state machine, capability names, group matrix, Web.Tests position) held without a single source contradiction through T01-T09; every gate verified against current source rather than planning assumptions.
+- Domain rules stayed Domain-owned end to end: Application handlers orchestrate, the Web layer never touches repositories or `DbContext`, and no business rule was duplicated into Razor or Application code.
+- The two-layer authorization pattern (class-level policy gate + programmatic `IAuthorizationService.AuthorizeAsync` with `Forbid()`) was reused unchanged for both new capabilities; UI hiding was correctly treated as UX, not as the security boundary (crafted-POST verification proved it).
+- Manual verification went beyond UI observation: SQL row inspection and an application stop/start cycle proved real provider persistence rather than trusting posted form values.
+- The 478 → 477 arithmetic slip was caught and corrected during the sprint instead of propagating into closure documentation.
 
 ## What Could Be Improved
-Placeholder. This section will be completed after verification and implementation work.
+- The pre-existing Details POST convention lets some `DomainException` failures surface as HTTP 500 through the Development developer-exception page instead of inline validation; the T08 Edit page shows the inline pattern is achievable and the inconsistency is now a recorded deferred follow-up rather than a surprise.
+- Web.Tests remain limited to policy-registration coverage because PageModels depend on sealed concrete Application handler classes; a PageModel seam (or WebApplicationFactory decision) is still an open testing-infrastructure question deferred since Sprint 13.
+- EF Core InMemory integration coverage still proves wiring and round-trips only; relational provider behavior required manual verification, and automated SQL Server integration testing remains unbuilt.
+- The T06 test-total arithmetic slip (478 recorded instead of 477) showed suite totals should be re-derived from per-suite numbers at every gate rather than carried forward.
 
 ## Lessons Learned
-Placeholder. This section will be completed after verification and implementation work.
+- Verify the planning contract against current source first (T01); zero mid-sprint contract surprises followed from that discipline.
+- Deferred wiring is a valid pattern when it is explicit: handler DI registration was deliberately deferred from T03/T04 to the Web tasks and landed as three scoped registrations (Cancel in T07; UpdateItem/RemoveItem in T08) without touching handler classes.
+- Reconciliation arithmetic matters: 346 + 92 + 39 = 477, and stating the arithmetic in evidence made the 478 slip self-detecting.
+- Manual verification and automated testing answer different questions; labeling SQL Server provider evidence as "manual application/provider verification" (not automated end-to-end testing) kept the evidence classes honest.
+- Documentation-only closure (T10) requires no test re-run when the accepted executable baseline is externally accepted and no executable file changed; the T09 evidence remains authoritative.
 
 ## Final Test Baseline
+**Accepted final Sprint 14 baseline (T09, externally accepted): 477 passed, 0 failed, 0 skipped (346 UnitTests + 92 IntegrationTests + 39 Web.Tests); normal build 0 errors; full non-incremental build 28 warnings / 0 errors. T10 changed no executable file, so this baseline remains authoritative.**
+
+Historical per-task verification results:
+
 T09 verification results (accepted incoming T08 baseline: 477 tests, 28 full-rebuild warnings, 0 errors):
 
 - UnitTests: 346 passed, 0 failed, 0 skipped
@@ -354,7 +370,7 @@ T08 verification results (accepted incoming T07 baseline: 477 tests, 28 full-reb
 - Full non-incremental build: 28 warnings, 0 errors (matches the accepted warning baseline; no T08 regression)
 - Manual browser verification: pending for T09
 
-T07 verification results (accepted incoming T06 baseline: 478 tests, 28 full-rebuild warnings, 0 errors):
+T07 verification results (accepted incoming T06 baseline: 477 tests — corrected during T07 from the previously recorded 478, an arithmetic slip; 28 full-rebuild warnings, 0 errors):
 
 - UnitTests: 346 passed, 0 failed, 0 skipped
 - IntegrationTests: 92 passed, 0 failed, 0 skipped
@@ -364,10 +380,12 @@ T07 verification results (accepted incoming T06 baseline: 478 tests, 28 full-reb
 - Full non-incremental build: 28 warnings, 0 errors (matches the accepted warning baseline; no T07 regression)
 - Manual browser verification: pending for T09
 
+T06 verification results (historical record; total below was originally recorded as 478 and corrected to 477 during T07 — arithmetic slip: 346 + 92 + 39 = 477, see T06 Execution Evidence):
+
 - UnitTests: 346 passed, 0 failed, 0 skipped
 - IntegrationTests: 92 passed, 0 failed, 0 skipped (87 accepted T05 baseline + 5 legitimate T06 tests)
 - Web.Tests: 39 passed, 0 failed, 0 skipped
-- Total: 478 passed, 0 failed, 0 skipped
+- Total: 477 passed, 0 failed, 0 skipped
 - Normal build: passed, 0 errors
 - Full non-incremental build: 28 warnings, 0 errors (matches the accepted warning baseline; no T06 regression)
 - Manual browser verification: pending for T09
@@ -381,10 +399,10 @@ T07 verification results (accepted incoming T06 baseline: 478 tests, 28 full-reb
 - Manual browser verification: pending for T09
 
 ## Release Decision
-`Not decided. Sprint 14 is likely feature-release-worthy, but semantic version/tag/release decisions occur separately after successful sprint closure.`
+`Not decided. Sprint 14 is feature-bearing and technically eligible for a semantic release decision after external review. No version has been assigned, no tag has been created, and no release exists; PR title/description, merge, semantic version, tag, and release decisions belong to the external reviewer/user.`
 
 ## Final Sprint Status
-`NOT COMPLETE`
+`Sprint 14 COMPLETE - documentation synchronized and ready for PR/release decision.`
 
 ## Final Note
-This retrospective baseline is intentionally created as a planning artifact only. It does not claim any implementation has occurred and must remain in a planned state until T01-T10 complete successfully.
+T10 finalized this retrospective after T01-T09 were externally accepted. Documentation synchronization covered README, ROADMAP, PROJECT_STATUS, CHANGELOG, purchasing/authorization/testing documentation, the engineering journal, and this retrospective; the planning report and the external task breakdown remain unchanged (historical planning evidence / external execution-control artifact). No production source, test source, migration, schema, seed, package, or project file was changed during T10. Graphify update was not run (documentation-only task). No Git operations were performed. No version was assigned and no tag or release was created. Sprint 15 has not been started.

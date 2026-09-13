@@ -1,6 +1,6 @@
 # Testing Conventions
 
-This document establishes the automated testing conventions for the Inventory Platform. These conventions are derived from Sprint 11, Sprint 12, and Sprint 13 implementations and are authoritative for current test authoring.
+This document establishes the automated testing conventions for the Inventory Platform. These conventions are derived from Sprint 11, Sprint 12, Sprint 13, and Sprint 14 implementations and are authoritative for current test authoring.
 
 ---
 
@@ -196,6 +196,7 @@ tests/
       AuthorizationGroupRepositoryTests.cs
     Purchasing/
       PurchaseOrderRepositoryTests.cs
+      PurchaseOrderLifecyclePersistenceTests.cs
 
   InventoryPlatform.Web.Tests/
     Authorization/
@@ -203,6 +204,7 @@ tests/
       FakeCapabilityAuthorizationServiceTests.cs
       CapabilityAuthorizationHandlerTests.cs
       MultiCapabilityAuthorizationHandlerTests.cs
+      PurchaseOrderCapabilityPolicyRegistrationTests.cs
 ```
 
 ### Namespace Convention
@@ -350,21 +352,19 @@ public void Dispose()
 - Direct `ApplicationDbContext` access is acceptable for test data setup and verification queries
 - Repository methods under test should use `AsNoTracking()` where the production implementation does
 
----
+---## Authorization Seed Baseline
 
-## Authorization Seed Baseline
-
-The verified Sprint 11 seed baseline (from source):
+The verified Sprint 14 seed baseline (from source, post-T05; the Sprint 11 baseline of 39 capabilities / 73 relationships is historical):
 
 ```text
-Capabilities:                    39
-Administrator capabilities:      39
-InventoryManager capabilities:   21
-Viewer capabilities:            13
-Total group-capability relationships: 73
+Capabilities:                    41
+Administrator capabilities:      41
+InventoryManager capabilities:   23
+Viewer capabilities:            15
+Total group-capability relationships: 79
 ```
 
-**Note:** The planning baseline originally stated Viewer=12, Total=72. Source inspection confirmed Viewer=13, Total=73 because `User.View` matches the Viewer filter's `EndsWith(".View")` predicate.
+**Note:** Sprint 14 T05 added `PurchaseOrder.Edit` and `PurchaseOrder.Cancel` (39 → 41 capabilities, 73 → 79 relationships); group assignment emerged from the existing filter-derived seed rules with no special-case seed logic. Earlier baselines (39/73; original planning note Viewer=12/Total=72 vs source Viewer=13/Total=73) are historical records.
 
 ---
 
@@ -403,11 +403,11 @@ No CI provider is currently configured in the repository. The complete test suit
 
 ## Current Test Coverage
 
-### UnitTests (314 tests)
+### UnitTests (346 tests)
 
 | Area | Subject | Tests |
 |------|---------|-------|
-| Domain | PurchaseOrder workflow | 62 |
+| Domain | PurchaseOrder workflow (incl. Sprint 14 cancellation + draft-edit coverage) | 83 |
 | Domain | PurchaseOrderItem behavior | 39 |
 | Domain | Product domain | 56 |
 | Domain | Capability domain | 15 |
@@ -422,12 +422,14 @@ No CI provider is currently configured in the repository. The complete test suit
 | Application | Purchasing — Receive handler (T04) | 14 |
 | Application | Purchasing — GetPurchaseOrder handler (T05) | 7 |
 | Application | Purchasing — GetPurchaseOrders handler (T05) | 9 |
+| Application | Purchasing — Cancel handler (Sprint 14 T03) | 7 |
+| Application | Purchasing — UpdateItem/RemoveItem handlers (Sprint 14 T04) | 14 |
 | Infrastructure | Placeholder | 1 |
-| **Total** | | **314** |
+| **Total** | | **346** |
 
 Rows marked "discovered cases" contain `[Theory]` methods whose `[InlineData]` rows each execute as a separate case; unmarked rows are `[Fact]` methods where methods and discovered cases are equal.
 
-### IntegrationTests (85 tests)
+### IntegrationTests (92 tests)
 
 | Area | Subject | Tests |
 |------|---------|-------|
@@ -435,24 +437,35 @@ Rows marked "discovered cases" contain `[Theory]` methods whose `[InlineData]` r
 | Authorization | CapabilityRepository | 12 |
 | Authorization | AuthorizationGroupRepository | 24 |
 | Purchasing | PurchaseOrderRepository (Sprint 13 T06) | 24 |
+| Purchasing | PurchaseOrderLifecyclePersistence (Sprint 14 T06) | 5 |
 | Infrastructure | Placeholder | 1 |
-| **Total** | | **85** |
+| **Total** | | **92** |
 
-### Web.Tests (33 tests)
+### Web.Tests (39 tests)
 
 | Area | Subject | Tests |
 |------|---------|-------|
 | Authorization | FakeCapabilityAuthorizationService verification | 12 |
-| Authorization | CapabilityAuthorizationHandler behavior (T03) | 8 |
-| Authorization | MultiCapabilityAuthorizationHandler behavior (T04) | 12 |
+| Authorization | CapabilityAuthorizationHandler behavior (Sprint 12 T03) | 8 |
+| Authorization | MultiCapabilityAuthorizationHandler behavior (Sprint 12 T04) | 12 |
+| Authorization | PurchaseOrder capability policy registration (Sprint 14 T05) | 6 |
 | Infrastructure | Placeholder | 1 |
-| **Total** | | **33** |
+| **Total** | | **39** |
 
-**Total: 432 tests, 432 passed, 0 failures, 0 skipped** (314 + 85 + 33; Sprint 13 integrated verification, T07)
+**Total: 477 tests, 477 passed, 0 failures, 0 skipped** (346 + 92 + 39; Sprint 14 T09 re-verification; arithmetic: 346 + 92 + 39 = 477 — the earlier 478 figure was an arithmetic slip corrected during the sprint).
 
-The Web.Tests verification tests confirm that the `FakeCapabilityAuthorizationService` compiles against the real `ICapabilityAuthorizationService` interface and produces controlled authorization results. The T03/T04 handler tests exercise the actual `CapabilityAuthorizationHandler` and `MultiCapabilityAuthorizationHandler` production sources directly (authentication gate, NameIdentifier extraction/parsing, service delegation, succeed/do-not-succeed outcomes, OR semantics with short-circuit, requirement constructor validation). Handler testing is source-level/unit-level; Razor Page authorization boundaries (Categories/Edit, Suppliers/Create) were verified at source level and by the remediations themselves — no HTTP-pipeline or browser testing exists or is claimed.
+The Web.Tests verification tests confirm that the `FakeCapabilityAuthorizationService` compiles against the real `ICapabilityAuthorizationService` interface and produces controlled authorization results. The T03/T04 handler tests exercise the actual `CapabilityAuthorizationHandler` and `MultiCapabilityAuthorizationHandler` production sources directly (the Sprint 14 `PurchaseOrderCapabilityPolicyRegistrationTests` additionally verify Edit/Cancel capability constants and their real `AddWeb` policy registration) (authentication gate, NameIdentifier extraction/parsing, service delegation, succeed/do-not-succeed outcomes, OR semantics with short-circuit, requirement constructor validation). Handler testing is source-level/unit-level; Razor Page authorization boundaries (Categories/Edit, Suppliers/Create) were verified at source level and by the remediations themselves — no HTTP-pipeline or browser testing exists or is claimed.
 
 ---
+
+## Sprint 14 Conventions (Reusable)
+
+Established by the Sprint 14 lifecycle implementation and reusable for future test authoring:
+
+1. **Domain-owned rules stay Domain-owned in tests.** Application handler tests assert that state guards (`Cancel()`), item rules (`UpdateItem`/`RemoveItem` by `ProductId`), and exception messages propagate from the aggregate unchanged — no rule is re-implemented or asserted at the wrong layer.
+2. **Real `DomainException` propagation is the contract.** Invalid transitions and item rules are tested through the handler call path with the no-save-after-exception guarantee, matching the actual Web-layer behavior.
+3. **Fresh-context isolation extends to lifecycle round-trips.** Cancellation, item update, item removal, and final-item removal persistence are each asserted through contexts different from the mutating context; EF change-tracker state is never the evidence.
+4. **No artificial coverage at seams that do not exist.** Where PageModels depend on sealed concrete Application handler classes, capability/policy registration is tested instead and page behavior is verified manually — coverage is never inflated by distorting production design.
 
 ## Sprint 13 Conventions (Reusable)
 
@@ -484,16 +497,17 @@ Blocked/deferred:
 
 - EditStatus `User.IsInRole` cleanup (T07) — the remaining occurrence (`Pages/Administrator/Users/EditStatus.cshtml.cs`, line 61) is a reachable, behavior-affecting self-deactivation guard for supported multi-role users, NOT dead code. Removing it would change observable behavior; T07 remains blocked/deferred pending an explicit behavioral decision.
 
-### Sprint 13 Outcome
+### Sprint 14 Outcome
 
 Completed:
 
-- Shared Purchasing test support (T01): `FakePurchaseOrderRepository`, `FakeUnitOfWork`, `PurchasingTestData`, `EntityIdHelper` (per-test instance-scoped interaction recording; no static test state)
-- Purchasing Application-layer coverage (T02–T05): Create/Submit/Approve/Receive handlers, Create validators, `PurchaseOrderErrors` contracts, `GetPurchaseOrder`/`GetPurchaseOrders` query handlers — 95 new UnitTests (all discovered-case counts reconciled)
-- `PurchaseOrderRepository` integration coverage (T06): Includes/ThenInclude with fresh-context isolation, search (numeric + name branches), inclusive date boundaries, status filter, all supported sorts plus default fallback, paging/metadata, AsNoTracking, persistence round-trip — 24 new IntegrationTests (EF Core InMemory)
-- Integrated verification (T07): **432 passed, 0 failed, 0 skipped** (314/85/33); full rebuild 28 warnings / 0 errors — baseline preserved, no warnings from test projects
+- Domain cancellation coverage (T02): 83 PurchaseOrder Domain tests passing (cancellation transitions, terminal `Cancelled` guards over Submit/Approve/Receive/UpdateItem/RemoveItem)
+- Application workflows (T03/T04): 7 cancellation handler tests + 14 UpdateItem/RemoveItem handler tests (not-found, success, invalid state, missing line, save counts/call order, validators-free Domain-owned validation)
+- Authorization seed/policy coverage (T05): `AuthorizationSeederTests` expected-data updates (41 capabilities, 79 relationships) + new `PurchaseOrderCapabilityPolicyRegistrationTests` (6 Web.Tests) proving Edit/Cancel constants, naming, and real `AddWeb` registration
+- Persistence coverage (T06): 5 fresh-context lifecycle round-trip tests (Cancel Draft/Submitted, UpdateItem, RemoveItem, final-item removal → empty Draft)
+- Integrated verification (T09): **477 passed, 0 failed, 0 skipped** (346/92/39); full rebuild 28 warnings / 0 errors — baseline preserved; manual browser and real SQL Server provider verification also passed (manual verification remains manual, not automated testing)
 
-Still deferred (unchanged by Sprint 13):
+Still deferred (unchanged by Sprint 14):
 
 - EditStatus self-deactivation guard (above) — untouched by Sprint 13
 - `GetPurchaseOrdersHandler` does not copy `PagedRequest.Status` into `PagedQuery` (T05 recorded finding; no remediation authorized)
