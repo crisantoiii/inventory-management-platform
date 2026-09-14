@@ -8,7 +8,7 @@
 - **Task breakdown:** `SPRINT_15_TASK_BREAKDOWN.md`
 - **Retrospective state:** BASELINE
 - **Sprint status:** IN PROGRESS
-- **Implementation status:** T01 COMPLETE
+- **Implementation status:** T02 COMPLETE
 - **Release classification:** Non-release technical-hardening sprint
 
 ---
@@ -94,8 +94,8 @@ No global exception middleware or Application contract redesign is planned.
 
 | Task | Title | Initial Status |
 |---|---|---|
-| T01 | Contract Verification and Design Lock | NOT STARTED |
-| T02 | Purchase Order Details Workflow Error Handling | NOT STARTED |
+| T01 | Contract Verification and Design Lock | COMPLETE |
+| T02 | Purchase Order Details Workflow Error Handling | COMPLETE |
 | T03 | Regression and Coverage Verification | NOT STARTED |
 | T04 | Integrated and Manual Verification | NOT STARTED |
 | T05 | Documentation Synchronization and Sprint Closure | NOT STARTED |
@@ -185,6 +185,20 @@ These findings must not be silently absorbed into Sprint 15 implementation.
 - **Build:** None executed (verification-only task)
 - **Graphify:** Not run - verification-only task; no source/test-source changes
 - **Notes:** All accepted Revision 2 assumptions remain supported by current source. No source drift detected.
+
+### T02 - Purchase Order Details Workflow Error Handling
+
+- **Status:** COMPLETE
+- **Date:** 2026-09-13
+- **Result:** T02 ACCEPTED CANDIDATE - PROCEED TO T03
+- **Production file changed:** `src/InventoryPlatform/InventoryPlatform.Web/Pages/Purchasing/PurchaseOrders/Details.cshtml.cs`
+- **Behavior implemented:** All four POST handlers (Submit, Approve, Receive, Cancel) now catch `DomainException` and route through `RenderDomainFailureAsync` private helper. Helper adds canonical Domain message to ModelState, reloads Purchase Order via `GetPurchaseOrderHandler`, returns `NotFound()` if reload fails, otherwise sets `PurchaseOrder` property and returns `Page()`.
+- **Tests executed:** UnitTests (346 passed), IntegrationTests (92 passed), Web.Tests (39 passed)
+- **Build result:** 0 errors, 20 warnings (all pre-existing)
+- **Graphify:** Updated successfully (3303 nodes, 6364 edges, 262 communities)
+- **Database/migration impact:** None
+- **Authorization impact:** None
+- **Deviations:** None
 
 ---
 
