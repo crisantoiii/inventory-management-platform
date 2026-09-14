@@ -4,6 +4,7 @@ using InventoryPlatform.Application.Features.Purchasing.GetPurchaseOrder;
 using InventoryPlatform.Application.Features.Purchasing.ReceivePurchaseOrder;
 using InventoryPlatform.Application.Features.Purchasing.SubmitPurchaseOrder;
 using InventoryPlatform.Domain.Enums;
+using InventoryPlatform.Domain.Exceptions;
 using InventoryPlatform.Web.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -96,48 +97,58 @@ public class DetailsModel : PageModel
             return Forbid();
         }
 
-        var result = await _submitHandler.HandleAsync(
-            new SubmitPurchaseOrderRequest(id),
-            cancellationToken);
-
-        if (result.IsFailure)
+        try
         {
-            ModelState.AddModelError(
-                string.Empty,
-                result.Error.Message);
-
-            var purchaseOrderResult = await _handler.HandleAsync(
-                new GetPurchaseOrderRequest(id),
+            var result = await _submitHandler.HandleAsync(
+                new SubmitPurchaseOrderRequest(id),
                 cancellationToken);
 
-            if (purchaseOrderResult.IsFailure ||
-                purchaseOrderResult.Value is null)
+            if (result.IsFailure)
             {
-                return NotFound();
+                ModelState.AddModelError(
+                    string.Empty,
+                    result.Error.Message);
+
+                var purchaseOrderResult = await _handler.HandleAsync(
+                    new GetPurchaseOrderRequest(id),
+                    cancellationToken);
+
+                if (purchaseOrderResult.IsFailure ||
+                    purchaseOrderResult.Value is null)
+                {
+                    return NotFound();
+                }
+
+                PurchaseOrder = purchaseOrderResult.Value;
+
+                return Page();
             }
 
-            PurchaseOrder = purchaseOrderResult.Value;
+            TempData["SuccessMessage"] =
+                $"Purchase Order '{result.Value!.Id}' was submitted successfully.";
 
-            return Page();
+            return RedirectToPage(
+                "./Details",
+                new
+                {
+                    id = result.Value.Id,
+                    Search,
+                    FromDate,
+                    ToDate,
+                    Status,
+                    SortBy,
+                    Descending,
+                    PageNum,
+                    PageSize
+                });
         }
-
-        TempData["SuccessMessage"] =
-            $"Purchase Order '{result.Value!.Id}' was submitted successfully.";
-
-        return RedirectToPage(
-            "./Details",
-            new
-            {
-                id = result.Value.Id,
-                Search,
-                FromDate,
-                ToDate,
-                Status,
-                SortBy,
-                Descending,
-                PageNum,
-                PageSize
-            });
+        catch (DomainException exception)
+        {
+            return await RenderDomainFailureAsync(
+                id,
+                exception.Message,
+                cancellationToken);
+        }
     }
 
     public async Task<IActionResult> OnPostApproveAsync(
@@ -155,48 +166,58 @@ public class DetailsModel : PageModel
             return Forbid();
         }
 
-        var result = await _approveHandler.HandleAsync(
-            new ApprovePurchaseOrderRequest(id),
-            cancellationToken);
-
-        if (result.IsFailure)
+        try
         {
-            ModelState.AddModelError(
-                string.Empty,
-                result.Error.Message);
-
-            var purchaseOrderResult = await _handler.HandleAsync(
-                new GetPurchaseOrderRequest(id),
+            var result = await _approveHandler.HandleAsync(
+                new ApprovePurchaseOrderRequest(id),
                 cancellationToken);
 
-            if (purchaseOrderResult.IsFailure ||
-                purchaseOrderResult.Value is null)
+            if (result.IsFailure)
             {
-                return NotFound();
+                ModelState.AddModelError(
+                    string.Empty,
+                    result.Error.Message);
+
+                var purchaseOrderResult = await _handler.HandleAsync(
+                    new GetPurchaseOrderRequest(id),
+                    cancellationToken);
+
+                if (purchaseOrderResult.IsFailure ||
+                    purchaseOrderResult.Value is null)
+                {
+                    return NotFound();
+                }
+
+                PurchaseOrder = purchaseOrderResult.Value;
+
+                return Page();
             }
 
-            PurchaseOrder = purchaseOrderResult.Value;
+            TempData["SuccessMessage"] =
+                $"Purchase Order '{result.Value!.Id}' was approved successfully.";
 
-            return Page();
+            return RedirectToPage(
+                "./Details",
+                new
+                {
+                    id = result.Value.Id,
+                    Search,
+                    FromDate,
+                    ToDate,
+                    Status,
+                    SortBy,
+                    Descending,
+                    PageNum,
+                    PageSize
+                });
         }
-
-        TempData["SuccessMessage"] =
-            $"Purchase Order '{result.Value!.Id}' was approved successfully.";
-
-        return RedirectToPage(
-            "./Details",
-            new
-            {
-                id = result.Value.Id,
-                Search,
-                FromDate,
-                ToDate,
-                Status,
-                SortBy,
-                Descending,
-                PageNum,
-                PageSize
-            });
+        catch (DomainException exception)
+        {
+            return await RenderDomainFailureAsync(
+                id,
+                exception.Message,
+                cancellationToken);
+        }
     }
 
     public async Task<IActionResult> OnPostReceiveAsync(
@@ -216,51 +237,61 @@ public class DetailsModel : PageModel
             return Forbid();
         }
 
-        var result = await _receiveHandler.HandleAsync(
-            new ReceivePurchaseOrderRequest(
-                purchaseOrderId,
-                productId,
-                quantity),
-            cancellationToken);
-
-        if (result.IsFailure)
+        try
         {
-            ModelState.AddModelError(
-                string.Empty,
-                result.Error.Message);
-
-            var purchaseOrderResult = await _handler.HandleAsync(
-                new GetPurchaseOrderRequest(purchaseOrderId),
+            var result = await _receiveHandler.HandleAsync(
+                new ReceivePurchaseOrderRequest(
+                    purchaseOrderId,
+                    productId,
+                    quantity),
                 cancellationToken);
 
-            if (purchaseOrderResult.IsFailure ||
-                purchaseOrderResult.Value is null)
+            if (result.IsFailure)
             {
-                return NotFound();
+                ModelState.AddModelError(
+                    string.Empty,
+                    result.Error.Message);
+
+                var purchaseOrderResult = await _handler.HandleAsync(
+                    new GetPurchaseOrderRequest(purchaseOrderId),
+                    cancellationToken);
+
+                if (purchaseOrderResult.IsFailure ||
+                    purchaseOrderResult.Value is null)
+                {
+                    return NotFound();
+                }
+
+                PurchaseOrder = purchaseOrderResult.Value;
+
+                return Page();
             }
 
-            PurchaseOrder = purchaseOrderResult.Value;
+            TempData["SuccessMessage"] =
+                $"Purchase Order '{result.Value!.PurchaseOrderId}' was received successfully.";
 
-            return Page();
+            return RedirectToPage(
+                "./Details",
+                new
+                {
+                    id = result.Value.PurchaseOrderId,
+                    Search,
+                    FromDate,
+                    ToDate,
+                    Status,
+                    SortBy,
+                    Descending,
+                    PageNum,
+                    PageSize
+                });
         }
-
-        TempData["SuccessMessage"] =
-            $"Purchase Order '{result.Value!.PurchaseOrderId}' was received successfully.";
-
-        return RedirectToPage(
-            "./Details",
-            new
-            {
-                id = result.Value.PurchaseOrderId,
-                Search,
-                FromDate,
-                ToDate,
-                Status,
-                SortBy,
-                Descending,
-                PageNum,
-                PageSize
-            });
+        catch (DomainException exception)
+        {
+            return await RenderDomainFailureAsync(
+                purchaseOrderId,
+                exception.Message,
+                cancellationToken);
+        }
     }
 
     public async Task<IActionResult> OnPostCancelAsync(
@@ -278,47 +309,78 @@ public class DetailsModel : PageModel
             return Forbid();
         }
 
-        var result = await _cancelHandler.HandleAsync(
-            new CancelPurchaseOrderRequest(id),
-            cancellationToken);
-
-        if (result.IsFailure)
+        try
         {
-            ModelState.AddModelError(
-                string.Empty,
-                result.Error.Message);
-
-            var purchaseOrderResult = await _handler.HandleAsync(
-                new GetPurchaseOrderRequest(id),
+            var result = await _cancelHandler.HandleAsync(
+                new CancelPurchaseOrderRequest(id),
                 cancellationToken);
 
-            if (purchaseOrderResult.IsFailure ||
-                purchaseOrderResult.Value is null)
+            if (result.IsFailure)
             {
-                return NotFound();
+                ModelState.AddModelError(
+                    string.Empty,
+                    result.Error.Message);
+
+                var purchaseOrderResult = await _handler.HandleAsync(
+                    new GetPurchaseOrderRequest(id),
+                    cancellationToken);
+
+                if (purchaseOrderResult.IsFailure ||
+                    purchaseOrderResult.Value is null)
+                {
+                    return NotFound();
+                }
+
+                PurchaseOrder = purchaseOrderResult.Value;
+
+                return Page();
             }
 
-            PurchaseOrder = purchaseOrderResult.Value;
+            TempData["SuccessMessage"] =
+                $"Purchase Order '{result.Value!.Id}' was cancelled successfully.";
 
-            return Page();
+            return RedirectToPage(
+                "./Details",
+                new
+                {
+                    id = result.Value.Id,
+                    Search,
+                    FromDate,
+                    ToDate,
+                    Status,
+                    SortBy,
+                    Descending,
+                    PageNum,
+                    PageSize
+                });
+        }
+        catch (DomainException exception)
+        {
+            return await RenderDomainFailureAsync(
+                id,
+                exception.Message,
+                cancellationToken);
+        }
+    }
+
+    private async Task<IActionResult> RenderDomainFailureAsync(
+        int id,
+        string message,
+        CancellationToken cancellationToken)
+    {
+        ModelState.AddModelError(string.Empty, message);
+
+        var result = await _handler.HandleAsync(
+            new GetPurchaseOrderRequest(id),
+            cancellationToken);
+
+        if (result.IsFailure || result.Value is null)
+        {
+            return NotFound();
         }
 
-        TempData["SuccessMessage"] =
-            $"Purchase Order '{result.Value!.Id}' was cancelled successfully.";
+        PurchaseOrder = result.Value;
 
-        return RedirectToPage(
-            "./Details",
-            new
-            {
-                id = result.Value.Id,
-                Search,
-                FromDate,
-                ToDate,
-                Status,
-                SortBy,
-                Descending,
-                PageNum,
-                PageSize
-            });
+        return Page();
     }
 }
