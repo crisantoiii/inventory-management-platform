@@ -22,7 +22,7 @@ v1.3  Account Management       ✅
 v1.4  Additional Reporting     ✅
 v1.5  Purchasing Enhancements  ✅
 v1.6  Dynamic Capability Auth  ✅
-(Sprint 11 Automated Testing ✅ — non-release; Sprint 12 Authorization Refinement ✅ — non-release; Sprint 13 Purchasing Workflow Test Automation ✅ — non-release; Sprint 14 Purchase Order Cancellation and Draft Item Editing ✅ — non-release)
+(Sprint 11 Automated Testing ✅ — non-release; Sprint 12 Authorization Refinement ✅ — non-release; Sprint 13 Purchasing Workflow Test Automation ✅ — non-release; Sprint 14 Purchase Order Cancellation and Draft Item Editing ✅ — non-release; Sprint 15 Purchase Order Workflow Error Handling and UX Hardening ✅ — non-release)
 
 ---
 
@@ -240,6 +240,37 @@ Build:             0 errors (full rebuild: 28 pre-existing warnings)
 - Repository integration tests use EF Core InMemory: repository wiring/query-shape regression coverage only — not SQL Server integration testing
 - Sprint 12 EditStatus item and the T05 `PagedRequest.Status` pass-through finding remain deferred, untouched
 
+## Sprint 15 - Purchase Order Workflow Error Handling and UX Hardening
+
+**Status:** Complete/Closed
+
+Sprint 15 hardened the Purchase Order Details presentation boundary: all four POST workflows (Submit, Approve, Receive, Cancel) now catch expected `DomainException` failures and render the canonical Domain message as inline validation feedback (ModelState + Purchase Order reload via `GetPurchaseOrderHandler` + `Page()`, through one private local helper; helper reload failure returns `NotFound()`), instead of propagating to the Development exception page. Authorization remains before try/catch and unchanged; existing Application Result failures keep their ModelState + reload + Page() semantics; unexpected exceptions propagate. Rejected operations persist no state changes (SQL before/after and restart evidence in T04); successful paths are unchanged.
+
+### Completed
+
+- T01: Contract Verification and Design Lock
+- T02: Purchase Order Details Workflow Error Handling (`Details.cshtml.cs` only)
+- T03: Regression and Coverage Verification (all suites green; Result/NotFound semantics documented correctly)
+- T04: Integrated and Manual Verification (real-browser failure/success/authorization/NotFound scenarios with SQL before/after, restart persistence check, migration-history check)
+- T05: Documentation Synchronization and Sprint Closure
+
+### Final Test Baseline
+
+```text
+UnitTests:        346 passed
+IntegrationTests:  92 passed
+Web.Tests:         39 passed
+Total:            477 passed, 0 failed, 0 skipped
+Build:             0 errors (full rebuild: 28 pre-existing warnings)
+```
+
+### Boundaries Held
+
+- No production source changed outside `Details.cshtml.cs` (T02); no test, migration/schema, authorization/seed, package, or project changes
+- No artificial PageModel test seam introduced
+- `Descending=True` hidden-field POST round-trip loss (Details and Edit pages) is a pre-existing markup issue, deferred to a future approved task — representative navigation/query state was preserved except for this issue
+- No version assigned, no tag created, no release published (non-release technical-hardening sprint)
+
 ## Sprint 14 - Purchase Order Cancellation and Draft Item Editing
 
 **Status:** Complete
@@ -278,7 +309,7 @@ Build:             0 errors (full rebuild: 28 pre-existing warnings; no Sprint 1
 
 ## Next Sprint Planning
 
-Sprint 11 through Sprint 14 are complete. Sprint 14 achieved its lifecycle-completion objective with the full suite green and all sprint boundaries held. The next activity is a separate Sprint Planning session; no Sprint 15 scope is defined and Sprint 15 has not been started.
+Sprint 11 through Sprint 15 are complete. Sprint 15 achieved its error-handling hardening objective with the full suite green and all sprint boundaries held. The next activity is a separate Sprint Planning session; no Sprint 16 scope is defined and Sprint 16 has not been started.
 
 ## D1 - Documentation Synchronization
 

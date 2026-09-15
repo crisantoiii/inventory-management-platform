@@ -44,7 +44,7 @@ The focus is not only on implementing business features but also on applying pro
 
 **Current Version:** v1.6.0 - Dynamic Capability-Based Authorization
 
-**Current Development Status:** Sprint 14 Purchase Order Cancellation and Draft Item Editing — Complete. 477 automated tests passing (346 UnitTests, 92 IntegrationTests, 39 Web.Tests; 0 failed, 0 skipped). Not a release sprint — v1.6.0 remains the current release baseline. T07 (EditStatus `IsInRole` cleanup) remains Blocked/Deferred — the remaining check is a reachable, behavior-affecting guard, not dead code.
+**Current Development Status:** Sprint 15 Purchase Order Workflow Error Handling and UX Hardening — Complete/Closed. All four Purchase Order Details POST workflows (Submit, Approve, Receive, Cancel) now render expected `DomainException` failures as inline validation feedback instead of HTTP 500, with authorization, Result/NotFound semantics, and persistence safety preserved. 477 automated tests passing (346 UnitTests, 92 IntegrationTests, 39 Web.Tests; 0 failed, 0 skipped). Not a release sprint — v1.6.0 remains the current release baseline. Deferred findings: `Descending=True` hidden-field POST round-trip loss (pre-existing, Details and Edit pages) and the Sprint 12 T07 EditStatus `IsInRole` cleanup (reachable, behavior-affecting guard).
 
 ## Completed Modules
 
@@ -61,6 +61,7 @@ The focus is not only on implementing business features but also on applying pro
 - ✅ Web Authorization Handler Testing (Sprint 12 — 33 Web.Tests, no mocking framework)
 - ✅ Purchasing Workflow Test Automation (Sprint 13 — handlers, validators, repository integration; 432 project-wide)
 - ✅ Purchase Order Cancellation and Draft Item Editing (Sprint 14 — `PurchaseOrder.Edit` / `PurchaseOrder.Cancel` capabilities; 477 project-wide)
+- ✅ Purchase Order Workflow Error Handling and UX Hardening (Sprint 15 — Details Submit/Approve/Receive/Cancel `DomainException` failures render inline; 477 project-wide)
 - ✅ User Management
 - ✅ Account Management
 - ✅ Purchasing (Core Workflow + Sprint 8 P1-P7 Enhancements Complete)
@@ -409,6 +410,7 @@ The long-term goal is to evolve this project into a complete inventory managemen
 - ✅ Partial Purchase Order Receiving
 - ✅ Final Purchase Order Receiving
 - ✅ Completed Purchase Order State
+- ✅ Expected workflow failures (Submit/Approve/Receive/Cancel) render as inline validation feedback with no persistence (Sprint 15)
 
 ### Purchase Order Presentation
 
@@ -805,7 +807,7 @@ No major architectural redesign was required.
 - Business behavior resides inside Domain entities.
 - Application handlers orchestrate workflows rather than implement business rules.
 - Purchase Orders are implemented as workflow-driven aggregates.
-- Purchase Order workflow actions are exposed through the Details page.
+- Purchase Order workflow actions are exposed through the Details page, which renders expected workflow `DomainException` failures (Submit/Approve/Receive/Cancel) as inline validation feedback while authorization, NotFound, and unexpected-exception behavior remain unchanged.
 - Purchase Order receiving is performed at the Purchase Order Item level.
 - Purchase Order totals remain calculated from Purchase Order items.
 - Client-side validation improves user experience while Domain validation remains authoritative.
@@ -921,11 +923,12 @@ Development Tools
 
 ## Current
 
+- Sprint 15 - Purchase Order Workflow Error Handling and UX Hardening - Complete (Details Submit/Approve/Receive/Cancel `DomainException` failures render as inline validation instead of HTTP 500; authorization, Result/NotFound, and persistence semantics unchanged; 477 automated tests; no schema/migration change; `Descending=True` hidden-field round-trip issue deferred, pre-existing)
 - Sprint 14 - Purchase Order Cancellation and Draft Item Editing - Complete (Domain cancellation + Application workflows + `PurchaseOrder.Edit`/`PurchaseOrder.Cancel` capabilities + Draft item Edit page; 477 automated tests; no schema/migration change)
 - Sprint 13 - Purchasing Workflow Test Automation - Complete (Application handler/validator/query tests + PurchaseOrderRepository integration tests; 432 automated tests; no production changes)
 - Sprint 12 - Authorization Refinement - Complete (handler tests + authorization boundary fixes; T07 EditStatus cleanup deferred/blocked)
 - Sprint 10 - Dynamic Capability-Based Authorization - Complete
-- v1.6.0 released (v1.6.0 remains the current release baseline; Sprints 11-13 are non-release sprints)
+- v1.6.0 released (v1.6.0 remains the current release baseline; Sprints 11-15 are non-release sprints)
 
 ## Sprint 10 Closure State
 
