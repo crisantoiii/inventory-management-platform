@@ -1,5 +1,30 @@
 # Changelog
 
+## [Sprint 15] - Purchase Order Workflow Error Handling and UX Hardening
+
+### Summary
+
+Hardened the Purchase Order Details presentation boundary so expected Domain business-rule failures on the four POST workflows render as user-facing inline validation feedback instead of propagating to the Development exception page, following the Sprint 14 Edit-page precedent. Not a release sprint — no version has been assigned; v1.6.0 remains the current release baseline.
+
+### Changed
+
+- All four Purchase Order Details POST handlers (Submit, Approve, Receive, Cancel) now catch expected `DomainException` and route through a single private re-render helper (`RenderDomainFailureAsync`): canonical Domain message added to model-level `ModelState`, Purchase Order reloaded via `GetPurchaseOrderHandler`, successful reload returns `Page()`, helper reload failure returns `NotFound()`
+- Authorization remains before try/catch and unchanged (`Forbid()` semantics intact); unexpected exceptions remain outside the narrow catch; existing Application Result failures keep their pre-existing ModelState + reload + Page() semantics
+- `PurchaseOrder` reload on failure uses `GetPurchaseOrderHandler`; no Web-layer persistence was added
+
+### Verification
+
+- Automated baseline: 477 passed tests (346 UnitTests, 92 IntegrationTests, 39 Web.Tests; 0 failed, 0 skipped); normal build 0 warnings / 0 errors; full non-incremental build 28 pre-existing warnings / 0 errors (no Sprint 15 warning regression)
+- Manual application/browser verification against the configured SQL Server database: all expected Domain failure scenarios render inline with no HTTP 500 (Submit empty/non-Draft, Approve invalid state, all four Receive failures, Cancel invalid state); rejected operations left persisted state unchanged (PurchaseOrders, PurchaseOrderItems, Products.QuantityOnHand, InventoryTransactions); authorization denial remained distinct from validation feedback; GET and crafted POST of a missing Purchase Order returned HTTP 404 via the existing NotFound path; success-path regression passed; persistence confirmed across application restart; migration history matches source with no pending model changes
+
+### Known/Deferred (recorded, not remediated)
+
+- `Descending=True` is not reliably preserved through the hidden-input POST round-trip (Razor boolean-attribute rendering on `value="@Model.Descending"`); exists on Details and Edit pages, predates Sprint 15/T02, does not block the sprint objective — deferred to a future approved task
+- Antiforgery `SecurePolicy = Always` is incompatible with plain-HTTP serving; the `https` launch profile is the intended development configuration (record-only observation)
+- Create-page duplicate-product `DomainException` presentation and Create FluentValidation production invocation remain deferred (unchanged from planning)
+
+---
+
 ## [Sprint 14] - Purchase Order Cancellation and Draft Item Editing
 
 ### Summary

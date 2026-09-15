@@ -6,9 +6,9 @@
 - **Title:** Purchase Order Workflow Error Handling and UX Hardening
 - **Planning authority:** `plan/SPRINT_15_PLANNING_REPORT.md` - Revision 2
 - **Task breakdown:** `SPRINT_15_TASK_BREAKDOWN.md`
-- **Retrospective state:** T04 RECORDED
-- **Sprint status:** IN PROGRESS (T05 pending)
-- **Implementation status:** T04 COMPLETE
+- **Retrospective state:** FINALIZED (T05 COMPLETE)
+- **Sprint status:** COMPLETE / CLOSED
+- **Implementation status:** T01-T05 COMPLETE
 - **Release classification:** Non-release technical-hardening sprint
 
 ---
@@ -92,13 +92,13 @@ No global exception middleware or Application contract redesign is planned.
 
 ## 5. Planned Tasks
 
-| Task | Title | Initial Status |
+| Task | Title | Status |
 |---|---|---|
 | T01 | Contract Verification and Design Lock | COMPLETE |
 | T02 | Purchase Order Details Workflow Error Handling | COMPLETE |
 | T03 | Regression and Coverage Verification | COMPLETE |
 | T04 | Integrated and Manual Verification | COMPLETE |
-| T05 | Documentation Synchronization and Sprint Closure | NOT STARTED |
+| T05 | Documentation Synchronization and Sprint Closure | COMPLETE |
 
 ---
 
@@ -326,6 +326,8 @@ All rejected operations compared before/after via read-only queries: PurchaseOrd
 3. Test tooling: verification used a temporary, untracked local browser-automation harness (Selenium + Chrome) driving the real app; the harness files were removed after evidence capture and are not part of the repository change set.
 4. Setup side effects through the application (documented, deliberate test data): user `t04noperm@inventory.local` created and retained (same precedent as Sprint 14 `t09denied`); PO 21 created then cancelled; PO 6 advanced Draft→Submitted→Approved; PO 7 received in full (product 2 stock 123→133, one new InventoryTransaction).
 
+### T03 - Regression and Coverage Verification
+
 - **Status:** COMPLETE
 - **Date:** 2026-09-13
 - **Result:** T03 ACCEPTED CANDIDATE - PROCEED TO T04
@@ -340,6 +342,18 @@ All rejected operations compared before/after via read-only queries: PurchaseOrd
 - **Graphify:** Not run - verification-only task; no source/test-source changes
 - **Persistence safety:** All four rejected workflows avoid persistence (confirmed by Application tests).
 - **Authorization regression:** All policies unchanged, ordering unchanged, Web authorization tests pass.
+- **Deviations:** None
+
+### T05 - Documentation Synchronization and Sprint Closure
+
+- **Status:** COMPLETE
+- **Date:** 2026-09-15
+- **Result:** T05 ACCEPTED CANDIDATE - SPRINT 15 READY TO CLOSE
+- **Files changed:** Retrospective (finalized), README.md, ROADMAP.md, PROJECT_STATUS.md, CHANGELOG.md, docs/ENGINEERING_JOURNAL.md. No production, test-source, migration, authorization, or package changes.
+- **Tests executed:** None (documentation-only task; the accepted T04 baseline stands as the sprint's final baseline and no fresh runs were executed or claimed)
+- **Build:** None executed (documentation-only task)
+- **Graphify:** Not run - documentation-only task; no source/test-source changes
+- **Notes:** Documentation synchronized with the accepted T01-T04 evidence. The deferred `Descending=True` finding was preserved with appropriately qualified navigation wording; the antiforgery `SecurePolicy = Always` HTTPS observation was recorded as record-only; no stale `result.IsFailure -> NotFound()` wording remains in current-state docs; Sprint 15 was marked COMPLETE/CLOSED only after synchronization. Exact changed files are listed in the T05 execution report.
 - **Deviations:** None
 
 ---
@@ -363,38 +377,43 @@ All rejected operations compared before/after via read-only queries: PurchaseOrd
 
 ### Final Sprint 15 Results
 
-Recorded during T04 (fresh runs): UnitTests 346, IntegrationTests 92, Web.Tests 39, total 477 passed, 0 failed, 0 skipped; normal build 0 warnings/0 errors; full non-incremental build 28 warnings (pre-existing)/0 errors.
+Recorded during T04 (fresh runs, re-confirmed after a clean rebuild): UnitTests 346, IntegrationTests 92, Web.Tests 39, total 477 passed, 0 failed, 0 skipped; normal build 0 warnings/0 errors; full non-incremental build 28 warnings (all pre-existing)/0 errors. T05 was documentation-only and executed no fresh test or build runs; the accepted T04 baseline stands as the sprint's final baseline.
 
 | Metric | Final |
 |---|---:|
-| UnitTests | TBD |
-| IntegrationTests | TBD |
-| Web.Tests | TBD |
-| Total | TBD |
-| Failed | TBD |
-| Skipped | TBD |
-| Normal build warnings | TBD |
-| Normal build errors | TBD |
-| Full rebuild warnings | TBD |
-| Full rebuild errors | TBD |
+| UnitTests | 346 |
+| IntegrationTests | 92 |
+| Web.Tests | 39 |
+| Total | 477 |
+| Failed | 0 |
+| Skipped | 0 |
+| Normal build warnings | 0 |
+| Normal build errors | 0 |
+| Full rebuild warnings | 28 |
+| Full rebuild errors | 0 |
 
 ---
 
 ## 11. What Went Well
 
-To be completed during Sprint 15 closure.
+- **Design lock held end to end.** T01 verified all Revision 2 assumptions against current source before implementation; T02 then landed in a single file (`Details.cshtml.cs`) with zero deviations, and no later task exposed drift.
+- **The Edit-page precedent carried.** The local catch → ModelState → re-render helper pattern mirrored the established Sprint 14 Edit-page behavior, which made T02 a per-handler try/catch plus one shared private helper rather than new architecture.
+- **Narrow scope stayed narrow.** Authorization remained before try/catch, Result/NotFound semantics stayed untouched, and unexpected exceptions still propagate — the planning matrix predicted exactly what happened.
+- **Verification depth paid off.** T04's real-browser plus SQL before/after method surfaced a subtle pre-existing defect (`Descending=True` round-trip loss) that automated suites could never see, with root cause proven down to Razor boolean-attribute rendering.
+- **No-save semantics were already proven.** Existing Application tests asserting `SaveChangesAsync` non-invocation on failure meant the sprint needed no new test infrastructure to demonstrate persistence safety.
 
 ---
 
 ## 12. What Could Be Improved
 
-To be completed during Sprint 15 closure.
+- **The `Descending=True` hidden-field defect survived four sprints of verification.** Razor boolean-attribute rendering silently produced `value="value"` for `value="@Model.Descending"`; earlier sort-state checks evidently never exercised a descending round-trip through a POST re-render. Markup-level round-trip checks belong in manual verification checklists.
+- **Razor bool attributes are a recurring trap.** The same pattern exists on the Edit page and would resurface anywhere `value="@someBool"` is used; a convention note (prefer `asp-for` or a non-bool expression for hidden bool fields) would prevent recurrence.
+- **PageModel-level error handling is becoming a repeated convention.** Edit (Sprint 14) and Details (Sprint 15) now share the same catch → ModelState → re-render shape by copy, not by abstraction; per the Rule of Three, a third occurrence should trigger extraction of a shared helper or base behavior.
+- **Crafted-POST verification is powerful but heavy.** T04 required a temporary browser-automation harness; a lightweight, documented harness convention would reduce setup cost for future manual verification tasks.
 
 ---
 
 ## 13. Decisions Made During Sprint
-
-To be completed as tasks are accepted.
 
 Initial accepted planning decisions:
 
@@ -405,15 +424,27 @@ Initial accepted planning decisions:
 5. Do not create artificial test seams merely to increase automated test counts.
 6. Keep Create-page findings deferred.
 
+Decisions recorded during execution:
+
+7. T03 (record-only correction): existing Application Result failures in Details use ModelState + reload + Page(), NOT NotFound() — T02 preserved pre-existing Result semantics, and documentation was corrected rather than code.
+8. T04: `Descending=True` round-trip loss recorded as a pre-existing UX limitation and deferred to a future approved task; NOT corrected within Sprint 15 scope.
+9. T04: authorization denial kept entirely separate from validation feedback (AccessDenied page with empty summary) — confirmed unchanged by crafted-POST verification.
+10. T05: per repository convention (Sprints 11-14), a per-sprint CHANGELOG entry was added even though the sprint is non-release; no version was assigned.
+
 ---
 
 ## 14. Architecture Observations
 
-To be updated during execution.
+Initial observation (confirmed by execution):
 
-Initial observation:
+The sprint corrected a presentation-boundary asymmetry without moving business rules out of the Domain or altering established Application handler contracts.
 
-The sprint is intended to correct a presentation-boundary asymmetry without moving business rules out of the Domain or altering established Application handler contracts.
+Execution observations:
+
+- The Domain remains the sole rule owner: every inline message rendered during T04 came verbatim from the aggregate's `DomainException` — no message text was duplicated into Web code.
+- The Application layer was untouched; handlers still propagate `DomainException` and return `Result` failures exactly as before, so the change is invisible below the Razor boundary.
+- The private `RenderDomainFailureAsync` helper is PageModel-local by design; no base-class, middleware, or contract abstraction was introduced, and no Web persistence was added.
+- Authorization stays structurally first: policy checks and `Forbid()` occur before try/catch, keeping security failures and business-rule failures observably distinct.
 
 ---
 
@@ -475,31 +506,36 @@ Sprint 15 can be marked COMPLETE only when:
 
 ## 18. Final Sprint Outcome
 
-**Status:** IN PROGRESS
+**Status:** COMPLETE / CLOSED
 
-To be completed during T05.
+Sprint 15 delivered its accepted scope exactly: all four Purchase Order Details POST workflows (Submit, Approve, Receive, Cancel) catch expected `DomainException` failures, render the canonical Domain message as user-facing inline validation, reload the Purchase Order through `GetPurchaseOrderHandler`, and return `Page()` via one private local helper (helper reload failure → `NotFound()`), with no HTTP 500 for expected Domain failures. Authorization remains before try/catch and unchanged; existing Result failures keep their ModelState + reload + Page() semantics with `NotFound()` only on helper reload failure; unexpected exceptions propagate. Rejected operations persist nothing (automated no-save tests plus T04 SQL before/after and restart evidence); successful paths are unchanged. Final baseline: 477 passed / 0 failed / 0 skipped; normal build 0 warnings / 0 errors; full rebuild 28 pre-existing warnings / 0 errors. No schema/migration, authorization/seed, package, or project changes; no version bump, tag, or release. The sprint closed as a non-release technical-hardening sprint.
 
 ---
 
 ## 19. Release Decision
 
-**Initial classification:** Non-release technical-hardening sprint.
+**Final classification:** Non-release technical-hardening sprint — confirmed.
 
-No semantic version is assigned during planning.
+No new business capability, lifecycle transition, authorization capability, or schema change was introduced; the sprint corrected only presentation-layer handling of existing Domain failures.
 
-Final closure must confirm whether execution remained within this classification.
+- Version bump: none — v1.6.0 remains the current release baseline.
+- Tag: none.
+- GitHub release: none.
 
 ---
 
 ## 20. Retrospective Closure
 
-To be completed after T05 acceptance.
-
-- **Sprint status:** IN PROGRESS
-- **All tasks accepted:** No
-- **Final test baseline:** TBD
-- **Manual verification:** TBD
-- **Database migration:** Expected none
-- **Authorization changes:** Expected none
-- **Release/tag:** Not planned
-- **Known deferred findings:** Create duplicate-product error presentation; Create FluentValidation production invocation
+- **Sprint status:** COMPLETE / CLOSED
+- **All tasks accepted:** Yes — T01-T05 COMPLETE (external review of T05 remains outstanding)
+- **Final test baseline:** 477 passed (346 UnitTests, 92 IntegrationTests, 39 Web.Tests), 0 failed, 0 skipped; normal build 0 warnings/0 errors; full non-incremental build 28 pre-existing warnings/0 errors
+- **Manual verification:** Passed — real-browser scenarios through the running app (all four failure modes inline, no HTTP 500), SQL before/after persistence checks, authorization denial, Result/NotFound, success-path regression, restart persistence check
+- **Database migration:** None (10 existing migrations unchanged; no pending model changes)
+- **Authorization changes:** None (capabilities, policies, seeds, and Forbid() ordering unchanged)
+- **Release/tag:** None — non-release technical-hardening sprint; v1.6.0 remains the release baseline
+- **Known deferred findings:**
+  - `Descending=True` hidden-input POST round-trip loss (Details and Edit pages; pre-existing Razor boolean-attribute rendering) — deferred to a future approved task
+  - Create duplicate-product `DomainException` presentation — deferred, out of Sprint 15 scope
+  - Create FluentValidation production invocation — deferred investigation / record-only
+  - Antiforgery `SecurePolicy = Always` vs plain-HTTP serving — record-only environment observation
+  - Sprint 12 T07 EditStatus `IsInRole` cleanup — remains Blocked/Deferred from Sprint 12

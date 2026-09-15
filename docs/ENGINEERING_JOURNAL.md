@@ -24,9 +24,9 @@ Rather than documenting daily work, it captures important architectural decision
 
 # Current Release State
 
-**Current Version:** Sprint 14 Purchase Order Cancellation and Draft Item Editing (non-release sprint; v1.6.0 remains the release baseline)
+**Current Version:** Sprint 15 Purchase Order Workflow Error Handling and UX Hardening (non-release sprint; v1.6.0 remains the release baseline)
 
-Sprint 14 Purchase Order Cancellation and Draft Item Editing is complete. 477 automated tests passing across Domain, Application, Infrastructure, and Web layers (346 UnitTests, 92 IntegrationTests, 39 Web.Tests; 0 failed, 0 skipped). The sprint made the existing `Cancelled` state reachable through the full stack with terminal semantics, added a dedicated Draft item edit page, and introduced the `PurchaseOrder.Edit` / `PurchaseOrder.Cancel` capabilities (catalog 39 → 41) within the existing dynamic capability model. The Sprint 12/13 three-project test foundation and all earlier baselines remain intact beneath it. No schema migration, EF mapping change, or data backfill was required.
+Sprint 15 Purchase Order Workflow Error Handling and UX Hardening is complete and closed. 477 automated tests passing across Domain, Application, Infrastructure, and Web layers (346 UnitTests, 92 IntegrationTests, 39 Web.Tests; 0 failed, 0 skipped). The sprint hardened the Purchase Order Details presentation boundary: all four POST workflows (Submit, Approve, Receive, Cancel) catch expected `DomainException` failures and render the canonical Domain message as inline validation (ModelState + reload + `Page()` via one private local helper) instead of the Development exception page, with authorization, Result/NotFound semantics, and no-save behavior preserved. The Sprint 12/13/14 three-project test foundation and all earlier baselines remain intact beneath it. No schema migration, EF mapping change, authorization/seed change, or data backfill was required; `Descending=True` hidden-field round-trip loss (pre-existing) was recorded as deferred.
 
 # Sprint 14 - Purchase Order Cancellation and Draft Item Editing
 

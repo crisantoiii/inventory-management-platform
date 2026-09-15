@@ -870,6 +870,7 @@ The Details page currently supports:
 Submit
 Approve
 Receive
+Cancel (introduced Sprint 14; Draft Item Editing is provided by the dedicated Edit page)
 Rationale
 
 The Purchase Order Details page already represents the current state of the Purchase Order and its items.
@@ -882,6 +883,8 @@ Provides immediate visibility of the current Purchase Order state.
 Allows actions to be displayed according to the current status.
 
 The Presentation layer reflects the workflow while the Domain remains responsible for enforcing valid state transitions.
+
+Since Sprint 15, expected Domain business-rule failures on these POST actions (Submit, Approve, Receive, Cancel) are caught by the Details PageModel and rendered as inline validation feedback (ModelState + reload + Page()) while authorization, NotFound, and unexpected-exception behavior remain unchanged.
 
 Alternatives Considered
 

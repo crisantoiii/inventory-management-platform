@@ -30,7 +30,7 @@ Account Management
 
 **Latest Release:** v1.6.0 — Sprint 10 Dynamic Capability-Based Authorization
 
-**Project Status:** Sprint 14 Purchase Order Cancellation and Draft Item Editing — Complete. 477 automated tests passing (346 UnitTests, 92 IntegrationTests, 39 Web.Tests; 0 failed, 0 skipped). Not a release sprint — v1.6.0 remains the current release baseline. T07 (EditStatus `IsInRole` cleanup) remains Blocked/Deferred — the remaining check is a reachable, behavior-affecting guard, not dead code.
+**Project Status:** Sprint 15 Purchase Order Workflow Error Handling and UX Hardening — Complete/Closed. All four Purchase Order Details POST workflows (Submit, Approve, Receive, Cancel) now render expected `DomainException` failures as inline validation feedback instead of HTTP 500, with authorization, Result/NotFound semantics, and persistence safety preserved. 477 automated tests passing (346 UnitTests, 92 IntegrationTests, 39 Web.Tests; 0 failed, 0 skipped). Not a release sprint — v1.6.0 remains the current release baseline. Deferred findings: `Descending=True` hidden-field POST round-trip loss (pre-existing, Details and Edit pages) and the Sprint 12 T07 EditStatus `IsInRole` cleanup (reachable, behavior-affecting guard).
 
 **Last Updated:** September 2026
 
@@ -134,8 +134,8 @@ Verified:
 
 - **Completed Modules:** 11
 - **Architecture Status:** Validated
-- **Current Milestone:** Sprint 14 — Purchase Order Cancellation and Draft Item Editing (Complete; not a release sprint — v1.6.0 remains the current release baseline)
-- **Next Milestone:** Ready for PR/release decision — separate Sprint Planning session pending; no Sprint 15 scope defined
+- **Current Milestone:** Sprint 15 — Purchase Order Workflow Error Handling and UX Hardening (Complete/Closed; not a release sprint — v1.6.0 remains the current release baseline)
+- **Next Milestone:** Separate Sprint Planning session pending; no Sprint 16 scope defined
 - **Automated Tests:** 477 passing (346 UnitTests, 92 IntegrationTests, 39 Web.Tests; 0 failed, 0 skipped)
 
 ---
@@ -822,7 +822,7 @@ Final verification covered normal application regression, reporting workflows, e
 
 # Current Focus
 
-Sprint 14 Purchase Order Cancellation and Draft Item Editing is complete. 477 automated tests passing (346 UnitTests, 92 IntegrationTests, 39 Web.Tests; 0 failed, 0 skipped). The sprint delivered authorized cancellation of Draft and Submitted Purchase Orders (Cancelled is terminal), a dedicated Draft item edit page (Quantity/UnitCost update, item removal keyed by `ProductId`, final-item removal allowed, empty-Draft submission still forbidden), and the new `PurchaseOrder.Edit` / `PurchaseOrder.Cancel` capabilities within the existing dynamic capability authorization model (catalog 39 → 41). No schema migration, EF mapping change, or data backfill was required (existing `Cancelled = 6` status). Automated suites, manual browser verification, and real SQL Server provider verification all passed. T07 (EditStatus `IsInRole` cleanup) remains blocked/deferred pending an explicit behavioral decision, and the Details POST `DomainException` handling convention is recorded as a deferred follow-up. The next activity is the external PR/release decision followed by a separate Sprint Planning session; no Sprint 15 scope is defined.
+Sprint 15 Purchase Order Workflow Error Handling and UX Hardening is complete and closed. 477 automated tests passing (346 UnitTests, 92 IntegrationTests, 39 Web.Tests; 0 failed, 0 skipped). The sprint hardened the Purchase Order Details presentation boundary: all four POST workflows (Submit, Approve, Receive, Cancel) catch expected `DomainException` failures and render the canonical Domain message as inline validation (ModelState + Purchase Order reload + `Page()` via one private local helper; helper reload failure → `NotFound()`) instead of the Development exception page, resolving the follow-up recorded at Sprint 14 closure. Authorization remains before try/catch and unchanged; existing Result failures keep their ModelState + reload + Page() semantics; unexpected exceptions propagate. Rejected operations persist no state changes (automated no-save tests plus SQL before/after and restart evidence); successful paths are unchanged. No schema migration, EF mapping change, authorization/seed change, or package/project change was required. Representative navigation/query state was preserved except for a pre-existing `Descending=True` hidden-field round-trip issue, deferred for a future approved task. T07 (EditStatus `IsInRole` cleanup) remains blocked/deferred pending an explicit behavioral decision. The next activity is a separate Sprint Planning session; no Sprint 16 scope is defined.
 
 Completed in Sprint 8:
 
