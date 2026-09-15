@@ -6,9 +6,9 @@
 - **Title:** Purchase Order Workflow Error Handling and UX Hardening
 - **Planning authority:** `plan/SPRINT_15_PLANNING_REPORT.md` - Revision 2
 - **Task breakdown:** `SPRINT_15_TASK_BREAKDOWN.md`
-- **Retrospective state:** BASELINE
-- **Sprint status:** IN PROGRESS
-- **Implementation status:** T03 COMPLETE
+- **Retrospective state:** T04 RECORDED
+- **Sprint status:** IN PROGRESS (T05 pending)
+- **Implementation status:** T04 COMPLETE
 - **Release classification:** Non-release technical-hardening sprint
 
 ---
@@ -97,7 +97,7 @@ No global exception middleware or Application contract redesign is planned.
 | T01 | Contract Verification and Design Lock | COMPLETE |
 | T02 | Purchase Order Details Workflow Error Handling | COMPLETE |
 | T03 | Regression and Coverage Verification | COMPLETE |
-| T04 | Integrated and Manual Verification | NOT STARTED |
+| T04 | Integrated and Manual Verification | COMPLETE |
 | T05 | Documentation Synchronization and Sprint Closure | NOT STARTED |
 
 ---
@@ -200,11 +200,136 @@ These findings must not be silently absorbed into Sprint 15 implementation.
 - **Authorization impact:** None
 - **Deviations:** None
 
-### T03 - Regression and Coverage Verification
+### T04 - Integrated and Manual Verification
+
+- **Status:** COMPLETE
+- **Date:** 2026-09-15
+- **Result:** T04 ACCEPTED CANDIDATE - PROCEED TO T05
+- **Files changed:** Retrospective only. No production, test-source, migration, authorization, or package changes.
+
+#### Automated Verification (fresh runs)
+
+| Suite | Passed | Failed | Skipped | Total |
+|---|---:|---:|---:|---:|
+| UnitTests | 346 | 0 | 0 | 346 |
+| IntegrationTests | 92 | 0 | 0 | 92 |
+| Web.Tests | 39 | 0 | 0 | 39 |
+| **Total** | **477** | **0** | **0** | **477** |
+
+- **Normal build:** 0 warnings, 0 errors.
+- **Full non-incremental build:** 28 warnings (all pre-existing: CS0108 x6, CS0114 x6, CS8601 x8, CS8602 x26, CS8604 x6, CS8618 x4), 0 errors. Matches Sprint 14/T03 baseline.
+- Re-run again after the manual-verification phase and after a clean rebuild; identical results.
+
+#### Application Startup
+
+- Environment: `ASPNETCORE_ENVIRONMENT=Development`, `https://localhost:7238` (the `https` launch profile URL from `launchSettings.json`).
+- Database: local SQL Server 2025 (17.0.1000.7), database `InventoryPlatform`, `Trusted_Connection` per `appsettings.Development.json`. Connection verified before startup.
+- Startup succeeded with no exceptions; `IdentitySeeder`/`AuthorizationSeeder` completed (seed users, capabilities, groups present in SQL).
+- Login page returned HTTP 200; authorized users reach the Purchase Order Details page.
+- Environment observation (record-only): the antiforgery cookie uses `SecurePolicy = Always`, so serving the app over plain HTTP (e.g. forcing the `http` profile URL) makes any antiforgery-dependent request fail with a 500 from `DeveloperExceptionPageMiddleware`. Running the intended `https` profile is unaffected. Pre-existing configuration, not a Sprint 15 change.
+
+#### Manual Browser Verification Method
+
+Real Chrome browser (Selenium) driving the running application over HTTPS with authenticated sessions (the seeded `admin` user and a dedicated capability-less user). Crafted POSTs were executed same-origin from inside the authenticated browser session with a valid antiforgery token harvested from a real rendered page - genuine requests through the running application boundary, not out-of-band HTTP calls. Every scenario recorded SQL before/after state via read-only `sqlcmd` queries. Representative non-default navigation query used for failure scenarios: `Search=Air&FromDate=2026-01-01&ToDate=2026-12-31&Status=1&SortBy=OrderDate&Descending=True&PageNum=2&PageSize=5`.
+
+#### Submit Failure (empty Draft PO 21, real UI button)
+
+- Starting state: Draft (1), zero items (item removed through the real Edit-page RemoveItem UI first).
+- Action: click "Submit Purchase Order" on Details.
+- Result: Details re-rendered (`Page()`), ModelOnly validation summary showed canonical message `A purchase order must contain at least one item.`, no Development exception page, no HTTP 500.
+- SQL before == after: status Draft (1), zero items, ledger count unchanged (10).
+- Navigation state: Back link and hidden fields preserved Search/FromDate/ToDate/Status/SortBy/PageNum/PageSize (see navigation finding below for `Descending`).
+
+#### Submit Failure (non-Draft, crafted POST, PO 9 Approved)
+
+- Crafted POST `?handler=Submit` on Approved PO 9 (UI hides Submit for non-Draft).
+- Result: Details re-rendered with `Only draft purchase orders can be modified.`, no HTTP 500.
+- SQL: status unchanged (Approved, 3); items unchanged.
+
+#### Approve Failure (crafted POST, PO 6 Draft)
+
+- Result: Details re-rendered with `Only submitted purchase orders can be approved.`, no HTTP 500.
+- SQL: status unchanged (Draft, 1); no persistence mutation.
+
+#### Cancel Failure (crafted POST, PO 9 Approved)
+
+- Result: Details re-rendered with `Only draft or submitted purchase orders can be cancelled.`, no HTTP 500.
+- SQL: status unchanged (Approved, 3); no persistence mutation.
+
+#### Receive Failures (all four, through the running app)
+
+| Scenario | Trigger | Canonical message rendered | SQL before == after |
+|---|---|---|---|
+| Invalid status | Receive on Draft PO 6 (crafted POST) | `Only approved purchase orders can receive inventory.` | status Draft; item ReceivedQuantity 0.00; product QuantityOnHand 16.00; ledger count 10 - unchanged |
+| Item not found | Receive product 1 (exists in catalog, not in PO 7) on Approved PO 7 (crafted POST) | `Purchase order item was not found.` | unchanged (status, items, product stock, ledger) |
+| Invalid quantity | Receive quantity 0 on Approved PO 7 (crafted POST) | `Received quantity must be greater than zero.` | unchanged |
+| Over-receive | Receive quantity 15 > ordered 10 on Approved PO 7 (crafted POST) | `Received quantity cannot exceed ordered quantity.` | unchanged |
+
+All four: no HTTP 500 / Development exception page; Details re-rendered with unchanged status badge; no PO receipt mutation, no inventory mutation, no stock-transaction/ledger row created by the rejected operations.
+
+Note: the item-not-found scenario intentionally used an existing product absent from the PO (product 1 on PO 7, which contains only product 2) so the Domain item-lookup rule fires rather than the Application product-lookup Result failure. A truly non-existent product id (e.g. 999) yields the Application Result failure `Product with ID '999' was not found.` before the Domain rule - a different (Result, not DomainException) path, verified separately below.
+
+#### Success Path Regression (real UI)
+
+| Workflow | PO | Outcome (visible + SQL) |
+|---|---|---|
+| Submit | 6 | success alert `Purchase Order '6' was submitted successfully.`; redirect to Details with query state; status Draft → Submitted (2) |
+| Approve | 6 | success alert; status Submitted → Approved (3) |
+| Receive | 7 (product 2, qty 10) | success alert; status Approved → Completed (5); item ReceivedQuantity 0.00 → 10.00; product QuantityOnHand 123.00 → 133.00; InventoryTransactions 10 → 11 |
+| Cancel | 21 (empty Draft) | success alert; status Draft → Cancelled (6) |
+
+No new inline error behavior appeared on any successful action.
+
+#### Authorization Verification
+
+- Subject: dedicated user `t04noperm@inventory.local` created through the running app (no roles, no AuthorizationGroup membership, hence zero capabilities).
+- Details GET: redirected to `/Identity/Account/AccessDenied` (existing behavior).
+- Crafted POST `?handler=Submit` on Draft PO 6: response was the AccessDenied page with an **empty** ModelState validation summary - authorization denial was NOT converted into validation feedback; handler business code never executed.
+- SQL: PO 6 unchanged (Draft; item intact). Capability policy model, `Forbid()` ordering, and seed data unchanged.
+
+#### Result / NotFound Verification
+
+- GET `/Purchasing/PurchaseOrders/Details/999`: HTTP 404 (existing NotFound path).
+- Crafted POST `?handler=Submit` with `id=999` (valid antiforgery, authenticated session): HTTP 404 via the Result failure → NotFound() path; response was not a Details re-render and contained no validation summary.
+- Distinct from DomainException handling (re-render + validation summary), as required.
+
+#### Navigation / Query State Verification
+
+After the Submit failure re-render, the Back link and post values preserved `Search=Air`, `FromDate=2026-01-01`, `ToDate=2026-12-31`, `Status` (round-trips as `Status=Draft`, equal value), `SortBy=OrderDate`, `PageNum=2`, `PageSize=5`.
+
+**Finding (pre-existing, not a T02 regression):** `Descending=True` did not survive the POST round-trip. Root cause (confirmed by DOM inspection, raw server HTML, clean rebuild, and the emitted Razor source): `value="@Model.Descending"` on a CLR `bool` triggers Razor boolean-attribute rendering - `true` renders the attribute as the literal string `value="value"`, `false` omits the attribute. The posted `"value"` string fails bool model binding, so `Descending` rebinds as `false` on the re-render. The identical markup pattern exists on `Edit.cshtml` (hidden inputs at lines 165-166, 242-243), proving it is a pre-existing page-markup convention, not something introduced by T02 (which changed only `Details.cshtml.cs`). Per T04 scope rules this was NOT corrected in source; recorded as a pre-existing UX limitation / correction requirement for a future approved task (remedy, if approved: render `value="@Model.Descending"` as a non-bool expression, e.g. `value="@(Model.Descending ? "true" : "false")"`, or use `asp-for`/`asp-page-handler` tag helpers).
+
+#### Real SQL Server Persistence Verification
+
+All rejected operations compared before/after via read-only queries: PurchaseOrders.Status, PurchaseOrderItems (Quantity/UnitCost/ReceivedQuantity), Products.QuantityOnHand, InventoryTransactions count. Every rejected Submit/Approve/Receive/Cancel left persisted state byte-identical (evidence tables above). No SQL data modification was performed outside deliberate application actions under test, except removal of intermediate draft Purchase Orders (ids 12-18) created accidentally by the verification harness itself during its debugging, before the recorded verification run (documented cleanup, no application data touched).
+
+#### Restart Persistence Check
+
+1. Stopped the application (all rejected and successful operations already performed).
+2. Restarted against the same database; reloaded relevant Purchase Orders through the UI.
+3. Results: PO 6 still Approved (successful submit+approve persisted); PO 7 still Completed with ReceivedQuantity 10.00, product QuantityOnHand 133.00, ledger 11 (successful receive persisted); PO 9 still Approved with zero ReceivedQuantity and unchanged items (rejected submit/approve/cancel left no mutation); PO 21 still Cancelled (successful cancel persisted).
+
+#### Database / Migration Verification
+
+- `__EFMigrationsHistory` contains exactly the 10 migration files present in source (latest `20260831141400_CreateAuthorizationSchema`); no Sprint 15 migration exists.
+- `dotnet ef migrations has-pending-model-changes` (dotnet-ef 10.0.10): "No changes have been made to the model since the last migration." - no model drift from T02.
+- No schema change; no migration created.
+
+#### Graphify
+
+`graphify update .`: Not run - verification-only task; no source/test-source changes.
+
+#### Deviations / Findings
+
+1. `Descending` bool hidden-input round-trip loss - pre-existing markup limitation (Details and Edit pages), recorded above as a correction requirement; not fixed during T04.
+2. HTTP-only serving is incompatible with the antiforgery `SecurePolicy = Always` configuration (startup/HTTPS observation above); the `https` launch profile is the intended local configuration and was used.
+3. Test tooling: verification used a temporary, untracked local browser-automation harness (Selenium + Chrome) driving the real app; the harness files were removed after evidence capture and are not part of the repository change set.
+4. Setup side effects through the application (documented, deliberate test data): user `t04noperm@inventory.local` created and retained (same precedent as Sprint 14 `t09denied`); PO 21 created then cancelled; PO 6 advanced Draft→Submitted→Approved; PO 7 received in full (product 2 stock 123→133, one new InventoryTransaction).
 
 - **Status:** COMPLETE
 - **Date:** 2026-09-13
 - **Result:** T03 ACCEPTED CANDIDATE - PROCEED TO T04
+
 - **T02 implementation recheck:** All 14 locked implementation properties confirmed. Source matches accepted T02 design.
 - **Result/NotFound behavior corrected:** Existing Result failures in Submit/Approve/Receive/Cancel use ModelState + reload + Page() (NOT NotFound()). This is a documentation-only correction; T02 did not change Result semantics.
 - **Domain coverage:** All four workflows have comprehensive Domain test coverage (83 tests in PurchaseOrderTests).
@@ -238,7 +363,7 @@ These findings must not be silently absorbed into Sprint 15 implementation.
 
 ### Final Sprint 15 Results
 
-To be completed during T04/T05.
+Recorded during T04 (fresh runs): UnitTests 346, IntegrationTests 92, Web.Tests 39, total 477 passed, 0 failed, 0 skipped; normal build 0 warnings/0 errors; full non-incremental build 28 warnings (pre-existing)/0 errors.
 
 | Metric | Final |
 |---|---:|
