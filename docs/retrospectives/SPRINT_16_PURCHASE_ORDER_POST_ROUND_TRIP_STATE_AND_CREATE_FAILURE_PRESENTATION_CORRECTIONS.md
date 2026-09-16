@@ -80,7 +80,7 @@ No global exception middleware, no Application contract redesign, no new abstrac
 
 | Task | Title | Status |
 |---|---|---|
-| T01 | Contract Verification and Design Lock | NOT STARTED |
+| T01 | Contract Verification and Design Lock | COMPLETE |
 | T02 | Descending Round-Trip Correction | NOT STARTED |
 | T03 | Create Domain-Failure Inline Presentation | NOT STARTED |
 | T04 | Integrated and Manual Verification | NOT STARTED |
@@ -150,8 +150,20 @@ These findings must not be silently absorbed into Sprint 16 implementation.
 
 ### T01 - Contract Verification and Design Lock
 
-- **Status:** NOT STARTED
-- **[AWAITING EXECUTION EVIDENCE]** — expected result: `DESIGN LOCKED — T02 READY` with site-by-site confirmation of the six markup sites, the bool binding contract, the Create exception path, existing failure restoration, no-persistence evidence, and any source drift.
+- **Status:** COMPLETE (2026-09-16)
+- **Result:** `DESIGN LOCKED — T02 READY`
+- **Verification performed (source-level, evidence below):**
+  - **Contract A:** all six accepted hidden `Descending` input sites reconfirmed at exact lines — `Details.cshtml` 67 (Submit), 86 (Approve), 107 (Cancel), 288 (Receive); `Edit.cshtml` 165–166 (UpdateItem), 242–243 (RemoveItem); all `name="Descending" value="@Model.Descending"` on the `[BindProperty(SupportsGet = true)] public bool Descending` properties (`Details.cshtml.cs:58–59`, `Edit.cshtml.cs:50–51`). Repo-wide sweep: no additional Purchase Order POST `name="Descending"` occurrence exists (only these two files); all other `Descending` navigation uses `asp-route-` tag helpers (unaffected). Hidden-`value="@Model.<prop>"` sweep: the six `Descending` inputs are the only CLR-bool ones (all other hidden values bind string/number/enum types via `ToString`/direct rendering).
+  - **Binding contract:** accepted explicit-string rendering `value="@(Model.Descending ? "true" : "false")"` remains compatible with the existing bool property. Framework evidence class: GET-side `Descending=True`/`Descending=False` binding is proven working in production today (Sprint 14 T09 PRG evidence; Sprint 15 T04 navigation evidence). POST-side format acceptance is not separately provable without a production/test change (forbidden in T01) — T02's rendered-HTML acceptance criterion is the designated proof point. **Note:** the T01 execution prompt suggested a bool-parse framework diagnostic; binary string inspection of the installed shared-framework assemblies was inconclusive and no production/test change was made to force the proof.
+  - **Contract B:** duplicate-product rule still in `PurchaseOrder.AddItem` (`PurchaseOrder.cs:54–57`, canonical message `"The product already exists in this purchase order."`); `CreatePurchaseOrderHandler` contains zero try/catch and calls `AddItem` (line 70) in its item loop; `CreateModel.OnPostAsync` still lacks `DomainException` handling (0 occurrences) and retains the exact restoration T03 reuses: `result.IsFailure` branch (lines 107–115: `ModelState.AddModelError(string.Empty, …)` → `EnsureAtLeastOneItem()` → `PopulateDropdownListsAsync()` → `Page()`), `ModelState.IsValid` gate (line 84), success PRG to Index (line 120); `Create.cshtml:25` has the `ModelOnly` validation summary; Create authorization remains the class-level `[Authorize(Policy = PurchaseOrder.CreatePolicy)]` (line 12).
+  - **No-persistence evidence reconfirmed:** `CreatePurchaseOrderHandlerTests.HandleAsync_DuplicateProductInRequest_ThrowsDomainException` (two identical product ids 10; asserts `DomainException`, message contains "already exists", `AddAsyncCallCount == 0`, `SaveChangesAsyncCallCount == 0`); Domain rule test `PurchaseOrderTests.AddItem_DuplicateProduct_ThrowsDomainException`.
+  - **Boundaries/non-goals reconfirmed:** no DB/migration/auth/package change required; no global `DomainException` middleware in the pipeline (`Program.cs` → `UseWeb()`: only `/Error` exception handler in non-Development, no DomainException middleware); no shared POST-failure helper exists outside the Purchase Order pages (Candidate E remains deferred/unimplemented); no FluentValidation invocation in the Purchasing Web path (Candidate C excluded); EditStatus `IsInRole` guard untouched at line 61 (Candidate D1 deferred).
+- **Tests executed (fresh, this task):** full solution suite — UnitTests 346 passed, IntegrationTests 92 passed, Web.Tests 39 passed, total 477 / 0 failed / 0 skipped; targeted Purchasing filter (`FullyQualifiedName~CreatePurchaseOrder|FullyQualifiedName~PurchaseOrderTests`) — 125 passed / 0 failed. Normal build: 0 warnings / 0 errors.
+- **Build result:** normal solution build succeeded (0 warnings, 0 errors). Full non-incremental build not executed in T01 (reserved for T04).
+- **Graphify:** not run — verification-only task; no source/test-source changes.
+- **Database/migration impact:** none. **Authorization impact:** none.
+- **Deviations:** none. No source drift found; all fourteen T01 acceptance criteria satisfied.
+- **Files changed:** this retrospective T01 task-log section only.
 
 ### T02 - Descending Round-Trip Correction
 
