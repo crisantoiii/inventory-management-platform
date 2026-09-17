@@ -167,8 +167,14 @@ These findings must not be silently absorbed into Sprint 16 implementation.
 
 ### T02 - Descending Round-Trip Correction
 
-- **Status:** NOT STARTED
-- **[AWAITING EXECUTION EVIDENCE]** — expected result: six inputs corrected with the explicit-string design; rendered-HTML evidence; fresh regression suite counts; build result; `graphify update .` confirmation.
+- **Status:** BLOCKED — EXTERNAL REVIEW REQUIRED (2026-09-17)
+- **Implementation:** all six accepted inputs were changed to `value="@(Model.Descending ? "true" : "false")"`: Details Submit/Approve/Cancel/Receive and Edit UpdateItem/RemoveItem. Source verification found zero remaining `value="@Model.Descending"` occurrences. No PageModel, Create, test-source, database, migration, authorization, package, Domain, or Application change was made.
+- **Rendered/runtime evidence obtained:** the HTTPS application started against the configured local SQL Server. The currently renderable Details Receive forms (Purchase Orders 3, 6, 8, and 9) emitted literal lowercase `value="true"` for `Descending=true` and `value="false"` for `Descending=false`. Safe Receive POSTs against Purchase Order 3 / Product 2 with `quantity=0` returned HTTP 200 failure re-renders and preserved the posted hidden value as `true` and `false`, respectively. A read-only SQL check afterward confirmed Purchase Order 3 remained status 3 and Product 2 remained quantity 8.00 / received quantity 0.00.
+- **Environmental verification limitation:** the current database contains no Draft purchase order (statuses present: 3, 4, 5, and 6). Consequently `Edit.cshtml` cannot render its UpdateItem/RemoveItem forms, and representative Edit true/false POST checks cannot be executed without creating or changing fixture/business data. No such out-of-scope mutation was performed. Details Submit/Approve/Cancel forms were likewise not all present in the current state-specific fixture set. The complete rendered/form matrix remains unclaimed.
+- **Automated tests:** `dotnet test InventoryPlatform.slnx --no-build` — UnitTests 346 passed, IntegrationTests 92 passed, Web.Tests 39 passed; total 477 passed / 0 failed / 0 skipped.
+- **Build:** `dotnet build InventoryPlatform.slnx` succeeded with 20 warnings / 0 errors; warnings were in pre-existing Administrator/Account/Reports/Purchase Order Index files, not the two changed Razor files.
+- **Graphify:** `graphify update .` completed; `graphify-out/graph.json` refreshed at 2026-09-17 19:18:22, followed by a successful scoped query resolving the Purchase Order Details/Edit models and POST handlers.
+- **Result:** the source correction and representative Details proof pass, but mandatory representative Edit true/false proof is unverified. T02 is not marked complete and T03 must not proceed pending external review or provision of a safe Draft fixture.
 
 ### T03 - Create Domain-Failure Inline Presentation
 
