@@ -64,7 +64,7 @@
                             <input type="hidden" name="ToDate" value="@Model.ToDate" />
                             <input type="hidden" name="Status" value="@Model.Status" />
                             <input type="hidden" name="SortBy" value="@Model.SortBy" />
-                            <input type="hidden" name="Descending" value="@Model.Descending" />
+                            <input type="hidden" name="Descending" value="@(Model.Descending ? "true" : "false")" />
                             <input type="hidden" name="PageNum" value="@Model.PageNum" />
                             <input type="hidden" name="PageSize" value="@Model.PageSize" />
                             <button type="submit" class="btn btn-primary">
@@ -83,7 +83,7 @@
                         <input type="hidden" name="ToDate" value="@Model.ToDate" />
                         <input type="hidden" name="Status" value="@Model.Status" />
                         <input type="hidden" name="SortBy" value="@Model.SortBy" />
-                        <input type="hidden" name="Descending" value="@Model.Descending" />
+                        <input type="hidden" name="Descending" value="@(Model.Descending ? "true" : "false")" />
                         <input type="hidden" name="PageNum" value="@Model.PageNum" />
                         <input type="hidden" name="PageSize" value="@Model.PageSize" />
                         <button type="submit" class="btn btn-primary">
@@ -104,7 +104,7 @@
                         <input type="hidden" name="ToDate" value="@Model.ToDate" />
                         <input type="hidden" name="Status" value="@Model.Status" />
                         <input type="hidden" name="SortBy" value="@Model.SortBy" />
-                        <input type="hidden" name="Descending" value="@Model.Descending" />
+                        <input type="hidden" name="Descending" value="@(Model.Descending ? "true" : "false")" />
                         <input type="hidden" name="PageNum" value="@Model.PageNum" />
                         <input type="hidden" name="PageSize" value="@Model.PageSize" />
                         <button type="submit" class="btn btn-outline-danger">
@@ -286,7 +286,7 @@
 
                                                     <input type="hidden"
                                                            name="Descending"
-                                                           value="@Model.Descending" />
+                                                           value="@(Model.Descending ? "true" : "false")" />
                                                     <input type="hidden"
                                                            name="PageNum"
                                                            value="@Model.PageNum" />
