@@ -1,6 +1,8 @@
 using InventoryPlatform.Application.Features.Products.GetProducts;
 using InventoryPlatform.Application.Features.Purchasing.CreatePurchaseOrder;
 using InventoryPlatform.Application.Features.Suppliers.GetSuppliers;
+using InventoryPlatform.Domain.Exceptions;
+using InventoryPlatform.Shared.Results;
 using InventoryPlatform.Web.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -99,9 +101,21 @@ public class CreateModel : PageModel
                     item.UnitCost))
                 .ToList());
 
-        var result = await _handler.HandleAsync(
-            request,
-            cancellationToken);
+        Result<CreatePurchaseOrderResponse> result;
+
+        try
+        {
+            result = await _handler.HandleAsync(
+                request,
+                cancellationToken);
+        }
+        catch (DomainException exception)
+        {
+            ModelState.AddModelError(string.Empty, exception.Message);
+            EnsureAtLeastOneItem();
+            await PopulateDropdownListsAsync(cancellationToken);
+            return Page();
+        }
 
         if (!result.IsSuccess)
         {

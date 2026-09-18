@@ -2218,3 +2218,21 @@ Use `IAuthorizationService.AuthorizeAsync(User, null, policyName)` in Razor view
 - Zero `IdentityConstants.Roles` references in .cshtml files
 - Server-side authorization remains independent of UI visibility
 
+---
+
+# DD-042 — Explicit Hidden Boolean POST Values
+
+**Status:** Implemented in Sprint 16
+
+## Context
+
+Purchase Order workflow forms must carry sorting direction through POST requests. Rendering a CLR `bool` directly into an HTML `value` attribute can be interpreted through Razor's boolean-attribute semantics, producing an unusable value or omitting the value instead of posting the intended state.
+
+## Decision
+
+When a hidden boolean field is written explicitly, render its value as a lowercase string (`condition ? "true" : "false"`). Use `asp-for` when normal model-bound input generation is appropriate. Do not rely on direct boolean interpolation into a hidden `value` attribute.
+
+## Rationale and Consequences
+
+The representation is unambiguous to HTML and ASP.NET Core model binding. Sprint 16 applied it to the six Details/Edit `Descending` fields, and a 12-case runtime matrix proved both boolean states across Submit, Approve, Cancel, Receive, UpdateItem, and RemoveItem. The convention changes presentation serialization only; query, Domain, Application, persistence, and authorization behavior remain unchanged.
+

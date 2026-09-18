@@ -24,9 +24,21 @@ Rather than documenting daily work, it captures important architectural decision
 
 # Current Release State
 
-**Current Version:** Sprint 15 Purchase Order Workflow Error Handling and UX Hardening (non-release sprint; v1.6.0 remains the release baseline)
+**Current Version:** Sprint 16 Purchase Order POST Round-Trip State and Create Failure Presentation Corrections (non-release sprint; v1.6.0 remains the release baseline)
 
-Sprint 15 Purchase Order Workflow Error Handling and UX Hardening is complete and closed. 477 automated tests passing across Domain, Application, Infrastructure, and Web layers (346 UnitTests, 92 IntegrationTests, 39 Web.Tests; 0 failed, 0 skipped). The sprint hardened the Purchase Order Details presentation boundary: all four POST workflows (Submit, Approve, Receive, Cancel) catch expected `DomainException` failures and render the canonical Domain message as inline validation (ModelState + reload + `Page()` via one private local helper) instead of the Development exception page, with authorization, Result/NotFound semantics, and no-save behavior preserved. The Sprint 12/13/14 three-project test foundation and all earlier baselines remain intact beneath it. No schema migration, EF mapping change, authorization/seed change, or data backfill was required; `Descending=True` hidden-field round-trip loss (pre-existing) was recorded as deferred.
+Sprint 16 is complete and closed. Six Details/Edit forms now serialize hidden `Descending` values as explicit lowercase strings, and Create catches only expected `DomainException` failures to present the canonical message inline after restoring page data. The 12-case true/false round-trip matrix passed; three invalid Create variants persisted nothing; successful workflow and authorization checks passed. The automated baseline remains 477 passing (346 UnitTests, 92 IntegrationTests, 39 Web.Tests; 0 failed, 0 skipped), with normal build 0/0 and non-incremental build 28 pre-existing warnings/0 errors. No schema, authorization, package, or configuration change occurred. This was not a release sprint.
+
+# Sprint 16 - Purchase Order POST Round-Trip State and Create Failure Presentation Corrections
+
+## Engineering Lessons
+
+- Hidden boolean fields should use explicit string rendering (`"true"`/`"false"`) or an appropriate `asp-for`; direct boolean Razor attribute rendering is unsafe for POST state.
+- Expected Domain failures belong at the page boundary as ModelState feedback, while unexpected exceptions continue to propagate.
+- The Rule of Three is a checkpoint, not an automatic extraction. Details, Edit, and Create share catch → ModelState → restore → `Page()`, but their restoration, state checks, redirects, and NotFound behavior differ. Candidate E remains deferred to a dedicated design/refactoring task rather than introducing delegate-heavy coupling.
+
+## Verification
+
+The 12/12 round-trip matrix, invalid/successful Create workflows, authorization gates, SQL no-persistence checks, 477-test suite, and both build modes passed. Candidates A and B are resolved; Candidates C, D1, D4, and E remain deferred.
 
 # Sprint 14 - Purchase Order Cancellation and Draft Item Editing
 
