@@ -75,7 +75,7 @@ The first Reporting vertical slice has also been implemented through Inventory V
 | Unit Management | ✅ Complete |
 | Inventory Transactions | ✅ Complete |
 | Architecture Sprint | ✅ Complete |
-| Purchasing | ✅ Core Workflow + Sprint 8 P1-P7 Enhancements + Sprint 14 Cancellation & Draft Item Editing + Sprint 15 Workflow Error Handling Complete |
+| Purchasing | ✅ Core Workflow + Sprint 8 Enhancements + Sprint 14 Cancellation/Edit + Sprint 15/16 POST Presentation and Round-Trip Hardening Complete |
 | Reporting | ✅ Sprint 7 Additional Reporting Complete |
 | Dynamic Capability-Based Authorization | ✅ Sprint 10 Complete — v1.6.0 released |
 
@@ -364,6 +364,8 @@ Each inventory transaction records:
 - ✅ Domain Receive Quantity Validation
 - ✅ Validation Summaries
 - ✅ Expected workflow failures (Submit/Approve/Receive/Cancel) render as inline validation feedback instead of HTTP 500, with no persistence (Sprint 15)
+- ✅ All six Details/Edit workflow forms preserve `Descending` in both states using explicit hidden string values (Sprint 16)
+- ✅ Expected Create `DomainException` failures render inline after restoring item and dropdown data, with no persistence (Sprint 16)
 - ✅ Success Messages
 - ✅ Index Query Failure Feedback
 - ✅ Supplier Query Failure Feedback

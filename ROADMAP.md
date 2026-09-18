@@ -22,7 +22,7 @@ v1.3  Account Management       ✅
 v1.4  Additional Reporting     ✅
 v1.5  Purchasing Enhancements  ✅
 v1.6  Dynamic Capability Auth  ✅
-(Sprint 11 Automated Testing ✅ — non-release; Sprint 12 Authorization Refinement ✅ — non-release; Sprint 13 Purchasing Workflow Test Automation ✅ — non-release; Sprint 14 Purchase Order Cancellation and Draft Item Editing ✅ — non-release; Sprint 15 Purchase Order Workflow Error Handling and UX Hardening ✅ — non-release)
+(Sprint 11 Automated Testing ✅ — non-release; Sprint 12 Authorization Refinement ✅ — non-release; Sprint 13 Purchasing Workflow Test Automation ✅ — non-release; Sprint 14 Purchase Order Cancellation and Draft Item Editing ✅ — non-release; Sprint 15 Purchase Order Workflow Error Handling and UX Hardening ✅ — non-release; Sprint 16 Purchase Order POST Round-Trip State and Create Failure Presentation Corrections ✅ — non-release)
 
 ---
 
@@ -307,9 +307,15 @@ Build:             0 errors (full rebuild: 28 pre-existing warnings; no Sprint 1
 - Manual browser/provider verification against SQL Server remains manual — it is not automated end-to-end or SQL Server integration testing
 - No version assigned, no tag created, no release published
 
+## Sprint 16 - Purchase Order POST Round-Trip State and Create Failure Presentation Corrections
+
+**Status:** Complete/Closed — non-release sprint; v1.6.0 remains the release baseline.
+
+Sprint 16 corrected the six Purchase Order Details/Edit hidden `Descending` values and added narrow inline handling for expected Create `DomainException` failures. A 12-case true/false runtime matrix passed for Submit, Approve, Cancel, Receive, UpdateItem, and RemoveItem. Duplicate-product, zero-quantity, and negative-cost Create failures rendered inline without persistence; the successful workflow and authorization checks also passed. The final automated baseline is 477/0/0 (346 UnitTests, 92 IntegrationTests, 39 Web.Tests), with 0/0 normal-build diagnostics and 28 pre-existing warnings/0 errors non-incrementally. Candidates C, D1, D4, and E remain deferred.
+
 ## Next Sprint Planning
 
-Sprint 11 through Sprint 15 are complete. Sprint 15 achieved its error-handling hardening objective with the full suite green and all sprint boundaries held. The next activity is a separate Sprint Planning session; no Sprint 16 scope is defined and Sprint 16 has not been started.
+Sprint 11 through Sprint 16 are complete. Sprint 16 achieved its round-trip and Create-presentation objectives with all verification gates green and all scope boundaries held. The next activity is a separate Sprint Planning session; no next-sprint scope has been defined.
 
 ## D1 - Documentation Synchronization
 

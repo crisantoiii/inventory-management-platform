@@ -1,5 +1,24 @@
 # Changelog
 
+## [Sprint 16] - Purchase Order POST Round-Trip State and Create Failure Presentation Corrections
+
+### Changed
+
+- Corrected exactly six Purchase Order Details/Edit hidden `Descending` inputs to render explicit `"true"`/`"false"` values.
+- Added a narrow `DomainException` boundary around Create handler execution so expected business failures render the canonical message inline after item/dropdown restoration; Result failures, success PRG, authorization, NotFound, and unexpected exceptions retain their existing semantics.
+
+### Verified
+
+- 12/12 true/false round-trip cases passed across Submit, Approve, Cancel, Receive, UpdateItem, and RemoveItem.
+- Duplicate-product, zero-quantity, and negative-cost Create failures rendered inline and produced no persistence; successful Create and workflow regression passed.
+- Authorization checks passed. Automated suites: 346 UnitTests + 92 IntegrationTests + 39 Web.Tests = 477 passed, 0 failed, 0 skipped.
+- Normal build: 0 warnings/0 errors. Non-incremental build: 28 pre-existing warnings/0 errors; no new warning or defect.
+
+### Deferred / Release Classification
+
+- Candidates C (Create FluentValidation invocation), D1 (EditStatus behavior), D4 (HTTP/CI/automated SQL infrastructure), and E (shared POST failure-render extraction) remain deferred. Candidate E was re-evaluated under the Rule of Three and reserved for a dedicated design/refactoring task because page restoration responsibilities differ.
+- Non-release sprint: no version bump, tag, GitHub release, schema/migration, authorization/seed, package, or configuration change. v1.6.0 remains the release baseline.
+
 ## [Sprint 15] - Purchase Order Workflow Error Handling and UX Hardening
 
 ### Summary

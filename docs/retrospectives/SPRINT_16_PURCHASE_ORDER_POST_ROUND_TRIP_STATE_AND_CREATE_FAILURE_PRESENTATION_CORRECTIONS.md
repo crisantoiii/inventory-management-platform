@@ -1,8 +1,8 @@
 # Sprint 16 Retrospective - Purchase Order POST Round-Trip State and Create Failure Presentation Corrections
 
-> **STATUS: PLANNING-TIME BASELINE — NOT A COMPLETED RETROSPECTIVE.**
+> **STATUS: FINAL — SPRINT COMPLETE / CLOSED.**
 >
-> This document is the Sprint 16 retrospective **baseline/template** created at planning finalization. Sections marked **[PLANNED]** record accepted planning content only. Sections marked **[AWAITING EXECUTION EVIDENCE]** are placeholders that T01–T05 must fill with actual recorded results. No commits, test results, browser evidence, or completed outcomes are claimed here. Per repository convention (Sprints 11–15), this baseline will be finalized into the retrospective only after T04 acceptance, during T05.
+> Finalized at T05 from the accepted T01–T04 execution record. Sprint 16 is complete and closed.
 
 ## Sprint Identity
 
@@ -10,13 +10,13 @@
 - **Title:** Purchase Order POST Round-Trip State and Create Failure Presentation Corrections
 - **Planning authority:** `plan/SPRINT_16_PLANNING_REPORT.md` — Revision 1, **ACCEPTED / FINALIZED**
 - **Task breakdown:** `plan/SPRINT_16_TASK_BREAKDOWN.md`
-- **Retrospective state:** BASELINE — AWAITING EXECUTION (T01 NOT STARTED)
-- **Sprint status:** NOT STARTED
-- **Release classification:** [PLANNED] Non-release technical-hardening sprint — no version bump, tag, or GitHub release
+- **Retrospective state:** FINAL
+- **Sprint status:** COMPLETE / CLOSED
+- **Release classification:** Non-release technical-hardening sprint — no version bump, tag, or GitHub release
 
 ---
 
-## 1. Sprint Objective [PLANNED]
+## 1. Sprint Objective
 
 Preserve Purchase Order descending-sort state through POST round-trips and render expected Create workflow `DomainException` failures as inline validation feedback — eliminating the last known silent navigation-state loss and the last known HTTP-500 presentation path in the Purchasing workflow.
 
@@ -29,14 +29,14 @@ The sprint must preserve Domain rules, Application contracts, authorization beha
 
 ---
 
-## 2. Why This Sprint Exists [PLANNED]
+## 2. Why This Sprint Exists
 
 - **A:** Sprint 15 T04 manual verification surfaced a pre-existing `Descending=True` hidden-input POST round-trip loss (Razor boolean-attribute rendering on `value="@Model.Descending"`; `true` renders `value="value"`, `false` omits the attribute; the posted `"value"` string fails bool binding). Revision 1 confirmed all six markup sites in source and the mechanism in generated Razor code. Recorded as deferred in Sprint 15 and every current-state doc; now accepted for correction.
 - **B:** Sprint 14/15 planning deferred Create-page duplicate-product `DomainException` presentation. Revision 1 confirmed `PurchaseOrder.AddItem` throws the duplicate-product rule, `CreatePurchaseOrderHandler` propagates it uncaught, and `CreateModel` has no Domain-failure handling — Create is the only Purchase Order POST surface without the established inline pattern (Details: 4 catches since Sprint 15; Edit: 2 catches since Sprint 14; Create: 0).
 
 ---
 
-## 3. Accepted Architecture Baseline [PLANNED]
+## 3. Accepted Architecture Baseline
 
 - **A (locked):** explicit string rendering — `value="@(Model.Descending ? "true" : "false")"` — on exactly the six affected inputs. No `asp-for` substitution, no query-state redesign, no PageModel binding change.
 - **B (locked):** narrow `catch (DomainException)` around the expected handler call in `OnPostAsync` only; `ModelState.AddModelError(string.Empty, exception.Message)`; reuse `EnsureAtLeastOneItem()` + `PopulateDropdownListsAsync()` + `Page()`; no aggregate reload helper, no shared/helper extraction, no validator wiring, no Application/Domain change; success path and class-level `CreatePolicy` authorization unchanged; unexpected exceptions propagate.
@@ -54,7 +54,7 @@ No global exception middleware, no Application contract redesign, no new abstrac
 
 ## 4. Sprint Scope
 
-### In Scope [PLANNED]
+### In Scope
 
 - Candidate A markup correction (six inputs, two Razor files)
 - Candidate B narrow DomainException handling (one PageModel method)
@@ -62,7 +62,7 @@ No global exception middleware, no Application contract redesign, no new abstrac
 - T04 integrated and manual verification (including SQL before-vs-after evidence)
 - T05 documentation synchronization and closure
 
-### Out of Scope [PLANNED — accepted non-goals]
+### Out of Scope (accepted non-goals)
 
 - Candidate C — Create FluentValidation production invocation (DEFERRED)
 - Candidate D1 — EditStatus `IsInRole(InventoryManager)` decision (DEFERRED)
@@ -76,23 +76,23 @@ No global exception middleware, no Application contract redesign, no new abstrac
 
 ---
 
-## 5. Planned Tasks
+## 5. Completed Tasks
 
 | Task | Title | Status |
 |---|---|---|
 | T01 | Contract Verification and Design Lock | COMPLETE |
-| T02 | Descending Round-Trip Correction | ACCEPTED — EDIT RUNTIME VERIFICATION DEFERRED TO T04 |
-| T03 | Create Domain-Failure Inline Presentation | COMPLETE — READY FOR EXTERNAL REVIEW |
-| T04 | Integrated and Manual Verification | NOT STARTED |
-| T05 | Documentation Synchronization and Sprint Closure | NOT STARTED |
+| T02 | Descending Round-Trip Correction | COMPLETE / ACCEPTED |
+| T03 | Create Domain-Failure Inline Presentation | COMPLETE / ACCEPTED |
+| T04 | Integrated and Manual Verification | COMPLETE / ACCEPTED |
+| T05 | Documentation Synchronization and Sprint Closure | COMPLETE |
 
 Details, boundaries, acceptance criteria, and stop conditions: `plan/SPRINT_16_TASK_BREAKDOWN.md`.
 
 ---
 
-## 6. Starting Quality Baseline [PLANNED]
+## 6. Starting Quality Baseline
 
-Accepted Revision 1 planning baseline (reproduced during Revision 1 discovery; these are **planning-baseline values, not fresh execution evidence** — T04 must produce fresh recorded results):
+Accepted Revision 1 planning baseline (reproduced during Revision 1 discovery; these were planning values and were subsequently matched by T04's fresh execution evidence):
 
 - **UnitTests:** 346 passed
 - **IntegrationTests:** 92 passed
@@ -106,15 +106,15 @@ Sprint 16 execution must record fresh test/build results rather than assuming th
 
 ---
 
-## 7. Planned Verification Strategy
+## 7. Verification Strategy and Result
 
-### Automated [PLANNED]
+### Automated
 
 - full UnitTests / IntegrationTests / Web.Tests (fresh runs in T02/T03 regression and T04)
 - normal solution build and full non-incremental build (T04)
 - no new automated tests — no legitimate PageModel/Razor seam exists (Sprint 14 Option B holds); no artificial seams permitted
 
-### Manual Browser [PLANNED — awaiting T04 evidence]
+### Runtime Matrix
 
 - all six Descending forms × true/false states: rendered HTML check, failure re-render preservation, success PRG/query-state preservation
 - Index sort-header/pagination regression
@@ -122,7 +122,7 @@ Sprint 16 execution must record fresh test/build results rather than assuming th
 - successful Create, Details, and Edit regression
 - authorization spot check (denied persona → AccessDenied, not validation feedback)
 
-### Persistence [PLANNED — evidence hierarchy]
+### Persistence
 
 Primary evidence (both required):
 
@@ -131,11 +131,11 @@ Primary evidence (both required):
 
 Application restart check is supplementary only.
 
-**Status: [AWAITING EXECUTION EVIDENCE] — no manual/browser/SQL evidence exists yet.**
+**Status: COMPLETE.** All 12 boolean-state cases passed. The verification used the running HTTPS application through same-origin requests with antiforgery tokens because an interactive browser surface was unavailable; this limitation changed the interaction mechanism, not the exercised HTTP/Razor/handler path. Read-only SQL before/after evidence confirmed invalid Create attempts produced no new Purchase Order, item, or rejected remark rows. The existing handler test independently retained its zero-save assertion.
 
 ---
 
-## 8. Deferred Findings at Sprint Start [PLANNED]
+## 8. Deferred Findings
 
 - **Create FluentValidation production invocation (Candidate C):** DEFERRED — T03 must not wire validators.
 - **EditStatus `IsInRole(InventoryManager)` decision (Candidate D1):** DEFERRED — blocked since Sprint 12 pending an explicit behavioral decision.
@@ -178,7 +178,7 @@ These findings must not be silently absorbed into Sprint 16 implementation.
 
 ### T03 - Create Domain-Failure Inline Presentation
 
-- **Status:** COMPLETE — READY FOR EXTERNAL REVIEW (2026-09-18)
+- **Status:** COMPLETE / ACCEPTED (2026-09-18)
 - **Production correction:** `CreateModel.OnPostAsync` now imports `InventoryPlatform.Domain.Exceptions` and places a narrow `catch (DomainException exception)` around only `_handler.HandleAsync(request, cancellationToken)`. The catch adds `exception.Message` as a model-level error via `ModelState.AddModelError(string.Empty, exception.Message)`, reuses `EnsureAtLeastOneItem()` and `PopulateDropdownListsAsync(cancellationToken)`, and returns `Page()`. The existing `ModelState.IsValid` gate, ordinary Result-failure restoration, class-level `PurchaseOrder.CreatePolicy`, success `TempData` message and PRG redirect remain unchanged. No `catch (Exception)` was introduced, so unexpected exceptions remain uncaught.
 - **Locked-contract reconfirmation:** before editing, current source confirmed that Create had no `DomainException` catch; `CreatePurchaseOrderHandler` allowed `PurchaseOrder.AddItem` exceptions to propagate; `PurchaseOrder.AddItem` owned the duplicate-product invariant and canonical message; the ordinary Result-failure path used model-level ModelState, `EnsureAtLeastOneItem()`, `PopulateDropdownListsAsync(cancellationToken)`, and `Page()`; and `Create.cshtml` rendered `asp-validation-summary="ModelOnly"`. No material source drift was found.
 - **Live HTTP/page evidence:** the HTTPS application started against the configured local SQL Server. An authenticated same-origin Create POST containing Product 3 twice returned HTTP 200 at `/Purchasing/PurchaseOrders/Create`, not an unhandled failure. The `ModelOnly` validation summary rendered the canonical message `The product already exists in this purchase order.` Both item rows were restored with Product 3 selected and quantities 2 and 4; Supplier 1 remained selected; supplier and product dropdown options were populated; and two item rows remained available.
@@ -189,11 +189,11 @@ These findings must not be silently absorbed into Sprint 16 implementation.
 - **Graphify:** `graphify update .` completed successfully; the rebuilt graph contains 8,078 nodes, 13,562 edges, and 623 communities. The optional community-label refresh note did not prevent the update. The pre-edit scoped query resolved the Web `CreateModel` → Application `CreatePurchaseOrderHandler` → Domain `PurchaseOrder.AddItem` boundary.
 - **Files changed:** production — `src/InventoryPlatform/InventoryPlatform.Web/Pages/Purchasing/PurchaseOrders/Create.cshtml.cs` (narrow presentation-boundary catch only); documentation — this retrospective (known T02 disposition synchronization plus actual T03 evidence); generated Graphify artifacts refreshed by the required update. Temporary HTTP/cookie/header evidence files were removed after verification.
 - **Scope audit:** no Domain, Application handler, repository, persistence, migration/schema, authorization/capability/policy/seed, package, configuration, test-source, Create markup, Details/Edit, Candidate C, or Candidate E change was made. T04 and T05 remain unimplemented. Edit `UpdateItem`/`RemoveItem` runtime verification for both `Descending=true` and `Descending=false` remains pending for T04 using an authorized Draft Purchase Order workflow/fixture.
-- **Result:** `T03 COMPLETE — READY FOR EXTERNAL REVIEW`.
+- **Result:** Accepted; proceeded to T04.
 
 ### T04 - Integrated and Manual Verification
 
-- **Status:** COMPLETE — READY FOR EXTERNAL REVIEW (2026-09-18)
+- **Status:** COMPLETE / ACCEPTED (2026-09-18)
 - **Authorities/preflight:** `knowledge.md`, `plan/SPRINT_16_PLANNING_REPORT.md`, `plan/SPRINT_16_TASK_BREAKDOWN.md`, and this retrospective were present and read. The actual five-layer InventoryPlatform source tree was present. Source audit found exactly six accepted explicit-string `Descending` sites (Details 67/86/107/288; Edit 165/242), zero legacy `value="@Model.Descending"` sites, unchanged `[BindProperty(SupportsGet = true)] bool Descending` properties, the accepted narrow Create `catch (DomainException)`, zero broad Create `catch (Exception)`, canonical `exception.Message`, existing restoration calls, and unchanged Domain/Application contracts. No source drift was found.
 - **Authorized fixtures and successful Create regression:** six disposable Draft Purchase Orders were created through the running application's normal authenticated Create workflow, each returning HTTP 302 to the Purchase Order Index: 22 `T04-FLOW-TRUE`, 23 `T04-FLOW-FALSE`, 24 `T04-CANCEL-TRUE`, 25 `T04-CANCEL-FALSE`, 26 `T04-EDIT-TRUE`, and 27 `T04-EDIT-FALSE`. Orders 22–25 were created with Product 1, quantity 5, unit cost 10. Orders 26–27 were created with Product 1 (5 × 10) and Product 2 (3 × 20). SQL changed exactly from 12 Purchase Orders / 12 items to 18 / 20 after these six successful Creates.
 - **Descending six-form × two-state runtime matrix:** all requests used `Search=T04`, `SortBy=OrderDate`, `PageNum=2`, and `PageSize=5`; rendered values were literal lowercase strings, submitted values were lowercase `true`/`false`, and successful redirects contained the correctly bound `Descending=True`/`Descending=False` query value.
@@ -222,20 +222,22 @@ These findings must not be silently absorbed into Sprint 16 implementation.
 - **Build/warning reconciliation:** normal `dotnet build InventoryPlatform.slnx` succeeded with 0 warnings / 0 errors. `dotnet build InventoryPlatform.slnx --no-incremental` succeeded with 28 warnings / 0 errors, exactly matching the planning baseline. Warning families were CS0108, CS0114, CS8601, CS8602, CS8604, and CS8618 in pre-existing Application InventoryTransactions, Infrastructure, Administrator/Account, Purchase Order Index, and Reports files. None originated in the six corrected Razor sites or `Create.cshtml.cs`; Sprint 16 introduced no warning.
 - **Graphify:** no update was run because T04 changed no source/test-source. `graphify explain CreatePurchaseOrderHandler` successfully resolved the current Application node, its `CreateModel` Web caller, DI registration, persistence interfaces, and duplicate-product test connection. An initial ambiguous `graphify path CreateModel PurchaseOrder` found no directed path; this was a query-selection limitation, not a stale-graph or product defect.
 - **Files/data changed:** repository file change is this T04 retrospective section only. Runtime business data consists of disposable Purchase Orders 22–27 and their expected workflow/item/inventory mutations, all created through authorized normal application flows and retained as documented verification fixtures. Sixty-six temporary local HTTP cookie/body/header files were removed after evidence capture.
-- **Scope audit:** no production source, test source, Razor markup, Domain/Application/repository behavior, schema/migration, authorization capability/policy/seed, package, configuration, Candidate C, or Candidate E change was made. T05 remains NOT STARTED. No Git command, release, version, or tag operation was performed.
+- **Scope audit:** no production source, test source, Razor markup, Domain/Application/repository behavior, schema/migration, authorization capability/policy/seed, package, configuration, Candidate C, or Candidate E change was made during T04. No Git command, release, version, or tag operation was performed.
 - **Defects/new findings:** none. Tooling limitation: no browser UI surface was available, so verification used authenticated same-origin HTTPS requests with genuine antiforgery tokens against the running application, rendered HTML inspection, redirect headers, and read-only SQL. This exercised the real Razor/PageModel/Application/Domain/persistence boundary and established every mandatory matrix cell without creating permanent test infrastructure.
-- **Result:** `T04 COMPLETE — READY FOR EXTERNAL REVIEW`. External review is required before T05.
+- **Result:** Accepted; T05 closure authorized.
 
 ### T05 - Documentation Synchronization and Sprint Closure
 
-- **Status:** NOT STARTED
-- **[AWAITING EXECUTION EVIDENCE]** — expected result: documentation synchronized; Razor hidden-bool lesson recorded; Candidate E checkpoint completed (Section 12); A/B marked resolved only when proven; retrospective finalized; sprint marked COMPLETE only if T01–T04 acceptance criteria were satisfied.
+- **Status:** COMPLETE (2026-09-18)
+- Synchronized README, project status, roadmap, changelog, feature catalog, engineering journal, design decisions, task tracker, and this retrospective.
+- Converted the hidden-bool observation into an explicit rendering convention; completed the Candidate E checkpoint; marked A/B resolved and kept C/D1/D4/E deferred.
+- Documentation-only: no tests rerun, Graphify update, release, version, tag, production/test source, schema, authorization, package, or configuration change.
 
 ---
 
 ## 10. Sprint Metrics
 
-### Planning Baseline [PLANNED]
+### Planning Baseline
 
 | Metric | Value |
 |---|---:|
@@ -249,20 +251,30 @@ These findings must not be silently absorbed into Sprint 16 implementation.
 
 ### Final Sprint 16 Results
 
-**[AWAITING EXECUTION EVIDENCE]** — T04 must record fresh per-suite counts, totals, and build warning/error counts here. Do not carry the planning baseline forward as the final result.
+| Gate | Final result |
+|---|---|
+| UnitTests | 346 passed, 0 failed, 0 skipped |
+| IntegrationTests | 92 passed, 0 failed, 0 skipped |
+| Web.Tests | 39 passed, 0 failed, 0 skipped |
+| Total | 477 passed, 0 failed, 0 skipped |
+| Normal build | 0 warnings, 0 errors |
+| Non-incremental build | 28 pre-existing warnings, 0 errors; no new warning |
+| Descending matrix | 12/12 passed |
+| Invalid Create matrix | duplicate product, quantity 0, and cost -1 all inline; no persistence |
+| Success/auth regression | passed |
 
 ---
 
-## 11. Expected Observations (to confirm or refute during execution) [PLANNED HYPOTHESES — NOT FINDINGS]
+## 11. Observations Confirmed During Execution
 
 - The explicit-string rendering fixes the `Descending` round-trip in all six forms with no binding-side effects.
 - The narrow Create catch is sufficient because the duplicate-product `DomainException` is thrown inside `PurchaseOrder.AddItem` before `AddAsync`, so the failure path persists nothing.
 - The existing `ModelOnly` validation summary on `Create.cshtml` renders the new model-level error without markup changes.
-- These are design expectations to be confirmed by T01–T04 evidence; they must not be recorded as outcomes until verified.
+- T04 confirmed each observation through runtime and persistence evidence.
 
 ---
 
-## 12. Candidate E — Rule-of-Three Re-Evaluation Checkpoint [MANDATORY IN T05 — NOT TO BE IMPLEMENTED IN SPRINT 16]
+## 12. Candidate E — Rule-of-Three Re-Evaluation
 
 After T03, three PageModels will share the same shape by copy:
 
@@ -270,13 +282,13 @@ After T03, three PageModels will share the same shape by copy:
 2. `EditModel.RenderDomainFailureAsync` (Sprint 14 — ModelState + aggregate reload + Draft-check redirect + `Page()`)
 3. `CreateModel` failure restoration (Sprint 16 — ModelState + item restore + dropdown reload + `Page()`)
 
-**[AWAITING T05 EXECUTION]** — during T05, re-apply the repository Rule-of-Three test (DD-018, knowledge.md §3): are the three occurrences genuinely the same responsibility, or do the differing reload/restore steps (aggregate reload vs dropdown repopulation vs Draft-check redirect) mean the shared part is only the two-line ModelState+catch prologue? Record the decision and reasoning here. **Do not implement any extraction in Sprint 16 regardless of the conclusion.**
+**Decision: DEFER.** The Rule-of-Three checkpoint was satisfied, but the repeated shape is not yet one stable responsibility. Details reloads the aggregate and can return NotFound; Edit reloads, enforces Draft state, and can redirect; Create restores posted item rows and dropdown data without an aggregate reload. Extracting only the catch/ModelState prologue would save little, while abstracting restoration would introduce delegates or PageModel coupling that obscures page-specific behavior. Candidate E remains reserved for a dedicated future design/refactoring task; Sprint 16 implemented no extraction.
 
 ---
 
 ## 13. Decisions Made During Sprint
 
-**Planning-era accepted decisions [PLANNED]:**
+**Accepted decisions:**
 
 1. Sprint 16 limited to Candidates A + B.
 2. Candidate A uses the explicit-string design; `asp-for` and query-state redesign rejected.
@@ -286,17 +298,17 @@ After T03, three PageModels will share the same shape by copy:
 
 **Decisions recorded during execution:**
 
-**[AWAITING EXECUTION EVIDENCE]** — T01–T05 record actual decisions/deviations here.
+Execution confirmed the accepted decisions. T03's first attempt stopped without implementation because the required authority set was unavailable; the retry began only after the authorities were supplied and then completed normally. T04's interactive browser surface was unavailable, so equivalent same-origin HTTPS requests with antiforgery tokens and read-only SQL evidence were used and disclosed. Neither deviation expanded scope or weakened the required behavioral checks.
 
 ---
 
-## 14. Known Non-Goals [PLANNED]
+## 14. Known Non-Goals
 
 Sprint 16 does not attempt to: redesign exception handling application-wide; change Purchase Order lifecycle semantics; add purchasing features; change authorization; change the database schema; wire FluentValidation; extract shared helpers; normalize tag helpers; resolve the EditStatus decision; create a semantic release.
 
 ---
 
-## 15. Definition of Done [PLANNED]
+## 15. Definition of Done
 
 Sprint 16 can be marked COMPLETE only when (per the accepted task breakdown):
 
@@ -314,21 +326,21 @@ Sprint 16 can be marked COMPLETE only when (per the accepted task breakdown):
 
 ## 16. Final Sprint Outcome
 
-**[AWAITING EXECUTION EVIDENCE]** — to be written only after T05, from actual recorded results.
+Sprint 16 met its objective. Candidate A is resolved: all six hidden fields use explicit lowercase boolean strings and every true/false round trip passed. Candidate B is resolved: expected Create Domain failures render inline, restore the page, and persist nothing. Successful behavior and authorization remain intact. Candidates C, D1, D4, and E remain deferred; rejected items remain rejected. No new defect or warning was introduced.
 
-## 17. Release Decision [PLANNED]
+## 17. Release Decision
 
-Planned classification: **non-release technical-hardening sprint** — no new business capability, lifecycle transition, authorization capability, or schema change. Version bump: none (v1.6.0 remains the release baseline). Tag: none. GitHub release: none. To be confirmed at T05 against actual outcomes.
+Final classification: **non-release technical-hardening sprint** — no new business capability, lifecycle transition, authorization capability, or schema change. Version bump: none (v1.6.0 remains the release baseline). Tag: none. GitHub release: none.
 
 ## 18. Retrospective Closure
 
-- **Sprint status:** NOT STARTED (baseline stage)
-- **All tasks accepted:** No — T01–T05 NOT STARTED
-- **Final test baseline:** [AWAITING EXECUTION EVIDENCE]
-- **Manual verification:** [AWAITING EXECUTION EVIDENCE]
-- **Database migration:** [PLANNED] None expected — confirm during T04
-- **Authorization changes:** [PLANNED] None expected — confirm during T04
-- **Release/tag:** [PLANNED] None — non-release classification
+- **Sprint status:** COMPLETE / CLOSED
+- **All tasks accepted:** Yes — T01 through T05 complete
+- **Final test baseline:** 477 passed, 0 failed, 0 skipped (346/92/39)
+- **Runtime verification:** 12/12 round-trip matrix plus invalid/successful Create and authorization checks passed
+- **Database migration:** None
+- **Authorization changes:** None
+- **Release/tag:** None — non-release classification; v1.6.0 remains the release baseline
 - **Known deferred findings (carried):** Candidate C; Candidate D1; Candidate D4; Candidate E (re-evaluation checkpoint in Section 12)
-- **Graphify:** not run at baseline stage (planning/documentation only); T02/T03 must run `graphify update .` after their source changes
+- **Graphify:** T02/T03 source changes were updated as recorded in their task evidence; no update was required for verification-only T04 or documentation-only T05
 - **Git operations:** none — the developer controls Git manually

@@ -30,7 +30,7 @@ Account Management
 
 **Latest Release:** v1.6.0 — Sprint 10 Dynamic Capability-Based Authorization
 
-**Project Status:** Sprint 15 Purchase Order Workflow Error Handling and UX Hardening — Complete/Closed. All four Purchase Order Details POST workflows (Submit, Approve, Receive, Cancel) now render expected `DomainException` failures as inline validation feedback instead of HTTP 500, with authorization, Result/NotFound semantics, and persistence safety preserved. 477 automated tests passing (346 UnitTests, 92 IntegrationTests, 39 Web.Tests; 0 failed, 0 skipped). Not a release sprint — v1.6.0 remains the current release baseline. Deferred findings: `Descending=True` hidden-field POST round-trip loss (pre-existing, Details and Edit pages) and the Sprint 12 T07 EditStatus `IsInRole` cleanup (reachable, behavior-affecting guard).
+**Project Status:** Sprint 16 Purchase Order POST Round-Trip State and Create Failure Presentation Corrections — Complete/Closed. Six Details/Edit POST forms preserve both `Descending` states through explicit hidden string values; expected Create `DomainException` failures render inline after page-data restoration and persist nothing. The 12/12 runtime matrix, 477 automated tests, normal build (0 warnings/0 errors), and non-incremental build (28 pre-existing warnings/0 errors) passed. Not a release sprint — v1.6.0 remains the release baseline. Candidates C, D1, D4, and E remain deferred.
 
 **Last Updated:** September 2026
 
@@ -134,8 +134,8 @@ Verified:
 
 - **Completed Modules:** 11
 - **Architecture Status:** Validated
-- **Current Milestone:** Sprint 15 — Purchase Order Workflow Error Handling and UX Hardening (Complete/Closed; not a release sprint — v1.6.0 remains the current release baseline)
-- **Next Milestone:** Separate Sprint Planning session pending; no Sprint 16 scope defined
+- **Current Milestone:** Sprint 16 — Purchase Order POST Round-Trip State and Create Failure Presentation Corrections (Complete/Closed; not a release sprint — v1.6.0 remains the current release baseline)
+- **Next Milestone:** Separate Sprint Planning session pending; no next-sprint scope is defined
 - **Automated Tests:** 477 passing (346 UnitTests, 92 IntegrationTests, 39 Web.Tests; 0 failed, 0 skipped)
 
 ---
@@ -822,7 +822,7 @@ Final verification covered normal application regression, reporting workflows, e
 
 # Current Focus
 
-Sprint 15 Purchase Order Workflow Error Handling and UX Hardening is complete and closed. 477 automated tests passing (346 UnitTests, 92 IntegrationTests, 39 Web.Tests; 0 failed, 0 skipped). The sprint hardened the Purchase Order Details presentation boundary: all four POST workflows (Submit, Approve, Receive, Cancel) catch expected `DomainException` failures and render the canonical Domain message as inline validation (ModelState + Purchase Order reload + `Page()` via one private local helper; helper reload failure → `NotFound()`) instead of the Development exception page, resolving the follow-up recorded at Sprint 14 closure. Authorization remains before try/catch and unchanged; existing Result failures keep their ModelState + reload + Page() semantics; unexpected exceptions propagate. Rejected operations persist no state changes (automated no-save tests plus SQL before/after and restart evidence); successful paths are unchanged. No schema migration, EF mapping change, authorization/seed change, or package/project change was required. Representative navigation/query state was preserved except for a pre-existing `Descending=True` hidden-field round-trip issue, deferred for a future approved task. T07 (EditStatus `IsInRole` cleanup) remains blocked/deferred pending an explicit behavioral decision. The next activity is a separate Sprint Planning session; no Sprint 16 scope is defined.
+Sprint 16 is complete and closed. The six Details/Edit POST forms explicitly render hidden booleans as `"true"`/`"false"`, and the 12-case runtime matrix proved both states survive Submit, Approve, Cancel, Receive, UpdateItem, and RemoveItem round trips. Create now catches only expected `DomainException` failures, adds the canonical message to ModelState, restores item/dropdown data, and returns `Page()`; duplicate-product, zero-quantity, and negative-cost attempts rendered inline and left SQL counts unchanged. Successful Create and workflow behavior, authorization, NotFound, and unexpected-exception semantics remain unchanged. All 477 automated tests pass (346/92/39); builds retain the 0-warning normal and 28-pre-existing-warning non-incremental baselines. No schema, authorization, package, or configuration change occurred. Candidates C, D1, D4, and E remain deferred. The next activity requires a separate planning session; no next-sprint scope is defined.
 
 Completed in Sprint 8:
 
