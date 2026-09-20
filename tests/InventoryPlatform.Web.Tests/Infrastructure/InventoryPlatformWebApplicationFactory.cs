@@ -1,4 +1,6 @@
 using InventoryPlatform.Infrastructure.Persistence.Context;
+using InventoryPlatform.Web.Tests.Authentication;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
@@ -78,6 +80,20 @@ public sealed class InventoryPlatformWebApplicationFactory
 
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseInMemoryDatabase(DatabaseName));
+
+            services
+                .AddAuthentication(options =>
+                {
+                    options.DefaultAuthenticateScheme =
+                        TestAuthenticationDefaults.Scheme;
+                })
+                .AddScheme<
+                    AuthenticationSchemeOptions,
+                    SeededUserAuthenticationHandler>(
+                    TestAuthenticationDefaults.Scheme,
+                    _ => { });
+
+            services.AddScoped<SeededTestUserResolver>();
 
             if (_preserveProductionConfigurationForStructuralFailure)
             {
