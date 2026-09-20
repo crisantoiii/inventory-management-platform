@@ -1,6 +1,7 @@
 using InventoryPlatform.Infrastructure.Persistence.Context;
 using InventoryPlatform.Web.Tests.Authentication;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
@@ -10,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace InventoryPlatform.Web.Tests.Infrastructure;
 
@@ -58,6 +60,8 @@ public sealed class InventoryPlatformWebApplicationFactory
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
+        builder.ConfigureLogging(logging => logging.ClearProviders());
+
         builder.ConfigureTestServices(services =>
         {
             var capturedDescriptors = services
@@ -80,6 +84,10 @@ public sealed class InventoryPlatformWebApplicationFactory
 
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseInMemoryDatabase(DatabaseName));
+
+            services
+                .AddDataProtection()
+                .UseEphemeralDataProtectionProvider();
 
             services
                 .AddAuthentication(options =>
