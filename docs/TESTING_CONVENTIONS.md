@@ -1,6 +1,6 @@
 # Testing Conventions
 
-This document establishes the automated testing conventions for the Inventory Platform. These conventions are derived from Sprint 11, Sprint 12, Sprint 13, and Sprint 14 implementations and are authoritative for current test authoring.
+This document establishes the automated testing conventions for the Inventory Platform. These conventions are derived from Sprint 11, Sprint 12, Sprint 13, Sprint 14, and Sprint 17 implementations and are authoritative for current test authoring.
 
 ---
 
@@ -12,7 +12,7 @@ This document establishes the automated testing conventions for the Inventory Pl
 |---------|---------|------------|
 | `InventoryPlatform.UnitTests` | Domain behavior, Application service isolation tests | Domain, Application, Shared |
 | `InventoryPlatform.IntegrationTests` | Persistence/Infrastructure behavior tests | Domain, Application, Infrastructure, Shared |
-| `InventoryPlatform.Web.Tests` | Web-layer authorization handler tests | Web (transitively: Application, Domain, Infrastructure, Shared) |
+| `InventoryPlatform.Web.Tests` | Web-layer authorization handler tests + real HTTP/Razor integration tests (Sprint 17) | Web (transitively: Application, Domain, Infrastructure, Shared) |
 
 UnitTests must NOT reference `InventoryPlatform.Web`.
 IntegrationTests must NOT reference `InventoryPlatform.Web`.
@@ -58,6 +58,10 @@ Web.Tests must NOT reference:
 
 **IntegrationTests additionally uses:**
 - Microsoft.EntityFrameworkCore.InMemory 10.0.*
+
+**Web.Tests additionally uses (Sprint 17):**
+- Microsoft.AspNetCore.Mvc.Testing 10.0.* — in-process `WebApplicationFactory<Program>` test host
+- Microsoft.EntityFrameworkCore.InMemory 10.0.* — per-factory isolated database
 
 **No mocking frameworks** (Moq, NSubstitute, FakeItEasy) are used in any test project. Test doubles are hand-written where required.
 
@@ -106,14 +110,28 @@ Use IntegrationTests where persistence or Infrastructure behavior is the subject
 
 ### Web.Tests
 
-Use Web.Tests for Web-layer behavior such as:
+Use Web.Tests for two complementary layers of Web behavior:
+
+**Web-layer authorization handler unit tests** (handler-level, no HTTP):
 
 - `CapabilityAuthorizationHandler` unit tests
 - `MultiCapabilityAuthorizationHandler` unit tests
 - Web-layer authorization boundary behavior
-- Other Web-layer authorization behavior where appropriate
+- Capability policy registration verification
 
-Handler tests construct handlers directly with a hand-written `FakeCapabilityAuthorizationService` implementing `ICapabilityAuthorizationService`. No WebApplicationFactory or HTTP pipeline is required.**Completed in Sprint 12:**
+Handler tests construct handlers directly with a hand-written `FakeCapabilityAuthorizationService` implementing `ICapabilityAuthorizationService`.
+
+**Real HTTP/Razor integration tests** (Sprint 17):
+
+Use a real `WebApplicationFactory<Program>` HTTP test when the behavior under proof is only observable through the actual pipeline: rendered Razor output, rendered antiforgery token/cookie semantics, model binding, authentication challenge/forbid redirects, PRG redirects, real `DomainException` presentation, or same-factory persistence after a POST.
+
+- Direct PageModel instantiation remains appropriate where the behavior is fully observable without the pipeline (e.g., policy registration shape).
+- Direct handler tests remain appropriate for Application-layer orchestration (UnitTests).
+- Reach for the HTTP layer when asserting rendered form semantics, antiforgery, redirect/challenge behavior, or end-to-end no-mutation guarantees — do not reconstruct those behaviors with mocks.
+
+See the "HTTP/Razor Integration-Test Conventions (Sprint 17)" section below for the host, safety, and antiforgery rules.
+
+**Completed in Sprint 12:**
 
 - `FakeCapabilityAuthorizationService` — hand-written fake implementing `ICapabilityAuthorizationService`
 - `FakeCapabilityAuthorizationServiceTests` — verification that the fake compiles, instantiates, and produces controlled results (12 tests)
@@ -205,6 +223,20 @@ tests/
       CapabilityAuthorizationHandlerTests.cs
       MultiCapabilityAuthorizationHandlerTests.cs
       PurchaseOrderCapabilityPolicyRegistrationTests.cs
+    Authentication/
+      TestAuthenticationDefaults.cs
+      SeededTestUserResolver.cs
+      SeededUserAuthenticationHandler.cs
+      SeededUserAuthenticationTests.cs
+    Infrastructure/
+      InventoryPlatformWebApplicationFactory.cs
+      InventoryPlatformWebApplicationFactoryTests.cs
+    Http/
+      CategoryCreateAuthorizationTests.cs
+      CategoryCreatePostWorkflowTests.cs
+      CategoryCreateFormExtraction.cs
+      PurchaseOrderSubmitDomainFailureHttpTests.cs
+      PurchaseOrderSubmitFormExtraction.cs
 ```
 
 ### Namespace Convention
@@ -441,7 +473,7 @@ Rows marked "discovered cases" contain `[Theory]` methods whose `[InlineData]` r
 | Infrastructure | Placeholder | 1 |
 | **Total** | | **92** |
 
-### Web.Tests (39 tests)
+### Web.Tests (58 tests)
 
 | Area | Subject | Tests |
 |------|---------|-------|
@@ -449,12 +481,19 @@ Rows marked "discovered cases" contain `[Theory]` methods whose `[InlineData]` r
 | Authorization | CapabilityAuthorizationHandler behavior (Sprint 12 T03) | 8 |
 | Authorization | MultiCapabilityAuthorizationHandler behavior (Sprint 12 T04) | 12 |
 | Authorization | PurchaseOrder capability policy registration (Sprint 14 T05) | 6 |
+| Infrastructure | Database-safe WebApplicationFactory safety/isolation (Sprint 17 T03) | 5 |
+| Authentication | Seeded-user test authentication (Sprint 17 T04) | 8 |
+| HTTP | Category Create GET authorization matrix (Sprint 17 T05) | 3 |
+| HTTP | Category Create antiforgery POST/PRG/persistence (Sprint 17 T06) | 1 |
+| HTTP | Purchase Order Submit domain-failure proof (Sprint 17 T07) | 2 |
 | Infrastructure | Placeholder | 1 |
-| **Total** | | **39** |
+| **Total** | | **58** |
 
-**Total: 477 tests, 477 passed, 0 failures, 0 skipped** (346 + 92 + 39; Sprint 14 T09 re-verification; arithmetic: 346 + 92 + 39 = 477 — the earlier 478 figure was an arithmetic slip corrected during the sprint).
+**Total: 496 tests, 496 passed, 0 failures, 0 skipped** (346 + 92 + 58; Sprint 17 T08 re-verification; arithmetic: 346 + 92 + 58 = 496 — Web.Tests grew from 39 to 58 during Sprint 17 T03-T07).
 
-The Web.Tests verification tests confirm that the `FakeCapabilityAuthorizationService` compiles against the real `ICapabilityAuthorizationService` interface and produces controlled authorization results. The T03/T04 handler tests exercise the actual `CapabilityAuthorizationHandler` and `MultiCapabilityAuthorizationHandler` production sources directly (the Sprint 14 `PurchaseOrderCapabilityPolicyRegistrationTests` additionally verify Edit/Cancel capability constants and their real `AddWeb` policy registration) (authentication gate, NameIdentifier extraction/parsing, service delegation, succeed/do-not-succeed outcomes, OR semantics with short-circuit, requirement constructor validation). Handler testing is source-level/unit-level; Razor Page authorization boundaries (Categories/Edit, Suppliers/Create) were verified at source level and by the remediations themselves — no HTTP-pipeline or browser testing exists or is claimed.
+The Web.Tests verification tests confirm that the `FakeCapabilityAuthorizationService` compiles against the real `ICapabilityAuthorizationService` interface and produces controlled authorization results. The T03/T04 handler tests exercise the actual `CapabilityAuthorizationHandler` and `MultiCapabilityAuthorizationHandler` production sources directly (the Sprint 14 `PurchaseOrderCapabilityPolicyRegistrationTests` additionally verify Edit/Cancel capability constants and their real `AddWeb` policy registration) (authentication gate, NameIdentifier extraction/parsing, service delegation, succeed/do-not-succeed outcomes, OR semantics with short-circuit, requirement constructor validation). Handler testing is source-level/unit-level.
+
+Since Sprint 17, Web.Tests additionally exercises the real ASP.NET Core HTTP/Razor pipeline through a database-safe `WebApplicationFactory<Program>`: real startup seeding, test-only seeded-user authentication with real GUID identities, production capability authorization, real rendered antiforgery token/cookie semantics, real model binding, challenge/forbid redirects, PRG, `DomainException` failure redisplay, and same-factory persistence are all verified through actual HTTP requests (see the Sprint 17 conventions section below). Coverage is representative — one Category GET matrix, one Category successful POST, and one Purchase Order domain-failure POST — not exhaustive route coverage; no relational behavior is claimed from the InMemory-based host.
 
 ---
 
@@ -466,6 +505,23 @@ Established by the Sprint 14 lifecycle implementation and reusable for future te
 2. **Real `DomainException` propagation is the contract.** Invalid transitions and item rules are tested through the handler call path with the no-save-after-exception guarantee, matching the actual Web-layer behavior.
 3. **Fresh-context isolation extends to lifecycle round-trips.** Cancellation, item update, item removal, and final-item removal persistence are each asserted through contexts different from the mutating context; EF change-tracker state is never the evidence.
 4. **No artificial coverage at seams that do not exist.** Where PageModels depend on sealed concrete Application handler classes, capability/policy registration is tested instead and page behavior is verified manually — coverage is never inflated by distorting production design.
+
+## HTTP/Razor Integration-Test Conventions (Sprint 17)
+
+Established by the Sprint 17 HTTP/Razor integration-test foundation and authoritative for future HTTP test authoring:
+
+1. **Choose the right layer before writing the test.** Use direct PageModel/handler tests when the behavior is fully observable without the pipeline; use a real HTTP test only when rendered Razor output, antiforgery, challenge/forbid redirects, PRG, `DomainException` presentation, or end-to-end persistence/no-mutation is the subject.
+2. **Database safety by containment plus structural proof.** The test host injects a deliberately non-production sentinel `DefaultConnection` through early host configuration (before application registration reads configuration), lets normal production registrations occur, replaces `ApplicationDbContext` registrations in test service customization before the final root provider is built, and runs a fail-closed structural validation that rejects any surviving production context configuration. HTTP tests must never open a production SQL connection, and the sentinel means a failed replacement cannot silently reach real infrastructure.
+3. **Real startup seeding, not test-only suppression.** The unchanged `UseWeb()` pipeline performs Identity/authorization seeding against the unique per-factory EF Core InMemory database. Do not add a test-only seeder suppression flag, an alternate startup class, or an extra production environment branch for tests — the minimal production seam is `public partial class Program { }`.
+4. **Unique database per factory; unique data per test.** `DatabaseName` is a `Guid`-suffixed instance property; each test creates and disposes its own factory. Test-created rows use unique (Guid-suffixed) names. No test reads another test's mutations.
+5. **Authentication is test-only; authorization stays production.** Requests carry a logical seeded-user selector header (`X-Test-User`); the test authentication handler resolves the selector through the real `UserManager`/Identity store and issues only the two real claims (`NameIdentifier` from the persisted GUID, `Name`). Never fabricate role or capability claims — capability authorization must flow through the production `ICapabilityAuthorizationService`/handlers/repositories. Challenge/forbid remain production Identity application-cookie behavior.
+6. **Antiforgery is exercised, never bypassed or manufactured.** Extract the antiforgery token from the actually rendered form and preserve the matching antiforgery cookie from the GET response (narrow BCL-only regex/attribute decoding is the accepted extraction approach — no AngleSharp/parser packages). POST to the effective rendered form action with exactly the rendered hidden fields. Multiple forms on a page are disambiguated by a production-stable marker (button text), not by position.
+7. **Environment isolation stays test-only.** Ephemeral Data Protection (no machine key ring), cleared logging providers (no Windows EventLog dependency), HTTPS client base address, and in-process `TestServer` requests only. None of this isolation may leak into production configuration.
+8. **Isolation under default parallelism.** No collection attributes, no `maxParallelThreads` changes, no global serialization, no sleeps/retries. Factories, clients, and cookie containers are per-test state disposed with `await using`/`using`.
+9. **No relational claims from the InMemory host.** HTTP integration tests prove wiring, rendered behavior, and same-factory persistence — not SQL translation, constraints, transactions, or provider-specific behavior.
+10. **Assert semantics, not HTML snapshots.** Prefer stable production markers (button text, exact invariant messages, hidden-field values) over full-HTML equality. Where rendering is culture-dependent (e.g., `DateOnly` hidden inputs rendered with the host culture's short-date pattern), assert the semantic round-trip (parse the rendered value back under the same culture the server binds with) rather than a literal string.
+11. **Rendered behavior is observed, not guessed.** Effective form actions, redirect destinations, and hidden-field formatting must be taken from the actual rendered response (Sprint 17 evidence: `asp-page-handler` renders `?handler=Submit` in the action; culture-formatted date hidden inputs) — never assumed from source intent.
+12. **Domain-failure redisplay contract.** Expected `DomainException` failures are proven through the real POST, asserting the existing production presentation (ModelState redisplay with HTTP 200 in the current source), preserved navigation/query state, and a fresh-scope same-factory reload proving no mutation. Never inject or catch the exception in the test.
 
 ## Sprint 13 Conventions (Reusable)
 
@@ -507,23 +563,22 @@ Completed:
 - Persistence coverage (T06): 5 fresh-context lifecycle round-trip tests (Cancel Draft/Submitted, UpdateItem, RemoveItem, final-item removal → empty Draft)
 - Integrated verification (T09): **477 passed, 0 failed, 0 skipped** (346/92/39); full rebuild 28 warnings / 0 errors — baseline preserved; manual browser and real SQL Server provider verification also passed (manual verification remains manual, not automated testing)
 
-Still deferred (unchanged by Sprint 14):
+Still deferred (Sprint 17 state):
 
 - EditStatus self-deactivation guard (above) — untouched by Sprint 13
-- `GetPurchaseOrdersHandler` does not copy `PagedRequest.Status` into `PagedQuery` (T05 recorded finding; no remediation authorized)
-- SQL Server relational verification beyond InMemory (FK/unique constraints, transactions, SQL translation, collation, provider-specific behavior)
-- WebApplicationFactory / Razor-page HTTP-pipeline testing; CI provider establishment
+- `GetPurchaseOrdersHandler` does not copy `PagedRequest.Status` into `PagedQuery` (T05 recorded finding; no remediation authorized; re-verified against current source at Sprint 17 T09 closure)
+- SQL Server relational verification beyond InMemory (FK/unique constraints, transactions, SQL translation, collation, provider-specific behavior) — now applies to the Sprint 17 HTTP test host as well
+- Broader HTTP/Razor route coverage beyond the Sprint 17 representative cases (more Category/Purchase Order routes, other modules)
+- CI provider establishment
 
 ### Future Considerations
 
-- WebApplicationFactory integration tests
-- Razor Page authorization integration tests
-- HTTP pipeline testing
+- Broader HTTP/Razor route coverage (the Sprint 17 foundation exists; only representative cases are covered)
 - Browser automation (Playwright)
 - Code coverage reporting and gates
 - Mutation testing
 - Performance/load testing
-- SQL Server integration testing
+- SQL Server / relational integration testing (including for the HTTP test host)
 - Broader repository coverage
 - FluentValidation test coverage
 - CI provider establishment
@@ -532,15 +587,17 @@ Still deferred (unchanged by Sprint 14):
 
 ## Key Conventions Summary
 
-1. **Three test projects:** UnitTests (no DB), IntegrationTests (EF Core InMemory), Web.Tests (handler tests)
+1. **Three test projects:** UnitTests (no DB), IntegrationTests (EF Core InMemory), Web.Tests (handler tests + Sprint 17 real HTTP/Razor integration tests)
 2. **No Web reference:** UnitTests and IntegrationTests do not reference InventoryPlatform.Web
 3. **No test-project cross-references:** Web.Tests does not reference UnitTests or IntegrationTests
 4. **xUnit framework:** All tests use `[Fact]` attributes
 5. **Hand-written fakes:** No mocking framework; minimal in-memory fakes for Application service and handler tests
 6. **Behavior-oriented naming:** `MethodOrBehavior_WhenCondition_ExpectedResult`
-7. **Isolated databases:** Each integration test class uses a unique InMemory database name
-8. **Real implementations:** Integration tests use actual repository implementations
-9. **No production changes:** Test infrastructure does not alter production code
-10. **Provider-neutral CI:** Tests are locally reproducible; no CI provider is configured
-11. **Behavior-focused coverage:** Tests verify business behavior, not implementation details
-12. **Discovered-case accounting:** State whether a reported count is test methods or discovered test cases (`[Theory]` × `[InlineData]` rows); reconcile suite totals against actual execution
+7. **Isolated databases:** Each integration test class uses a unique InMemory database name; each HTTP test factory owns a unique `Guid`-suffixed InMemory database
+8. **Real implementations:** Integration tests use actual repository implementations; HTTP integration tests exercise the real pipeline (seeding, authentication resolution, capability authorization, antiforgery, model binding, persistence)
+9. **No production changes:** Test infrastructure does not alter production code; the only production seam is `public partial class Program { }`
+10. **No production SQL from HTTP tests:** Sentinel connection containment, pre-provider DbContext replacement, and fail-closed structural validation (Sprint 17)
+11. **No fabricated authorization:** Test authentication issues only real persisted-GUID claims; capability authorization flows through production services; antiforgery is extracted from rendered forms, never bypassed or manufactured (Sprint 17)
+12. **Provider-neutral CI:** Tests are locally reproducible; no CI provider is configured
+13. **Behavior-focused coverage:** Tests verify business behavior, not implementation details
+14. **Discovered-case accounting:** State whether a reported count is test methods or discovered test cases (`[Theory]` × `[InlineData]` rows); reconcile suite totals against actual execution

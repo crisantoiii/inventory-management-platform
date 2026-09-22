@@ -30,7 +30,7 @@ Account Management
 
 **Latest Release:** v1.6.0 — Sprint 10 Dynamic Capability-Based Authorization
 
-**Project Status:** Sprint 16 Purchase Order POST Round-Trip State and Create Failure Presentation Corrections — Complete/Closed. Six Details/Edit POST forms preserve both `Descending` states through explicit hidden string values; expected Create `DomainException` failures render inline after page-data restoration and persist nothing. The 12/12 runtime matrix, 477 automated tests, normal build (0 warnings/0 errors), and non-incremental build (28 pre-existing warnings/0 errors) passed. Not a release sprint — v1.6.0 remains the release baseline. Candidates C, D1, D4, and E remain deferred.
+**Project Status:** Sprint 17 HTTP/Razor Integration-Test Foundation — Complete/Closed. The repository now has a real HTTP/Razor integration-test foundation: a database-safe `WebApplicationFactory` (early sentinel `DefaultConnection`, pre-provider `ApplicationDbContext` replacement, fail-closed structural validation, unchanged real startup seeding, per-factory InMemory isolation), test-only seeded-user authentication with real persisted GUID identities and production capability authorization, and representative HTTP tests proving the Category Create GET authorization matrix, the Category Create rendered-antiforgery POST/PRG/persistence, and the empty-Draft Purchase Order Submit `DomainException` redisplay with navigation-state preservation and no mutation. The T03–T07 integrated subset passed 19/19 in two independent invocations and complete Web.Tests passed 58/58 in two independent invocations. **496 automated tests** (346 UnitTests, 92 IntegrationTests, 58 Web.Tests; 0 failed, 0 skipped), normal build (0 warnings/0 errors), and non-incremental build (28 pre-existing warnings/0 errors) passed. T08 was verification-only with no source changes. Not a release sprint — v1.6.0 remains the release baseline. HTTP coverage is representative, not exhaustive: broader route coverage, browser/Playwright, relational-provider, and CI work remain deferred.
 
 **Last Updated:** September 2026
 
@@ -134,9 +134,9 @@ Verified:
 
 - **Completed Modules:** 11
 - **Architecture Status:** Validated
-- **Current Milestone:** Sprint 16 — Purchase Order POST Round-Trip State and Create Failure Presentation Corrections (Complete/Closed; not a release sprint — v1.6.0 remains the current release baseline)
+- **Current Milestone:** Sprint 17 — HTTP/Razor Integration-Test Foundation (Complete/Closed; not a release sprint — v1.6.0 remains the current release baseline)
 - **Next Milestone:** Separate Sprint Planning session pending; no next-sprint scope is defined
-- **Automated Tests:** 477 passing (346 UnitTests, 92 IntegrationTests, 39 Web.Tests; 0 failed, 0 skipped)
+- **Automated Tests:** 496 passing (346 UnitTests, 92 IntegrationTests, 58 Web.Tests; 0 failed, 0 skipped)
 
 ---
 
@@ -822,7 +822,7 @@ Final verification covered normal application regression, reporting workflows, e
 
 # Current Focus
 
-Sprint 16 is complete and closed. The six Details/Edit POST forms explicitly render hidden booleans as `"true"`/`"false"`, and the 12-case runtime matrix proved both states survive Submit, Approve, Cancel, Receive, UpdateItem, and RemoveItem round trips. Create now catches only expected `DomainException` failures, adds the canonical message to ModelState, restores item/dropdown data, and returns `Page()`; duplicate-product, zero-quantity, and negative-cost attempts rendered inline and left SQL counts unchanged. Successful Create and workflow behavior, authorization, NotFound, and unexpected-exception semantics remain unchanged. All 477 automated tests pass (346/92/39); builds retain the 0-warning normal and 28-pre-existing-warning non-incremental baselines. No schema, authorization, package, or configuration change occurred. Candidates C, D1, D4, and E remain deferred. The next activity requires a separate planning session; no next-sprint scope is defined.
+Sprint 17 is complete and closed. The HTTP/Razor integration-test foundation is established: `InventoryPlatform.Web.Tests` now hosts a database-safe `WebApplicationFactory<Program>` (unique EF Core InMemory database per factory, early sentinel connection value, captured/replaced production `ApplicationDbContext` registrations, fail-closed structural validation, unchanged real `UseWeb()` startup seeding, ephemeral Data Protection, cleared logging providers), test-only seeded-user authentication (`X-Test-User` selector resolved through the real Identity store into real GUID claims with no fabricated authorization claims), and representative real-pipeline HTTP tests: Category Create GET authorization (anonymous challenge / manager 200 / viewer access-denied), Category Create rendered-antiforgery POST with PRG and same-factory persistence, and empty-Draft Purchase Order Submit domain-failure redisplay (exact invariant message, navigation-state preservation, no mutation). Sprint 17 T01 documented the lifecycle correction that the originally planned `IStartupFilter` pre-seeding guard was invalid (startup seeding runs synchronously inside `app.UseWeb()` before any `IStartupFilter` middleware could guard it); Revision 4 established the accepted early host configuration + pre-provider replacement + structural fail-closed validation architecture. T08 passed as verification-only with no source changes. All 496 automated tests pass (346/92/58); builds retain the 0-warning normal and 28-pre-existing-warning non-incremental baselines; no pending EF model changes. No schema, authorization, package, or configuration change occurred. HTTP coverage is representative, not exhaustive — broader route coverage, browser/Playwright automation, relational-provider verification, and CI automation remain deferred. The next activity requires a separate planning session; no next-sprint scope is defined.
 
 Completed in Sprint 8:
 

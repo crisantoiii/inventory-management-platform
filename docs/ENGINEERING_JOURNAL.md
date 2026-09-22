@@ -26,7 +26,26 @@ Rather than documenting daily work, it captures important architectural decision
 
 **Current Version:** Sprint 16 Purchase Order POST Round-Trip State and Create Failure Presentation Corrections (non-release sprint; v1.6.0 remains the release baseline)
 
-Sprint 16 is complete and closed. Six Details/Edit forms now serialize hidden `Descending` values as explicit lowercase strings, and Create catches only expected `DomainException` failures to present the canonical message inline after restoring page data. The 12-case true/false round-trip matrix passed; three invalid Create variants persisted nothing; successful workflow and authorization checks passed. The automated baseline remains 477 passing (346 UnitTests, 92 IntegrationTests, 39 Web.Tests; 0 failed, 0 skipped), with normal build 0/0 and non-incremental build 28 pre-existing warnings/0 errors. No schema, authorization, package, or configuration change occurred. This was not a release sprint.
+Sprint 17 is complete and closed. The HTTP/Razor integration-test foundation is established in `InventoryPlatform.Web.Tests`: a database-safe `WebApplicationFactory<Program>` (early sentinel `DefaultConnection`, pre-provider `ApplicationDbContext` replacement, fail-closed structural validation, unchanged real startup seeding, per-factory InMemory isolation), test-only seeded-user authentication resolving real persisted GUID identities, and representative real-pipeline HTTP tests (Category Create GET authorization matrix, Category Create rendered-antiforgery POST/PRG/persistence, empty-Draft Purchase Order Submit `DomainException` redisplay with navigation preservation and no mutation). The T01 discovery corrected the planned `IStartupFilter` pre-seeding guard (it cannot guard `UseWeb()`'s synchronous seeding); Revision 4 accepted the sentinel + replacement + structural-validation architecture. T08 passed as verification-only with zero source changes. The automated baseline is 496 passing (346 UnitTests, 92 IntegrationTests, 58 Web.Tests; 0 failed, 0 skipped), with normal build 0/0, non-incremental build 28 pre-existing warnings/0 errors, and no pending EF model changes. No production behavior, schema, authorization, package (beyond the two approved test packages), or configuration change occurred. This was not a release sprint.
+
+# Sprint 17 - HTTP/Razor Integration-Test Foundation
+
+## Engineering Lessons
+
+- **Verify startup lifecycle assumptions against actual execution order.** T01 established that `IStartupFilter` middleware wrapping occurs after `app.UseWeb()` begins and therefore cannot guard its synchronous `IdentitySeeder.SeedAsync` call — a planning correction, not a product defect. The accepted guard is early host-configuration sentinel containment plus pre-provider `ApplicationDbContext` replacement plus fail-closed structural validation.
+- **Database safety needs both containment and structural proof.** The sentinel value alone would not detect a botched replacement; the structural validator failing closed before root-provider construction makes an unsafe host impossible to start accidentally.
+- **Rendered Razor behavior is observed, not guessed.** The effective Submit form action is `/Details/{id}?handler=Submit` (the tag helper appends the handler selector), and Details renders `FromDate`/`ToDate` hidden inputs with the host culture's short-date pattern — both taken from real responses, not source intent. HTTP tests assert semantic round-trips where rendering is culture-dependent.
+- **Representative coverage is honest coverage.** Three HTTP scenarios (Category GET matrix, Category POST, PO failure POST) prove the foundation without implying exhaustive route coverage or relational guarantees from InMemory.
+
+## Verification
+
+The integrated T03–T07 subset passed 19/19 in two independent invocations and complete Web.Tests passed 58/58 in two independent invocations under default parallelism (no serialization, sleeps, or retries). All 496 automated tests pass (arithmetic: 346 + 92 + 58 = 496; +5 T03, +8 T04, +3 T05, +1 T06, +2 T07, +0 T08 over the 477 pre-sprint baseline). Normal build 0 warnings/0 errors; non-incremental build 28 pre-existing warnings/0 errors; no pending EF model changes. Retrospective: `docs/retrospectives/SPRINT_17_HTTP_RAZOR_INTEGRATION_TEST_FOUNDATION.md`.
+
+---
+
+# Sprint 16 Journal Position (Historical)
+
+Sprint 16 is complete and closed. Six Details/Edit forms now serialize hidden `Descending` values as explicit lowercase strings, and Create catches only expected `DomainException` failures to present the canonical message inline after restoring page data. The 12-case true/false round-trip matrix passed; three invalid Create variants persisted nothing; successful workflow and authorization checks passed. The automated baseline at Sprint 16 closure was 477 passing (346 UnitTests, 92 IntegrationTests, 39 Web.Tests; 0 failed, 0 skipped), with normal build 0/0 and non-incremental build 28 pre-existing warnings/0 errors. No schema, authorization, package, or configuration change occurred. This was not a release sprint. (Superseded as the current baseline by Sprint 17's 496.)
 
 # Sprint 16 - Purchase Order POST Round-Trip State and Create Failure Presentation Corrections
 

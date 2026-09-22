@@ -1,5 +1,44 @@
 # Changelog
 
+## [Sprint 17] - HTTP/Razor Integration-Test Foundation
+
+### Summary
+
+Established a real HTTP/Razor integration-test foundation in `InventoryPlatform.Web.Tests`, closing the gap where Web.Tests could not exercise the actual ASP.NET Core pipeline. Not a release sprint — no version assigned, no tag, no GitHub release; v1.6.0 remains the current release baseline.
+
+### Added
+
+- Minimal production test-host seam: `public partial class Program { }`
+- Web.Tests packages: `Microsoft.AspNetCore.Mvc.Testing` 10.0.*, `Microsoft.EntityFrameworkCore.InMemory` 10.0.*
+- Database-safe `InventoryPlatformWebApplicationFactory`: early non-production sentinel `DefaultConnection` via host configuration, production `ApplicationDbContext` registration capture/replacement before final provider construction, fail-closed structural validation (with negative unsafe-registration proof), unique `Guid`-suffixed InMemory database per factory, unchanged real `UseWeb()` startup seeding, cross-factory isolation proof (5 tests)
+- Test-only seeded-user authentication: `X-Test-User` selector resolved through the real Identity store into real persisted GUID claims; no fabricated role/capability claims; production capability authorization and Identity challenge/forbid schemes retained (8 tests)
+- Real HTTP Category Create GET authorization matrix: anonymous 302 challenge, InventoryManager 200, Viewer access-denied forbid (3 tests)
+- Real rendered-antiforgery Category Create POST: extracted token + matching preserved cookie, real model binding/PageModel/Application/persistence, successful 302 PRG, same-factory persistence verification (1 test)
+- Real empty-Draft Purchase Order Submit domain-failure proof: actual `A purchase order must contain at least one item.` invariant through the real Details/Submit form, existing `DomainException` redisplay (HTTP 200), navigation-state preservation, no-mutation verification (2 tests)
+- Narrow BCL-only form/antiforgery extraction helpers (no HTML-parser package, no token manufacturing)
+- Sprint 17 testing conventions and DD-043 design-decision record
+
+### Changed
+
+- No production source changed (the only production seam is `public partial class Program { }`); no schema/migration, authorization/seed, configuration, or other package change
+- Automated baseline: 477 → 496 passed tests (346 UnitTests, 92 IntegrationTests, 58 Web.Tests; 0 failed, 0 skipped); normal build 0 warnings/0 errors; full non-incremental build 28 pre-existing warnings/0 errors (no Sprint 17 warning regression)
+
+### Planning Correction (T01)
+
+The originally planned `IStartupFilter` pre-seeding database guard was invalid: `app.UseWeb()` synchronously executes `IdentitySeeder.SeedAsync` before any `IStartupFilter` middleware wrapping occurs. Revision 4 accepted the corrected safety architecture (early host-configuration sentinel + pre-provider replacement + fail-closed structural validation). `IStartupFilter` is not the final guard.
+
+### Verification
+
+- Integrated T03–T07 subset: 19/19 in two independent invocations; complete Web.Tests 58/58 in two independent invocations (T08 isolation/repeatability gate)
+- Default xUnit parallelism preserved; no global serialization, sleeps, or retries
+- EF Core: no pending model changes
+- Coverage is representative, not exhaustive; no relational behavior is claimed from the InMemory-based host
+
+### Deferred
+
+- Broader HTTP/Razor route coverage, browser/Playwright automation, relational-provider verification, and CI provider establishment remain deferred
+- Candidate C (Create FluentValidation invocation), D1 (EditStatus behavior), E (shared POST failure-render extraction) remain deferred, unchanged
+
 ## [Sprint 16] - Purchase Order POST Round-Trip State and Create Failure Presentation Corrections
 
 ### Changed
