@@ -17,3 +17,5 @@ var app = builder.Build();
 app.UseWeb();
 
 app.Run();
+
+public partial class Program { }

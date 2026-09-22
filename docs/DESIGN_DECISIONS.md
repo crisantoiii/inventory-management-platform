@@ -2236,3 +2236,46 @@ When a hidden boolean field is written explicitly, render its value as a lowerca
 
 The representation is unambiguous to HTML and ASP.NET Core model binding. Sprint 16 applied it to the six Details/Edit `Descending` fields, and a 12-case runtime matrix proved both boolean states across Submit, Approve, Cancel, Receive, UpdateItem, and RemoveItem. The convention changes presentation serialization only; query, Domain, Application, persistence, and authorization behavior remain unchanged.
 
+---
+
+# DD-043 — Database-Safe In-Process HTTP/Razor Test Host
+
+**Status:** Implemented in Sprint 17
+
+## Context
+
+Web.Tests originally exercised the Web layer only through directly constructed handlers and PageModel-adjacent tests; the real ASP.NET Core pipeline (Razor rendering, antiforgery, model binding, challenge/forbid redirects, PRG, `DomainException` presentation) was untested. A `WebApplicationFactory` was needed, but building the real host normally runs `app.UseWeb()`, which synchronously executes real startup seeding and would normally read the production `DefaultConnection` — so an unsafe or missing database-safety boundary could reach real SQL Server infrastructure from tests.
+
+The originally planned `IStartupFilter` pre-seeding database guard was evaluated and **rejected during Sprint 17 T01 discovery**: `IStartupFilter` middleware wrapping occurs after `app.UseWeb()` begins executing, and `UseWeb()` synchronously calls `IdentitySeeder.SeedAsync(app.Services)` — the filter cannot guard that startup seeding. This was a planning/lifecycle correction, not a product defect.
+
+## Decision
+
+HTTP/Razor integration tests use a **database-safe in-process test host** with layered containment and structural proof:
+
+1. Inject a deliberately non-production sentinel `DefaultConnection` (`T03_SENTINEL_NOT_A_SQL_CONNECTION_STRING`) through early host configuration, before application registration reads configuration;
+2. allow normal production registrations to occur;
+3. capture and replace `ApplicationDbContext` registrations in test service customization before the final root provider is constructed;
+4. structurally validate that no unsafe production context configuration survived (exactly one context/options/configuration registration each, no captured descriptor reused);
+5. **fail closed before root-provider construction** on invalid replacement;
+6. build the final provider against a unique `Guid`-suffixed EF Core InMemory database per factory;
+7. run the unchanged `UseWeb()` startup seeding against InMemory;
+8. positively verify the final provider name and the real seed baseline.
+
+The only production seam is `public partial class Program { }`. Authentication is test-only: a logical seeded-user selector header resolves through the real Identity store into real persisted-GUID claims; no role/capability claims are fabricated, so capability authorization flows through the production services. Antiforgery is exercised through actually rendered tokens and matching cookies — never disabled, bypassed, or manufactured.
+
+## Rejected / Avoided Alternatives
+
+- **`IStartupFilter` as the pre-seeding safety boundary** — rejected (lifecycle: executes too late to guard synchronous `UseWeb()` seeding); not the final guard.
+- **Test-only seeder suppression flag** — rejected; it would diverge the test host from real startup behavior.
+- **Separate alternate production startup class / extra production environment branch for tests** — rejected; unnecessary production seams.
+- **Fake capability claims for authorization** — rejected; authorization must be proven through the real capability infrastructure.
+- **Antiforgery bypass or token manufacturing** — rejected; rendered token + cookie semantics are part of the behavior under proof.
+- **HTML-parser packages (e.g., AngleSharp)** — rejected; narrow BCL-only form extraction is sufficient and keeps the package surface minimal.
+- **Relational guarantees from the InMemory host** — not claimed; InMemory proves wiring, rendered behavior, and same-factory persistence only.
+
+## Consequences
+
+- Representative real-pipeline behavior (Category GET authorization matrix, Category Create antiforgery POST/PRG/persistence, empty-Draft Purchase Order Submit `DomainException` redisplay with navigation preservation and no mutation) is now automatically verified.
+- Coverage is representative, not exhaustive; broader route coverage, browser automation, relational-provider verification, and CI remain deferred.
+- Test-only isolation (ephemeral Data Protection, cleared logging providers, HTTPS test clients, per-test factories/clients/cookies) never leaks into production configuration; default xUnit parallelism is preserved.
+

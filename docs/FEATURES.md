@@ -21,6 +21,18 @@ The platform currently provides business modules for:
 
 Shared infrastructure such as paging, filtering, sorting, the Result pattern, and Identity service abstractions are reused consistently across modules while maintaining a clear separation of concerns.
 
+# Sprint 17 - HTTP/Razor Integration-Test Foundation
+
+Sprint 17 added a real HTTP/Razor integration-test foundation (a testing capability, not a product feature). Representative automated HTTP proofs now exist:
+
+- ✅ Database-safe in-process `WebApplicationFactory` test host: early sentinel connection containment, pre-provider `ApplicationDbContext` replacement, fail-closed structural validation, unchanged real startup seeding, unique InMemory database per factory
+- ✅ Test-only seeded-user authentication resolving real persisted GUID identities; production capability authorization preserved; no fabricated authorization claims
+- ✅ Category Create GET authorization matrix: anonymous → Identity login challenge; InventoryManager → HTTP 200 rendered page; Viewer → Identity access-denied forbid
+- ✅ Category Create successful POST: real rendered antiforgery token + matching cookie, real model binding/PageModel/Application/persistence, successful 302 PRG, same-factory persistence verification
+- ✅ Purchase Order empty-Draft Submit domain failure: actual `A purchase order must contain at least one item.` invariant through the real Details/Submit form and `PurchaseOrder.Submit` authorization; existing `DomainException` handling redisplays the page with HTTP 200; navigation state preserved; PO remains Draft with zero items (no unintended Submit mutation)
+
+Coverage is representative, not exhaustive: broader HTTP/Razor route coverage, browser automation, relational-provider verification, and CI automation remain deferred. No relational behavior is claimed from the InMemory-backed test host. See `docs/TESTING_CONVENTIONS.md` for the durable HTTP integration-test conventions.
+
 # Sprint 9 - Code Quality & Consistency
 
 Sprint 9 improves consistency across existing features without adding a new business capability.
@@ -1029,7 +1041,7 @@ All admin pages require `Administration.Access` capability.
 - Viewer has User.View capability (seed filter includes all *.View) — **deferred** (by design)
 - Reports unrestricted (design decision pending) — **deferred** (owner decision pending)
 
-Findings recorded after the list above was written: the Sprint 12 `EditStatus` `User.IsInRole(InventoryManager)` self-deactivation guard remains deferred pending an explicit behavioral decision; the Sprint 13 T05 investigation recorded that `GetPurchaseOrdersHandler` does not copy `PagedRequest.Status` into `PagedQuery` (finding only; no remediation authorized). Sprint 13 itself made no production changes.
+Findings recorded after the list above was written: the Sprint 12 `EditStatus` `User.IsInRole(InventoryManager)` self-deactivation guard remains deferred pending an explicit behavioral decision; the Sprint 13 T05 investigation recorded that `GetPurchaseOrdersHandler` does not copy the generic `PagedRequest.Status` (`ProductStatusFilter`) into `PagedQuery` — it passes the Purchase Order-specific `PurchaseOrderStatus` separately to `GetPagedAsync` (finding only; no remediation authorized; re-verified against current source at Sprint 17 T09 closure). Sprint 13 itself made no production changes.
 
 
 ## User Administration
