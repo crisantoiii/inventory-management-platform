@@ -2279,3 +2279,34 @@ The only production seam is `public partial class Program { }`. Authentication i
 - Coverage is representative, not exhaustive; broader route coverage, browser automation, relational-provider verification, and CI remain deferred.
 - Test-only isolation (ephemeral Data Protection, cleared logging providers, HTTPS test clients, per-test factories/clients/cookies) never leaks into production configuration; default xUnit parallelism is preserved.
 
+---
+
+# DD-044 — Fail-Closed SQL Server LocalDB Relational Verification
+
+**Status:** Implemented in Sprint 18
+
+## Context
+
+The established EF Core InMemory and HTTP test suites prove application wiring, query shape, rendering, and persistence round-trips, but they cannot prove the actual SQL Server migration chain, database-enforced constraints, transaction behavior, provider storage semantics, or SQL translation. The verification tier also needs to make accidental development/production database access impossible by construction.
+
+## Decision
+
+SQL Server relational tests remain inside `InventoryPlatform.IntegrationTests` under `IntegrationTests.Relational` and use only `(localdb)\MSSQLLocalDB`. Every test owns a unique database named `InventoryPlatformRelationalTests_<guid>`. A safety guard validates the exact server and disposable prefix before connection, creation, `MigrateAsync()`, and guarded cleanup. Connections use trusted authentication and are built independently of application `DefaultConnection`; production seeders are not invoked. LocalDB unavailability and guard failure are hard failures, never conditional skips. Default xUnit parallelism remains enabled because isolation is database-per-test.
+
+The implemented contract is intentionally limited to R1-R6: fresh migration, Product SKU uniqueness, Category FK delete restriction, one-`SaveChangesAsync` atomicity, one observed `decimal(18,2)` mapping, and the actual Inventory Movement production query's translation/aggregation.
+
+## Rejected Alternatives
+
+- **SQLite as an equivalent relational provider** — rejected because it cannot prove the SQL Server contract, error codes, type behavior, or SQL translation.
+- **Application `DefaultConnection` reuse** — rejected because it could target a development or production database.
+- **`EnsureCreated()`** — rejected because it bypasses the real migration chain.
+- **Shared database or global xUnit serialization** — rejected because unique database-per-test isolation supports deterministic parallel execution.
+- **Conditional skip when LocalDB is unavailable** — rejected because an intentionally executed provider-verification tier must not report a false pass.
+
+## Consequences
+
+- Sprint 18 provides 41 SQL Server relational cases, including safety/infrastructure tests; it does not represent 41 separate business guarantees.
+- R4, R5, and R6 remain evidence-bounded: one save operation, one decimal mapping without conversion-layer attribution, and one report query respectively.
+- LocalDB keeps developer execution independent of Docker, but future CI requires an explicit SQL Server endpoint/runner decision.
+- The tier adds no production behavior, model/mapping, migration, startup, or configuration change.
+

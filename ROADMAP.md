@@ -22,7 +22,7 @@ v1.3  Account Management       ✅
 v1.4  Additional Reporting     ✅
 v1.5  Purchasing Enhancements  ✅
 v1.6  Dynamic Capability Auth  ✅
-(Sprint 11 Automated Testing ✅ — non-release; Sprint 12 Authorization Refinement ✅ — non-release; Sprint 13 Purchasing Workflow Test Automation ✅ — non-release; Sprint 14 Purchase Order Cancellation and Draft Item Editing ✅ — non-release; Sprint 15 Purchase Order Workflow Error Handling and UX Hardening ✅ — non-release; Sprint 16 Purchase Order POST Round-Trip State and Create Failure Presentation Corrections ✅ — non-release; Sprint 17 HTTP/Razor Integration-Test Foundation ✅ — non-release)
+(Sprint 11 Automated Testing ✅ — non-release; Sprint 12 Authorization Refinement ✅ — non-release; Sprint 13 Purchasing Workflow Test Automation ✅ — non-release; Sprint 14 Purchase Order Cancellation and Draft Item Editing ✅ — non-release; Sprint 15 Purchase Order Workflow Error Handling and UX Hardening ✅ — non-release; Sprint 16 Purchase Order POST Round-Trip State and Create Failure Presentation Corrections ✅ — non-release; Sprint 17 HTTP/Razor Integration-Test Foundation ✅ — non-release; Sprint 18 SQL Server Relational Verification ✅ — non-release)
 
 ---
 
@@ -353,9 +353,45 @@ Sprint 17 proves the foundation through representative cases: one Category GET a
 - Default xUnit parallelism preserved; no global serialization, sleeps, or retries
 - No version assigned, no tag created, no release published
 
+## Sprint 18 - SQL Server Relational Verification
+
+**Status:** Complete/Closed — technical/non-release sprint; v1.6.0 remains the latest release baseline. No version or tag was created.
+
+Sprint 18 established an automated SQL Server-backed relational verification tier in `tests/InventoryPlatform.IntegrationTests/Relational/`. It runs only against `(localdb)\MSSQLLocalDB`, creates a unique `InventoryPlatformRelationalTests_<guid>` database per test, validates the server and database prefix before create/migrate/drop operations, fails hard when LocalDB is unavailable, uses trusted authentication, never reads production `DefaultConnection`, invokes no production seeders, and retains default xUnit parallelism.
+
+### Completed
+
+- R1: Real `MigrateAsync()` on a fresh database; all 10 migrations applied through `20260831141400_CreateAuthorizationSchema`; zero pending migrations afterward
+- R2: `IX_Products_Sku` rejected a duplicate Product SKU with SQL error 2601
+- R3: `FK_Products_Categories_CategoryId` rejected deletion of a referenced Category with SQL error 547
+- R4: One `SaveChangesAsync()` containing valid and constraint-violating pending writes persisted neither write; this is not a guarantee about every application workflow
+- R5: Representative `Product.QuantityOnHand` `decimal(18,2)` persistence was observed before being asserted; the evidence does not assign conversion responsibility to EF or SQL Server
+- R6: The actual `GetInventoryMovementHandler` → `InventoryMovementRepository.GetInventoryMovementAsync` query translated and executed on SQL Server with deterministic aggregates; this does not cover all reports
+- T06 integrated verification and T07 documentation closure completed
+
+### Final Verification Baseline
+
+```text
+Relational:        41 passed
+UnitTests:        346 passed
+IntegrationTests: 133 passed
+Web.Tests:         58 passed
+Total:            537 passed, 0 failed, 0 skipped
+Build:             0 errors (normal: 0 warnings; non-incremental: 28 unchanged historical warnings)
+EF:                no pending model changes
+Migrations:        10; latest 20260831141400_CreateAuthorizationSchema
+```
+
+### Boundaries Held
+
+- Zero production behavior/source, EF model/mapping, migration, package/project, startup, or configuration changes
+- Coverage is limited to R1-R6; broader relational/report and HTTP/Razor coverage remain deferred
+- CI and a future CI SQL Server endpoint remain deferred
+- SQLite remains rejected as an equivalent SQL Server verification provider
+
 ## Next Sprint Planning
 
-Sprint 11 through Sprint 17 are complete. Sprint 17 established the HTTP/Razor integration-test foundation with all verification gates green and all scope boundaries held. The next activity is a separate Sprint Planning session; no next-sprint scope has been defined.
+Sprint 11 through Sprint 18 are complete. Sprint 18 established the SQL Server relational-verification tier with all verification gates green and all scope boundaries held. The next activity requires separate planning; no next-sprint scope has been defined.
 
 ## D1 - Documentation Synchronization
 

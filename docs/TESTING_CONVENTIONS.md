@@ -461,7 +461,7 @@ No CI provider is currently configured in the repository. The complete test suit
 
 Rows marked "discovered cases" contain `[Theory]` methods whose `[InlineData]` rows each execute as a separate case; unmarked rows are `[Fact]` methods where methods and discovered cases are equal.
 
-### IntegrationTests (92 tests)
+### IntegrationTests (133 tests)
 
 | Area | Subject | Tests |
 |------|---------|-------|
@@ -470,8 +470,9 @@ Rows marked "discovered cases" contain `[Theory]` methods whose `[InlineData]` r
 | Authorization | AuthorizationGroupRepository | 24 |
 | Purchasing | PurchaseOrderRepository (Sprint 13 T06) | 24 |
 | Purchasing | PurchaseOrderLifecyclePersistence (Sprint 14 T06) | 5 |
+| Relational | SQL Server LocalDB safety/infrastructure and R1-R6 contracts (Sprint 18) | 41 |
 | Infrastructure | Placeholder | 1 |
-| **Total** | | **92** |
+| **Total** | | **133** |
 
 ### Web.Tests (58 tests)
 
@@ -489,7 +490,7 @@ Rows marked "discovered cases" contain `[Theory]` methods whose `[InlineData]` r
 | Infrastructure | Placeholder | 1 |
 | **Total** | | **58** |
 
-**Total: 496 tests, 496 passed, 0 failures, 0 skipped** (346 + 92 + 58; Sprint 17 T08 re-verification; arithmetic: 346 + 92 + 58 = 496 — Web.Tests grew from 39 to 58 during Sprint 17 T03-T07).
+**Current total: 537 tests, 537 passed, 0 failures, 0 skipped** (346 + 133 + 58; Sprint 18 T06 integrated verification). The 41 Sprint 18 relational cases include infrastructure/safety verification; they are not 41 distinct business contracts. The Sprint 17 historical closure total remains 496 (346 + 92 + 58).
 
 The Web.Tests verification tests confirm that the `FakeCapabilityAuthorizationService` compiles against the real `ICapabilityAuthorizationService` interface and produces controlled authorization results. The T03/T04 handler tests exercise the actual `CapabilityAuthorizationHandler` and `MultiCapabilityAuthorizationHandler` production sources directly (the Sprint 14 `PurchaseOrderCapabilityPolicyRegistrationTests` additionally verify Edit/Cancel capability constants and their real `AddWeb` policy registration) (authentication gate, NameIdentifier extraction/parsing, service delegation, succeed/do-not-succeed outcomes, OR semantics with short-circuit, requirement constructor validation). Handler testing is source-level/unit-level.
 
@@ -522,6 +523,43 @@ Established by the Sprint 17 HTTP/Razor integration-test foundation and authorit
 10. **Assert semantics, not HTML snapshots.** Prefer stable production markers (button text, exact invariant messages, hidden-field values) over full-HTML equality. Where rendering is culture-dependent (e.g., `DateOnly` hidden inputs rendered with the host culture's short-date pattern), assert the semantic round-trip (parse the rendered value back under the same culture the server binds with) rather than a literal string.
 11. **Rendered behavior is observed, not guessed.** Effective form actions, redirect destinations, and hidden-field formatting must be taken from the actual rendered response (Sprint 17 evidence: `asp-page-handler` renders `?handler=Submit` in the action; culture-formatted date hidden inputs) — never assumed from source intent.
 12. **Domain-failure redisplay contract.** Expected `DomainException` failures are proven through the real POST, asserting the existing production presentation (ModelState redisplay with HTTP 200 in the current source), preserved navigation/query state, and a fresh-scope same-factory reload proving no mutation. Never inject or catch the exception in the test.
+
+## SQL Server Relational-Test Conventions (Sprint 18)
+
+The SQL Server relational tier lives under `tests/InventoryPlatform.IntegrationTests/Relational/` and contains these Sprint 18 files:
+
+- `RelationalSafetyGuard.cs`
+- `RelationalTestDatabase.cs`
+- `RelationalTestInfrastructureSqlServerTests.cs`
+- `SqlServerMigrationTests.cs`
+- `SqlServerConstraintTests.cs`
+- `SqlServerStorageSemanticsTests.cs`
+- `SqlServerInventoryMovementQueryTests.cs`
+
+Durable conventions:
+
+1. **SQL Server fidelity is the purpose.** Run against SQL Server LocalDB only, at exact server `(localdb)\MSSQLLocalDB`. SQLite is relational but is not an equivalent substitute for SQL Server migrations, error codes, precision behavior, or query translation.
+2. **Fail closed and fail hard.** Relational execution must fail if LocalDB is unavailable or any safety assertion is false. Never turn provider absence into a conditional skip.
+3. **Own a unique disposable database per test.** Names begin with `InventoryPlatformRelationalTests_` and end with a unique GUID. Validate both the exact server and guarded database prefix before connecting, creating, migrating, or dropping.
+4. **Never reuse application configuration.** Construct the test connection using trusted local authentication; do not read production `DefaultConnection`, target development database `InventoryPlatform`, store credentials, or invoke production seeders.
+5. **Use the real migration chain.** Create schema with `MigrateAsync()`, not `EnsureCreated()`. R1 proves all 10 migrations apply to a fresh database through `20260831141400_CreateAuthorizationSchema` and leave zero pending migrations.
+6. **Cleanup is guarded and best-effort.** Apply the safety guard again before drop. Cleanup failure must be surfaced but is not the primary safety mechanism; unique names and positive target validation provide containment.
+7. **Retain default xUnit parallelism.** Database-per-test ownership removes shared mutable database state; do not add global serialization, collection-level disabling, sleeps, or retries for convenience.
+8. **Exercise real production paths where translation is the contract.** R6 calls `GetInventoryMovementHandler`, which delegates to `InventoryMovementRepository.GetInventoryMovementAsync`; do not copy the LINQ into a test-only query.
+9. **Observe provider behavior before locking assertions.** Provider-specific storage assertions, such as R5's representative `Product.QuantityOnHand` `decimal(18,2)` case, must be based on observed deterministic behavior. Do not claim whether EF/provider conversion or SQL Server assignment caused the result without separate evidence.
+10. **Keep claims bounded.** R2 proves `IX_Products_Sku`; R3 proves `FK_Products_Categories_CategoryId`; R4 proves all-or-nothing behavior for one failing `SaveChangesAsync`; R5 proves one mapped decimal property; R6 proves one report query. None establishes a universal guarantee for every constraint, workflow, decimal mapping, or report.
+
+Run only the relational tier from the solution directory:
+
+```powershell
+dotnet test tests/InventoryPlatform.IntegrationTests/InventoryPlatform.IntegrationTests.csproj --filter FullyQualifiedName~Relational
+```
+
+EF pending-model checks require the Web startup project because `ApplicationDbContext` is DI-constructed. The repository tool baseline is `dotnet-ef` 10.0.10:
+
+```powershell
+dotnet ef migrations has-pending-model-changes --project src/InventoryPlatform/InventoryPlatform.Infrastructure --startup-project src/InventoryPlatform/InventoryPlatform.Web
+```
 
 ## Sprint 13 Conventions (Reusable)
 
@@ -563,11 +601,11 @@ Completed:
 - Persistence coverage (T06): 5 fresh-context lifecycle round-trip tests (Cancel Draft/Submitted, UpdateItem, RemoveItem, final-item removal → empty Draft)
 - Integrated verification (T09): **477 passed, 0 failed, 0 skipped** (346/92/39); full rebuild 28 warnings / 0 errors — baseline preserved; manual browser and real SQL Server provider verification also passed (manual verification remains manual, not automated testing)
 
-Still deferred (Sprint 17 state):
+Still deferred (Sprint 18 state):
 
 - EditStatus self-deactivation guard (above) — untouched by Sprint 13
 - `GetPurchaseOrdersHandler` does not copy `PagedRequest.Status` into `PagedQuery` (T05 recorded finding; no remediation authorized; re-verified against current source at Sprint 17 T09 closure)
-- SQL Server relational verification beyond InMemory (FK/unique constraints, transactions, SQL translation, collation, provider-specific behavior) — now applies to the Sprint 17 HTTP test host as well
+- Broader SQL Server relational verification beyond the bounded Sprint 18 R1-R6 contracts, including other constraints, workflows, reports, collation, and provider-specific behavior; the Sprint 17 HTTP host remains InMemory and makes no relational claims
 - Broader HTTP/Razor route coverage beyond the Sprint 17 representative cases (more Category/Purchase Order routes, other modules)
 - CI provider establishment
 
@@ -578,7 +616,7 @@ Still deferred (Sprint 17 state):
 - Code coverage reporting and gates
 - Mutation testing
 - Performance/load testing
-- SQL Server / relational integration testing (including for the HTTP test host)
+- Broader SQL Server relational integration testing beyond R1-R6 (including any future SQL Server-backed HTTP host)
 - Broader repository coverage
 - FluentValidation test coverage
 - CI provider establishment
@@ -587,17 +625,17 @@ Still deferred (Sprint 17 state):
 
 ## Key Conventions Summary
 
-1. **Three test projects:** UnitTests (no DB), IntegrationTests (EF Core InMemory), Web.Tests (handler tests + Sprint 17 real HTTP/Razor integration tests)
+1. **Three test projects:** UnitTests (no DB), IntegrationTests (EF Core InMemory plus Sprint 18 SQL Server LocalDB relational tier), Web.Tests (handler tests + Sprint 17 real HTTP/Razor integration tests)
 2. **No Web reference:** UnitTests and IntegrationTests do not reference InventoryPlatform.Web
 3. **No test-project cross-references:** Web.Tests does not reference UnitTests or IntegrationTests
 4. **xUnit framework:** All tests use `[Fact]` attributes
 5. **Hand-written fakes:** No mocking framework; minimal in-memory fakes for Application service and handler tests
 6. **Behavior-oriented naming:** `MethodOrBehavior_WhenCondition_ExpectedResult`
-7. **Isolated databases:** Each integration test class uses a unique InMemory database name; each HTTP test factory owns a unique `Guid`-suffixed InMemory database
+7. **Isolated databases:** Each InMemory integration test class uses a unique database name; each HTTP test factory owns a unique `Guid`-suffixed InMemory database; each relational test owns a unique guarded `InventoryPlatformRelationalTests_<guid>` LocalDB database
 8. **Real implementations:** Integration tests use actual repository implementations; HTTP integration tests exercise the real pipeline (seeding, authentication resolution, capability authorization, antiforgery, model binding, persistence)
 9. **No production changes:** Test infrastructure does not alter production code; the only production seam is `public partial class Program { }`
 10. **No production SQL from HTTP tests:** Sentinel connection containment, pre-provider DbContext replacement, and fail-closed structural validation (Sprint 17)
 11. **No fabricated authorization:** Test authentication issues only real persisted-GUID claims; capability authorization flows through production services; antiforgery is extracted from rendered forms, never bypassed or manufactured (Sprint 17)
-12. **Provider-neutral CI:** Tests are locally reproducible; no CI provider is configured
+12. **Provider-neutral commands, provider-specific relational dependency:** Tests are locally reproducible; no CI provider or CI SQL Server endpoint is configured. A future runner must supply SQL Server fidelity rather than substituting SQLite.
 13. **Behavior-focused coverage:** Tests verify business behavior, not implementation details
 14. **Discovered-case accounting:** State whether a reported count is test methods or discovered test cases (`[Theory]` × `[InlineData]` rows); reconcile suite totals against actual execution

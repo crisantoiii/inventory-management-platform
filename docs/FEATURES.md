@@ -21,6 +21,12 @@ The platform currently provides business modules for:
 
 Shared infrastructure such as paging, filtering, sorting, the Result pattern, and Identity service abstractions are reused consistently across modules while maintaining a clear separation of concerns.
 
+# Sprint 18 - SQL Server Relational Verification
+
+Sprint 18 added an engineering verification capability, not a user-facing feature: 41 tests under `tests/InventoryPlatform.IntegrationTests/Relational/` exercise SQL Server LocalDB through guarded, unique disposable databases. The tier applies the real migrations and proves the bounded R1-R6 contracts: fresh-schema migration, Product SKU uniqueness, Category FK delete restriction, one-save atomicity, representative `decimal(18,2)` storage behavior, and the actual Inventory Movement production query's SQL Server translation and deterministic aggregates.
+
+The durable safety boundary is LocalDB-only on `(localdb)\MSSQLLocalDB`, trusted authentication, `InventoryPlatformRelationalTests_<guid>` database names, validation before destructive operations, fail-hard/no-skip behavior, no production `DefaultConnection`, no production seeders, guarded cleanup, and default xUnit parallelism. R4 is not a blanket workflow-transaction guarantee; R5 does not attribute conversion to EF or SQL Server; R6 does not prove all reports. The final baseline is 537/537 (346 UnitTests, 133 IntegrationTests, 58 Web.Tests; 0 failed, 0 skipped). Sprint 18 made zero production changes and was technical/non-release; v1.6.0 remains the latest release.
+
 # Sprint 17 - HTTP/Razor Integration-Test Foundation
 
 Sprint 17 added a real HTTP/Razor integration-test foundation (a testing capability, not a product feature). Representative automated HTTP proofs now exist:
