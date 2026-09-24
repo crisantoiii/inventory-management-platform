@@ -1,5 +1,34 @@
 # Changelog
 
+## [Sprint 18] - SQL Server Relational Verification
+
+### Summary
+
+Established a fail-closed SQL Server LocalDB relational-verification tier that executes the real migration chain and proves six bounded database/provider contracts. This was technical testing work, not a product feature or release: no version or tag was created, and v1.6.0 remains the latest release baseline.
+
+### Added
+
+- 41 relational tests under `tests/InventoryPlatform.IntegrationTests/Relational/`, including safety/infrastructure coverage
+- LocalDB-only disposable database lifecycle using `(localdb)\MSSQLLocalDB`, unique `InventoryPlatformRelationalTests_<guid>` names, trusted authentication, guarded create/drop, fail-hard behavior, no conditional skips, no production `DefaultConnection`, no production seeders, real migrations, and default xUnit parallelism
+- R1 fresh-database migration proof: 10 migrations through `20260831141400_CreateAuthorizationSchema`, with zero pending migrations afterward
+- R2 Product SKU uniqueness proof (`IX_Products_Sku`, SQL error 2601)
+- R3 referenced-Category delete restriction proof (`FK_Products_Categories_CategoryId`, SQL error 547)
+- R4 all-or-nothing proof for one `SaveChangesAsync()` containing valid and constraint-violating pending writes
+- R5 observed-and-asserted representative `Product.QuantityOnHand` `decimal(18,2)` persistence behavior
+- R6 SQL Server translation/execution proof for the actual `GetInventoryMovementHandler` → `InventoryMovementRepository.GetInventoryMovementAsync` path and deterministic aggregates
+
+### Changed
+
+- Automated baseline: 496 → 537 passed tests (346 UnitTests, 133 IntegrationTests, 58 Web.Tests; 0 failed, 0 skipped)
+- Normal build: 0 warnings/0 errors; non-incremental build: 28 unchanged historical warnings/0 errors; EF pending model changes: none
+- Zero production behavior/source, migration/model, package/project, startup, or configuration changes
+
+### Scope and Deferred Work
+
+- R4 is limited to a single failing `SaveChangesAsync`; R5 does not identify whether EF/provider or SQL Server assignment performs conversion; R6 does not generalize to all report queries
+- CI/future CI SQL Server endpoint, broader HTTP/Razor and relational/report coverage, FluentValidation production invocation, authorization decisions, warning cleanup, and browser automation remain deferred
+- SQLite remains explicitly non-equivalent to SQL Server for this verification tier
+
 ## [Sprint 17] - HTTP/Razor Integration-Test Foundation
 
 ### Summary

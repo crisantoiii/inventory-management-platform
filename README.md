@@ -44,7 +44,7 @@ The focus is not only on implementing business features but also on applying pro
 
 **Current Version:** v1.6.0 - Dynamic Capability-Based Authorization
 
-**Current Development Status:** Sprint 17 HTTP/Razor Integration-Test Foundation — Complete/Closed. The platform now has a real HTTP/Razor integration-test foundation: a database-safe `WebApplicationFactory` with early sentinel connection containment, pre-provider `ApplicationDbContext` replacement, fail-closed structural validation, unchanged real startup seeding, test-only seeded-user authentication, and representative HTTP tests proving Category GET authorization, Category Create antiforgery POST/PRG/persistence, and the empty-Draft Purchase Order Submit domain-failure redisplay. **496 automated tests pass** (346 UnitTests, 92 IntegrationTests, 58 Web.Tests; 0 failed, 0 skipped); normal build is 0 warnings/0 errors and the non-incremental build retains 28 pre-existing warnings/0 errors. This was not a release sprint; v1.6.0 remains the release baseline. Coverage is representative, not exhaustive — broader route, browser, relational, and CI work remains deferred.
+**Current Development Status:** Sprint 18 SQL Server Relational Verification — Complete/Closed. A 41-test SQL Server LocalDB tier now executes the real migration chain and verifies six bounded contracts: fresh-database migration (R1), Product SKU uniqueness (R2), Category delete restriction (R3), one-`SaveChangesAsync` atomicity (R4), representative `decimal(18,2)` storage behavior (R5), and the actual Inventory Movement production query's SQL Server translation and deterministic aggregation (R6). The suite uses only `(localdb)\MSSQLLocalDB`, unique `InventoryPlatformRelationalTests_<guid>` databases, trusted authentication, guarded create/drop, fail-hard execution, and no production `DefaultConnection` or seeders. **537 automated tests pass** (346 UnitTests, 133 IntegrationTests, 58 Web.Tests; 0 failed, 0 skipped); normal build is 0 warnings/0 errors, the non-incremental build retains 28 unchanged historical warnings/0 errors, and EF reports no pending model changes. Sprint 18 made zero production changes and was technical/non-release; v1.6.0 remains the latest release baseline. Evidence is limited to R1-R6 and does not imply every workflow or report query is relationally verified.
 
 ## Completed Modules
 
@@ -64,6 +64,7 @@ The focus is not only on implementing business features but also on applying pro
 - ✅ Purchase Order Workflow Error Handling and UX Hardening (Sprint 15 — Details Submit/Approve/Receive/Cancel `DomainException` failures render inline; 477 project-wide)
 - ✅ Purchase Order POST Round-Trip State and Create Failure Presentation Corrections (Sprint 16 — six explicit hidden-bool values, inline Create Domain failures, 12/12 runtime matrix; 477 project-wide)
 - ✅ HTTP/Razor Integration-Test Foundation (Sprint 17 — database-safe in-process test host, real seeding/auth/antiforgery, representative Category + Purchase Order HTTP tests; 496 project-wide)
+- ✅ SQL Server Relational Verification (Sprint 18 — fail-closed LocalDB lifecycle, real migrations, R1-R6 provider contracts; 41 relational tests, 537 project-wide)
 - ✅ User Management
 - ✅ Account Management
 - ✅ Purchasing (Core Workflow + Sprint 8 P1-P7 Enhancements Complete)
@@ -925,13 +926,14 @@ Development Tools
 
 ## Current
 
+- Sprint 18 - SQL Server Relational Verification - Complete/Closed (41 LocalDB relational tests; R1-R6; 537 automated tests; zero production changes; technical/non-release)
 - Sprint 17 - HTTP/Razor Integration-Test Foundation - Complete/Closed (database-safe `WebApplicationFactory`, seeded-user test authentication, real antiforgery POST, Purchase Order domain-failure HTTP proof; T03-T07 integrated subset 19/19 twice, Web.Tests 58/58 twice, 496 automated tests; verification-only T08; non-release)
 - Sprint 16 - Purchase Order POST Round-Trip State and Create Failure Presentation Corrections - Complete/Closed (six Details/Edit hidden bool fields round-trip both states; expected Create `DomainException` failures render inline with restoration and no persistence; 12/12 runtime matrix and 477 automated tests passed; non-release)
 - Sprint 14 - Purchase Order Cancellation and Draft Item Editing - Complete (Domain cancellation + Application workflows + `PurchaseOrder.Edit`/`PurchaseOrder.Cancel` capabilities + Draft item Edit page; 477 automated tests; no schema/migration change)
 - Sprint 13 - Purchasing Workflow Test Automation - Complete (Application handler/validator/query tests + PurchaseOrderRepository integration tests; 432 automated tests; no production changes)
 - Sprint 12 - Authorization Refinement - Complete (handler tests + authorization boundary fixes; T07 EditStatus cleanup deferred/blocked)
 - Sprint 10 - Dynamic Capability-Based Authorization - Complete
-- v1.6.0 released (v1.6.0 remains the current release baseline; Sprints 11-15 are non-release sprints)
+- v1.6.0 released (v1.6.0 remains the current release baseline; Sprints 11-18 are non-release sprints)
 
 ## Sprint 10 Closure State
 

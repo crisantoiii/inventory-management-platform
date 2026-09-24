@@ -24,7 +24,25 @@ Rather than documenting daily work, it captures important architectural decision
 
 # Current Release State
 
-**Current Version:** Sprint 16 Purchase Order POST Round-Trip State and Create Failure Presentation Corrections (non-release sprint; v1.6.0 remains the release baseline)
+**Current Version:** Sprint 18 SQL Server Relational Verification (non-release sprint; v1.6.0 remains the latest release baseline)
+
+Sprint 18 is complete and closed. The repository now has a 41-test SQL Server LocalDB relational tier under `tests/InventoryPlatform.IntegrationTests/Relational/`. Its objective was to establish automated SQL Server-backed verification that executes the real migration chain and proves high-value database/provider behavior under a fail-closed disposable-database safety contract, with zero production behavior changes. R1-R6 cover fresh migration, Product SKU uniqueness, Category FK delete restriction, single-save atomicity, observed representative `decimal(18,2)` persistence, and the actual Inventory Movement query's SQL Server translation/aggregation. The accepted baseline is 537/537 (346 UnitTests, 133 IntegrationTests, 58 Web.Tests; 0 failed, 0 skipped), normal build 0 warnings/0 errors, non-incremental build 28 unchanged historical warnings/0 errors, no EF pending model changes, and 10 migrations through `20260831141400_CreateAuthorizationSchema`. This was technical/non-release work; v1.6.0 remains the latest release.
+
+# Sprint 18 - SQL Server Relational Verification
+
+## Engineering Lessons
+
+- **Provider-specific behavior needs provider-specific evidence.** EF InMemory remains useful for repository wiring and query shape, but cannot prove SQL Server migrations, constraints, transaction behavior, precision semantics, or translation.
+- **Safety is an executable contract.** Restricting the exact LocalDB server and disposable name prefix before create/migrate/drop operations, never reading `DefaultConnection`, and failing hard without conditional skips prevents an unavailable provider or unsafe target from becoming a false pass.
+- **Observe before asserting provider storage behavior.** R5 first captured actual `Product.QuantityOnHand` `decimal(18,2)` persistence, then asserted the deterministic result without speculating which conversion layer produced it.
+- **Exercise the production query, not copied LINQ.** R6 invoked `GetInventoryMovementHandler` through `InventoryMovementRepository.GetInventoryMovementAsync`; its proof is intentionally limited to that report path.
+- **EF design-time checks need the Web startup project.** `ApplicationDbContext` is constructed through DI, so pending-model verification uses `--startup-project InventoryPlatform.Web`; repository `dotnet-ef` tooling is 10.0.10.
+
+## Verification and Scope
+
+The relational tier passed 41/41 and the complete solution passed 537/537 with zero failed and zero skipped. Default xUnit parallelism remained enabled. Normal build was 0W/0E; the non-incremental 28W/0E result matches the unchanged historical warning baseline. EF reported no pending model changes. Sprint 18 changed tests and test infrastructure only: no production behavior/source, EF model/mapping, migrations, packages/projects, startup, configuration, or CI workflow changed. R4 is limited to one `SaveChangesAsync`; R5 does not assign conversion responsibility; R6 does not generalize to other reports. Retrospective: `docs/retrospectives/SPRINT_18_SQL_SERVER_RELATIONAL_VERIFICATION.md`.
+
+---
 
 Sprint 17 is complete and closed. The HTTP/Razor integration-test foundation is established in `InventoryPlatform.Web.Tests`: a database-safe `WebApplicationFactory<Program>` (early sentinel `DefaultConnection`, pre-provider `ApplicationDbContext` replacement, fail-closed structural validation, unchanged real startup seeding, per-factory InMemory isolation), test-only seeded-user authentication resolving real persisted GUID identities, and representative real-pipeline HTTP tests (Category Create GET authorization matrix, Category Create rendered-antiforgery POST/PRG/persistence, empty-Draft Purchase Order Submit `DomainException` redisplay with navigation preservation and no mutation). The T01 discovery corrected the planned `IStartupFilter` pre-seeding guard (it cannot guard `UseWeb()`'s synchronous seeding); Revision 4 accepted the sentinel + replacement + structural-validation architecture. T08 passed as verification-only with zero source changes. The automated baseline is 496 passing (346 UnitTests, 92 IntegrationTests, 58 Web.Tests; 0 failed, 0 skipped), with normal build 0/0, non-incremental build 28 pre-existing warnings/0 errors, and no pending EF model changes. No production behavior, schema, authorization, package (beyond the two approved test packages), or configuration change occurred. This was not a release sprint.
 
