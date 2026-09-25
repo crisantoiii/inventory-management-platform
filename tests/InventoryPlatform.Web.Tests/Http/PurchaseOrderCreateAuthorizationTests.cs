@@ -1,6 +1,7 @@
 using System.Net;
 using System.Text.RegularExpressions;
 using InventoryPlatform.Domain.Entities;
+using InventoryPlatform.Domain.Enums;
 using InventoryPlatform.Infrastructure.Identity;
 using InventoryPlatform.Infrastructure.Persistence.Context;
 using InventoryPlatform.Web.Tests.Authentication;
@@ -18,6 +19,18 @@ public sealed class PurchaseOrderCreateAuthorizationTests
 {
     private const string PurchaseOrderCreatePath =
         "/Purchasing/PurchaseOrders/Create";
+
+    private const string PurchaseOrderIndexPath =
+        "/Purchasing/PurchaseOrders";
+
+    private const string AntiforgeryCookieName =
+        "InventoryPlatform.AntiForgery";
+
+    private const string AntiforgeryTokenFieldName =
+        "__RequestVerificationToken";
+
+    private const string ValidCreateRemarks =
+        "S19-T03-VALID-CREATE";
 
     [Fact]
     public async Task GetPurchaseOrderCreate_WithoutTestUser_RedirectsToIdentityLogin()
@@ -100,6 +113,88 @@ public sealed class PurchaseOrderCreateAuthorizationTests
             TestUserSelectors.PurchaseOrderDenied,
             client.DefaultRequestHeaders.GetValues(
                 TestAuthenticationDefaults.UserHeader).Single());
+    }
+
+    [Fact]
+    public async Task PostPurchaseOrderCreate_AsInventoryManager_WithRenderedAntiforgeryMaterial_PersistsOrderAndRedirects()
+    {
+        await using var factory = new InventoryPlatformWebApplicationFactory();
+        var arrangedData = await ArrangePurchaseOrderOptionsAsync(factory);
+        var cookieContainer = new CookieContainer();
+        using var client = CreateCookiePreservingClient(factory, cookieContainer);
+
+        var getResponse = await client.GetAsync(PurchaseOrderCreatePath);
+        var getHtml = await getResponse.Content.ReadAsStringAsync();
+
+        Assert.True(
+            getResponse.StatusCode == HttpStatusCode.OK,
+            $"Expected HTTP 200 on GET {PurchaseOrderCreatePath} but received " +
+            $"{(int)getResponse.StatusCode}.{Environment.NewLine}{getHtml}");
+
+        var formAction = PurchaseOrderCreateFormExtraction
+            .ExtractCreateFormAction(getHtml);
+        var antiforgeryToken = PurchaseOrderCreateFormExtraction
+            .ExtractCreateFormAntiforgeryToken(getHtml);
+
+        Assert.Equal(PurchaseOrderCreatePath, formAction);
+        Assert.False(string.IsNullOrWhiteSpace(antiforgeryToken));
+
+        var antiforgeryCookie = Assert.Single(
+            cookieContainer
+                .GetCookies(client.BaseAddress!)
+                .Cast<Cookie>(),
+            cookie => cookie.Name == AntiforgeryCookieName);
+
+        Assert.False(string.IsNullOrWhiteSpace(antiforgeryCookie.Value));
+
+        using var postRequest = new HttpRequestMessage(HttpMethod.Post, formAction)
+        {
+            Content = new FormUrlEncodedContent(
+                new Dictionary<string, string>
+                {
+                    [AntiforgeryTokenFieldName] = antiforgeryToken,
+                    ["PurchaseOrder.SupplierId"] = arrangedData.SupplierId.ToString(),
+                    ["PurchaseOrder.ExpectedDeliveryDate"] = "2030-01-15",
+                    ["PurchaseOrder.Remarks"] = ValidCreateRemarks,
+                    ["PurchaseOrder.Items[0].ProductId"] = arrangedData.ProductId.ToString(),
+                    ["PurchaseOrder.Items[0].Quantity"] = "3",
+                    ["PurchaseOrder.Items[0].UnitCost"] = "12.50"
+                })
+        };
+
+        var postResponse = await client.SendAsync(postRequest);
+        var postHtml = await postResponse.Content.ReadAsStringAsync();
+
+        Assert.True(
+            postResponse.StatusCode == HttpStatusCode.Redirect,
+            $"Expected HTTP 302 but received {(int)postResponse.StatusCode}." +
+            $"{Environment.NewLine}{postHtml}");
+
+        var location = Assert.IsType<Uri>(postResponse.Headers.Location);
+        var destination = location.IsAbsoluteUri
+            ? location
+            : new Uri(client.BaseAddress!, location);
+
+        Assert.Equal(PurchaseOrderIndexPath, destination.AbsolutePath);
+
+        await using var verificationScope = factory.Services.CreateAsyncScope();
+        var context = verificationScope.ServiceProvider
+            .GetRequiredService<ApplicationDbContext>();
+        var persistedOrder = await context.PurchaseOrders
+            .AsNoTracking()
+            .Include(order => order.Items)
+            .SingleAsync(order => order.Remarks == ValidCreateRemarks);
+
+        Assert.Equal(arrangedData.SupplierId, persistedOrder.SupplierId);
+        Assert.Equal(new DateOnly(2030, 1, 15), persistedOrder.ExpectedDeliveryDate);
+        Assert.Equal(ValidCreateRemarks, persistedOrder.Remarks);
+        Assert.Equal(PurchaseOrderStatus.Draft, persistedOrder.Status);
+
+        var persistedItem = Assert.Single(persistedOrder.Items);
+        Assert.Equal(arrangedData.ProductId, persistedItem.ProductId);
+        Assert.Equal(3m, persistedItem.Quantity);
+        Assert.Equal(12.50m, persistedItem.UnitCost);
+        Assert.Equal(37.50m, persistedItem.LineTotal);
     }
 
     private static async Task<(int SupplierId, int ProductId)>
@@ -188,6 +283,28 @@ public sealed class PurchaseOrderCreateAuthorizationTests
         return client;
     }
 
+    private static HttpClient CreateCookiePreservingClient(
+        InventoryPlatformWebApplicationFactory factory,
+        CookieContainer cookieContainer)
+    {
+        var cookieHandler = new CookiePreservingHandler(cookieContainer)
+        {
+            InnerHandler = factory.Server.CreateHandler()
+        };
+
+        var client = new HttpClient(cookieHandler)
+        {
+            BaseAddress = new Uri("https://localhost"),
+            Timeout = TimeSpan.FromSeconds(30)
+        };
+
+        client.DefaultRequestHeaders.Add(
+            TestAuthenticationDefaults.UserHeader,
+            TestUserSelectors.InventoryManager);
+
+        return client;
+    }
+
     private static void AssertRedirect(
         HttpClient client,
         HttpResponseMessage response,
@@ -226,5 +343,39 @@ public sealed class PurchaseOrderCreateAuthorizationTests
         Assert.True(
             option.Success,
             $"Select '{selectName}' did not contain option '{optionValue}' / '{optionText}'.");
+    }
+
+    private sealed class CookiePreservingHandler : DelegatingHandler
+    {
+        private readonly CookieContainer _cookieContainer;
+
+        public CookiePreservingHandler(CookieContainer cookieContainer)
+        {
+            _cookieContainer = cookieContainer;
+        }
+
+        protected override async Task<HttpResponseMessage> SendAsync(
+            HttpRequestMessage request,
+            CancellationToken cancellationToken)
+        {
+            var cookieHeader = _cookieContainer.GetCookieHeader(request.RequestUri!);
+
+            if (!string.IsNullOrEmpty(cookieHeader))
+            {
+                request.Headers.TryAddWithoutValidation("Cookie", cookieHeader);
+            }
+
+            var response = await base.SendAsync(request, cancellationToken);
+
+            if (response.Headers.TryGetValues("Set-Cookie", out var setCookieHeaders))
+            {
+                foreach (var setCookieHeader in setCookieHeaders)
+                {
+                    _cookieContainer.SetCookies(request.RequestUri!, setCookieHeader);
+                }
+            }
+
+            return response;
+        }
     }
 }
