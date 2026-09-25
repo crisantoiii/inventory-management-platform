@@ -32,6 +32,12 @@ public sealed class PurchaseOrderCreateAuthorizationTests
     private const string ValidCreateRemarks =
         "S19-T03-VALID-CREATE";
 
+    private const string DuplicateCreateRemarks =
+        "S19-T04-DUPLICATE";
+
+    private const string DuplicateProductMessage =
+        "The product already exists in this purchase order.";
+
     [Fact]
     public async Task GetPurchaseOrderCreate_WithoutTestUser_RedirectsToIdentityLogin()
     {
@@ -195,6 +201,157 @@ public sealed class PurchaseOrderCreateAuthorizationTests
         Assert.Equal(3m, persistedItem.Quantity);
         Assert.Equal(12.50m, persistedItem.UnitCost);
         Assert.Equal(37.50m, persistedItem.LineTotal);
+    }
+
+    [Fact]
+    public async Task PostPurchaseOrderCreate_AsInventoryManager_WithDuplicateProduct_RedisplaysRestoredFormWithoutMutation()
+    {
+        await using var factory = new InventoryPlatformWebApplicationFactory();
+        var arrangedData = await ArrangePurchaseOrderOptionsAsync(factory);
+        var cookieContainer = new CookieContainer();
+        using var client = CreateCookiePreservingClient(factory, cookieContainer);
+
+        var getResponse = await client.GetAsync(PurchaseOrderCreatePath);
+        var getHtml = await getResponse.Content.ReadAsStringAsync();
+
+        Assert.True(
+            getResponse.StatusCode == HttpStatusCode.OK,
+            $"Expected HTTP 200 on GET {PurchaseOrderCreatePath} but received " +
+            $"{(int)getResponse.StatusCode}.{Environment.NewLine}{getHtml}");
+
+        var formAction = PurchaseOrderCreateFormExtraction
+            .ExtractCreateFormAction(getHtml);
+        var antiforgeryToken = PurchaseOrderCreateFormExtraction
+            .ExtractCreateFormAntiforgeryToken(getHtml);
+
+        Assert.Equal(PurchaseOrderCreatePath, formAction);
+        Assert.False(string.IsNullOrWhiteSpace(antiforgeryToken));
+
+        var antiforgeryCookie = Assert.Single(
+            cookieContainer
+                .GetCookies(client.BaseAddress!)
+                .Cast<Cookie>(),
+            cookie => cookie.Name == AntiforgeryCookieName);
+
+        Assert.False(string.IsNullOrWhiteSpace(antiforgeryCookie.Value));
+
+        int initialOrderCount;
+        int initialItemCount;
+
+        await using (var initialScope = factory.Services.CreateAsyncScope())
+        {
+            var context = initialScope.ServiceProvider
+                .GetRequiredService<ApplicationDbContext>();
+
+            initialOrderCount = await context.PurchaseOrders.CountAsync();
+            initialItemCount = await context.PurchaseOrderItems.CountAsync();
+            Assert.False(await context.PurchaseOrders.AnyAsync(
+                order => order.Remarks == DuplicateCreateRemarks));
+        }
+
+        using var postRequest = new HttpRequestMessage(HttpMethod.Post, formAction)
+        {
+            Content = new FormUrlEncodedContent(
+                new Dictionary<string, string>
+                {
+                    [AntiforgeryTokenFieldName] = antiforgeryToken,
+                    ["PurchaseOrder.SupplierId"] = arrangedData.SupplierId.ToString(),
+                    ["PurchaseOrder.ExpectedDeliveryDate"] = "2030-01-15",
+                    ["PurchaseOrder.Remarks"] = DuplicateCreateRemarks,
+                    ["PurchaseOrder.Items[0].ProductId"] = arrangedData.ProductId.ToString(),
+                    ["PurchaseOrder.Items[0].Quantity"] = "2",
+                    ["PurchaseOrder.Items[0].UnitCost"] = "12.50",
+                    ["PurchaseOrder.Items[1].ProductId"] = arrangedData.ProductId.ToString(),
+                    ["PurchaseOrder.Items[1].Quantity"] = "4",
+                    ["PurchaseOrder.Items[1].UnitCost"] = "15.75"
+                })
+        };
+
+        var postResponse = await client.SendAsync(postRequest);
+        var postHtml = await postResponse.Content.ReadAsStringAsync();
+
+        Assert.True(
+            postResponse.StatusCode == HttpStatusCode.OK,
+            $"Expected HTTP 200 domain-failure redisplay but received " +
+            $"{(int)postResponse.StatusCode}.{Environment.NewLine}{postHtml}");
+        Assert.Null(postResponse.Headers.Location);
+        Assert.Contains(
+            DuplicateProductMessage,
+            PurchaseOrderCreateFormExtraction.ExtractValidationSummaryText(postHtml),
+            StringComparison.Ordinal);
+
+        AssertSelectContainsOption(
+            postHtml,
+            "PurchaseOrder.SupplierId",
+            arrangedData.SupplierId,
+            "S19 Purchase Order Supplier");
+        AssertSelectContainsOption(
+            postHtml,
+            "PurchaseOrder.Items[0].ProductId",
+            arrangedData.ProductId,
+            "S19 Purchase Order Product");
+        AssertSelectContainsOption(
+            postHtml,
+            "PurchaseOrder.Items[1].ProductId",
+            arrangedData.ProductId,
+            "S19 Purchase Order Product");
+
+        Assert.Equal(
+            arrangedData.SupplierId.ToString(),
+            PurchaseOrderCreateFormExtraction.ExtractSelectedOptionValue(
+                postHtml,
+                "PurchaseOrder.SupplierId"));
+        Assert.Equal(
+            "2030-01-15",
+            PurchaseOrderCreateFormExtraction.ExtractInputValue(
+                postHtml,
+                "PurchaseOrder.ExpectedDeliveryDate"));
+        Assert.Equal(
+            DuplicateCreateRemarks,
+            PurchaseOrderCreateFormExtraction.ExtractTextareaValue(
+                postHtml,
+                "PurchaseOrder.Remarks"));
+        Assert.Equal(2, PurchaseOrderCreateFormExtraction.CountItemRows(postHtml));
+
+        Assert.Equal(
+            arrangedData.ProductId.ToString(),
+            PurchaseOrderCreateFormExtraction.ExtractSelectedOptionValue(
+                postHtml,
+                "PurchaseOrder.Items[0].ProductId"));
+        Assert.Equal(
+            "2",
+            PurchaseOrderCreateFormExtraction.ExtractInputValue(
+                postHtml,
+                "PurchaseOrder.Items[0].Quantity"));
+        Assert.Equal(
+            "12.50",
+            PurchaseOrderCreateFormExtraction.ExtractInputValue(
+                postHtml,
+                "PurchaseOrder.Items[0].UnitCost"));
+        Assert.Equal(
+            arrangedData.ProductId.ToString(),
+            PurchaseOrderCreateFormExtraction.ExtractSelectedOptionValue(
+                postHtml,
+                "PurchaseOrder.Items[1].ProductId"));
+        Assert.Equal(
+            "4",
+            PurchaseOrderCreateFormExtraction.ExtractInputValue(
+                postHtml,
+                "PurchaseOrder.Items[1].Quantity"));
+        Assert.Equal(
+            "15.75",
+            PurchaseOrderCreateFormExtraction.ExtractInputValue(
+                postHtml,
+                "PurchaseOrder.Items[1].UnitCost"));
+
+        await using var verificationScope = factory.Services.CreateAsyncScope();
+        var verificationContext = verificationScope.ServiceProvider
+            .GetRequiredService<ApplicationDbContext>();
+
+        Assert.Equal(initialOrderCount, await verificationContext.PurchaseOrders.CountAsync());
+        Assert.Equal(initialItemCount, await verificationContext.PurchaseOrderItems.CountAsync());
+        Assert.False(await verificationContext.PurchaseOrders.AnyAsync(
+            order => order.Remarks == DuplicateCreateRemarks));
     }
 
     private static async Task<(int SupplierId, int ProductId)>
