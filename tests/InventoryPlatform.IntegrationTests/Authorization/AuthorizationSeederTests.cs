@@ -6,6 +6,7 @@ using Xunit;
 
 namespace InventoryPlatform.IntegrationTests.Authorization;
 
+[Trait(TestTiers.TraitKey, TestTiers.ProviderNeutral)]
 public class AuthorizationSeederTests : IDisposable
 {
     private readonly DbContextOptions<ApplicationDbContext> _options;

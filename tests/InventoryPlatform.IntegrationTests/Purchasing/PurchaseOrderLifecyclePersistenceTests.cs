@@ -39,6 +39,7 @@ namespace InventoryPlatform.IntegrationTests.Purchasing;
 /// transaction semantics, or provider-specific behavior.
 /// </para>
 /// </summary>
+[Trait(TestTiers.TraitKey, TestTiers.ProviderNeutral)]
 public sealed class PurchaseOrderLifecyclePersistenceTests
 {
     // Unique per-test-instance database (xUnit creates a new instance per test).

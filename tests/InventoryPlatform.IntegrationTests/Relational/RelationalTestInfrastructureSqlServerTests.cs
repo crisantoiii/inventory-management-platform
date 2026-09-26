@@ -34,6 +34,7 @@ public sealed class RelationalTestInfrastructureSqlServerTests
     // =====================================================================
 
     [Fact]
+    [Trait(TestTiers.TraitKey, TestTiers.ProviderNeutral)]
     public void ValidateTarget_WithApprovedServerAndDisposableName_Succeeds()
     {
         var databaseName = RelationalSafetyGuard.GenerateDatabaseName();
@@ -47,6 +48,7 @@ public sealed class RelationalTestInfrastructureSqlServerTests
     }
 
     [Fact]
+    [Trait(TestTiers.TraitKey, TestTiers.ProviderNeutral)]
     public void ValidateConnectionString_WithTestOwnedConstruction_Succeeds()
     {
         var databaseName = RelationalSafetyGuard.GenerateDatabaseName();
@@ -73,6 +75,7 @@ public sealed class RelationalTestInfrastructureSqlServerTests
     // =====================================================================
 
     [Theory]
+    [Trait(TestTiers.TraitKey, TestTiers.ProviderNeutral)]
     [InlineData("PORepoTest_abc123")]
     [InlineData("InventoryPlatformRelationalTests")]
     [InlineData("InventoryPlatformRelationalTestsOther")]
@@ -106,6 +109,7 @@ public sealed class RelationalTestInfrastructureSqlServerTests
     // =====================================================================
 
     [Fact]
+    [Trait(TestTiers.TraitKey, TestTiers.ProviderNeutral)]
     public void ValidateTarget_WithDevelopmentDatabaseName_FailsClosed()
     {
         // The dev database has no disposable prefix, so it fails on the prefix rule;
@@ -127,6 +131,7 @@ public sealed class RelationalTestInfrastructureSqlServerTests
     }
 
     [Fact]
+    [Trait(TestTiers.TraitKey, TestTiers.ProviderNeutral)]
     public void ValidateTarget_WithDisposablePrefixButDevelopmentName_FailsClosed()
     {
         // Structural subtlety: a name like 'InventoryPlatformRelationalTests_InventoryPlatform'
@@ -151,6 +156,7 @@ public sealed class RelationalTestInfrastructureSqlServerTests
     // =====================================================================
 
     [Theory]
+    [Trait(TestTiers.TraitKey, TestTiers.ProviderNeutral)]
     [InlineData("localhost")]
     [InlineData("(local)")]
     [InlineData("(localdb)\\SomeOtherInstance")]
@@ -171,6 +177,7 @@ public sealed class RelationalTestInfrastructureSqlServerTests
     }
 
     [Fact]
+    [Trait(TestTiers.TraitKey, TestTiers.ProviderNeutral)]
     public void ValidateConnectionString_WithUnexpectedServer_FailsClosed()
     {
         // End-to-end through the connection-string parse path, not just the raw
@@ -192,6 +199,7 @@ public sealed class RelationalTestInfrastructureSqlServerTests
     // =====================================================================
 
     [Theory]
+    [Trait(TestTiers.TraitKey, TestTiers.ProviderNeutral)]
     [InlineData(null)]
     [InlineData("")]
     [InlineData("   ")]
@@ -204,6 +212,7 @@ public sealed class RelationalTestInfrastructureSqlServerTests
     }
 
     [Theory]
+    [Trait(TestTiers.TraitKey, TestTiers.ProviderNeutral)]
     [InlineData(null)]
     [InlineData("")]
     [InlineData("   ")]
@@ -216,6 +225,7 @@ public sealed class RelationalTestInfrastructureSqlServerTests
     }
 
     [Fact]
+    [Trait(TestTiers.TraitKey, TestTiers.ProviderNeutral)]
     public void ValidateConnectionString_WithUnparseableConnectionString_FailsClosed()
     {
         Assert.ThrowsAny<ArgumentException>(
@@ -228,6 +238,7 @@ public sealed class RelationalTestInfrastructureSqlServerTests
     // =====================================================================
 
     [Fact]
+    [Trait(TestTiers.TraitKey, TestTiers.ProviderNeutral)]
     public void GenerateDatabaseName_ProducesGuardValidDisposableNames()
     {
         var name = RelationalSafetyGuard.GenerateDatabaseName();
@@ -245,6 +256,7 @@ public sealed class RelationalTestInfrastructureSqlServerTests
     }
 
     [Fact]
+    [Trait(TestTiers.TraitKey, TestTiers.ProviderNeutral)]
     public void GenerateDatabaseName_IndependentGenerations_NeverReuseNames()
     {
         var names = Enumerable.Range(0, 100)
@@ -259,6 +271,7 @@ public sealed class RelationalTestInfrastructureSqlServerTests
     // =====================================================================
 
     [Fact]
+    [Trait(TestTiers.TraitKey, TestTiers.SqlServerRelational)]
     public async Task CreateAsync_OnApprovedLocalDB_CreatesRealDatabaseAndReportsReachability()
     {
         await using var database = await RelationalTestDatabase.CreateAsync();
@@ -272,6 +285,7 @@ public sealed class RelationalTestInfrastructureSqlServerTests
     }
 
     [Fact]
+    [Trait(TestTiers.TraitKey, TestTiers.SqlServerRelational)]
     public async Task CreateContext_ExecutesRealProviderOperationsOnTheOwnedDatabase()
     {
         await using var database = await RelationalTestDatabase.CreateAsync();
@@ -298,6 +312,7 @@ public sealed class RelationalTestInfrastructureSqlServerTests
     }
 
     [Fact]
+    [Trait(TestTiers.TraitKey, TestTiers.SqlServerRelational)]
     public async Task DisposeAsync_DropsTheOwnedDatabase()
     {
         string databaseName;
@@ -313,6 +328,7 @@ public sealed class RelationalTestInfrastructureSqlServerTests
     }
 
     [Fact]
+    [Trait(TestTiers.TraitKey, TestTiers.SqlServerRelational)]
     public async Task DisposeAsync_CleanupIsBestEffortAndReportsFailures()
     {
         var database = await RelationalTestDatabase.CreateAsync();
@@ -334,6 +350,7 @@ public sealed class RelationalTestInfrastructureSqlServerTests
     }
 
     [Fact]
+    [Trait(TestTiers.TraitKey, TestTiers.SqlServerRelational)]
     public async Task DisposeAsync_CleanupIsRestrictedToGuardValidatedOwnedTarget()
     {
         // Structural proof of cleanup restriction: the lifecycle's drop path
@@ -363,6 +380,7 @@ public sealed class RelationalTestInfrastructureSqlServerTests
     }
 
     [Fact]
+    [Trait(TestTiers.TraitKey, TestTiers.SqlServerRelational)]
     public async Task CreateAsync_IndependentInstances_OwnIndependentDatabases()
     {
         await using var first = await RelationalTestDatabase.CreateAsync();
@@ -402,6 +420,7 @@ public sealed class RelationalTestInfrastructureSqlServerTests
     }
 
     [Fact]
+    [Trait(TestTiers.TraitKey, TestTiers.ProviderNeutral)]
     public async Task RelationalTier_FailsHard_WhenServerIsUnavailable()
     {
         // Fail-hard proof at the infrastructure level: a lifecycle attempt against a

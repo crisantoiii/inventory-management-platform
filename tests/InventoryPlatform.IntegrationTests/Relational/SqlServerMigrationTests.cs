@@ -38,6 +38,7 @@ namespace InventoryPlatform.IntegrationTests.Relational;
 /// parallelism is preserved (unique database per test). LocalDB unavailable → real
 /// failure, never a skip.
 /// </summary>
+[Trait(TestTiers.TraitKey, TestTiers.SqlServerRelational)]
 public sealed class SqlServerMigrationTests
 {
     /// <summary>

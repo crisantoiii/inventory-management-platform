@@ -44,6 +44,7 @@ namespace InventoryPlatform.IntegrationTests.Relational;
 /// No R6 semantics are asserted. Default xUnit parallelism preserved.
 /// </para>
 /// </summary>
+[Trait(TestTiers.TraitKey, TestTiers.SqlServerRelational)]
 public sealed class SqlServerStorageSemanticsTests
 {
     // SQL Server error number for a duplicate key on a unique index (same stable

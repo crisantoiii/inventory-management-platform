@@ -39,6 +39,7 @@ namespace InventoryPlatform.IntegrationTests.Purchasing;
 /// AsNoTracking claim is made for GetByIdAsync.
 /// </para>
 /// </summary>
+[Trait(TestTiers.TraitKey, TestTiers.ProviderNeutral)]
 public sealed class PurchaseOrderRepositoryTests
 {
     // Unique per-test-instance database (xUnit creates a new instance per test).
