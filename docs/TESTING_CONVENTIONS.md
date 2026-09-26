@@ -1,6 +1,6 @@
 # Testing Conventions
 
-This document establishes the automated testing conventions for the Inventory Platform. These conventions are derived from Sprint 11, Sprint 12, Sprint 13, Sprint 14, and Sprint 17 implementations and are authoritative for current test authoring.
+This document establishes the automated testing conventions for the Inventory Platform. These conventions are derived from Sprint 11, Sprint 12, Sprint 13, Sprint 14, Sprint 17, and Sprint 19 implementations and are authoritative for current test authoring.
 
 ---
 
@@ -487,14 +487,17 @@ Rows marked "discovered cases" contain `[Theory]` methods whose `[InlineData]` r
 | HTTP | Category Create GET authorization matrix (Sprint 17 T05) | 3 |
 | HTTP | Category Create antiforgery POST/PRG/persistence (Sprint 17 T06) | 1 |
 | HTTP | Purchase Order Submit domain-failure proof (Sprint 17 T07) | 2 |
+| HTTP | Purchase Order Create GET authorization coverage H1-H3 (Sprint 19 T02) | 3 |
+| HTTP | Purchase Order Create valid-POST PRG/persistence H4 (Sprint 19 T03) | 1 |
+| HTTP | Purchase Order Create duplicate-product failure redisplay H5 (Sprint 19 T04) | 1 |
 | Infrastructure | Placeholder | 1 |
-| **Total** | | **58** |
+| **Total** | | **63** |
 
-**Current total: 537 tests, 537 passed, 0 failures, 0 skipped** (346 + 133 + 58; Sprint 18 T06 integrated verification). The 41 Sprint 18 relational cases include infrastructure/safety verification; they are not 41 distinct business contracts. The Sprint 17 historical closure total remains 496 (346 + 92 + 58).
+**Current total: 542 tests, 542 passed, 0 failures, 0 skipped** (346 + 133 + 63; Sprint 19 T05 integrated verification, with the relational tier freshly re-executed against available LocalDB). The 41 Sprint 18 relational cases include infrastructure/safety verification; they are not 41 distinct business contracts. The Sprint 18 historical closure total remains 537 (346 + 133 + 58); the Sprint 17 historical closure total remains 496 (346 + 92 + 58).
 
 The Web.Tests verification tests confirm that the `FakeCapabilityAuthorizationService` compiles against the real `ICapabilityAuthorizationService` interface and produces controlled authorization results. The T03/T04 handler tests exercise the actual `CapabilityAuthorizationHandler` and `MultiCapabilityAuthorizationHandler` production sources directly (the Sprint 14 `PurchaseOrderCapabilityPolicyRegistrationTests` additionally verify Edit/Cancel capability constants and their real `AddWeb` policy registration) (authentication gate, NameIdentifier extraction/parsing, service delegation, succeed/do-not-succeed outcomes, OR semantics with short-circuit, requirement constructor validation). Handler testing is source-level/unit-level.
 
-Since Sprint 17, Web.Tests additionally exercises the real ASP.NET Core HTTP/Razor pipeline through a database-safe `WebApplicationFactory<Program>`: real startup seeding, test-only seeded-user authentication with real GUID identities, production capability authorization, real rendered antiforgery token/cookie semantics, real model binding, challenge/forbid redirects, PRG, `DomainException` failure redisplay, and same-factory persistence are all verified through actual HTTP requests (see the Sprint 17 conventions section below). Coverage is representative — one Category GET matrix, one Category successful POST, and one Purchase Order domain-failure POST — not exhaustive route coverage; no relational behavior is claimed from the InMemory-based host.
+Since Sprint 17, Web.Tests additionally exercises the real ASP.NET Core HTTP/Razor pipeline through a database-safe `WebApplicationFactory<Program>`: real startup seeding, test-only seeded-user authentication with real GUID identities, production capability authorization, real rendered antiforgery token/cookie semantics, real model binding, challenge/forbid redirects, PRG, `DomainException` failure redisplay, and same-factory persistence are all verified through actual HTTP requests (see the Sprint 17 conventions section below). Since Sprint 19, this coverage includes the five Purchase Order Create behaviors H1-H5 (anonymous challenge, authorized manager access, real-capability denial, valid-antiforgery POST → 302 PRG → same-factory persistence, and duplicate-product Domain-failure redisplay with restoration and no mutation) — see the Sprint 19 conventions section below. Coverage is representative — one Category GET matrix, one Category successful POST, one Purchase Order domain-failure POST, and the five Purchase Order Create behaviors — not exhaustive route coverage; no relational behavior is claimed from the InMemory-based host.
 
 ---
 
@@ -523,6 +526,17 @@ Established by the Sprint 17 HTTP/Razor integration-test foundation and authorit
 10. **Assert semantics, not HTML snapshots.** Prefer stable production markers (button text, exact invariant messages, hidden-field values) over full-HTML equality. Where rendering is culture-dependent (e.g., `DateOnly` hidden inputs rendered with the host culture's short-date pattern), assert the semantic round-trip (parse the rendered value back under the same culture the server binds with) rather than a literal string.
 11. **Rendered behavior is observed, not guessed.** Effective form actions, redirect destinations, and hidden-field formatting must be taken from the actual rendered response (Sprint 17 evidence: `asp-page-handler` renders `?handler=Submit` in the action; culture-formatted date hidden inputs) — never assumed from source intent.
 12. **Domain-failure redisplay contract.** Expected `DomainException` failures are proven through the real POST, asserting the existing production presentation (ModelState redisplay with HTTP 200 in the current source), preserved navigation/query state, and a fresh-scope same-factory reload proving no mutation. Never inject or catch the exception in the test.
+
+## Purchase Order Create HTTP Conventions (Sprint 19)
+
+Established by the Sprint 19 Purchase Order Create HTTP/Razor coverage on top of the Sprint 17 foundation and authoritative for future Purchase Order Create HTTP test authoring:
+
+1. **Authorization is proven through the real capability policy.** H3 uses a persisted test-only user with no authorization-group assignment (`purchaseorder-denied@inventory.test`) so denial flows through the production `PurchaseOrder.Create` capability decision. Do not substitute the seeded Viewer (it already possesses `PurchaseOrder.Create`) and do not fabricate or stub capability outcomes in HTTP tests.
+2. **H3 identity is test-only and factory-local.** The denied identity is arranged per-test through factory-local helpers; no production seed, group, or policy change exists or is permitted to back it.
+3. **Antiforgery and form semantics come from the rendered Create page.** Extract the token, matching cookie, effective form action, and indexed item fields with the narrow `PurchaseOrderCreateFormExtraction` helper (PO-Create path and submit-marker specific, BCL regex/decoding only); POST to the effective action with exactly the rendered hidden fields.
+4. **Persistence is verified from a new scope on the same factory.** After the 302 PRG, reload through `factory.Services.CreateAsyncScope()` on the same factory instance — never a second factory and never the mutating scope.
+5. **Domain failure is asserted as redisplay + restoration + no mutation.** H5 asserts HTTP 200, the canonical `The product already exists in this purchase order.` message, restored Supplier/Product options, Supplier selection, date, remarks, and both rows/values, unchanged PO/item counts, and no persisted order (marker `S19-T04-DUPLICATE`).
+6. **No relational claim from Create HTTP evidence.** H1-H5 are EF Core InMemory HTTP-host evidence; SQL Server relational truth remains with the Sprint 18 tier under `tests/InventoryPlatform.IntegrationTests/Relational/`.
 
 ## SQL Server Relational-Test Conventions (Sprint 18)
 
@@ -601,12 +615,20 @@ Completed:
 - Persistence coverage (T06): 5 fresh-context lifecycle round-trip tests (Cancel Draft/Submitted, UpdateItem, RemoveItem, final-item removal → empty Draft)
 - Integrated verification (T09): **477 passed, 0 failed, 0 skipped** (346/92/39); full rebuild 28 warnings / 0 errors — baseline preserved; manual browser and real SQL Server provider verification also passed (manual verification remains manual, not automated testing)
 
-Still deferred (Sprint 18 state):
+### Sprint 19 Outcome
+
+Completed:
+
+- Purchase Order Create HTTP coverage (T02-T04): five real-pipeline behaviors — H1 anonymous GET challenge with semantic ReturnUrl, H2 authorized manager access, H3 real `PurchaseOrder.Create` capability denial of the test-only `purchaseorder-denied@inventory.test` user (no authorization-group assignment; the seeded Viewer is not the H3 identity), H4 valid-antiforgery POST → 302 PRG → same-factory persistence (marker `S19-T03-VALID-CREATE`), H5 duplicate-product Domain-failure redisplay/restoration with no mutation (marker `S19-T04-DUPLICATE`)
+- Narrow `PurchaseOrderCreateFormExtraction` (PO-Create-specific, BCL-only) and factory-local data-arrangement helpers
+- Integrated verification (T05): **542 passed, 0 failed, 0 skipped** (346/133/63); relational tier freshly re-executed against available LocalDB; normal build 0W/0E; non-incremental 28W/0E; no pending EF model changes; 10 migrations unchanged — zero production/test-source changes in T05/T06
+
+Still deferred (Sprint 19 state):
 
 - EditStatus self-deactivation guard (above) — untouched by Sprint 13
 - `GetPurchaseOrdersHandler` does not copy `PagedRequest.Status` into `PagedQuery` (T05 recorded finding; no remediation authorized; re-verified against current source at Sprint 17 T09 closure)
-- Broader SQL Server relational verification beyond the bounded Sprint 18 R1-R6 contracts, including other constraints, workflows, reports, collation, and provider-specific behavior; the Sprint 17 HTTP host remains InMemory and makes no relational claims
-- Broader HTTP/Razor route coverage beyond the Sprint 17 representative cases (more Category/Purchase Order routes, other modules)
+- Broader SQL Server relational verification beyond the bounded Sprint 18 R1-R6 contracts, including other constraints, workflows, reports, collation, and provider-specific behavior; the Sprint 17/Sprint 19 HTTP host remains InMemory and makes no relational claims
+- Broader HTTP/Razor route coverage beyond the Sprint 17 representative cases and the Sprint 19 Purchase Order Create behaviors (more Category/Purchase Order routes, other modules)
 - CI provider establishment
 
 ### Future Considerations
