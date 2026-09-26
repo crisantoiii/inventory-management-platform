@@ -22,7 +22,7 @@ v1.3  Account Management       ✅
 v1.4  Additional Reporting     ✅
 v1.5  Purchasing Enhancements  ✅
 v1.6  Dynamic Capability Auth  ✅
-(Sprint 11 Automated Testing ✅ — non-release; Sprint 12 Authorization Refinement ✅ — non-release; Sprint 13 Purchasing Workflow Test Automation ✅ — non-release; Sprint 14 Purchase Order Cancellation and Draft Item Editing ✅ — non-release; Sprint 15 Purchase Order Workflow Error Handling and UX Hardening ✅ — non-release; Sprint 16 Purchase Order POST Round-Trip State and Create Failure Presentation Corrections ✅ — non-release; Sprint 17 HTTP/Razor Integration-Test Foundation ✅ — non-release; Sprint 18 SQL Server Relational Verification ✅ — non-release)
+(Sprint 11 Automated Testing ✅ — non-release; Sprint 12 Authorization Refinement ✅ — non-release; Sprint 13 Purchasing Workflow Test Automation ✅ — non-release; Sprint 14 Purchase Order Cancellation and Draft Item Editing ✅ — non-release; Sprint 15 Purchase Order Workflow Error Handling and UX Hardening ✅ — non-release; Sprint 16 Purchase Order POST Round-Trip State and Create Failure Presentation Corrections ✅ — non-release; Sprint 17 HTTP/Razor Integration-Test Foundation ✅ — non-release; Sprint 18 SQL Server Relational Verification ✅ — non-release; Sprint 19 Purchase Order Create HTTP/Razor Integration Coverage ✅ — non-release)
 
 ---
 
@@ -389,9 +389,57 @@ Migrations:        10; latest 20260831141400_CreateAuthorizationSchema
 - CI and a future CI SQL Server endpoint remain deferred
 - SQLite remains rejected as an equivalent SQL Server verification provider
 
+## Sprint 19 - Purchase Order Create HTTP/Razor Integration Coverage
+
+**Status:** Complete/Closed — technical/non-release sprint; v1.6.0 remains the latest release baseline. No version or tag was created.
+
+Sprint 19 extended the Sprint 17 database-safe HTTP/Razor integration-test foundation to verify the real Purchase Order Create pipeline end-to-end. Five accepted HTTP behaviors (H1-H5) now cover representative authorization, antiforgery, model binding, persistence, PRG, expected Domain-failure redisplay with restoration, and no-mutation scenarios for `/Purchasing/PurchaseOrders/Create` — all through the real ASP.NET Core pipeline with production capability authorization and rendered antiforgery, on EF Core InMemory per-factory test hosts.
+
+### Completed
+
+- T01: Contract and Test-Seam Lock
+- T02: GET Authorization Coverage (H1 anonymous challenge, H2 authorized manager access, H3 real-capability denial)
+- T03: Valid POST Coverage (H4 antiforgery POST → 302 PRG → same-factory persistence; marker `S19-T03-VALID-CREATE`)
+- T04: Duplicate-Product Failure Coverage (H5 canonical `The product already exists in this purchase order.` redisplay/restoration, no mutation; marker `S19-T04-DUPLICATE`)
+- T05: Integrated Regression and Architecture Verification — all eight gates pass; 542/542 fresh; LocalDB available so the relational tier ran freshly
+- T06: Documentation Synchronization and Sprint Closure
+
+### H1-H5 Behavioral Coverage
+
+- **H1:** Anonymous GET `/Purchasing/PurchaseOrders/Create` challenges to Identity login with the correct semantic ReturnUrl
+- **H2:** Persisted seeded `manager@inventory.local` accesses the real Create page
+- **H3:** Persisted test-only `purchaseorder-denied@inventory.test`, with no authorization-group assignment, is denied by real `PurchaseOrder.Create` capability authorization. The seeded Viewer is NOT the H3 identity because the Viewer already possesses `PurchaseOrder.Create`. No production seed or authorization bypass was added.
+- **H4:** Real GET + real antiforgery token/cookie + indexed POST → real PageModel/Application handler → immediate 302 PRG to `/Purchasing/PurchaseOrders` → same-factory persistence of a Draft PO plus one item
+- **H5:** Duplicate ProductId rows trigger the real Domain invariant; HTTP 200 redisplay with Supplier/Product options, selection, date, remarks, and both rows/values restored; PO/item counts unchanged and no order persisted
+
+H4/H5 are EF Core InMemory HTTP-host evidence, not SQL Server relational evidence. Sprint 18 remains the relational architecture authority.
+
+### Final Test Baseline
+
+```text
+UnitTests:        346 passed
+IntegrationTests: 133 passed (relational tier freshly passed against available LocalDB)
+Web.Tests:         63 passed (H1-H5 included)
+Total:            542 passed, 0 failed, 0 skipped
+Build:             0 errors (normal: 0 warnings; non-incremental: 28 unchanged historical warnings)
+EF:                no pending model changes
+Migrations:        10; latest 20260831141400_CreateAuthorizationSchema (unchanged; none created)
+```
+
+### Boundaries Held
+
+- Zero production behavior/source, test-source, seed/policy/config, migration, package, or project changes — verification and documentation only from T05 onward
+- No antiforgery bypass, no fabricated capability claims, no third-party HTML parser, no generic browser/HTTP DSL
+- No relational claim is made from InMemory HTTP evidence
+- No version assigned, no tag created, no release published
+
+### Unassigned Carry-Forward (not assigned to any future sprint)
+
+C19-01 validation invocation/architecture; C19-02 provider-neutral continuous verification; C19-03 relational CI; C19-04 broader HTTP/Razor coverage; C19-05 browser/E2E; C19-06 EditStatus authorization; C19-07 report authorization; C19-08 warning remediation; C19-09 broader SQL relational/report verification; C19-10 Sales; C19-11 Audit; C19-12 import/attachment/barcode. Observation preserved: the seeded Viewer has broad `PurchaseOrder.*`, including `PurchaseOrder.Create` — recorded only; no remediation commitment.
+
 ## Next Sprint Planning
 
-Sprint 11 through Sprint 18 are complete. Sprint 18 established the SQL Server relational-verification tier with all verification gates green and all scope boundaries held. The next activity requires separate planning; no next-sprint scope has been defined.
+Sprint 11 through Sprint 19 are complete. Sprint 18 established the SQL Server relational-verification tier and Sprint 19 extended the Sprint 17 HTTP/Razor foundation with real-pipeline Purchase Order Create coverage (H1-H5), closing on a fresh 542/542 verification baseline. The next activity requires separate planning; no Sprint 20 scope has been defined and none of the Sprint 19 carry-forward items are assigned to it.
 
 ## D1 - Documentation Synchronization
 

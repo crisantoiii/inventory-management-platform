@@ -1,5 +1,34 @@
 # Changelog
 
+## [Sprint 19] - Purchase Order Create HTTP/Razor Integration Coverage
+
+### Summary
+
+Extended the Sprint 17 database-safe HTTP/Razor integration-test foundation to verify the real Purchase Order Create pipeline through five accepted HTTP behaviors (H1-H5): authorization, rendered antiforgery, model binding, persistence, PRG, expected Domain-failure redisplay with restoration, and no-mutation. This was technical testing work, not a product feature or release: no version or tag was created, and v1.6.0 remains the latest release baseline.
+
+### Added
+
+- Five real-pipeline Purchase Order Create HTTP tests in `tests/InventoryPlatform.Web.Tests/Http/PurchaseOrderCreateAuthorizationTests.cs`:
+  - H1: anonymous GET `/Purchasing/PurchaseOrders/Create` challenges to Identity login with the correct semantic ReturnUrl
+  - H2: persisted seeded `manager@inventory.local` accesses the real Create page
+  - H3: persisted test-only `purchaseorder-denied@inventory.test`, with no authorization-group assignment, is denied by real `PurchaseOrder.Create` capability authorization
+  - H4: valid rendered-antiforgery indexed POST → real PageModel/Application handler → immediate 302 PRG to `/Purchasing/PurchaseOrders` → same-factory persistence of a Draft PO plus one item (marker `S19-T03-VALID-CREATE`)
+  - H5: duplicate ProductId rows trigger the real Domain invariant with canonical message `The product already exists in this purchase order.`, HTTP 200 redisplay with options/selection/date/remarks/rows restored, and no mutation (marker `S19-T04-DUPLICATE`)
+- Narrow Purchase-Order-Create form extraction (`PurchaseOrderCreateFormExtraction`) and Purchase-Order-Create data arrangement helpers, factory-local and BCL-only
+- H3 amendment: the seeded Viewer is NOT the H3 identity because the Viewer already possesses `PurchaseOrder.Create`; the H3 identity is a test-only persisted user with no authorization-group assignment
+
+### Changed
+
+- Automated baseline: 537 → 542 passed tests (346 UnitTests, 133 IntegrationTests, 63 Web.Tests; 0 failed, 0 skipped)
+- Normal build: 0 warnings/0 errors; non-incremental build: 28 unchanged historical warnings/0 errors; EF pending model changes: none; migration chain unchanged at 10 through `20260831141400_CreateAuthorizationSchema` (no migration created)
+- H1-H5 are EF Core InMemory HTTP-host evidence, not SQL Server relational evidence; Sprint 18 remains the relational architecture authority
+- Sprint 19 T05 freshly re-verified the full solution including the relational tier against available LocalDB `(localdb)\MSSQLLocalDB` (133/133 IntegrationTests); zero production behavior/source, test-source, seed/policy/config, migration, package, or project changes
+
+### Scope and Carry-Forward (unassigned)
+
+- C19-01 validation invocation/architecture; C19-02 provider-neutral continuous verification; C19-03 relational CI; C19-04 broader HTTP/Razor coverage; C19-05 browser/E2E; C19-06 EditStatus authorization; C19-07 report authorization; C19-08 warning remediation (the 28-warning non-incremental baseline); C19-09 broader SQL relational/report verification; C19-10 Sales; C19-11 Audit; C19-12 import/attachment/barcode
+- Observation preserved without a remediation commitment: the seeded Viewer has broad `PurchaseOrder.*`, including `PurchaseOrder.Create`
+
 ## [Sprint 18] - SQL Server Relational Verification
 
 ### Summary

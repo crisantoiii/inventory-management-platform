@@ -21,11 +21,23 @@ The platform currently provides business modules for:
 
 Shared infrastructure such as paging, filtering, sorting, the Result pattern, and Identity service abstractions are reused consistently across modules while maintaining a clear separation of concerns.
 
+# Sprint 19 - Purchase Order Create HTTP/Razor Integration Coverage
+
+Sprint 19 added an engineering verification capability, not a user-facing feature: the Sprint 17 database-safe HTTP/Razor integration foundation now verifies the real `/Purchasing/PurchaseOrders/Create` pipeline end-to-end through five accepted HTTP behaviors (H1-H5):
+
+- ✅ H1 — Anonymous GET challenges to Identity login with the correct semantic ReturnUrl
+- ✅ H2 — Persisted seeded `manager@inventory.local` accesses the real Create page
+- ✅ H3 — Persisted test-only `purchaseorder-denied@inventory.test`, with no authorization-group assignment, is denied by real `PurchaseOrder.Create` capability authorization (the seeded Viewer is NOT the H3 identity because it already possesses `PurchaseOrder.Create`; no production seed or authorization bypass was added)
+- ✅ H4 — Valid rendered-antiforgery indexed POST → real PageModel/Application handler → immediate 302 PRG → same-factory persistence of a Draft Purchase Order plus one item (marker `S19-T03-VALID-CREATE`)
+- ✅ H5 — Duplicate ProductId rows trigger the real Domain invariant with canonical message `The product already exists in this purchase order.`, HTTP 200 redisplay with Supplier/Product options, selection, date, remarks, and both rows/values restored, PO/item counts unchanged, and no order persisted (marker `S19-T04-DUPLICATE`)
+
+The tests run through the real ASP.NET Core pipeline on the database-safe per-factory InMemory host with production capability authorization and rendered antiforgery. H1-H5 are EF Core InMemory HTTP-host evidence, not SQL Server relational evidence; Sprint 18 remains the relational architecture authority. The final baseline is 542/542 (346 UnitTests, 133 IntegrationTests, 63 Web.Tests; 0 failed, 0 skipped), with the relational tier freshly re-executed against available LocalDB at the Sprint 19 T05 integrated verification. Sprint 19 made zero production changes and was technical/non-release; v1.6.0 remains the latest release.
+
 # Sprint 18 - SQL Server Relational Verification
 
 Sprint 18 added an engineering verification capability, not a user-facing feature: 41 tests under `tests/InventoryPlatform.IntegrationTests/Relational/` exercise SQL Server LocalDB through guarded, unique disposable databases. The tier applies the real migrations and proves the bounded R1-R6 contracts: fresh-schema migration, Product SKU uniqueness, Category FK delete restriction, one-save atomicity, representative `decimal(18,2)` storage behavior, and the actual Inventory Movement production query's SQL Server translation and deterministic aggregates.
 
-The durable safety boundary is LocalDB-only on `(localdb)\MSSQLLocalDB`, trusted authentication, `InventoryPlatformRelationalTests_<guid>` database names, validation before destructive operations, fail-hard/no-skip behavior, no production `DefaultConnection`, no production seeders, guarded cleanup, and default xUnit parallelism. R4 is not a blanket workflow-transaction guarantee; R5 does not attribute conversion to EF or SQL Server; R6 does not prove all reports. The final baseline is 537/537 (346 UnitTests, 133 IntegrationTests, 58 Web.Tests; 0 failed, 0 skipped). Sprint 18 made zero production changes and was technical/non-release; v1.6.0 remains the latest release.
+The durable safety boundary is LocalDB-only on `(localdb)\MSSQLLocalDB`, trusted authentication, `InventoryPlatformRelationalTests_<guid>` database names, validation before destructive operations, fail-hard/no-skip behavior, no production `DefaultConnection`, no production seeders, guarded cleanup, and default xUnit parallelism. R4 is not a blanket workflow-transaction guarantee; R5 does not attribute conversion to EF or SQL Server; R6 does not prove all reports. The Sprint 18 closure baseline was 537/537 (346 UnitTests, 133 IntegrationTests, 58 Web.Tests; 0 failed, 0 skipped) — historical, superseded as the current baseline by Sprint 19's 542/542. Sprint 18 made zero production changes and was technical/non-release; v1.6.0 remains the latest release.
 
 # Sprint 17 - HTTP/Razor Integration-Test Foundation
 
