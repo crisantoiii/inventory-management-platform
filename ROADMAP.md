@@ -22,7 +22,7 @@ v1.3  Account Management       ✅
 v1.4  Additional Reporting     ✅
 v1.5  Purchasing Enhancements  ✅
 v1.6  Dynamic Capability Auth  ✅
-(Sprint 11 Automated Testing ✅ — non-release; Sprint 12 Authorization Refinement ✅ — non-release; Sprint 13 Purchasing Workflow Test Automation ✅ — non-release; Sprint 14 Purchase Order Cancellation and Draft Item Editing ✅ — non-release; Sprint 15 Purchase Order Workflow Error Handling and UX Hardening ✅ — non-release; Sprint 16 Purchase Order POST Round-Trip State and Create Failure Presentation Corrections ✅ — non-release; Sprint 17 HTTP/Razor Integration-Test Foundation ✅ — non-release; Sprint 18 SQL Server Relational Verification ✅ — non-release; Sprint 19 Purchase Order Create HTTP/Razor Integration Coverage ✅ — non-release)
+(Sprint 11 Automated Testing ✅ — non-release; Sprint 12 Authorization Refinement ✅ — non-release; Sprint 13 Purchasing Workflow Test Automation ✅ — non-release; Sprint 14 Purchase Order Cancellation and Draft Item Editing ✅ — non-release; Sprint 15 Purchase Order Workflow Error Handling and UX Hardening ✅ — non-release; Sprint 16 Purchase Order POST Round-Trip State and Create Failure Presentation Corrections ✅ — non-release; Sprint 17 HTTP/Razor Integration-Test Foundation ✅ — non-release; Sprint 18 SQL Server Relational Verification ✅ — non-release; Sprint 19 Purchase Order Create HTTP/Razor Integration Coverage ✅ — non-release; Sprint 20 Provider-Neutral Continuous Verification ✅ — non-release)
 
 ---
 
@@ -437,9 +437,54 @@ Migrations:        10; latest 20260831141400_CreateAuthorizationSchema (unchange
 
 C19-01 validation invocation/architecture; C19-02 provider-neutral continuous verification; C19-03 relational CI; C19-04 broader HTTP/Razor coverage; C19-05 browser/E2E; C19-06 EditStatus authorization; C19-07 report authorization; C19-08 warning remediation; C19-09 broader SQL relational/report verification; C19-10 Sales; C19-11 Audit; C19-12 import/attachment/barcode. Observation preserved: the seeded Viewer has broad `PurchaseOrder.*`, including `PurchaseOrder.Create` — recorded only; no remediation commitment.
 
+## Sprint 20 - Provider-Neutral Continuous Verification
+
+**Status:** Complete/Closed — technical/non-release sprint; v1.6.0 remains the latest release baseline. No version or tag was created.
+
+Sprint 20 established provider-neutral continuous verification: an explicit, fail-safe IntegrationTest tier contract, a single shared verification command used identically locally and in CI, and a GitHub Actions provider-neutral gate with a successful hosted run. The SQL Server relational tier and browser/E2E remain outside the provider-neutral gate.
+
+### Delivered
+
+- Explicit `TestTier` contract: every IntegrationTest resolves to exactly one supported tier — `ProviderNeutral` or `SqlServerRelational`. Classification follows actual runtime provider dependency, not folder/namespace; tests that connect or attempt to connect to SQL Server/LocalDB belong to `SqlServerRelational`.
+- Fail-safe classification audit: rejects missing, duplicate/multiple, and unknown tier values; locks the SQL-provider-bound inventory by fully qualified identity (14 identities); the audit is ProviderNeutral and runs inside every gate invocation.
+- Shared verification entry point `scripts/verify-provider-neutral.ps1`: tool restore (`dotnet-ef 10.0.10`), tool-resolution evidence, solution restore, normal Release build, UnitTests, Web.Tests, affirmative `TestTier=ProviderNeutral` IntegrationTests, EF `migrations has-pending-model-changes`, TRX output to `artifacts/verification/`, explicit executed/excluded tier summary, strict exit-code propagation, working-directory independence.
+- GitHub Actions workflow `.github/workflows/provider-neutral-verification.yml`: PR→`main`, push→`main`, `workflow_dispatch`; `windows-latest`; .NET `10.0.x`; `contents: read`; full delegation to the shared script; TRX artifact upload with `if: always()`; no secrets, no database/browser setup. The hosted job `Provider-neutral verification (windows-latest)` completed successfully on a clean hosted runner, uploading a three-file `provider-neutral-verification-results` artifact.
+
+### Verification-Driven Remediation
+
+Initial classification placed one real LocalDB connection probe (`RelationalTier_FailsHard_WhenServerIsUnavailable`) in `ProviderNeutral`. T03 verification exposed actual provider contact (a stopped `MSSQLLocalDB` auto-started during a gated run); runtime behavior proved the test provider-dependent, and it was moved to `SqlServerRelational` with the lock updated intentionally — relational inventory 13 → 14, ProviderNeutral 127 → 126. The final provider-neutral gate proved zero provider contact: with `MSSQLLocalDB` stopped before an integrated run, it remained stopped afterward (last-start unchanged). Treated as resolved verification-driven hardening, not an open defect.
+
+### Final Verification Baseline (Sprint 20 T05)
+
+```text
+UnitTests:               346 passed
+Web.Tests:                63 passed
+ProviderNeutral:         126 passed (classification audit included)
+SqlServerRelational:      14 discovered only (NOT executed during Sprint 20)
+Classification audit:      7/7 passed
+EF:                        no pending model changes
+Normal Release build:      0 warnings, 0 errors
+Shared script exit:        0
+LocalDB/SQL contact:       none
+Hosted workflow:           PASS (qualified evidence; see retrospective)
+```
+
+Hosted evidence proves the hosted job, script step, summary step, and three-file artifact upload succeeded; detailed hosted test counts and EF output remain supported by the local/integrated verification record.
+
+### Boundaries Held
+
+- Zero production behavior/source changes; zero test/script/workflow source changes in T06
+- No SQL Server relational test execution during Sprint 20 (discovery/lock verification only); no SQL relational-pass claim is made for Sprint 20
+- No browser/E2E execution
+- No version assigned, no tag created, no release published
+
+### Unassigned Carry-Forward (not assigned to any future sprint)
+
+C20-01 SQL Server relational CI (hosted relational execution needs a hosted SQL Server/LocalDB endpoint decision); C20-02 broader HTTP/Razor coverage; C20-03 browser/E2E; C20-04 EditStatus authorization guard decision; C20-05 report authorization; C20-06 warning remediation (28-warning non-incremental baseline unchanged); C20-07 broader SQL relational/report verification; C20-08 Sales; C20-09 Audit; C20-10 import/attachment/barcode; C20-11 validation invocation/architecture. Observation preserved: the seeded Viewer has broad `PurchaseOrder.*`, including `PurchaseOrder.Create` — recorded only; no remediation commitment.
+
 ## Next Sprint Planning
 
-Sprint 11 through Sprint 19 are complete. Sprint 18 established the SQL Server relational-verification tier and Sprint 19 extended the Sprint 17 HTTP/Razor foundation with real-pipeline Purchase Order Create coverage (H1-H5), closing on a fresh 542/542 verification baseline. The next activity requires separate planning; no Sprint 20 scope has been defined and none of the Sprint 19 carry-forward items are assigned to it.
+Sprint 11 through Sprint 20 are complete. Sprint 20 closed the C19-02 provider-neutral continuous verification carry-forward item: the provider-neutral CI foundation exists, the hosted workflow executed successfully, and the provider-neutral gate makes zero LocalDB/SQL Server provider contact. SQL Server relational CI remains future work (C20-01). The next activity requires separate planning; no Sprint 21 scope has been selected and none of the Sprint 20 carry-forward items are assigned to it.
 
 ## D1 - Documentation Synchronization
 

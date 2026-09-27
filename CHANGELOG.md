@@ -1,5 +1,34 @@
 # Changelog
 
+## [Sprint 20] - Provider-Neutral Continuous Verification
+
+### Summary
+
+Established provider-neutral continuous verification: an explicit, fail-safe IntegrationTest tier contract, a single shared local/CI verification command, and a GitHub Actions provider-neutral gate with a successful hosted run. This was technical testing/CI work, not a product feature or release: no version or tag was created, and v1.6.0 remains the latest release baseline.
+
+### Added
+
+- Explicit IntegrationTest tier contract (`TestTiers`): every IntegrationTest resolves to exactly one supported `TestTier` — `ProviderNeutral` or `SqlServerRelational`. Classification follows actual runtime provider dependency (tests that connect or attempt to connect to SQL Server/LocalDB are `SqlServerRelational`), not folder or namespace.
+- Fail-safe classification audit (`TierClassificationAudit`, `TierClassificationAuditTests`): rejects missing, duplicate/multiple, and unknown tier values; locks the SQL-provider-bound inventory by fully qualified identity (14 identities); the audit itself is ProviderNeutral and runs inside every provider-neutral gate invocation.
+- Shared verification entry point `scripts/verify-provider-neutral.ps1`: repository-local .NET tool restore (`dotnet-ef 10.0.10` via `src/InventoryPlatform/dotnet-tools.json`), local tool-resolution evidence, solution restore, normal Release build, UnitTests (no filter), Web.Tests (no filter), affirmative `TestTier=ProviderNeutral` IntegrationTests, EF `migrations has-pending-model-changes` (Infrastructure project / Web startup, matching configuration, `--no-build`), distinct TRX files per suite (`artifacts/verification/`), explicit executed/excluded tier summary, strict native exit-code propagation, caller-working-directory independence. Parameters: `-Configuration` (default `Release`), `-ResultsDirectory` (default repository-relative `artifacts/verification`), controlled `-SkipRestore` (skips only the two restore steps; never build/tests/EF; not used in CI).
+- GitHub Actions workflow `.github/workflows/provider-neutral-verification.yml`: pull requests targeting `main`, pushes to `main`, and `workflow_dispatch`; `windows-latest`; .NET SDK `10.0.x`; least-privilege `contents: read`; delegates entirely to the shared script (no duplicated verification commands, no `-SkipRestore`, normal restore); uploads `provider-neutral-verification-results` (TRX) with `if: always()`; workflow summary distinguishing executed and excluded tiers; no secrets, no database/LocalDB/SQL Server setup, no browser setup.
+
+### Changed
+
+- Verification-driven remediation: T03 verification empirically exposed that `RelationalTier_FailsHard_WhenServerIsUnavailable` — classified `ProviderNeutral` at T01 — attempts a real connection to the approved LocalDB instance (a stopped `MSSQLLocalDB` auto-started during a gated run). Under the frozen rule that runtime provider dependency determines classification, the test was reclassified to `SqlServerRelational` and the T02 lock was intentionally updated: relational inventory 13 → 14, ProviderNeutral 127 → 126.
+- Final provider-neutral gate makes zero LocalDB/SQL Server provider contact: with `MSSQLLocalDB` stopped before an integrated gate run, the instance remained stopped afterward (last-start timestamp unchanged); no connection, database creation, or provider execution attempt was observed; source audit confirms all provider-connection sites are confined to `SqlServerRelational`-classified tests.
+- Automated baseline: 542 → 535 passing through the provider-neutral gate (346 UnitTests, 63 Web.Tests, 126 ProviderNeutral IntegrationTests; 0 failed, 0 skipped). 14 `SqlServerRelational` tests are discovered and locked but intentionally not executed during Sprint 20; they remain part of the project's full local suite. Normal Release build: 0 warnings/0 errors; EF pending model changes: none; migration chain unchanged at 10.
+- SQL Server relational tests remain outside the provider-neutral gate (discovery/lock verification only); browser/E2E remains outside the gate; no SQL relational-pass claim is made for Sprint 20. Sprint 18's historical relational passes remain historical evidence.
+
+### Hosted Verification (qualified)
+
+- The hosted GitHub Actions job `Provider-neutral verification (windows-latest)` completed successfully: checkout, .NET 10.0.x setup, provider-neutral script execution, workflow-summary generation, and upload of a three-file `provider-neutral-verification-results` artifact (artifact ID `10926782773`, 111464 bytes, SHA256 `38a540e304f33bd77cfbf9d6f4e21086dbf250ee60e0e8eb7320d108ddde739f`). Detailed hosted test counts and EF console output remain supported by the accepted local/integrated verification record rather than independently extracted from the supplied hosted evidence.
+
+### Scope and Carry-Forward (unassigned)
+
+- Closed the C19-02 provider-neutral continuous verification carry-forward item.
+- Remaining unassigned: C20-01 SQL Server relational CI (hosted relational execution needs a hosted SQL Server/LocalDB endpoint decision); C20-02 broader HTTP/Razor coverage; C20-03 browser/E2E; C20-04 EditStatus authorization guard decision; C20-05 report authorization; C20-06 warning remediation (the 28-warning non-incremental baseline); C20-07 broader SQL relational/report verification; C20-08 Sales; C20-09 Audit; C20-10 import/attachment/barcode; C20-11 validation invocation/architecture.
+
 ## [Sprint 19] - Purchase Order Create HTTP/Razor Integration Coverage
 
 ### Summary

@@ -21,6 +21,18 @@ The platform currently provides business modules for:
 
 Shared infrastructure such as paging, filtering, sorting, the Result pattern, and Identity service abstractions are reused consistently across modules while maintaining a clear separation of concerns.
 
+# Sprint 20 - Provider-Neutral Continuous Verification
+
+Sprint 20 added an engineering verification capability, not a user-facing feature: provider-neutral continuous verification. Every IntegrationTest now carries exactly one explicit `TestTier` — `ProviderNeutral` or `SqlServerRelational` — enforced by a fail-safe classification audit that rejects missing, duplicate/multiple, and unknown tier values and locks the 14-identity SQL-provider-bound inventory by fully qualified name. Classification follows actual runtime provider dependency (tests that connect or attempt to connect to SQL Server/LocalDB are `SqlServerRelational`), not folder or namespace.
+
+- ✅ Shared verification command: `scripts/verify-provider-neutral.ps1` — repository-local `dotnet-ef 10.0.10` tool restore and resolution evidence, solution restore, normal Release build, UnitTests, Web.Tests, affirmative `TestTier=ProviderNeutral` IntegrationTests, EF `migrations has-pending-model-changes`, distinct TRX files under `artifacts/verification/`, explicit executed/excluded tier summary, strict exit-code propagation, caller-working-directory independence
+- ✅ GitHub Actions gate: `.github/workflows/provider-neutral-verification.yml` — PR→`main`, push→`main`, `workflow_dispatch`; `windows-latest`; .NET `10.0.x`; `contents: read`; full delegation to the shared script; `provider-neutral-verification-results` TRX artifact upload with `if: always()`; no secrets, no database/browser setup
+- ✅ Hosted run: the job `Provider-neutral verification (windows-latest)` completed successfully on a clean hosted runner, uploading a three-file TRX artifact
+- ✅ Zero provider contact: with `MSSQLLocalDB` stopped before an integrated gate run, it remained stopped afterward (last-start unchanged); no connection, database creation, or provider execution attempt
+- ✅ Verification-driven remediation: one misclassified LocalDB connection probe was reclassified from `ProviderNeutral` to `SqlServerRelational` (relational inventory 13 → 14, ProviderNeutral 127 → 126) after T03 verification empirically exposed its real provider contact
+
+The provider-neutral gate executes the normal Release build, UnitTests (346), Web.Tests (63), and the 126 ProviderNeutral IntegrationTests, and explicitly does not execute the 14 `SqlServerRelational` tests or browser/E2E work — no SQL relational-pass claim is made for Sprint 20 (Sprint 18's relational passes remain historical evidence). SQL Server relational CI remains future work. Sprint 20 made zero production changes and was technical/non-release; v1.6.0 remains the latest release.
+
 # Sprint 19 - Purchase Order Create HTTP/Razor Integration Coverage
 
 Sprint 19 added an engineering verification capability, not a user-facing feature: the Sprint 17 database-safe HTTP/Razor integration foundation now verifies the real `/Purchasing/PurchaseOrders/Create` pipeline end-to-end through five accepted HTTP behaviors (H1-H5):

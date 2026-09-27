@@ -2310,3 +2310,35 @@ The implemented contract is intentionally limited to R1-R6: fresh migration, Pro
 - LocalDB keeps developer execution independent of Docker, but future CI requires an explicit SQL Server endpoint/runner decision.
 - The tier adds no production behavior, model/mapping, migration, startup, or configuration change.
 
+# DD-045 — Provider-Neutral Verification Gate and Runtime-Dependency Tier Classification
+
+**Status:** Implemented in Sprint 20
+
+## Context
+
+Sprint 18's relational tier is fail-hard by design: an intentionally executed relational test that cannot reach the approved LocalDB instance must fail, never skip. That is correct for relational execution, but it makes the whole IntegrationTests suite unusable as a fast, provider-free continuous-verification signal: any CI gate over the suite would either require SQL Server in every run or risk false passes. The platform needed a durable answer to "which tests may run anywhere, with zero provider contact," enforced mechanically rather than by convention.
+
+## Decision
+
+Every IntegrationTest method carries exactly one explicit `TestTier` trait. The supported values are exactly `ProviderNeutral` and `SqlServerRelational`. Classification follows actual runtime provider dependency: a test that opens, or attempts to open, a real connection to SQL Server/LocalDB is `SqlServerRelational` — even if it could pass without the provider — while tests using the EF Core InMemory provider or no provider are `ProviderNeutral`. Folder and namespace placement never determine the tier.
+
+A fail-safe classification audit (`TierClassificationAudit`) resolves class- and method-level traits through reflection, rejects missing, duplicate/multiple, and unknown tier values, and locks the SQL-provider-bound inventory by fully qualified test identity (currently 14). The audit itself is `ProviderNeutral`, so it executes inside every provider-neutral gate invocation.
+
+Continuous verification runs through one shared command authority, `scripts/verify-provider-neutral.ps1`: repository-local tool restore (`dotnet-ef 10.0.10`), tool-resolution evidence, solution restore, normal Release build, UnitTests, Web.Tests, IntegrationTests selected by the affirmative `--filter TestTier=ProviderNeutral`, EF `migrations has-pending-model-changes` (`--no-build`, from the tool-manifest directory so the repository-local tool resolves), distinct TRX files, an explicit executed/excluded tier summary, and strict native exit-code propagation. The GitHub Actions workflow `.github/workflows/provider-neutral-verification.yml` is a thin shell over that script (PR→`main`, push→`main`, `workflow_dispatch`; `windows-latest`; .NET `10.0.x`; `contents: read`; TRX artifact upload with `if: always()`; no secrets, no database/browser setup). The gate never implements provider-neutrality by excluding `SqlServerRelational`; positive inclusion keeps the audit in every run.
+
+## Rejected Alternatives
+
+- **Exclusion filtering (`--filter TestTier!=SqlServerRelational`)** — rejected because exclusion silently runs any future unclassified or unknown-tier test, weakening the contract; affirmative inclusion fails closed.
+- **Success-requirements classification ("it can pass without LocalDB")** — rejected after T03 verification empirically proved a ProviderNeutral-classified reachability probe opened a real LocalDB connection (a stopped `MSSQLLocalDB` auto-started during a gated run). The standard is no connection attempt at all.
+- **Conditional skip when LocalDB is unavailable** — rejected; it would mask classification drift and contradict DD-044's fail-hard rule.
+- **Duplicated CI commands instead of script delegation** — rejected because a second copy of the verification sequence inevitably drifts from local semantics.
+- **Total-count pass/fail criteria in the gate** — rejected; counts are reported, not frozen. The exactly-one-tier audit plus the identity lock governs correctness as the suite grows.
+
+## Consequences
+
+- The provider-neutral gate (346 UnitTests + 63 Web.Tests + 126 ProviderNeutral IntegrationTests, zero LocalDB/SQL Server contact — verified with the instance stopped before and after gated runs) runs identically on any developer machine and on a clean hosted runner.
+- The relational tier remains local-only until a hosted SQL Server/LocalDB endpoint decision exists; the 14 relational tests are discovered and locked, not executed by the gate.
+- Intentional relational inventory changes require a deliberate lock update; unexplained drift fails the audit.
+- The remediation that moved one misclassified probe from `ProviderNeutral` to `SqlServerRelational` (relational inventory 13 → 14, ProviderNeutral 127 → 126) is treated as resolved verification-driven hardening, not an open defect.
+- No production behavior, model/mapping, migration, startup, or configuration change is introduced.
+

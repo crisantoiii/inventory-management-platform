@@ -1,6 +1,6 @@
 # Testing Conventions
 
-This document establishes the automated testing conventions for the Inventory Platform. These conventions are derived from Sprint 11, Sprint 12, Sprint 13, Sprint 14, Sprint 17, and Sprint 19 implementations and are authoritative for current test authoring.
+This document establishes the automated testing conventions for the Inventory Platform. These conventions are derived from Sprint 11, Sprint 12, Sprint 13, Sprint 14, Sprint 17, Sprint 19, and Sprint 20 implementations and are authoritative for current test authoring.
 
 ---
 
@@ -58,6 +58,8 @@ Web.Tests must NOT reference:
 
 **IntegrationTests additionally uses:**
 - Microsoft.EntityFrameworkCore.InMemory 10.0.*
+
+**IntegrationTests tier contract (Sprint 20):** every IntegrationTest method resolves to exactly one supported `TestTier` value — `ProviderNeutral` or `SqlServerRelational` — enforced by the fail-safe classification audit. See the "Integration Test Tier Conventions (Sprint 20)" section below.
 
 **Web.Tests additionally uses (Sprint 17):**
 - Microsoft.AspNetCore.Mvc.Testing 10.0.* — in-process `WebApplicationFactory<Program>` test host
@@ -427,9 +429,18 @@ dotnet test tests/InventoryPlatform.IntegrationTests --no-build
 dotnet test tests/InventoryPlatform.Web.Tests --no-build
 ```
 
-### CI Status
+### CI Status (Sprint 20)
 
-No CI provider is currently configured in the repository. The complete test suite is locally reproducible using the commands above. When a CI provider is established, the provider-neutral commands can be directly translated into a provider-specific workflow.
+Provider-neutral CI is established. `.github/workflows/provider-neutral-verification.yml` runs on pull requests targeting `main`, pushes to `main`, and manual `workflow_dispatch` on `windows-latest` with .NET `10.0.x` and least-privilege `contents: read`. It delegates entirely to the shared verification script — `scripts/verify-provider-neutral.ps1` — and uploads the `provider-neutral-verification-results` TRX artifact with `if: always()`. The hosted job completed successfully on a clean hosted runner. No SQL Server/LocalDB setup, no browser setup, and no secrets are involved.
+
+**Shared verification command (local and CI):**
+
+```powershell
+# From any working directory; resolves the repository from the script location
+./scripts/verify-provider-neutral.ps1 -Configuration Release -ResultsDirectory artifacts/verification
+```
+
+The script is the single command authority: it restores repository-local .NET tools (`dotnet-ef 10.0.10` via `src/InventoryPlatform/dotnet-tools.json`) and proves tool resolution, restores the solution, performs a normal Release build, runs UnitTests (no filter), Web.Tests (no filter), and IntegrationTests with the affirmative `TestTier=ProviderNeutral` filter, runs EF `migrations has-pending-model-changes` (Infrastructure project / Web startup, matching configuration, `--no-build`), writes distinct TRX files to `artifacts/verification/`, prints an explicit executed/excluded tier summary, and returns non-zero on any mandatory failure. Parameters: `-Configuration` (default `Release`), `-ResultsDirectory` (default repository-relative `artifacts/verification`), `-SkipRestore` (controlled local reuse — skips ONLY the two restore steps; never build/tests/EF; **never used in CI**).
 
 ---
 
@@ -461,18 +472,25 @@ No CI provider is currently configured in the repository. The complete test suit
 
 Rows marked "discovered cases" contain `[Theory]` methods whose `[InlineData]` rows each execute as a separate case; unmarked rows are `[Fact]` methods where methods and discovered cases are equal.
 
-### IntegrationTests (133 tests)
+### IntegrationTests (140 tests: 126 ProviderNeutral + 14 SqlServerRelational)
 
-| Area | Subject | Tests |
-|------|---------|-------|
-| Authorization | AuthorizationSeeder | 24 |
-| Authorization | CapabilityRepository | 12 |
-| Authorization | AuthorizationGroupRepository | 24 |
-| Purchasing | PurchaseOrderRepository (Sprint 13 T06) | 24 |
-| Purchasing | PurchaseOrderLifecyclePersistence (Sprint 14 T06) | 5 |
-| Relational | SQL Server LocalDB safety/infrastructure and R1-R6 contracts (Sprint 18) | 41 |
-| Infrastructure | Placeholder | 1 |
-| **Total** | | **133** |
+Every IntegrationTest carries exactly one `TestTier` trait (Sprint 20). Tier classification follows runtime provider dependency.
+
+| Area | Subject | Tests | Tier |
+|------|---------|-------|------|
+| Authorization | AuthorizationSeeder | 26 | ProviderNeutral |
+| Authorization | AuthorizationGroupRepository | 23 | ProviderNeutral |
+| Authorization | CapabilityRepository | 13 | ProviderNeutral |
+| Purchasing | PurchaseOrderRepository (Sprint 13 T06) | 24 | ProviderNeutral |
+| Purchasing | PurchaseOrderLifecyclePersistence (Sprint 14 T06) | 5 | ProviderNeutral |
+| Tier audit | Classification rules (T02) | 6 | ProviderNeutral |
+| Tier audit | Live assembly audit + locked SQL inventory (T02; 14 identities) | 1 | ProviderNeutral |
+| Relational | SQL Server LocalDB safety/infrastructure guard + construction (no connection) | 20 | ProviderNeutral |
+| Relational | SQL Server LocalDB lifecycle, reachability, R1-R6 contracts (Sprint 18; remediated T03) | 21 | SqlServerRelational |
+| Infrastructure | Placeholder (`IntegrationTest1`) | 1 | ProviderNeutral |
+| **Total** | | **140** | **126 PN + 14 SQL** |
+
+The locked `SqlServerRelational` inventory is 14 identities (see `TierClassificationAuditTests.LockedSqlServerRelationalInventory`). The Sprint 20 provider-neutral gate executes the 126 ProviderNeutral tests and intentionally does not execute the 14 relational tests; the full local suite remains 535 + 14 tests.
 
 ### Web.Tests (58 tests)
 
@@ -493,7 +511,7 @@ Rows marked "discovered cases" contain `[Theory]` methods whose `[InlineData]` r
 | Infrastructure | Placeholder | 1 |
 | **Total** | | **63** |
 
-**Current total: 542 tests, 542 passed, 0 failures, 0 skipped** (346 + 133 + 63; Sprint 19 T05 integrated verification, with the relational tier freshly re-executed against available LocalDB). The 41 Sprint 18 relational cases include infrastructure/safety verification; they are not 41 distinct business contracts. The Sprint 18 historical closure total remains 537 (346 + 133 + 58); the Sprint 17 historical closure total remains 496 (346 + 92 + 58).
+**Current total: provider-neutral gate 535 passed, 0 failed, 0 skipped** (346 UnitTests + 63 Web.Tests + 126 ProviderNeutral IntegrationTests; Sprint 20 T05 integrated verification). The 14 `SqlServerRelational` tests are discovered and locked but intentionally not executed in the gate — the full local suite remains 535 + 14 tests, and no SQL relational-pass claim is made for Sprint 20 (Sprint 18's historical relational passes remain historical evidence). The Sprint 19 historical closure total remains 542 (346 + 133 + 63, with the relational tier freshly executed against available LocalDB); the Sprint 18 historical closure total remains 537 (346 + 133 + 58); the Sprint 17 historical closure total remains 496 (346 + 92 + 58).
 
 The Web.Tests verification tests confirm that the `FakeCapabilityAuthorizationService` compiles against the real `ICapabilityAuthorizationService` interface and produces controlled authorization results. The T03/T04 handler tests exercise the actual `CapabilityAuthorizationHandler` and `MultiCapabilityAuthorizationHandler` production sources directly (the Sprint 14 `PurchaseOrderCapabilityPolicyRegistrationTests` additionally verify Edit/Cancel capability constants and their real `AddWeb` policy registration) (authentication gate, NameIdentifier extraction/parsing, service delegation, succeed/do-not-succeed outcomes, OR semantics with short-circuit, requirement constructor validation). Handler testing is source-level/unit-level.
 
@@ -575,6 +593,18 @@ EF pending-model checks require the Web startup project because `ApplicationDbCo
 dotnet ef migrations has-pending-model-changes --project src/InventoryPlatform/InventoryPlatform.Infrastructure --startup-project src/InventoryPlatform/InventoryPlatform.Web
 ```
 
+## Integration Test Tier Conventions (Sprint 20)
+
+Established by Sprint 20 and authoritative for all current and future IntegrationTest authoring:
+
+1. **Exactly one tier, always.** Every IntegrationTest method must resolve to exactly one supported `TestTier` value. The supported values are exactly `ProviderNeutral` and `SqlServerRelational`. The classification audit fails closed on missing, duplicate/multiple, and unknown tier values.
+2. **Runtime provider dependency determines classification.** A test that opens, or attempts to open, a real connection to SQL Server/LocalDB belongs to `SqlServerRelational` — regardless of whether it could pass without the provider, and regardless of folder or namespace. Tests that use the EF Core InMemory provider, pure string/KB-level construction (e.g., `SqlConnectionStringBuilder` parsing), or no provider at all are `ProviderNeutral`.
+3. **Affirmative ProviderNeutral selection only.** The provider-neutral gate selects with `--filter TestTier=ProviderNeutral`. Never implement the gate by excluding `SqlServerRelational`; positive inclusion keeps the classification audit inside every gate run so contract drift fails the gate itself.
+4. **The SQL inventory is locked by identity.** `TierClassificationAuditTests.LockedSqlServerRelationalInventory` holds the fully qualified names of all SQL-provider-bound tests (currently 14). Intentional additions, removals, renames, or reclassifications of relational tests require a deliberate lock update in the same change; an unexplained drift fails the audit.
+5. **Zero provider contact is the ProviderNeutral property.** Passing without LocalDB is insufficient: a ProviderNeutral test must make no LocalDB/SQL Server connection, database creation, or provider execution attempt. When in doubt, classify by what the test attempts, not by what it requires.
+6. **SQL relational execution stays separate.** The provider-neutral gate never executes `TestTier=SqlServerRelational`. Relational execution remains a local, explicitly-invoked activity against `(localdb)\MSSQLLocalDB` under the Sprint 18 conventions (and remains future work for CI).
+7. **One shared command authority.** Local and CI verification both run `scripts/verify-provider-neutral.ps1`. Do not duplicate its restore/build/test/EF command sequence in CI or docs; extend the script when the verification contract changes.
+
 ## Sprint 13 Conventions (Reusable)
 
 Established by the Sprint 13 Purchasing test automation and reusable for future test authoring:
@@ -623,25 +653,26 @@ Completed:
 - Narrow `PurchaseOrderCreateFormExtraction` (PO-Create-specific, BCL-only) and factory-local data-arrangement helpers
 - Integrated verification (T05): **542 passed, 0 failed, 0 skipped** (346/133/63); relational tier freshly re-executed against available LocalDB; normal build 0W/0E; non-incremental 28W/0E; no pending EF model changes; 10 migrations unchanged — zero production/test-source changes in T05/T06
 
-Still deferred (Sprint 19 state):
+Still deferred (Sprint 20 state):
 
-- EditStatus self-deactivation guard (above) — untouched by Sprint 13
+- EditStatus self-deactivation guard (above) — untouched by later sprints
 - `GetPurchaseOrdersHandler` does not copy `PagedRequest.Status` into `PagedQuery` (T05 recorded finding; no remediation authorized; re-verified against current source at Sprint 17 T09 closure)
+- SQL Server relational CI — the provider-neutral gate deliberately excludes relational execution; a hosted SQL Server/LocalDB endpoint decision is required before the relational tier can run in CI (Sprint 20 carry-forward C20-01)
 - Broader SQL Server relational verification beyond the bounded Sprint 18 R1-R6 contracts, including other constraints, workflows, reports, collation, and provider-specific behavior; the Sprint 17/Sprint 19 HTTP host remains InMemory and makes no relational claims
 - Broader HTTP/Razor route coverage beyond the Sprint 17 representative cases and the Sprint 19 Purchase Order Create behaviors (more Category/Purchase Order routes, other modules)
-- CI provider establishment
+- Browser/E2E automation (carried forward; outside the provider-neutral gate)
 
 ### Future Considerations
 
 - Broader HTTP/Razor route coverage (the Sprint 17 foundation exists; only representative cases are covered)
 - Browser automation (Playwright)
+- SQL Server relational CI (requires a hosted SQL Server/LocalDB endpoint decision; C20-01)
 - Code coverage reporting and gates
 - Mutation testing
 - Performance/load testing
 - Broader SQL Server relational integration testing beyond R1-R6 (including any future SQL Server-backed HTTP host)
 - Broader repository coverage
 - FluentValidation test coverage
-- CI provider establishment
 
 ---
 
@@ -658,6 +689,8 @@ Still deferred (Sprint 19 state):
 9. **No production changes:** Test infrastructure does not alter production code; the only production seam is `public partial class Program { }`
 10. **No production SQL from HTTP tests:** Sentinel connection containment, pre-provider DbContext replacement, and fail-closed structural validation (Sprint 17)
 11. **No fabricated authorization:** Test authentication issues only real persisted-GUID claims; capability authorization flows through production services; antiforgery is extracted from rendered forms, never bypassed or manufactured (Sprint 17)
-12. **Provider-neutral commands, provider-specific relational dependency:** Tests are locally reproducible; no CI provider or CI SQL Server endpoint is configured. A future runner must supply SQL Server fidelity rather than substituting SQLite.
+12. **Provider-neutral gate, provider-specific relational dependency:** CI is established via `.github/workflows/provider-neutral-verification.yml` delegating to `scripts/verify-provider-neutral.ps1`; the gate is provider-neutral (zero LocalDB/SQL contact, verified) and never executes the relational tier. Relational execution still requires LocalDB fidelity — a future hosted relational runner must supply SQL Server fidelity rather than substituting SQLite.
 13. **Behavior-focused coverage:** Tests verify business behavior, not implementation details
 14. **Discovered-case accounting:** State whether a reported count is test methods or discovered test cases (`[Theory]` × `[InlineData]` rows); reconcile suite totals against actual execution
+15. **Exactly-one-tier IntegrationTest contract:** every IntegrationTest resolves to exactly one supported `TestTier` (`ProviderNeutral`, `SqlServerRelational`); classification follows runtime provider dependency; the audit fails closed and the 14-identity relational inventory is locked (Sprint 20)
+16. **No "all tests" language for the provider-neutral gate:** the gate executes 346 UnitTests + 63 Web.Tests + 126 ProviderNeutral IntegrationTests and explicitly does not execute the 14 `SqlServerRelational` tests or browser/E2E work — describe coverage by tier, never as "all tests pass"
