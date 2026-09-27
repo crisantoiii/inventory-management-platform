@@ -2,6 +2,7 @@ using Xunit;
 
 namespace InventoryPlatform.IntegrationTests;
 
+[Trait(TestTiers.TraitKey, TestTiers.ProviderNeutral)]
 public class IntegrationTest1
 {
     [Fact]

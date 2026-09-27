@@ -80,6 +80,7 @@ namespace InventoryPlatform.IntegrationTests.Relational;
 /// parallelism preserved — this test owns its own independent database.
 /// </para>
 /// </summary>
+[Trait(TestTiers.TraitKey, TestTiers.SqlServerRelational)]
 public sealed class SqlServerInventoryMovementQueryTests
 {
     private readonly ITestOutputHelper _output;

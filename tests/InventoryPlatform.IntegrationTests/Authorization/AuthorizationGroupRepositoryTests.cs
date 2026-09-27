@@ -7,6 +7,7 @@ using Xunit;
 
 namespace InventoryPlatform.IntegrationTests.Authorization;
 
+[Trait(TestTiers.TraitKey, TestTiers.ProviderNeutral)]
 public class AuthorizationGroupRepositoryTests : IDisposable
 {
     private readonly DbContextOptions<ApplicationDbContext> _options;

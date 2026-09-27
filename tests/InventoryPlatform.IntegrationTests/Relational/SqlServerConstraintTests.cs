@@ -44,6 +44,7 @@ namespace InventoryPlatform.IntegrationTests.Relational;
 /// xUnit parallelism preserved — each test owns an independent database.
 /// </para>
 /// </summary>
+[Trait(TestTiers.TraitKey, TestTiers.SqlServerRelational)]
 public sealed class SqlServerConstraintTests
 {
     // SQL Server error numbers (stable provider metadata, not localized text):
