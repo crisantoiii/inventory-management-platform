@@ -1,0 +1,118 @@
+# =====================================================================
+# Provider-Neutral Verification (Sprint 20 S20-T04)
+# =====================================================================
+#
+# GitHub Actions gate for the frozen provider-neutral verification
+# contract. This workflow is a thin shell: it delegates all verification
+# authority to the repository-owned script
+#
+#     scripts/verify-provider-neutral.ps1
+#
+# which implements (and is the single command authority for):
+#   1. restore of repository-local .NET tools (dotnet-ef 10.0.10);
+#   2. proof of local dotnet-ef tool resolution;
+#   3. solution restore;
+#   4. normal Release build;
+#   5. UnitTests (no filter);
+#   6. Web.Tests (no filter);
+#   7. IntegrationTests with affirmative filter TestTier=ProviderNeutral
+#      (classification audit included);
+#   8. EF migrations has-pending-model-changes;
+#   9. TRX output;
+#  10. explicit executed/excluded tier summary;
+#  11. non-zero exit on any mandatory failure.
+#
+# Explicitly OUTSIDE this gate (never executed here):
+#   - SQL Server relational tests (TestTier=SqlServerRelational);
+#   - browser/E2E tests.
+#
+# No SQL Server/LocalDB setup, no browser setup, no secrets, no
+# deployment credentials are required or used.
+#
+# =====================================================================
+
+name: Provider-Neutral Verification
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  provider-neutral-verification:
+    name: Provider-neutral verification (windows-latest)
+    runs-on: windows-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Setup .NET SDK 10.0.x
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0.x
+
+      # The shared script is the verification authority. Normal restore
+      # behavior (no -SkipRestore in CI); Release configuration; default
+      # repository-relative results directory (artifacts/verification).
+      # The script's non-zero exit code fails this step directly; the
+      # exit code is not swallowed or ignored.
+      - name: Run provider-neutral verification (scripts/verify-provider-neutral.ps1)
+        id: verify
+        shell: powershell
+        run: ./scripts/verify-provider-neutral.ps1 -Configuration Release -ResultsDirectory artifacts/verification
+
+      # Upload TRX results even when verification fails. If failure occurs
+      # before tests produce TRX files, the upload warns (if-no-files-found:
+      # warn) instead of failing the workflow on missing artifacts; an
+      # upload step failure still fails the job, so upload problems can
+      # never be converted into a false verification success.
+      - name: Upload verification results (TRX)
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: provider-neutral-verification-results
+          path: artifacts/verification/
+          if-no-files-found: warn
+          retention-days: 14
+
+      # Static gate-contract summary. Test counts are deliberately NOT
+      # duplicated here; the script's console output is the authoritative
+      # runtime record.
+      - name: Write workflow summary
+        if: ${{ always() }}
+        shell: pwsh
+        run: |
+          $verificationOutcome = '${{ steps.verify.outcome }}'
+          $resultLine = if ($verificationOutcome -eq 'success') {
+            'Result: verification PASSED.'
+          } else {
+            'Result: verification FAILED.'
+          }
+          $summary = @'
+          ## Provider-Neutral Verification
+
+          Provider-neutral verification delegates to scripts/verify-provider-neutral.ps1. SQL Server relational tests and browser/E2E tests are outside this gate.
+
+          **Executed by the gate**
+          - Normal Release solution build
+          - UnitTests (all tests, no filter)
+          - Web.Tests (all tests, no filter)
+          - IntegrationTests - affirmative filter ``TestTier=ProviderNeutral`` (classification audit included)
+          - EF ``migrations has-pending-model-changes`` (Infrastructure / Web startup, --no-build)
+
+          **Explicitly excluded (NOT EXECUTED by this gate)**
+          - SQL Server relational tests (``TestTier=SqlServerRelational``)
+          - Browser/E2E tests
+
+          No SQL Server relational-pass claim is made by this workflow.
+
+          $resultLine TRX artifacts (when generated): provider-neutral-verification-results.
+          '@
+          $summary | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Encoding utf8 -Append
