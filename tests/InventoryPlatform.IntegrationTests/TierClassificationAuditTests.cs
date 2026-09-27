@@ -94,6 +94,7 @@ public sealed class TierClassificationLiveAuditTests
         "InventoryPlatform.IntegrationTests.Relational.SqlServerMigrationTests.MigrateAsync_IsRepeatableAcrossIndependentFreshDatabases",
         "InventoryPlatform.IntegrationTests.Relational.SqlServerStorageSemanticsTests.SingleSaveChanges_WithOneConstraintViolation_PersistsNoPartialWrites",
         "InventoryPlatform.IntegrationTests.Relational.SqlServerStorageSemanticsTests.Decimal18_2Column_StoresDeterministicallyRoundedValue_ForSubscaleInput",
+        "InventoryPlatform.IntegrationTests.Relational.RelationalTestInfrastructureSqlServerTests.RelationalTier_FailsHard_WhenServerIsUnavailable",
     ];
 
     [Fact]

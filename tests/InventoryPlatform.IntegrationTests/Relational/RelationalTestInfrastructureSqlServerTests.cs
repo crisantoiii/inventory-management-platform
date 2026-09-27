@@ -26,6 +26,12 @@ namespace InventoryPlatform.IntegrationTests.Relational;
 /// LocalDB fails hard when unavailable (no conditional skip): an intentionally
 /// executed relational test that cannot reach the approved instance fails — it never
 /// silently passes or skips.
+///
+/// Sprint 20 T03 remediation: every test in this class that attempts any real
+/// provider connection (including the fail-hard reachability probe) is classified
+/// <c>TestTier=SqlServerRelational</c>; the guard/construction tests that never
+/// open a connection remain ProviderNeutral. Runtime provider dependency — not
+/// success requirements — determines the tier.
 /// </summary>
 public sealed class RelationalTestInfrastructureSqlServerTests
 {
@@ -420,7 +426,7 @@ public sealed class RelationalTestInfrastructureSqlServerTests
     }
 
     [Fact]
-    [Trait(TestTiers.TraitKey, TestTiers.ProviderNeutral)]
+    [Trait(TestTiers.TraitKey, TestTiers.SqlServerRelational)]
     public async Task RelationalTier_FailsHard_WhenServerIsUnavailable()
     {
         // Fail-hard proof at the infrastructure level: a lifecycle attempt against a
