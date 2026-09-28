@@ -119,4 +119,23 @@ public sealed class PurchaseOrderErrorsTests
         Assert.Equal("PurchaseOrder.ProductInactive", error.Code);
         Assert.Equal($"Product with ID '{productId}' is inactive.", error.Message);
     }
+
+    // =====================================================================
+    // Validation(message)
+    // =====================================================================
+
+    [Fact]
+    public void Validation_WithMessage_ReturnsExpectedCodeAndVerbatimMessage()
+    {
+        // Arrange
+        const string message = "  Validation message with punctuation!  ";
+
+        // Act
+        var error = PurchaseOrderErrors.Validation(message);
+
+        // Assert
+        Assert.IsType<Error>(error);
+        Assert.Equal("PurchaseOrder.Validation", error.Code);
+        Assert.Equal(message, error.Message);
+    }
 }

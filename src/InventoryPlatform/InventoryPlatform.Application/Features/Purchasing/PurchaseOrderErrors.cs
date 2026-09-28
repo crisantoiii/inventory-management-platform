@@ -28,4 +28,9 @@ public static class PurchaseOrderErrors
         new(
             "PurchaseOrder.ProductInactive",
             $"Product with ID '{productId}' is inactive.");
+
+    public static Error Validation(string message) =>
+        new(
+            "PurchaseOrder.Validation",
+            message);
 }
