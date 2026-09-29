@@ -60,6 +60,12 @@ public sealed class FakePurchaseOrderRepository : IPurchaseOrderRepository
 
     public List<PurchaseOrder> AddedPurchaseOrders { get; } = new();
 
+    /// <summary>
+    /// The cancellation token of the most recent <see cref="AddAsync"/> call, so a handler
+    /// test can prove cancellation-token forwarding reaches this repository.
+    /// </summary>
+    public CancellationToken LastAddAsyncCancellationToken { get; private set; }
+
     public PurchaseOrder? LastAddedPurchaseOrder =>
         AddedPurchaseOrders.Count > 0 ? AddedPurchaseOrders[^1] : null;
 
@@ -100,6 +106,7 @@ public sealed class FakePurchaseOrderRepository : IPurchaseOrderRepository
     {
         AddAsyncCallCount++;
         AddedPurchaseOrders.Add(entity);
+        LastAddAsyncCancellationToken = cancellationToken;
         _callOrder?.Record("PurchaseOrderRepository.AddAsync");
 
         return Task.CompletedTask;

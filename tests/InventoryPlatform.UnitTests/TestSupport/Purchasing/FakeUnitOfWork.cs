@@ -39,11 +39,18 @@ public sealed class FakeUnitOfWork : IUnitOfWork
 
     public int SaveChangesAsyncCallCount { get; private set; }
 
+    /// <summary>
+    /// The cancellation token of the most recent <see cref="SaveChangesAsync"/> call, so a
+    /// handler test can prove cancellation-token forwarding reaches the unit of work.
+    /// </summary>
+    public CancellationToken LastSaveChangesAsyncCancellationToken { get; private set; }
+
     // --- IUnitOfWork ---
 
     public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         SaveChangesAsyncCallCount++;
+        LastSaveChangesAsyncCancellationToken = cancellationToken;
         _callOrder?.Record("UnitOfWork.SaveChangesAsync");
 
         return Task.FromResult(_saveChangesResult);

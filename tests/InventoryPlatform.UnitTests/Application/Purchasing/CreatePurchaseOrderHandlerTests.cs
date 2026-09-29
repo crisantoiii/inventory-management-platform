@@ -1,3 +1,5 @@
+using FluentValidation;
+using FluentValidation.Results;
 using InventoryPlatform.Application.Features.Purchasing;
 using InventoryPlatform.Application.Features.Purchasing.CreatePurchaseOrder;
 using InventoryPlatform.Application.Interfaces.Persistence;
@@ -33,7 +35,8 @@ public sealed class CreatePurchaseOrderHandlerTests
             purchaseOrderRepository,
             supplierRepository,
             productRepository,
-            unitOfWork);
+            unitOfWork,
+            new CreatePurchaseOrderValidator());
 
         // Act
         var result = await handler.HandleAsync(request);
@@ -64,7 +67,8 @@ public sealed class CreatePurchaseOrderHandlerTests
             purchaseOrderRepository,
             supplierRepository,
             new FakeProductRepository(0, null, false),
-            unitOfWork);
+            unitOfWork,
+            new CreatePurchaseOrderValidator());
 
         // Act
         _ = await handler.HandleAsync(request);
@@ -91,7 +95,8 @@ public sealed class CreatePurchaseOrderHandlerTests
             purchaseOrderRepository,
             supplierRepository,
             new FakeProductRepository(0, null, false),
-            unitOfWork);
+            unitOfWork,
+            new CreatePurchaseOrderValidator());
 
         // Act
         var result = await handler.HandleAsync(request);
@@ -151,7 +156,8 @@ public sealed class CreatePurchaseOrderHandlerTests
             purchaseOrderRepository,
             supplierRepository,
             productRepository,
-            unitOfWork);
+            unitOfWork,
+            new CreatePurchaseOrderValidator());
 
         // Act
         var result = await handler.HandleAsync(request);
@@ -181,7 +187,8 @@ public sealed class CreatePurchaseOrderHandlerTests
             purchaseOrderRepository,
             supplierRepository,
             productRepository,
-            unitOfWork);
+            unitOfWork,
+            new CreatePurchaseOrderValidator());
 
         var request = CreateValidRequest(supplierId: 1, itemProductId: 101);
 
@@ -212,7 +219,8 @@ public sealed class CreatePurchaseOrderHandlerTests
             purchaseOrderRepository,
             supplierRepository,
             productRepository,
-            unitOfWork);
+            unitOfWork,
+            new CreatePurchaseOrderValidator());
 
         // Act
         var result = await handler.HandleAsync(request);
@@ -245,7 +253,8 @@ public sealed class CreatePurchaseOrderHandlerTests
             purchaseOrderRepository,
             supplierRepository,
             productRepository,
-            unitOfWork);
+            unitOfWork,
+            new CreatePurchaseOrderValidator());
 
         var request = CreateValidRequest(supplierId: 1, itemProductId: 101);
 
@@ -291,7 +300,8 @@ public sealed class CreatePurchaseOrderHandlerTests
             purchaseOrderRepository,
             supplierRepository,
             productRepository,
-            unitOfWork);
+            unitOfWork,
+            new CreatePurchaseOrderValidator());
 
         // Act
         var result = await handler.HandleAsync(request);
@@ -335,7 +345,8 @@ public sealed class CreatePurchaseOrderHandlerTests
             purchaseOrderRepository,
             supplierRepository,
             productRepository,
-            unitOfWork);
+            unitOfWork,
+            new CreatePurchaseOrderValidator());
 
         // Act
         var result = await handler.HandleAsync(request);
@@ -378,13 +389,18 @@ public sealed class CreatePurchaseOrderHandlerTests
             purchaseOrderRepository,
             supplierRepository,
             productRepository,
-            unitOfWork);
+            unitOfWork,
+            new CreatePurchaseOrderValidator());
 
         // Act / Assert
         var exception = await Assert.ThrowsAsync<DomainException>(
             () => handler.HandleAsync(request));
 
-        Assert.Contains("already exists", exception.Message);
+        // Application validation passed (supplier was read), so the duplicate product rule
+        // stays a Domain-owned failure with the canonical message.
+        Assert.True(new CreatePurchaseOrderValidator().Validate(request).IsValid);
+        Assert.Equal(1, supplierRepository.GetByIdAsyncCallCount);
+        Assert.Equal("The product already exists in this purchase order.", exception.Message);
         Assert.Equal(2, productRepository.GetByIdAsyncCallCount);
         Assert.Equal(10, productRepository.LastGetByIdAsyncRequestId);
         Assert.Equal(0, purchaseOrderRepository.AddAsyncCallCount);
@@ -426,7 +442,8 @@ public sealed class CreatePurchaseOrderHandlerTests
             purchaseOrderRepository,
             supplierRepository,
             productRepository,
-            unitOfWork);
+            unitOfWork,
+            new CreatePurchaseOrderValidator());
 
         // Act
         var result = await handler.HandleAsync(request);
@@ -489,7 +506,8 @@ public sealed class CreatePurchaseOrderHandlerTests
             purchaseOrderRepository,
             supplierRepository,
             productRepository,
-            unitOfWork);
+            unitOfWork,
+            new CreatePurchaseOrderValidator());
 
         // Act
         var result = await handler.HandleAsync(request);
@@ -557,7 +575,8 @@ public sealed class CreatePurchaseOrderHandlerTests
             purchaseOrderRepository,
             supplierRepository,
             productRepository,
-            unitOfWork);
+            unitOfWork,
+            new CreatePurchaseOrderValidator());
 
         // Act
         var result = await handler.HandleAsync(request);
@@ -605,6 +624,325 @@ public sealed class CreatePurchaseOrderHandlerTests
     }
 
     // =====================================================================
+    // T02: Application validation invoked first (frozen A1 contract)
+    // =====================================================================
+
+    [Fact]
+    public async Task HandleAsync_InvalidSupplierId_ReturnsValidationFailureWithNoRepositoryInteraction()
+    {
+        // Arrange
+        var callOrder = new CallOrder();
+        var request = CreateValidRequest(supplierId: 0, itemProductId: 101);
+
+        var supplierRepository = new FakeSupplierRepository(0, found: false, callOrder: callOrder);
+        var productRepository = new FakeProductRepository(101, null, false, callOrder: callOrder);
+        var purchaseOrderRepository = new FakePurchaseOrderRepository(callOrder: callOrder);
+        var unitOfWork = new FakeUnitOfWork(callOrder: callOrder);
+
+        var handler = CreateHandler(
+            purchaseOrderRepository,
+            supplierRepository,
+            unitOfWork,
+            productRepository);
+
+        // Act
+        var result = await handler.HandleAsync(request);
+
+        // Assert
+        Assert.False(result.IsSuccess);
+        Assert.True(result.IsFailure);
+        Assert.Equal("PurchaseOrder.Validation", result.Error.Code);
+        Assert.Equal("A valid supplier must be selected.", result.Error.Message);
+
+        Assert.Equal(0, supplierRepository.GetByIdAsyncCallCount);
+        Assert.Equal(0, productRepository.GetByIdAsyncCallCount);
+        Assert.Equal(0, purchaseOrderRepository.AddAsyncCallCount);
+        Assert.Equal(0, unitOfWork.SaveChangesAsyncCallCount);
+
+        var events = callOrder.Events.ToList();
+        Assert.Empty(events);
+    }
+
+    [Fact]
+    public async Task HandleAsync_ValidationFailure_MessageIsExactlyFirstFluentValidationFailure()
+    {
+        // Arrange
+        var request = new CreatePurchaseOrderRequest(
+            SupplierId: 1,
+            ExpectedDeliveryDate: default,
+            Remarks: null,
+            Items: new CreatePurchaseOrderItemRequest[]
+            {
+                new(10, 2m, 5m),
+                new(20, 0m, -1m)
+            }.AsReadOnly());
+
+        var expectedMessage = new CreatePurchaseOrderValidator()
+            .Validate(request)
+            .Errors[0]
+            .ErrorMessage;
+
+        var supplierRepository = new FakeSupplierRepository(1, found: false);
+        var purchaseOrderRepository = new FakePurchaseOrderRepository();
+        var unitOfWork = new FakeUnitOfWork();
+
+        var handler = CreateHandler(
+            purchaseOrderRepository,
+            supplierRepository,
+            unitOfWork);
+
+        // Act
+        var result = await handler.HandleAsync(request);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal("PurchaseOrder.Validation", result.Error.Code);
+        Assert.Equal(expectedMessage, result.Error.Message);
+        Assert.Equal(0, supplierRepository.GetByIdAsyncCallCount);
+        Assert.Equal(0, purchaseOrderRepository.AddAsyncCallCount);
+        Assert.Equal(0, unitOfWork.SaveChangesAsyncCallCount);
+    }
+
+    [Fact]
+    public async Task HandleAsync_SupplierIdAndItemFailures_SupplierIdMessageIsSelectedFirst()
+    {
+        // Arrange: SupplierId, ExpectedDeliveryDate and an item rule all fail.
+        var request = new CreatePurchaseOrderRequest(
+            SupplierId: 0,
+            ExpectedDeliveryDate: default,
+            Remarks: new string('x', 501),
+            Items: new CreatePurchaseOrderItemRequest[]
+            {
+                new(0, 0m, -1m)
+            }.AsReadOnly());
+
+        var supplierRepository = new FakeSupplierRepository(0, found: false);
+        var purchaseOrderRepository = new FakePurchaseOrderRepository();
+        var unitOfWork = new FakeUnitOfWork();
+
+        var handler = CreateHandler(
+            purchaseOrderRepository,
+            supplierRepository,
+            unitOfWork);
+
+        // Act
+        var result = await handler.HandleAsync(request);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal("PurchaseOrder.Validation", result.Error.Code);
+        Assert.Equal("A valid supplier must be selected.", result.Error.Message);
+        Assert.Equal(0, supplierRepository.GetByIdAsyncCallCount);
+        Assert.Equal(0, purchaseOrderRepository.AddAsyncCallCount);
+        Assert.Equal(0, unitOfWork.SaveChangesAsyncCallCount);
+    }
+
+    [Fact]
+    public async Task HandleAsync_ItemProductIdQuantityAndUnitCostInvalid_ProductIdMessageIsSelectedFirst()
+    {
+        // Arrange: only child rules fail, so the item's ProductId rule must win.
+        var request = new CreatePurchaseOrderRequest(
+            SupplierId: 1,
+            ExpectedDeliveryDate: new DateOnly(2026, 6, 1),
+            Remarks: null,
+            Items: new CreatePurchaseOrderItemRequest[]
+            {
+                new(0, 0m, -1m)
+            }.AsReadOnly());
+
+        var supplierRepository = new FakeSupplierRepository(1, found: false);
+        var purchaseOrderRepository = new FakePurchaseOrderRepository();
+        var unitOfWork = new FakeUnitOfWork();
+
+        var handler = CreateHandler(
+            purchaseOrderRepository,
+            supplierRepository,
+            unitOfWork);
+
+        // Act
+        var result = await handler.HandleAsync(request);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal("PurchaseOrder.Validation", result.Error.Code);
+        Assert.Equal("A valid product must be selected.", result.Error.Message);
+        Assert.Equal(0, supplierRepository.GetByIdAsyncCallCount);
+        Assert.Equal(0, purchaseOrderRepository.AddAsyncCallCount);
+        Assert.Equal(0, unitOfWork.SaveChangesAsyncCallCount);
+    }
+
+    [Fact]
+    public async Task HandleAsync_ZeroQuantity_FailsValidationBeforeAnyRepositoryRead()
+    {
+        // Arrange
+        var request = new CreatePurchaseOrderRequest(
+            SupplierId: 1,
+            ExpectedDeliveryDate: new DateOnly(2026, 6, 1),
+            Remarks: null,
+            Items: new CreatePurchaseOrderItemRequest[]
+            {
+                new(101, 0m, 5m)
+            }.AsReadOnly());
+
+        var expectedMessage = new CreatePurchaseOrderValidator()
+            .Validate(request)
+            .Errors[0]
+            .ErrorMessage;
+
+        var supplierRepository = new FakeSupplierRepository(1, found: false);
+        var productRepository = new FakeProductRepository(101, PurchasingTestData.CreateProduct(id: 101, sku: "SKU-101"), true);
+        var purchaseOrderRepository = new FakePurchaseOrderRepository();
+        var unitOfWork = new FakeUnitOfWork();
+
+        var handler = CreateHandler(
+            purchaseOrderRepository,
+            supplierRepository,
+            unitOfWork,
+            productRepository);
+
+        // Act
+        var result = await handler.HandleAsync(request);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal("PurchaseOrder.Validation", result.Error.Code);
+        Assert.Equal(expectedMessage, result.Error.Message);
+        Assert.Equal(0, supplierRepository.GetByIdAsyncCallCount);
+        Assert.Equal(0, productRepository.GetByIdAsyncCallCount);
+        Assert.Equal(0, purchaseOrderRepository.AddAsyncCallCount);
+        Assert.Equal(0, unitOfWork.SaveChangesAsyncCallCount);
+    }
+
+    [Fact]
+    public async Task HandleAsync_NegativeUnitCost_FailsValidationBeforeAnyRepositoryRead()
+    {
+        // Arrange
+        var request = new CreatePurchaseOrderRequest(
+            SupplierId: 1,
+            ExpectedDeliveryDate: new DateOnly(2026, 6, 1),
+            Remarks: null,
+            Items: new CreatePurchaseOrderItemRequest[]
+            {
+                new(101, 2m, -1m)
+            }.AsReadOnly());
+
+        var expectedMessage = new CreatePurchaseOrderValidator()
+            .Validate(request)
+            .Errors[0]
+            .ErrorMessage;
+
+        var supplierRepository = new FakeSupplierRepository(1, found: false);
+        var productRepository = new FakeProductRepository(101, PurchasingTestData.CreateProduct(id: 101, sku: "SKU-101"), true);
+        var purchaseOrderRepository = new FakePurchaseOrderRepository();
+        var unitOfWork = new FakeUnitOfWork();
+
+        var handler = CreateHandler(
+            purchaseOrderRepository,
+            supplierRepository,
+            unitOfWork,
+            productRepository);
+
+        // Act
+        var result = await handler.HandleAsync(request);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal("PurchaseOrder.Validation", result.Error.Code);
+        Assert.Equal(expectedMessage, result.Error.Message);
+        Assert.Equal(0, supplierRepository.GetByIdAsyncCallCount);
+        Assert.Equal(0, productRepository.GetByIdAsyncCallCount);
+        Assert.Equal(0, purchaseOrderRepository.AddAsyncCallCount);
+        Assert.Equal(0, unitOfWork.SaveChangesAsyncCallCount);
+    }
+
+    [Fact]
+    public async Task HandleAsync_ForwardsSameCancellationTokenToValidatorAndDownstreamOperations()
+    {
+        // Arrange
+        using var cts = new CancellationTokenSource();
+        var cancellationToken = cts.Token;
+
+        var supplier = PurchasingTestData.CreateSupplier(id: 1, name: "Active Supplier");
+        var request = CreateValidRequest(supplierId: 1, itemProductId: 101);
+
+        var recordingValidator = new RecordingValidator(new CreatePurchaseOrderValidator());
+        var supplierRepository = new FakeSupplierRepository(1, supplier, found: true);
+        var productRepository = new FakeProductRepository(
+            productId1: 101,
+            product1: PurchasingTestData.CreateProduct(id: 101, sku: "SKU-101"),
+            found1: true);
+        var purchaseOrderRepository = new FakePurchaseOrderRepository();
+        var unitOfWork = new FakeUnitOfWork();
+
+        var handler = CreateHandler(
+            purchaseOrderRepository,
+            supplierRepository,
+            unitOfWork,
+            productRepository,
+            recordingValidator);
+
+        // Act
+        var result = await handler.HandleAsync(request, cancellationToken);
+
+        // Assert
+        Assert.True(result.IsSuccess);
+
+        Assert.Equal(1, recordingValidator.ValidateAsyncCallCount);
+        Assert.Equal(cancellationToken, recordingValidator.LastCancellationToken);
+        Assert.Same(request, recordingValidator.LastRequest);
+
+        Assert.Equal(cancellationToken, supplierRepository.LastGetByIdAsyncCancellationToken);
+        Assert.Equal(cancellationToken, productRepository.LastGetByIdAsyncCancellationToken);
+        Assert.Equal(cancellationToken, purchaseOrderRepository.LastAddAsyncCancellationToken);
+        Assert.Equal(cancellationToken, unitOfWork.LastSaveChangesAsyncCancellationToken);
+    }
+
+    [Fact]
+    public async Task HandleAsync_EmptyItems_CreatesAndSavesEmptyDraftSuccessfully()
+    {
+        // Arrange
+        var supplierId = 1;
+        var supplier = PurchasingTestData.CreateSupplier(id: supplierId, name: "Active Supplier");
+
+        var request = new CreatePurchaseOrderRequest(
+            SupplierId: supplierId,
+            ExpectedDeliveryDate: new DateOnly(2026, 6, 1),
+            Remarks: null,
+            Items: Array.Empty<CreatePurchaseOrderItemRequest>());
+
+        var supplierRepository = new FakeSupplierRepository(supplierId, supplier, found: true);
+        var productRepository = new FakeProductRepository(0, null, false);
+        var purchaseOrderRepository = new FakePurchaseOrderRepository();
+        var unitOfWork = new FakeUnitOfWork();
+
+        var handler = CreateHandler(
+            purchaseOrderRepository,
+            supplierRepository,
+            unitOfWork,
+            productRepository);
+
+        // Act
+        var result = await handler.HandleAsync(request);
+
+        // Assert
+        Assert.True(result.IsSuccess);
+        Assert.False(result.IsFailure);
+
+        Assert.Equal(1, supplierRepository.GetByIdAsyncCallCount);
+        Assert.Equal(0, productRepository.GetByIdAsyncCallCount);
+
+        var added = purchaseOrderRepository.LastAddedPurchaseOrder;
+        Assert.NotNull(added);
+        Assert.Equal(PurchaseOrderStatus.Draft, added!.Status);
+        Assert.Equal(supplierId, added!.SupplierId);
+        Assert.Empty(added!.Items);
+
+        Assert.Equal(1, purchaseOrderRepository.AddAsyncCallCount);
+        Assert.Equal(1, unitOfWork.SaveChangesAsyncCallCount);
+        Assert.Equal(PurchaseOrderStatus.Draft, result.Value!.Status);
+    }
+
+    // =====================================================================
     // Helpers
     // =====================================================================
 
@@ -628,13 +966,15 @@ public sealed class CreatePurchaseOrderHandlerTests
         IPurchaseOrderRepository purchaseOrderRepository,
         ISupplierRepository supplierRepository,
         IUnitOfWork unitOfWork,
-        IProductRepository? productRepository = null)
+        IProductRepository? productRepository = null,
+        IValidator<CreatePurchaseOrderRequest>? validator = null)
     {
         return new CreatePurchaseOrderHandler(
             purchaseOrderRepository,
             supplierRepository,
             productRepository ?? new FakeProductRepository(0, null, false),
-            unitOfWork);
+            unitOfWork,
+            validator ?? new CreatePurchaseOrderValidator());
     }
 
     private static Error SupplierNotFound => PurchaseOrderErrors.SupplierNotFound;
@@ -656,6 +996,8 @@ public sealed class CreatePurchaseOrderHandlerTests
         public int GetByIdAsyncCallCount { get; private set; }
 
         public int? LastGetByIdAsyncRequestId { get; private set; }
+
+        public CancellationToken LastGetByIdAsyncCancellationToken { get; private set; }
 
         private readonly List<int> _getRequests = new List<int>();
 
@@ -688,6 +1030,7 @@ public sealed class CreatePurchaseOrderHandlerTests
             GetByIdAsyncCallCount++;
             _getRequests.Add(id);
             LastGetByIdAsyncRequestId = id;
+            LastGetByIdAsyncCancellationToken = cancellationToken;
             _callOrder?.Record("SupplierRepository.GetByIdAsync");
 
             return Task.FromResult(_found ? _supplier : null);
@@ -768,6 +1111,8 @@ public sealed class CreatePurchaseOrderHandlerTests
 
         public int? LastGetByIdAsyncRequestId { get; private set; }
 
+        public CancellationToken LastGetByIdAsyncCancellationToken { get; private set; }
+
         private readonly List<int> _getRequests = new List<int>();
 
         public IReadOnlyList<int> GetRequests => _getRequests;
@@ -828,6 +1173,7 @@ public sealed class CreatePurchaseOrderHandlerTests
             GetByIdAsyncCallCount++;
             _getRequests.Add(id);
             LastGetByIdAsyncRequestId = id;
+            LastGetByIdAsyncCancellationToken = cancellationToken;
             _callOrder?.Record("ProductRepository.GetByIdAsync");
 
             return id switch
@@ -897,5 +1243,51 @@ public sealed class CreatePurchaseOrderHandlerTests
             CancellationToken cancellationToken = default)
             => throw new NotSupportedException(
                 "FakeProductRepository does not support ExistsAsync: no T02 test exercises this member.");
+    }
+
+    /// <summary>
+    /// Pass-through validator wrapper that records the request instance and cancellation
+    /// token handed to <c>ValidateAsync</c>, delegating the actual validation to the real
+    /// <see cref="CreatePurchaseOrderValidator"/> so the observed contract stays the
+    /// production one. Used only to prove cancellation-token/request forwarding.
+    /// </summary>
+    public sealed class RecordingValidator : IValidator<CreatePurchaseOrderRequest>
+    {
+        private readonly IValidator<CreatePurchaseOrderRequest> _inner;
+
+        public RecordingValidator(IValidator<CreatePurchaseOrderRequest> inner) => _inner = inner;
+
+        public int ValidateAsyncCallCount { get; private set; }
+
+        public CancellationToken LastCancellationToken { get; private set; }
+
+        public CreatePurchaseOrderRequest? LastRequest { get; private set; }
+
+        public bool CanValidateInstancesOfType(Type instanceType)
+            => _inner.CanValidateInstancesOfType(instanceType);
+
+        public IValidatorDescriptor CreateDescriptor() => _inner.CreateDescriptor();
+
+        public ValidationResult Validate(CreatePurchaseOrderRequest instance)
+            => _inner.Validate(instance);
+
+        public Task<ValidationResult> ValidateAsync(
+            CreatePurchaseOrderRequest instance,
+            CancellationToken cancellation = default)
+        {
+            ValidateAsyncCallCount++;
+            LastRequest = instance;
+            LastCancellationToken = cancellation;
+
+            return _inner.ValidateAsync(instance, cancellation);
+        }
+
+        public ValidationResult Validate(IValidationContext context)
+            => _inner.Validate(context);
+
+        public Task<ValidationResult> ValidateAsync(
+            IValidationContext context,
+            CancellationToken cancellation = default)
+            => _inner.ValidateAsync(context, cancellation);
     }
 }
