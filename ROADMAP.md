@@ -22,7 +22,7 @@ v1.3  Account Management       ✅
 v1.4  Additional Reporting     ✅
 v1.5  Purchasing Enhancements  ✅
 v1.6  Dynamic Capability Auth  ✅
-(Sprint 11 Automated Testing ✅ — non-release; Sprint 12 Authorization Refinement ✅ — non-release; Sprint 13 Purchasing Workflow Test Automation ✅ — non-release; Sprint 14 Purchase Order Cancellation and Draft Item Editing ✅ — non-release; Sprint 15 Purchase Order Workflow Error Handling and UX Hardening ✅ — non-release; Sprint 16 Purchase Order POST Round-Trip State and Create Failure Presentation Corrections ✅ — non-release; Sprint 17 HTTP/Razor Integration-Test Foundation ✅ — non-release; Sprint 18 SQL Server Relational Verification ✅ — non-release; Sprint 19 Purchase Order Create HTTP/Razor Integration Coverage ✅ — non-release; Sprint 20 Provider-Neutral Continuous Verification ✅ — non-release)
+(Sprint 11 Automated Testing ✅ — non-release; Sprint 12 Authorization Refinement ✅ — non-release; Sprint 13 Purchasing Workflow Test Automation ✅ — non-release; Sprint 14 Purchase Order Cancellation and Draft Item Editing ✅ — non-release; Sprint 15 Purchase Order Workflow Error Handling and UX Hardening ✅ — non-release; Sprint 16 Purchase Order POST Round-Trip State and Create Failure Presentation Corrections ✅ — non-release; Sprint 17 HTTP/Razor Integration-Test Foundation ✅ — non-release; Sprint 18 SQL Server Relational Verification ✅ — non-release; Sprint 19 Purchase Order Create HTTP/Razor Integration Coverage ✅ — non-release; Sprint 20 Provider-Neutral Continuous Verification ✅ — non-release; Sprint 21 Validation Invocation Architecture ✅ — non-release)
 
 ---
 
@@ -482,9 +482,61 @@ Hosted evidence proves the hosted job, script step, summary step, and three-file
 
 C20-01 SQL Server relational CI (hosted relational execution needs a hosted SQL Server/LocalDB endpoint decision); C20-02 broader HTTP/Razor coverage; C20-03 browser/E2E; C20-04 EditStatus authorization guard decision; C20-05 report authorization; C20-06 warning remediation (28-warning non-incremental baseline unchanged); C20-07 broader SQL relational/report verification; C20-08 Sales; C20-09 Audit; C20-10 import/attachment/barcode; C20-11 validation invocation/architecture. Observation preserved: the seeded Viewer has broad `PurchaseOrder.*`, including `PurchaseOrder.Create` — recorded only; no remediation commitment.
 
+(Sprint 21 subsequently closed C20-11 and C19-01. The list above is preserved as the Sprint 20 closure snapshot; the current carry-forward register is the Sprint 21 section below.)
+
+## Sprint 21 - Validation Invocation Architecture
+
+**Status:** Complete/Closed — technical/architecture sprint; v1.6.0 remains the latest release baseline. No version or tag was created.
+
+Sprint 21 closed the validation-invocation/architecture gap carried from Sprint 20 as C20-11 and from Sprint 19 as C19-01. Purchase Order Create request validation is now invoked at the Application handler boundary, proven at the handler and real HTTP/Razor levels.
+
+### Delivered
+
+- **Application-boundary invocation:** `CreatePurchaseOrderHandler` takes `IValidator<CreatePurchaseOrderRequest>` and calls `await _validator.ValidateAsync(request, cancellationToken)` as the first operation of `HandleAsync`, before any repository access. No DI change was required — the existing `AddValidatorsFromAssembly` registration already resolves it.
+- **Frozen A1 scalar contract:** an invalid result returns exactly one error, `validationResult.Errors[0]`, as `Result<CreatePurchaseOrderResponse>.Failure(PurchaseOrderErrors.Validation(firstFailure.ErrorMessage))` — code `PurchaseOrder.Validation`, message verbatim, no sorting/grouping/concatenation and no field-level mapping.
+- **Rule matrix frozen:** `RuleFor(x => x.Items).NotEmpty()` retired with no replacement; top-level order `SupplierId` → `ExpectedDeliveryDate` → `Remarks` (`MaximumLength(500)`); child order `ProductId` → `Quantity` (`GreaterThan(0)`) → `UnitCost` (`GreaterThanOrEqualTo(0)`); error precedence follows declaration order.
+- **Explicit authority split:** Application/FluentValidation owns request-shape input validation; the Domain retains duplicate-`ProductId`, `Quantity > 0`, `UnitCost >= 0`, Draft-only mutation, and non-empty-Draft `Submit()`; handler supplier/product lookup ownership is unchanged; the Web layer retains `ModelState` presentation. `DomainException` still propagates uncaught.
+- **Empty-Draft distinction recorded:** an empty item collection is valid input and yields a successful empty Draft Create; `Submit()` on an empty Draft remains Domain-invalid.
+- **Three distinct proof layers:** validator rule tests (39 cases), handler invocation/contract tests (`CreatePurchaseOrderHandlerTests` at 23), and one real HTTP/Razor scenario (H6) in the existing Purchase Order Create fixture.
+- **Architecture decision recorded:** `docs/DESIGN_DECISIONS.md` DD-046, including rejected alternatives (PageModel invocation, global pipeline/decorator, MediatR, automatic MVC integration, A2 structured errors, a replacement item-count rule, Domain migration of the rules, validator removal).
+
+### Final Verification Baseline (Sprint 21 T04)
+
+```text
+UnitTests:               355 passed
+Web.Tests:                64 passed
+ProviderNeutral:         126 passed (classification audit included)
+SqlServerRelational:      14 discovered only (NOT executed during Sprint 21)
+EF pending-model:          none
+Normal Release build:      0 warnings, 0 errors
+Shared script exit:        0
+Migration chain:          unchanged (10, latest 20260831141400_CreateAuthorizationSchema)
+Browser/E2E:               NOT EXECUTED (outside the gate)
+```
+
+Provider-neutral gate total: **545 passed, 0 failed, 0 skipped** (Sprint 20 baseline: 535). Sprint 21 makes no SQL relational-pass claim.
+
+### Boundaries Held
+
+- Production changes limited to three Application files: `CreatePurchaseOrderValidator.cs`, `CreatePurchaseOrderHandler.cs`, `PurchaseOrderErrors.cs`
+- No Web/Razor/PageModel, Domain, Shared `Result`/`Error`, or DI change
+- No A2 structured error contract, no field-level mapping, no global validation pipeline/decorator, no MediatR, no automatic MVC FluentValidation integration
+- No new validation rule beyond retiring `Items.NotEmpty()`; no trimming, normalization, or date-chronology rule; no duplicate-product validator rule
+- No migration, schema, package, project, configuration, or CI change
+- No SQL Server relational execution; no browser/E2E; no route-coverage expansion beyond the single new Create scenario
+- No version assigned, no tag created, no release published
+
+### Unassigned Carry-Forward (not assigned to any future sprint)
+
+**Closed by Sprint 21:** C20-11 and C19-01 validation invocation/architecture (the same item carried forward twice).
+
+**Remaining unassigned:** C20-01 SQL Server relational CI (hosted relational execution needs a hosted SQL Server/LocalDB endpoint decision); C20-02 broader HTTP/Razor coverage; C20-03 browser/E2E; C20-04 EditStatus authorization guard decision; C20-05 report authorization; C20-06 warning remediation (28-warning non-incremental baseline unchanged); C20-07 broader SQL relational/report verification; C20-08 Sales; C20-09 Audit; C20-10 import/attachment/barcode. Observation preserved: the seeded Viewer has broad `PurchaseOrder.*`, including `PurchaseOrder.Create` — recorded only; no remediation commitment.
+
+Sprint 21 closed C20-11/C19-01 and reallocated none of the remaining items.
+
 ## Next Sprint Planning
 
-Sprint 11 through Sprint 20 are complete. Sprint 20 closed the C19-02 provider-neutral continuous verification carry-forward item: the provider-neutral CI foundation exists, the hosted workflow executed successfully, and the provider-neutral gate makes zero LocalDB/SQL Server provider contact. SQL Server relational CI remains future work (C20-01). The next activity requires separate planning; no Sprint 21 scope has been selected and none of the Sprint 20 carry-forward items are assigned to it.
+Sprint 11 through Sprint 21 are complete. Sprint 20 closed the C19-02 provider-neutral continuous verification carry-forward item: the provider-neutral CI foundation exists, the hosted workflow executed successfully, and the provider-neutral gate makes zero LocalDB/SQL Server provider contact. Sprint 21 closed the C20-11/C19-01 validation invocation/architecture item: the Purchase Order Create validators are now invoked at the Application handler boundary under DD-046, proven at the handler and real HTTP/Razor layers, with the Domain invariants and handler lookup ownership retained and the empty-Draft Create behavior explicitly distinguished from Domain-invalid empty-Draft Submit. SQL Server relational CI remains future work (C20-01). The next activity requires separate planning; no Sprint 22 scope has been selected and none of the remaining Sprint 20/Sprint 21 carry-forward items are assigned to it.
 
 ## D1 - Documentation Synchronization
 
