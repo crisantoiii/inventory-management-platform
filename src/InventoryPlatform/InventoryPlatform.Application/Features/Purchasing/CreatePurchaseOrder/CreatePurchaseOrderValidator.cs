@@ -17,10 +17,6 @@ public sealed class CreatePurchaseOrderValidator
         RuleFor(x => x.Remarks)
             .MaximumLength(500);
 
-        RuleFor(x => x.Items)
-            .NotEmpty()
-            .WithMessage("At least one purchase order item is required.");
-
         RuleForEach(x => x.Items)
             .SetValidator(new CreatePurchaseOrderItemValidator());
     }

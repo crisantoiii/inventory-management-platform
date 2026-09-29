@@ -1,168 +1,76 @@
 # Inventory Management Platform
+> A production-style Inventory Management Platform built with **ASP.NET Core 10**, **Clean Architecture**, **Rich Domain Modeling**, **CQRS-inspired Application Layer**, and **Entity Framework Core**. The project demonstrates enterprise software development practices through modular business capabilities, workflow-driven domain models, and maintainable architecture.
 
-> A production-style Inventory Management Platform built with **ASP.NET
-> Core 10**, **Clean Architecture**, **Rich Domain Modeling**,
-> **CQRS-inspired Application Layer**, and **Entity Framework Core**.
-> The project demonstrates enterprise software development practices
-> through modular business capabilities, workflow-driven domain models,
-> and maintainable architecture.
+The project is designed as a production-style portfolio application that demonstrates enterprise software development practices including layered architecture, reusable infrastructure, server-side data processing, and maintainable code organization.
 
-The project is designed as a production-style portfolio application that
-demonstrates enterprise software development practices including layered
-architecture, reusable infrastructure, server-side data processing, and
-maintainable code organization.
-
-------------------------------------------------------------------------
+---
 
 ## Highlights
 
--   Enterprise-style Clean Architecture
--   ASP.NET Core 10 Razor Pages
--   Entity Framework Core 10
--   CQRS-inspired Application Layer
--   Inventory transaction workflow with immutable history
--   Server-side search, sorting, and pagination
--   Reusable shared infrastructure
--   Business analytics dashboard
--   Workflow-driven Purchasing module
--   Read-oriented Reporting architecture
--   Inventory Valuation
--   Purchase History
--   Supplier Purchase Analysis
--   Stock Movement
--   Low Stock Report
--   Inventory Movement Report
--   Product Reports
--   Excel Export
--   PDF Export
--   Rich Domain Model
--   Vertical Slice Architecture
+- Enterprise-style Clean Architecture
+- ASP.NET Core 10 Razor Pages
+- Entity Framework Core 10
+- CQRS-inspired Application Layer
+- Inventory transaction workflow with immutable history
+- Server-side search, sorting, and pagination
+- Reusable shared infrastructure
+- Business analytics dashboard
+- Workflow-driven Purchasing module
+- Read-oriented Reporting architecture
+- Inventory Valuation
+- Purchase History
+- Supplier Purchase Analysis
+- Stock Movement
+- Low Stock Report
+- Inventory Movement Report
+- Product Reports
+- Excel Export
+- PDF Export
+- Rich Domain Model
+- Vertical Slice Architecture
 
-------------------------------------------------------------------------
+
+---
 
 # Why This Project?
 
-Many portfolio projects demonstrate CRUD functionality. This project
-goes beyond CRUD by emphasizing maintainable architecture, enterprise
-development practices, and scalable software design.
+Many portfolio projects demonstrate CRUD functionality. This project goes beyond CRUD by emphasizing maintainable architecture, enterprise development practices, and scalable software design.
 
-The focus is not only on implementing business features but also on
-applying professional engineering practices such as architectural
-reviews, feature-based organization, incremental refactoring, and
-comprehensive documentation.
+The focus is not only on implementing business features but also on applying professional engineering practices such as architectural reviews, feature-based organization, incremental refactoring, and comprehensive documentation.
 
-------------------------------------------------------------------------
+---
 
 ## Project Status
 
 **Current Version:** v1.6.0 - Dynamic Capability-Based Authorization
 
-**Current Development Status:** Sprint 20 --- Provider-Neutral
-Continuous Verification --- **Complete / Closed**
-
-Sprint 20 established a deterministic provider-neutral
-continuous-verification gate without changing production behavior.
-
-### Sprint 20 Verification Summary
-
-| Verification | Result |
-| :--- | :--- |
-| UnitTests | 346 passed |
-| Web.Tests | 63 passed |
-| ProviderNeutral IntegrationTests | 126 passed |
-| Provider-neutral gate total | 535 passed |
-| SqlServerRelational | 14 discovered and locked; not executed |
-| Classification audit | Passed |
-| Release build | 0 warnings / 0 errors |
-| EF pending-model check | No pending model changes |
-| LocalDB / SQL Server contact | None |
-| Hosted GitHub Actions gate | Passed |
-
-### Sprint 20 Engineering Changes
-
--   Every IntegrationTest carries exactly one explicit `TestTier`:
-    `ProviderNeutral` or `SqlServerRelational`.
--   Tier classification follows actual runtime provider dependency
-    rather than folder or namespace placement.
--   A fail-safe classification audit locks the current 14-test
-    SQL-provider-bound inventory.
--   Local and hosted verification use one shared command authority:
-    `scripts/verify-provider-neutral.ps1`.
--   The verification script restores the repository-local
-    `dotnet-ef 10.0.10` tool, restores and builds the solution, runs
-    UnitTests, Web.Tests, affirmative `TestTier=ProviderNeutral`
-    IntegrationTests, checks EF pending-model changes, writes TRX
-    results, and reports executed/excluded tiers.
--   `.github/workflows/provider-neutral-verification.yml` delegates to
-    the shared script on pull requests to `main`, pushes to `main`, and
-    manual dispatch using `windows-latest` and .NET 10.0.x with
-    least-privilege `contents: read`.
--   The hosted job completed successfully and uploaded the three-file
-    `provider-neutral-verification-results` artifact.
--   T03 verification exposed one misclassified LocalDB connection probe.
-    It was reclassified to `SqlServerRelational`, changing the
-    relational inventory from 13 to 14 and ProviderNeutral from 127 to
-    126.
--   Final provider-neutral verification proved zero LocalDB/SQL Server
-    provider contact.
--   The 14 `SqlServerRelational` tests are intentionally not executed by
-    this gate; Sprint 20 makes no SQL relational-pass claim. Sprint 18
-    relational results remain historical evidence.
--   The non-incremental build retains 28 unchanged historical warnings /
-    0 errors.
--   EF reports no pending model changes across the unchanged
-    10-migration chain; the latest migration remains
-    `20260831141400_CreateAuthorizationSchema`.
--   Sprint 20 made no production changes and is a technical/non-release
-    sprint. `v1.6.0` remains the latest semantic release.
+**Current Development Status:** Sprint 20 Provider-Neutral Continuous Verification — Complete/Closed. Every IntegrationTest now carries exactly one explicit `TestTier` (`ProviderNeutral` or `SqlServerRelational`), enforced by a fail-safe classification audit that locks the 14-identity SQL-provider-bound inventory; classification follows actual runtime provider dependency, not folder placement. Verification runs through one shared command authority, `scripts/verify-provider-neutral.ps1` (repository-local `dotnet-ef 10.0.10` tool restore and resolution evidence, solution restore, normal Release build, UnitTests, Web.Tests, affirmative `TestTier=ProviderNeutral` IntegrationTests, EF `migrations has-pending-model-changes`, TRX output, explicit executed/excluded tier summary), and the GitHub Actions workflow `.github/workflows/provider-neutral-verification.yml` (PR→main, push→main, manual dispatch; `windows-latest`; .NET 10.0.x; least-privilege `contents: read`) delegates entirely to that script. The hosted job completed successfully on a clean runner, uploading a three-file `provider-neutral-verification-results` TRX artifact. T03 verification empirically exposed one misclassified LocalDB connection probe; under the runtime-dependency rule it was reclassified to `SqlServerRelational` (relational inventory 13 → 14, ProviderNeutral 127 → 126), and the final provider-neutral gate makes zero LocalDB/SQL Server provider contact (instance stopped before and after gated runs; last-start timestamp unchanged). **Provider-neutral verification baseline: 535 passing** (346 UnitTests, 63 Web.Tests, 126 ProviderNeutral IntegrationTests; 0 failed, 0 skipped); the 14 `SqlServerRelational` tests are discovered and locked but intentionally not executed in the gate — Sprint 20 makes no SQL relational-pass claim (Sprint 18's relational passes are historical). Normal Release build is 0 warnings/0 errors (the non-incremental build retains 28 unchanged historical warnings/0 errors), EF reports no pending model changes across the unchanged 10-migration chain (latest `20260831141400_CreateAuthorizationSchema`). Sprint 20 made zero production changes and was technical/non-release; v1.6.0 remains the latest release baseline.
 
 ## Completed Modules
 
--   ✅ Product Management
--   ✅ Category Management
--   ✅ Supplier Management
--   ✅ Customer Management
--   ✅ Unit Management
--   ✅ Inventory Transactions
--   ✅ Dashboard
--   ✅ Authentication & Authorization
--   ✅ Dynamic Capability-Based Authorization
--   ✅ Automated Testing (Sprint 11 --- foundation, xUnit, EF Core
-    InMemory)
--   ✅ Web Authorization Handler Testing (Sprint 12 --- 33 Web.Tests, no
-    mocking framework)
--   ✅ Purchasing Workflow Test Automation (Sprint 13 --- handlers,
-    validators, repository integration; 432 project-wide)
--   ✅ Purchase Order Cancellation and Draft Item Editing (Sprint 14 ---
-    `PurchaseOrder.Edit` / `PurchaseOrder.Cancel` capabilities; 477
-    project-wide)
--   ✅ Purchase Order Workflow Error Handling and UX Hardening (Sprint
-    15 --- Details Submit/Approve/Receive/Cancel `DomainException`
-    failures render inline; 477 project-wide)
--   ✅ Purchase Order POST Round-Trip State and Create Failure
-    Presentation Corrections (Sprint 16 --- six explicit hidden-bool
-    values, inline Create Domain failures, 12/12 runtime matrix; 477
-    project-wide)
--   ✅ HTTP/Razor Integration-Test Foundation (Sprint 17 ---
-    database-safe in-process test host, real seeding/auth/antiforgery,
-    representative Category + Purchase Order HTTP tests; 496
-    project-wide)
--   ✅ SQL Server Relational Verification (Sprint 18 --- fail-closed
-    LocalDB lifecycle, real migrations, R1-R6 provider contracts; 41
-    relational tests, 537 project-wide)
--   ✅ Purchase Order Create HTTP/Razor Integration Coverage (Sprint 19
-    --- real-pipeline H1-H5
-    authorization/antiforgery/PRG/persistence/domain-failure proofs; 542
-    project-wide)
--   ✅ Provider-Neutral Continuous Verification (Sprint 20 --- explicit
-    TestTier contract, fail-safe classification audit, shared
-    `verify-provider-neutral.ps1`, GitHub Actions gate with successful
-    hosted run; provider-neutral gate 535 passing, zero LocalDB/SQL
-    contact)
--   ✅ User Management
--   ✅ Account Management
--   ✅ Purchasing (Core Workflow + Sprint 8 P1-P7 Enhancements Complete)
--   ✅ Reporting (Sprint 7 Additional Reporting Complete and Verified)
+- ✅ Product Management
+- ✅ Category Management
+- ✅ Supplier Management
+- ✅ Customer Management
+- ✅ Unit Management
+- ✅ Inventory Transactions
+- ✅ Dashboard
+- ✅ Authentication & Authorization
+- ✅ Dynamic Capability-Based Authorization
+- ✅ Automated Testing (Sprint 11 — foundation, xUnit, EF Core InMemory)
+- ✅ Web Authorization Handler Testing (Sprint 12 — 33 Web.Tests, no mocking framework)
+- ✅ Purchasing Workflow Test Automation (Sprint 13 — handlers, validators, repository integration; 432 project-wide)
+- ✅ Purchase Order Cancellation and Draft Item Editing (Sprint 14 — `PurchaseOrder.Edit` / `PurchaseOrder.Cancel` capabilities; 477 project-wide)
+- ✅ Purchase Order Workflow Error Handling and UX Hardening (Sprint 15 — Details Submit/Approve/Receive/Cancel `DomainException` failures render inline; 477 project-wide)
+- ✅ Purchase Order POST Round-Trip State and Create Failure Presentation Corrections (Sprint 16 — six explicit hidden-bool values, inline Create Domain failures, 12/12 runtime matrix; 477 project-wide)
+- ✅ HTTP/Razor Integration-Test Foundation (Sprint 17 — database-safe in-process test host, real seeding/auth/antiforgery, representative Category + Purchase Order HTTP tests; 496 project-wide)
+- ✅ SQL Server Relational Verification (Sprint 18 — fail-closed LocalDB lifecycle, real migrations, R1-R6 provider contracts; 41 relational tests, 537 project-wide)
+- ✅ Purchase Order Create HTTP/Razor Integration Coverage (Sprint 19 — real-pipeline H1-H5 authorization/antiforgery/PRG/persistence/domain-failure proofs; 542 project-wide)
+- ✅ Provider-Neutral Continuous Verification (Sprint 20 — explicit TestTier contract, fail-safe classification audit, shared `verify-provider-neutral.ps1`, GitHub Actions gate with successful hosted run; provider-neutral gate 535 passing, zero LocalDB/SQL contact)
+- ✅ User Management
+- ✅ Account Management
+- ✅ Purchasing (Core Workflow + Sprint 8 P1-P7 Enhancements Complete)
+- ✅ Reporting (Sprint 7 Additional Reporting Complete and Verified)
 
 ## Latest Release
 
@@ -170,135 +78,95 @@ continuous-verification gate without changing production behavior.
 
 ### Summary
 
-Introduced a dynamic, database-backed capability-based authorization
-model while preserving ASP.NET Core Identity authentication and
-maintaining backward compatibility. Replaced three static role-based
-authorization policies with capability-backed equivalents and migrated
-all page-level and UI-level authorization to the new model.
+Introduced a dynamic, database-backed capability-based authorization model while preserving ASP.NET Core Identity authentication and maintaining backward compatibility. Replaced three static role-based authorization policies with capability-backed equivalents and migrated all page-level and UI-level authorization to the new model.
 
 ### Added
 
--   Domain entities: Capability, AuthorizationGroup,
-    AuthorizationGroupCapability, UserAuthorizationGroup
--   Application interfaces: ICapabilityAuthorizationService,
-    ICapabilityRepository, IAuthorizationGroupRepository
--   Application service: CapabilityAuthorizationService
--   Web authorization: CapabilityRequirement,
-    MultiCapabilityRequirement, CapabilityAuthorizationHandler,
-    MultiCapabilityAuthorizationHandler
--   AuthorizationPolicies with 39 capability constants
--   EF Core configurations for 4 authorization tables
--   Repositories: CapabilityRepository, AuthorizationGroupRepository
--   Migration: CreateAuthorizationSchema
--   Seeder: AuthorizationSeeder with CapabilityCatalog (39 capabilities,
-    3 groups)
--   Administration pages: Groups CRUD, EditCapabilities, EditUsers,
-    Users CRUD, EditRoles, EditStatus, ResetPassword, Capabilities Index
-    (14 pages)
--   10 Application feature handlers for Group/Capability management
--   GetAllUsersHandler for user listing in group assignment
--   CapabilityAuthorizationExtensions for policy registration
--   ApplicationUserClaimsPrincipalFactory for MustChangePassword claim
+- Domain entities: Capability, AuthorizationGroup, AuthorizationGroupCapability, UserAuthorizationGroup
+- Application interfaces: ICapabilityAuthorizationService, ICapabilityRepository, IAuthorizationGroupRepository
+- Application service: CapabilityAuthorizationService
+- Web authorization: CapabilityRequirement, MultiCapabilityRequirement, CapabilityAuthorizationHandler, MultiCapabilityAuthorizationHandler
+- AuthorizationPolicies with 39 capability constants
+- EF Core configurations for 4 authorization tables
+- Repositories: CapabilityRepository, AuthorizationGroupRepository
+- Migration: CreateAuthorizationSchema
+- Seeder: AuthorizationSeeder with CapabilityCatalog (39 capabilities, 3 groups)
+- Administration pages: Groups CRUD, EditCapabilities, EditUsers, Users CRUD, EditRoles, EditStatus, ResetPassword, Capabilities Index (14 pages)
+- 10 Application feature handlers for Group/Capability management
+- GetAllUsersHandler for user listing in group assignment
+- CapabilityAuthorizationExtensions for policy registration
+- ApplicationUserClaimsPrincipalFactory for MustChangePassword claim
 
 ### Changed
 
--   All 50 page-level \[Authorize(Policy)\] attributes migrated to
-    capability-backed policies
--   21 Razor UI authorization checks via
-    IAuthorizationService.AuthorizeAsync
--   Three static role-based policies replaced with capability-backed
-    equivalents (same policy names)
--   \_ViewImports.cshtml updated with @using
-    InventoryPlatform.Web.Authorization
+- All 50 page-level [Authorize(Policy)] attributes migrated to capability-backed policies
+- 21 Razor UI authorization checks via IAuthorizationService.AuthorizeAsync
+- Three static role-based policies replaced with capability-backed equivalents (same policy names)
+- _ViewImports.cshtml updated with @using InventoryPlatform.Web.Authorization
 
 ### Security
 
--   Default deny enforced: all handler failure paths return without
-    context.Succeed()
--   No fallback role authorization exists in the codebase
--   UI visibility independently enforced via server-side \[Authorize\]
-    on every page
--   AccessDenied page renders correctly for denied authorization
+- Default deny enforced: all handler failure paths return without context.Succeed()
+- No fallback role authorization exists in the codebase
+- UI visibility independently enforced via server-side [Authorize] on every page
+- AccessDenied page renders correctly for denied authorization
 
 ### Verified
 
--   Build: SUCCESS (0 errors, 0 warnings)
--   Authentication: All 3 seeded users login successfully
--   Unauthenticated access: All protected pages redirect to login (302)
--   Administrator access: All admin pages accessible (200)
--   Manager access: All management pages accessible (200), Administrator
-    pages correctly denied (302)
--   Viewer access: View pages accessible (200), create/edit pages
-    correctly denied (302)
--   Purchasing per-action capabilities: View, Create, Submit, Approve,
-    Receive all verified
--   Reports: Accessible to all authenticated users (by design)
--   Database: 39 capabilities, 3 groups, 3 assignments verified
--   Database remediation: Stale InventoryManager/Administration.Access
-    and Viewer/Supplier.Create relationships removed and reverified
+- Build: SUCCESS (0 errors, 0 warnings)
+- Authentication: All 3 seeded users login successfully
+- Unauthenticated access: All protected pages redirect to login (302)
+- Administrator access: All admin pages accessible (200)
+- Manager access: All management pages accessible (200), Administrator pages correctly denied (302)
+- Viewer access: View pages accessible (200), create/edit pages correctly denied (302)
+- Purchasing per-action capabilities: View, Create, Submit, Approve, Receive all verified
+- Reports: Accessible to all authenticated users (by design)
+- Database: 39 capabilities, 3 groups, 3 assignments verified
+- Database remediation: Stale InventoryManager/Administration.Access and Viewer/Supplier.Create relationships removed and reverified
 
 ### Known Deferred Items
 
--   EditStatus `User.IsInRole(InventoryManager)` self-deactivation guard
-    (Sprint 12 T07, Blocked/Deferred): the guard is reachable for
-    supported multi-role users and behavior-affecting --- NOT dead code;
-    removal would change observable behavior and requires an explicit
-    behavioral decision. Categories/Edit (Sprint 12 T05) and
-    Suppliers/Create (Sprint 12 T06) authorization gaps were remediated
-    in Sprint 12.
--   Viewer has User.View capability (seed filter includes all \*.View)
--   Reports unrestricted (design decision pending)
+- EditStatus `User.IsInRole(InventoryManager)` self-deactivation guard (Sprint 12 T07, Blocked/Deferred): the guard is reachable for supported multi-role users and behavior-affecting — NOT dead code; removal would change observable behavior and requires an explicit behavioral decision. Categories/Edit (Sprint 12 T05) and Suppliers/Create (Sprint 12 T06) authorization gaps were remediated in Sprint 12.
+- Viewer has User.View capability (seed filter includes all *.View)
+- Reports unrestricted (design decision pending)
 
-The release preserves the established Clean Architecture, Vertical Slice
-Architecture, and identity abstraction while replacing static role-based
-authorization with a dynamic capability-based model.
+The release preserves the established Clean Architecture, Vertical Slice Architecture, and identity abstraction while replacing static role-based authorization with a dynamic capability-based model.
 
 ### Previous Release
 
-v1.5.0 --- Sprint 8 Purchasing Enhancements (August 2026). Purchasing
-enhancements including multiple item management, search, filtering,
-sorting, pagination, and inventory synchronization. See CHANGELOG.md for
-full details.
+v1.5.0 — Sprint 8 Purchasing Enhancements (August 2026). Purchasing enhancements including multiple item management, search, filtering, sorting, pagination, and inventory synchronization. See CHANGELOG.md for full details.
 
-------------------------------------------------------------------------
+---
+
 
 ## Architecture Validation
 
-The project completed **Architecture Sprint 1**, a comprehensive
-architectural review covering the Application, Infrastructure, and Web
-layers.
+The project completed **Architecture Sprint 1**, a comprehensive architectural review covering the Application, Infrastructure, and Web layers.
 
-Sprint 3 validated the architecture through the Purchasing Application
-layer, while Sprint 4 extended that validation into the Presentation
-layer by delivering a complete browser-accessible Purchasing workflow.
+Sprint 3 validated the architecture through the Purchasing Application layer, while Sprint 4 extended that validation into the Presentation layer by delivering a complete browser-accessible Purchasing workflow.
 
-Sprint 5 extended the architecture into dedicated read-oriented
-Reporting through Inventory Valuation.
+Sprint 5 extended the architecture into dedicated read-oriented Reporting through Inventory Valuation.
 
 Sprint 6 extended the architecture into self-service Account Management.
 
-The Account Management implementation validated the existing Identity
-abstraction, Application handler patterns, Razor Pages workflow, and
-separation between administrative User Management and self-service
-account management.
+The Account Management implementation validated the existing Identity abstraction, Application handler patterns, Razor Pages workflow, and separation between administrative User Management and self-service account management.
 
-The Account Management vertical slice was implemented without requiring
-structural architectural redesign.
+The Account Management vertical slice was implemented without requiring structural architectural redesign.
 
 ### Account Management Validation
 
--   ✅ Profile management
--   ✅ Password management
--   ✅ Email verification
--   ✅ Two-factor authentication
--   ✅ Recovery code authentication
--   ✅ Self-service authorization boundaries
+- ✅ Profile management
+- ✅ Password management
+- ✅ Email verification
+- ✅ Two-factor authentication
+- ✅ Recovery code authentication
+- ✅ Self-service authorization boundaries
 
 ### Reporting Validation
 
 The Reporting path is:
 
-``` text
+```text
 Presentation
      ↓
 Application Handler
@@ -314,164 +182,123 @@ EF Core Projection
 Database
 ```
 
-The implementation uses a dedicated DTO projection and does not modify
-Domain entities.
+The implementation uses a dedicated DTO projection and does not modify Domain entities.
 
-The first Reporting vertical slice was implemented without requiring
-structural architectural redesign.
+The first Reporting vertical slice was implemented without requiring structural architectural redesign.
 
 ### Review Outcome
+- ✅ Application layer validated
+- ✅ Infrastructure layer validated
+- ✅ Web layer validated
+- ✅ Architecture approved for future module expansion
 
--   ✅ Application layer validated
--   ✅ Infrastructure layer validated
--   ✅ Web layer validated
--   ✅ Architecture approved for future module expansion
+Sprint 10 validated the architecture through the implementation of Dynamic Capability-Based Authorization across all four layers:
 
-Sprint 10 validated the architecture through the implementation of
-Dynamic Capability-Based Authorization across all four layers:
+- ✅ Domain layer: Authorization entities with rich domain behavior
+- ✅ Application layer: Authorization abstractions and feature handlers
+- ✅ Infrastructure layer: EF Core persistence, repositories, seed data
+- ✅ Web layer: ASP.NET Core authorization handlers, policy registration, Razor visibility
 
--   ✅ Domain layer: Authorization entities with rich domain behavior
--   ✅ Application layer: Authorization abstractions and feature
-    handlers
--   ✅ Infrastructure layer: EF Core persistence, repositories, seed
-    data
--   ✅ Web layer: ASP.NET Core authorization handlers, policy
-    registration, Razor visibility
-
-The completed Purchasing, Reporting, Account Management, and Dynamic
-Capability-Based Authorization implementations further validated that
-the existing architecture can support CRUD-oriented modules,
-workflow-driven business processes, read-oriented reporting,
-self-service account security workflows, and dynamic capability-based
-authorization without requiring structural redesign.
+The completed Purchasing, Reporting, Account Management, and Dynamic Capability-Based Authorization implementations further validated that the existing architecture can support CRUD-oriented modules, workflow-driven business processes, read-oriented reporting, self-service account security workflows, and dynamic capability-based authorization without requiring structural redesign.
 
 ## Sprint 9 - ASP.NET Core Code Quality & Consistency
 
-Sprint 9 is a controlled code-quality and consistency workstream. It
-does not introduce a new business module or redesign the platform
-architecture.
+Sprint 9 is a controlled code-quality and consistency workstream. It does not introduce a new business module or redesign the platform architecture.
 
 ### Completed implementation work
 
--   T03 - normalized the Purchase History and Supplier Purchase Analysis
-    filter forms to use `asp-for`.
--   T04 - normalized Purchase Order sorting and pagination navigation to
-    Razor `asp-route-*` values and removed the former `GetSortUrl(...)`
-    / `GetPageUrl(...)` helpers.
--   T05 - consolidated accidental HTTP-boundary duplication by binding
-    the complete Application Request on seven list PageModels.
--   T06 - removed a duplicate inherited `AddAsync(...)` declaration from
-    `IInventoryTransactionRepository`.
--   T07 - verified repository query signatures without removing
-    meaningful feature-specific filters or shared `PagedQuery`
-    responsibilities.
--   T08 - removed the duplicate inherited `GetByIdAsync(...)`
-    declaration from `IInventoryTransactionRepository` and confirmed the
-    existing Clean Architecture boundaries remain intentional.
--   T09 - corrected seven list-page pagination links from manual
-    `?Page=...` URLs to `asp-route-PageNum` while preserving existing
-    route state.
--   T10 - corrected Purchase Order Details pagination context
-    preservation, duplicate Status option rendering, and missing filter
-    label/control IDs.
--   T13 - completed the final Sprint 9 documentation and architecture
-    consistency gate.
+- T03 - normalized the Purchase History and Supplier Purchase Analysis filter forms to use `asp-for`.
+- T04 - normalized Purchase Order sorting and pagination navigation to Razor `asp-route-*` values and removed the former `GetSortUrl(...)` / `GetPageUrl(...)` helpers.
+- T05 - consolidated accidental HTTP-boundary duplication by binding the complete Application Request on seven list PageModels.
+- T06 - removed a duplicate inherited `AddAsync(...)` declaration from `IInventoryTransactionRepository`.
+- T07 - verified repository query signatures without removing meaningful feature-specific filters or shared `PagedQuery` responsibilities.
+- T08 - removed the duplicate inherited `GetByIdAsync(...)` declaration from `IInventoryTransactionRepository` and confirmed the existing Clean Architecture boundaries remain intentional.
+- T09 - corrected seven list-page pagination links from manual `?Page=...` URLs to `asp-route-PageNum` while preserving existing route state.
+- T10 - corrected Purchase Order Details pagination context preservation, duplicate Status option rendering, and missing filter label/control IDs.
+- T13 - completed the final Sprint 9 documentation and architecture consistency gate.
 
 ### Locked Sprint 9 conventions
 
--   Use `asp-for` for appropriate Razor form binding and labels.
--   Prefer `asp-route-*` for direct Razor navigation and query state.
--   Use `PageNum` as the Razor/UI paging property and query parameter.
--   Preserve meaningful HTTP Request -\> Application Request -\>
-    Repository Query boundaries.
--   Apply the Rule-of-Three before introducing shared helpers or
-    abstractions.
--   Do not normalize `[FromQuery]`, `[BindProperty]`, or
-    handler-parameter binding merely for visual consistency.
--   Keep direct Infrastructure DTO projections where they represent the
-    existing read-model responsibility.
+- Use `asp-for` for appropriate Razor form binding and labels.
+- Prefer `asp-route-*` for direct Razor navigation and query state.
+- Use `PageNum` as the Razor/UI paging property and query parameter.
+- Preserve meaningful HTTP Request -> Application Request -> Repository Query boundaries.
+- Apply the Rule-of-Three before introducing shared helpers or abstractions.
+- Do not normalize `[FromQuery]`, `[BindProperty]`, or handler-parameter binding merely for visual consistency.
+- Keep direct Infrastructure DTO projections where they represent the existing read-model responsibility.
 
 ### Verification state
 
-Source-level verification was completed through T13. The supplied
-verification environment does not contain the `dotnet` CLI, so no
-successful build or runtime/browser result is claimed for Sprint 9. No
-automated test project/source is present in the supplied repository.
+Source-level verification was completed through T13. The supplied verification environment does not contain the `dotnet` CLI, so no successful build or runtime/browser result is claimed for Sprint 9. No automated test project/source is present in the supplied repository.
 
-T10 source verification confirms the corrected Purchase Order
-state-preservation behavior, Razor form conventions, route-tag-helper
-navigation, `PageNum` pagination links, and the seven T09 pagination
-corrections.
+T10 source verification confirms the corrected Purchase Order state-preservation behavior, Razor form conventions, route-tag-helper navigation, `PageNum` pagination links, and the seven T09 pagination corrections.
 
-Sprint 9 introduced no unrelated business capability or structural
-architectural redesign. Dynamic Capability-Based Authorization remains
-outside Sprint 9 scope and is not implemented.
+Sprint 9 introduced no unrelated business capability or structural architectural redesign. Dynamic Capability-Based Authorization remains outside Sprint 9 scope and is not implemented.
 
-------------------------------------------------------------------------
+---
 
 # Project Goals
 
 This project aims to demonstrate:
 
--   Clean Architecture
--   Repository Pattern
--   Result Pattern
--   Dependency Injection
--   Entity Framework Core
--   Razor Pages
--   Server-side Searching
--   Server-side Sorting
--   Server-side Pagination
--   Reusable Filtering Infrastructure
--   Scalable Module Design
+- Clean Architecture
+- Repository Pattern
+- Result Pattern
+- Dependency Injection
+- Entity Framework Core
+- Razor Pages
+- Server-side Searching
+- Server-side Sorting
+- Server-side Pagination
+- Reusable Filtering Infrastructure
+- Scalable Module Design
 
-The long-term goal is to evolve this project into a complete inventory
-management system suitable for small and medium-sized businesses.
+The long-term goal is to evolve this project into a complete inventory management system suitable for small and medium-sized businesses.
 
-------------------------------------------------------------------------
+---
 
 # Enterprise Features
 
--   Clean Architecture
--   Repository Pattern
--   Unit of Work
--   Result Pattern
--   CQRS-style Application Layer
--   Entity Framework Core Configurations
--   Server-side Paging
--   Server-side Sorting
--   Server-side Filtering
--   Soft Activation / Deactivation
--   Shared Infrastructure
--   Inventory Transaction History
--   Inventory Audit Trail
--   Immutable Business Records
--   Automatic Stock Management
--   Business Dashboard
--   Dedicated Reporting Read Models
--   Read-only EF Core Projections
--   Inventory Valuation Reporting
--   ASP.NET Core Identity
--   Cookie Authentication
--   Role-based Authorization
--   Dynamic Capability-Based Authorization
--   User Management
--   Password Management
--   Self-Service Account Management
--   Email Verification
--   Two-Factor Authentication
--   Recovery Code Management
--   Architecture Review Process
--   Feature-first Organization
--   ASP.NET Core Identity Isolation
--   Engineering Documentation
--   Rich Domain Model
--   Vertical Slice Architecture
--   Workflow-driven Business Processes
--   Dedicated Read Models
--   Business-oriented Application Handlers
+- Clean Architecture
+- Repository Pattern
+- Unit of Work
+- Result Pattern
+- CQRS-style Application Layer
+- Entity Framework Core Configurations
+- Server-side Paging
+- Server-side Sorting
+- Server-side Filtering
+- Soft Activation / Deactivation
+- Shared Infrastructure
+- Inventory Transaction History
+- Inventory Audit Trail
+- Immutable Business Records
+- Automatic Stock Management
+- Business Dashboard
+- Dedicated Reporting Read Models
+- Read-only EF Core Projections
+- Inventory Valuation Reporting
+- ASP.NET Core Identity
+- Cookie Authentication
+- Role-based Authorization
+- Dynamic Capability-Based Authorization
+- User Management
+- Password Management
+- Self-Service Account Management
+- Email Verification
+- Two-Factor Authentication
+- Recovery Code Management
+- Architecture Review Process
+- Feature-first Organization
+- ASP.NET Core Identity Isolation
+- Engineering Documentation
+- Rich Domain Model
+- Vertical Slice Architecture
+- Workflow-driven Business Processes
+- Dedicated Read Models
+- Business-oriented Application Handlers
 
-------------------------------------------------------------------------
+---
 
 # Current Features
 
@@ -479,147 +306,146 @@ management system suitable for small and medium-sized businesses.
 
 ### Product Lifecycle
 
--   ✅ Create Product
--   ✅ View Product Details
--   ✅ Edit Product
--   ✅ Activate Product
--   ✅ Deactivate Product
--   ✅ Add Barcode
--   ✅ Dropdown Category
--   ✅ Dropdown Unit
--   ✅ Add Quantity On Hand
+- ✅ Create Product
+- ✅ View Product Details
+- ✅ Edit Product
+- ✅ Activate Product
+- ✅ Deactivate Product
+- ✅ Add Barcode
+- ✅ Dropdown Category
+- ✅ Dropdown Unit
+- ✅ Add Quantity On Hand
 
 ### Product Listing
 
--   ✅ Server-side Search
--   ✅ Server-side Pagination
--   ✅ Server-side Sorting
--   ✅ Status Filtering
--   ✅ Success Notifications
+- ✅ Server-side Search
+- ✅ Server-side Pagination
+- ✅ Server-side Sorting
+- ✅ Status Filtering
+- ✅ Success Notifications
 
 ## Category Management
 
 ### Category Lifecycle
 
--   ✅ Create Category
--   ✅ View Category Details
--   ✅ Edit Category
--   ✅ Activate Category
--   ✅ Deactivate Category
+- ✅ Create Category
+- ✅ View Category Details
+- ✅ Edit Category
+- ✅ Activate Category
+- ✅ Deactivate Category
 
 ### Category Listing
 
--   ✅ Server-side Search
--   ✅ Server-side Pagination
--   ✅ Server-side Sorting
--   ✅ Status Filtering
--   ✅ Success Notifications
+- ✅ Server-side Search
+- ✅ Server-side Pagination
+- ✅ Server-side Sorting
+- ✅ Status Filtering
+- ✅ Success Notifications
 
 ## Supplier Management
 
 ### Supplier Lifecycle
 
--   ✅ Create Supplier
--   ✅ View Supplier Details
--   ✅ Edit Supplier
--   ✅ Activate Supplier
--   ✅ Deactivate Supplier
+- ✅ Create Supplier
+- ✅ View Supplier Details
+- ✅ Edit Supplier
+- ✅ Activate Supplier
+- ✅ Deactivate Supplier
 
 ### Supplier Listing
 
--   ✅ Server-side Search
--   ✅ Server-side Pagination
--   ✅ Server-side Sorting
--   ✅ Status Filtering
--   ✅ Success Notifications
+- ✅ Server-side Search
+- ✅ Server-side Pagination
+- ✅ Server-side Sorting
+- ✅ Status Filtering
+- ✅ Success Notifications
 
 ## Customer Management
 
 ### Customer Lifecycle
 
--   ✅ Create Customer
--   ✅ View Customer Details
--   ✅ Edit Customer
--   ✅ Activate Customer
--   ✅ Deactivate Customer
+- ✅ Create Customer
+- ✅ View Customer Details
+- ✅ Edit Customer
+- ✅ Activate Customer
+- ✅ Deactivate Customer
 
 ### Customer Listing
 
--   ✅ Server-side Search
--   ✅ Server-side Pagination
--   ✅ Server-side Sorting
--   ✅ Status Filtering
--   ✅ Success Notifications
+- ✅ Server-side Search
+- ✅ Server-side Pagination
+- ✅ Server-side Sorting
+- ✅ Status Filtering
+- ✅ Success Notifications
 
 ## Inventory Transactions
 
 ### Inventory Workflow
 
--   ✅ Create Inventory Transaction
--   ✅ View Transaction Details
--   ✅ Stock In
--   ✅ Stock Out
--   ✅ Stock Adjustment
+- ✅ Create Inventory Transaction
+- ✅ View Transaction Details
+- ✅ Stock In
+- ✅ Stock Out
+- ✅ Stock Adjustment
 
 ### Transaction Listing
 
--   ✅ Server-side Search
--   ✅ Server-side Pagination
--   ✅ Server-side Sorting
--   ✅ Success Notifications
+- ✅ Server-side Search
+- ✅ Server-side Pagination
+- ✅ Server-side Sorting
+- ✅ Success Notifications
 
 ### Business Rules
 
--   ✅ Immutable transaction history
--   ✅ Automatic Quantity On Hand updates
--   ✅ Stock validation
--   ✅ Inventory audit trail
+- ✅ Immutable transaction history
+- ✅ Automatic Quantity On Hand updates
+- ✅ Stock validation
+- ✅ Inventory audit trail
 
 ## Purchasing
 
 ### Purchase Order Workflow
 
--   ✅ Create Purchase Order
--   ✅ Get Purchase Order
--   ✅ Get Purchase Orders
--   ✅ Submit Purchase Order
--   ✅ Approve Purchase Order
--   ✅ Receive Purchase Order
--   ✅ Partial Purchase Order Receiving
--   ✅ Final Purchase Order Receiving
--   ✅ Completed Purchase Order State
--   ✅ Expected workflow failures (Submit/Approve/Receive/Cancel) render
-    as inline validation feedback with no persistence (Sprint 15)
+- ✅ Create Purchase Order
+- ✅ Get Purchase Order
+- ✅ Get Purchase Orders
+- ✅ Submit Purchase Order
+- ✅ Approve Purchase Order
+- ✅ Receive Purchase Order
+- ✅ Partial Purchase Order Receiving
+- ✅ Final Purchase Order Receiving
+- ✅ Completed Purchase Order State
+- ✅ Expected workflow failures (Submit/Approve/Receive/Cancel) render as inline validation feedback with no persistence (Sprint 15)
 
 ### Purchase Order Presentation
 
--   ✅ Purchase Order Listing
--   ✅ Purchase Order Creation
--   ✅ Multiple Purchase Order Item Creation
--   ✅ Dynamic Item Add/Remove in Create UI
--   ✅ Purchase Order Details
--   ✅ Supplier Selection
--   ✅ Product Selection
--   ✅ Expected Delivery Date
--   ✅ Remarks
--   ✅ Ordered Quantity Display
--   ✅ Received Quantity Display
--   ✅ Remaining Quantity Display
--   ✅ Calculated Purchase Order Total
+- ✅ Purchase Order Listing
+- ✅ Purchase Order Creation
+- ✅ Multiple Purchase Order Item Creation
+- ✅ Dynamic Item Add/Remove in Create UI
+- ✅ Purchase Order Details
+- ✅ Supplier Selection
+- ✅ Product Selection
+- ✅ Expected Delivery Date
+- ✅ Remarks
+- ✅ Ordered Quantity Display
+- ✅ Received Quantity Display
+- ✅ Remaining Quantity Display
+- ✅ Calculated Purchase Order Total
 
 ### Validation and Feedback
 
--   ✅ Client-side Receive Quantity Validation
--   ✅ Domain Receive Quantity Validation
--   ✅ Validation Summaries
--   ✅ Success Messages
--   ✅ Index Query Failure Feedback
--   ✅ Supplier Query Failure Feedback
--   ✅ Product Query Failure Feedback
+- ✅ Client-side Receive Quantity Validation
+- ✅ Domain Receive Quantity Validation
+- ✅ Validation Summaries
+- ✅ Success Messages
+- ✅ Index Query Failure Feedback
+- ✅ Supplier Query Failure Feedback
+- ✅ Product Query Failure Feedback
 
 ### Workflow
 
-``` text
+```text
 Draft
   ↓ Submit          ↓ Cancel
 Submitted
@@ -631,54 +457,48 @@ Receiving
 Completed
 ```
 
-Cancellation is available from Draft and Submitted states only.
-Cancelled is terminal: a cancelled Purchase Order cannot Submit,
-Approve, Receive, edit items, remove items, or reopen. Draft Purchase
-Orders support item editing (Quantity/UnitCost) and item removal through
-the dedicated Edit page; item mutation is keyed by `ProductId` and only
-Draft orders can be edited. Authorization uses the `PurchaseOrder.Edit`
-and `PurchaseOrder.Cancel` capabilities.
+Cancellation is available from Draft and Submitted states only. Cancelled is terminal: a cancelled Purchase Order cannot Submit, Approve, Receive, edit items, remove items, or reopen. Draft Purchase Orders support item editing (Quantity/UnitCost) and item removal through the dedicated Edit page; item mutation is keyed by `ProductId` and only Draft orders can be edited. Authorization uses the `PurchaseOrder.Edit` and `PurchaseOrder.Cancel` capabilities.
 
 ### Architectural Highlights
 
--   Rich Domain Model
--   Vertical Slice Architecture
--   Workflow-driven Business Processes
--   Dedicated Read Models
--   Business-oriented Application Handlers
--   Thin Razor PageModels
--   Application Handler-driven Presentation
+- Rich Domain Model
+- Vertical Slice Architecture
+- Workflow-driven Business Processes
+- Dedicated Read Models
+- Business-oriented Application Handlers
+- Thin Razor PageModels
+- Application Handler-driven Presentation
 
 ### Domain Design
 
--   Rich Domain Model
--   Workflow-driven state transitions
--   Aggregate-based business behavior
--   Thin Application handlers
+- Rich Domain Model
+- Workflow-driven state transitions
+- Aggregate-based business behavior
+- Thin Application handlers
 
 ## Reporting
 
 ### Inventory Valuation
 
--   ✅ Inventory Valuation Report
--   ✅ Inventory Valuation Read Model
--   ✅ Inventory Valuation Application Handler
--   ✅ Inventory Valuation Persistence Abstraction
--   ✅ Inventory Valuation Repository
--   ✅ Read-only EF Core Projection
--   ✅ Product-level Inventory Valuation
--   ✅ Category Projection
--   ✅ Quantity On Hand Display
--   ✅ Cost Price Display
--   ✅ Inventory Value Display
--   ✅ Total Inventory Value
--   ✅ Inventory Valuation Navigation
--   ✅ Dashboard/Report Value Consistency
--   ✅ Browser Verification
+- ✅ Inventory Valuation Report
+- ✅ Inventory Valuation Read Model
+- ✅ Inventory Valuation Application Handler
+- ✅ Inventory Valuation Persistence Abstraction
+- ✅ Inventory Valuation Repository
+- ✅ Read-only EF Core Projection
+- ✅ Product-level Inventory Valuation
+- ✅ Category Projection
+- ✅ Quantity On Hand Display
+- ✅ Cost Price Display
+- ✅ Inventory Value Display
+- ✅ Total Inventory Value
+- ✅ Inventory Valuation Navigation
+- ✅ Dashboard/Report Value Consistency
+- ✅ Browser Verification
 
 ### Inventory Valuation Calculation
 
-``` text
+```text
 Inventory Value
 = QuantityOnHand × CostPrice
 ```
@@ -687,7 +507,7 @@ The report uses actual persisted Product and Category data.
 
 ### Reporting Architecture
 
-``` text
+```text
 Presentation
      ↓
 Application
@@ -705,112 +525,110 @@ Sprint 7 Additional Reporting is complete and verified.
 
 Completed reporting capabilities and exports:
 
--   ✅ Inventory Valuation
--   ✅ Purchase History
--   ✅ Supplier Purchase Analysis
--   ✅ Stock Movement
--   ✅ Low Stock Report
--   ✅ Inventory Movement Report
--   ✅ Product Reports
--   ✅ Excel Export
--   ✅ PDF Export
+- ✅ Inventory Valuation
+- ✅ Purchase History
+- ✅ Supplier Purchase Analysis
+- ✅ Stock Movement
+- ✅ Low Stock Report
+- ✅ Inventory Movement Report
+- ✅ Product Reports
+- ✅ Excel Export
+- ✅ PDF Export
 
-Final project-wide verification is complete, including application
-regression, reporting verification, export verification, empty-database
-behavior, explicit query-failure behavior and recovery, authorization
-regression, and final build verification.
+Final project-wide verification is complete, including application regression, reporting verification, export verification, empty-database behavior, explicit query-failure behavior and recovery, authorization regression, and final build verification.
+
 
 ## Dashboard
 
 ### Dashboard Overview
 
--   ✅ Inventory statistics
--   ✅ Inventory value summary
--   ✅ Recent inventory transactions
--   ✅ Low stock products
--   ✅ Refresh dashboard
+- ✅ Inventory statistics
+- ✅ Inventory value summary
+- ✅ Recent inventory transactions
+- ✅ Low stock products
+- ✅ Refresh dashboard
 
 ### Dashboard Widgets
 
--   ✅ Product statistics
--   ✅ Inventory value
--   ✅ Recent transactions
--   ✅ Low stock monitoring
--   ✅ Empty state handling
+- ✅ Product statistics
+- ✅ Inventory value
+- ✅ Recent transactions
+- ✅ Low stock monitoring
+- ✅ Empty state handling
 
 ## Authentication
 
--   ✅ Login
--   ✅ Logout
--   ✅ Cookie Authentication
--   ✅ Role-based Authorization
--   ✅ Dynamic Capability-Based Authorization
--   ✅ ASP.NET Core Identity
--   ✅ Identity Cookie Authentication
+- ✅ Login
+- ✅ Logout
+- ✅ Cookie Authentication
+- ✅ Role-based Authorization
+- ✅ Dynamic Capability-Based Authorization
+- ✅ ASP.NET Core Identity
+- ✅ Identity Cookie Authentication
 
 ## User Management
 
 ### User Lifecycle
 
--   ✅ Create User
--   ✅ View User Details
--   ✅ Edit User
--   ✅ Activate User
--   ✅ Deactivate User
--   ✅ Reset Password
+- ✅ Create User
+- ✅ View User Details
+- ✅ Edit User
+- ✅ Activate User
+- ✅ Deactivate User
+- ✅ Reset Password
 
 ### Role Management
 
--   ✅ Assign Roles
+- ✅ Assign Roles
 
 ### User Listing
 
--   ✅ Server-side Search
--   ✅ Server-side Pagination
--   ✅ Server-side Sorting
--   ✅ Status Filtering
+- ✅ Server-side Search
+- ✅ Server-side Pagination
+- ✅ Server-side Sorting
+- ✅ Status Filtering
 
-------------------------------------------------------------------------
+---
 
 ## Account Management
 
 ### Profile
 
--   ✅ User Profile
--   ✅ Update Profile
--   ✅ Self-Service Account Management
+- ✅ User Profile
+- ✅ Update Profile
+- ✅ Self-Service Account Management
 
 ### Password Management
 
--   ✅ Change Password
--   ✅ Forgot Password
--   ✅ Reset Password
--   ✅ Force Password Change
+- ✅ Change Password
+- ✅ Forgot Password
+- ✅ Reset Password
+- ✅ Force Password Change
 
 ### Email Verification
 
--   ✅ Email Verification
--   ✅ Verification Request
--   ✅ Email Confirmation
+- ✅ Email Verification
+- ✅ Verification Request
+- ✅ Email Confirmation
 
 ### Two-Factor Authentication
 
--   ✅ 2FA Setup
--   ✅ TOTP Verification
--   ✅ 2FA Login Challenge
--   ✅ Recovery Codes
--   ✅ Recovery Code Login
--   ✅ Recovery Code Regeneration
--   ✅ Recovery Code Invalidation
--   ✅ Disable 2FA
+- ✅ 2FA Setup
+- ✅ TOTP Verification
+- ✅ 2FA Login Challenge
+- ✅ Recovery Codes
+- ✅ Recovery Code Login
+- ✅ Recovery Code Regeneration
+- ✅ Recovery Code Invalidation
+- ✅ Disable 2FA
 
-------------------------------------------------------------------------
+---
 
 # Architecture
 
 The solution follows a layered Clean Architecture approach.
 
-``` text
+```text
 InventoryPlatform
 │
 ├── InventoryPlatform.Web
@@ -826,7 +644,7 @@ InventoryPlatform
 
 ## Inventory Transaction Workflow
 
-``` text
+```text
 Create Transaction
         │
         ▼
@@ -847,7 +665,7 @@ Return Result
 
 ## Purchasing Workflow
 
-``` text
+```text
 Razor Page
      ↓
 Application Handler
@@ -861,13 +679,10 @@ Database
 Result
 ```
 
-The Purchase Order Details page exposes workflow actions such as Submit,
-Approve, and Receive while the Domain aggregate remains responsible for
-enforcing business rules and state transitions.
+The Purchase Order Details page exposes workflow actions such as Submit, Approve, and Receive while the Domain aggregate remains responsible for enforcing business rules and state transitions.
 
 Responsibilities:
-
-``` text
+```text
 InventoryPlatform
 │
 ├── Web
@@ -891,8 +706,7 @@ InventoryPlatform
 ```
 
 ## Solution Architecture
-
-``` text
+```text
 Request
 
 ↓
@@ -922,103 +736,91 @@ SQL Server
 
 ## Architectural Principles
 
--   Feature-first organization
--   Clean Architecture
--   Thin Razor PageModels
--   Application Handler-driven Presentation
--   Workflow-oriented Razor Pages
--   Thin Application Handlers
--   Business logic isolated from the Presentation layer
--   ASP.NET Core Identity encapsulated behind IIdentityService
--   Incremental refactoring guided by the Rule of Three
--   Vertical Slice Architecture
--   Request / Response / Handler pattern
--   Rich Domain Model
--   Workflow-oriented business commands
--   Dedicated Read Models
+- Feature-first organization
+- Clean Architecture
+- Thin Razor PageModels
+- Application Handler-driven Presentation
+- Workflow-oriented Razor Pages
+- Thin Application Handlers
+- Business logic isolated from the Presentation layer
+- ASP.NET Core Identity encapsulated behind IIdentityService
+- Incremental refactoring guided by the Rule of Three
+- Vertical Slice Architecture
+- Request / Response / Handler pattern
+- Rich Domain Model
+- Workflow-oriented business commands
+- Dedicated Read Models
 
-------------------------------------------------------------------------
+---
 
 ## Architecture Validation
 
 Architecture Sprint 1 confirmed:
 
--   Thin Application Handlers
--   Rich Domain Model
--   Repository Pattern
--   Unit of Work
--   Identity Isolation
--   Feature-first organization
--   Razor Pages architecture
+- Thin Application Handlers
+- Rich Domain Model
+- Repository Pattern
+- Unit of Work
+- Identity Isolation
+- Feature-first organization
+- Razor Pages architecture
 
 No major architectural redesign was required.
 
-------------------------------------------------------------------------
+---
 
 ## Implemented Patterns
 
--   Clean Architecture
--   Repository Pattern
--   Unit of Work
--   CQRS-style Application Layer
--   Result Pattern
--   FluentValidation
--   Dependency Injection
--   Entity Framework Core Configurations
--   Razor Pages
--   Feature-based Architecture
--   ASP.NET Core Identity
--   Role-based Authorization
--   Dynamic Capability-Based Authorization
--   Dependency Injection Extensions
--   Thin PageModels
--   Thin Handlers
--   Feature-first Architecture
--   Architecture Review Process
--   Rule of Three Refactoring
--   Vertical Slice Architecture
--   Rich Domain Model
--   Workflow-driven Business Processes
--   Dedicated Read Models
+- Clean Architecture
+- Repository Pattern
+- Unit of Work
+- CQRS-style Application Layer
+- Result Pattern
+- FluentValidation
+- Dependency Injection
+- Entity Framework Core Configurations
+- Razor Pages
+- Feature-based Architecture
+- ASP.NET Core Identity
+- Role-based Authorization
+- Dynamic Capability-Based Authorization
+- Dependency Injection Extensions
+- Thin PageModels
+- Thin Handlers
+- Feature-first Architecture
+- Architecture Review Process
+- Rule of Three Refactoring
+- Vertical Slice Architecture
+- Rich Domain Model
+- Workflow-driven Business Processes
+- Dedicated Read Models
 
-------------------------------------------------------------------------
+---
 
 # Key Design Decisions
 
--   Inventory transactions are immutable.
--   Product quantity is maintained through domain methods.
--   Stock movements are recorded for every inventory change.
--   Business logic resides in the Application and Domain layers.
--   Razor Pages interact only with the Application layer.
--   Dashboard data is composed using read-only DTO projections optimized
-    for reporting.
--   Identity operations are encapsulated behind IIdentityService.
--   Authentication uses ASP.NET Core Identity.
--   Administrative user management is separated from self-service
-    account management.
--   Business logic remains outside the Razor Pages.
--   Business behavior resides inside Domain entities.
--   Application handlers orchestrate workflows rather than implement
-    business rules.
--   Purchase Orders are implemented as workflow-driven aggregates.
--   Purchase Order workflow actions are exposed through the Details
-    page, which renders expected workflow `DomainException` failures
-    (Submit/Approve/Receive/Cancel) as inline validation feedback while
-    authorization, NotFound, and unexpected-exception behavior remain
-    unchanged.
--   Purchase Order receiving is performed at the Purchase Order Item
-    level.
--   Purchase Order totals remain calculated from Purchase Order items.
--   Client-side validation improves user experience while Domain
-    validation remains authoritative.
--   Dynamic capability-based authorization resolves permissions from the
-    database via Groups and Capabilities.
--   Authorization is enforced server-side through ASP.NET Core policies
-    backed by capability requirements.
--   UI visibility is independently managed through capability-backed
-    authorization service checks.
+- Inventory transactions are immutable.
+- Product quantity is maintained through domain methods.
+- Stock movements are recorded for every inventory change.
+- Business logic resides in the Application and Domain layers.
+- Razor Pages interact only with the Application layer.
+- Dashboard data is composed using read-only DTO projections optimized for reporting.
+- Identity operations are encapsulated behind IIdentityService.
+- Authentication uses ASP.NET Core Identity.
+- Administrative user management is separated from self-service account management.
+- Business logic remains outside the Razor Pages.
+- Business behavior resides inside Domain entities.
+- Application handlers orchestrate workflows rather than implement business rules.
+- Purchase Orders are implemented as workflow-driven aggregates.
+- Purchase Order workflow actions are exposed through the Details page, which renders expected workflow `DomainException` failures (Submit/Approve/Receive/Cancel) as inline validation feedback while authorization, NotFound, and unexpected-exception behavior remain unchanged.
+- Purchase Order receiving is performed at the Purchase Order Item level.
+- Purchase Order totals remain calculated from Purchase Order items.
+- Client-side validation improves user experience while Domain validation remains authoritative.
+- Dynamic capability-based authorization resolves permissions from the database via Groups and Capabilities.
+- Authorization is enforced server-side through ASP.NET Core policies backed by capability requirements.
+- UI visibility is independently managed through capability-backed authorization service checks.
 
-------------------------------------------------------------------------
+---
 
 # Shared Infrastructure
 
@@ -1026,168 +828,136 @@ Reusable infrastructure has been implemented to support future modules.
 
 ## Paging
 
--   PagedRequest
--   PagedQuery
--   PagedResult\<T\>
+- PagedRequest
+- PagedQuery
+- PagedResult\<T>
 
 ## Filtering
 
--   StatusFilter enum (shared across all modules)
+- StatusFilter enum (shared across all modules)
 
 ## Sorting
 
--   ProductSortFields
--   CategorySortFields
--   SupplierSortFields
--   CustomerSortFields
--   UnitSortFields
--   InventoryTransactionSortFields
--   UserSortFields
--   RoleOption
+- ProductSortFields
+- CategorySortFields
+- SupplierSortFields
+- CustomerSortFields
+- UnitSortFields
+- InventoryTransactionSortFields
+- UserSortFields
+- RoleOption
 
 ## Result Pattern
 
--   Result
--   Result\<T\>
+- Result
+- Result\<T>
 
-This infrastructure is shared across the Product, Category, Supplier,
-Customer, Unit, Inventory Transaction, and Purchasing modules where
-applicable.
+This infrastructure is shared across the Product, Category, Supplier, Customer, Unit, Inventory Transaction, and Purchasing modules where applicable.
 
-------------------------------------------------------------------------
+---
 
 # Technology Stack
 
-### Backend
+Backend
 
--   ASP.NET Core 10
--   Razor Pages
--   Entity Framework Core 10
--   SQL Server
--   LINQ
--   Microsoft ASP.NET Core Identity
+- ASP.NET Core 10
+- Razor Pages
+- Entity Framework Core 10
+- SQL Server
+- LINQ
+- Microsoft ASP.NET Core Identity
 
-### Architecture
+Architecture
 
--   Clean Architecture
--   Repository Pattern
--   Dependency Injection
--   Result Pattern
+- Clean Architecture
+- Repository Pattern
+- Dependency Injection
+- Result Pattern
 
-### Frontend
+Frontend
 
--   Bootstrap 5
--   HTML5
--   CSS3
+- Bootstrap 5
+- HTML5
+- CSS3
 
-### Development Tools
+Development Tools
 
--   Visual Studio 2026
--   Git
--   GitHub
--   SQL Server Management Studio
+- Visual Studio 2026
+- Git
+- GitHub
+- SQL Server Management Studio
 
-------------------------------------------------------------------------
+---
 
 # Current Progress
 
-  Module                           Status
-  -------------------------------- ---------------------------------------------------------
-  Product Management               ✅ Complete
-  Category Management              ✅ Complete
-  Supplier Management              ✅ Complete
-  Customer Management              ✅ Complete
-  Unit Management                  ✅ Complete
-  Inventory Transactions           ✅ Complete
-  Dashboard                        ✅ Complete
-  Authentication & Authorization   ✅ Complete
-  User Management                  ✅ Complete
-  Account Management               ✅ Complete
-  Purchasing                       ✅ Core Workflow + Sprint 8 P1-P7 Enhancements Complete
-  Reporting                        ✅ Sprint 7 Additional Reporting Complete and Verified
+| Module | Status |
+|----------|--------|
+| Product Management | ✅ Complete |
+| Category Management | ✅ Complete |
+| Supplier Management | ✅ Complete |
+| Customer Management | ✅ Complete |
+| Unit Management | ✅ Complete |
+| Inventory Transactions | ✅ Complete |
+| Dashboard | ✅ Complete |
+| Authentication & Authorization | ✅ Complete |
+| User Management | ✅ Complete |
+| Account Management | ✅ Complete |
+| Purchasing | ✅ Core Workflow + Sprint 8 P1-P7 Enhancements Complete |
+| Reporting | ✅ Sprint 7 Additional Reporting Complete and Verified |
 
-------------------------------------------------------------------------
+---
 
 # Roadmap
 
 ## Completed
 
--   Product Management
--   Category Management
--   Supplier Management
--   Customer Management
--   Unit Management
--   Inventory Transactions
--   Dashboard
--   Authentication & Authorization
--   User Management
--   Architecture Sprint 1
--   Purchasing Application Layer
--   Purchasing Presentation Layer
--   Inventory Valuation Reporting
+- Product Management
+- Category Management
+- Supplier Management
+- Customer Management
+- Unit Management
+- Inventory Transactions
+- Dashboard
+- Authentication & Authorization
+- User Management
+- Architecture Sprint 1
+- Purchasing Application Layer
+- Purchasing Presentation Layer
+- Inventory Valuation Reporting
 
 ## Current
 
--   Sprint 20 - Provider-Neutral Continuous Verification -
-    Complete/Closed (explicit TestTier contract, fail-safe
-    classification audit, shared `scripts/verify-provider-neutral.ps1`,
-    GitHub Actions gate with successful hosted run; provider-neutral
-    gate 535 passing --- 346 UnitTests, 63 Web.Tests, 126
-    ProviderNeutral IntegrationTests; 14 SqlServerRelational
-    discovered/locked, not executed; zero LocalDB/SQL contact;
-    technical/non-release)
--   Sprint 19 - Purchase Order Create HTTP/Razor Integration Coverage -
-    Complete/Closed (real-pipeline H1-H5 Purchase Order Create coverage;
-    542 automated tests; InMemory HTTP evidence --- no relational claim
-    from the HTTP host; zero production changes; technical/non-release)
--   Sprint 18 - SQL Server Relational Verification - Complete/Closed (41
-    LocalDB relational tests; R1-R6; 537 automated tests at Sprint 18
-    closure --- historical; zero production changes;
-    technical/non-release)
--   Sprint 17 - HTTP/Razor Integration-Test Foundation - Complete/Closed
-    (database-safe `WebApplicationFactory`, seeded-user test
-    authentication, real antiforgery POST, Purchase Order domain-failure
-    HTTP proof; T03-T07 integrated subset 19/19 twice, Web.Tests 58/58
-    twice, 496 automated tests; verification-only T08; non-release)
--   Sprint 16 - Purchase Order POST Round-Trip State and Create Failure
-    Presentation Corrections - Complete/Closed (six Details/Edit hidden
-    bool fields round-trip both states; expected Create
-    `DomainException` failures render inline with restoration and no
-    persistence; 12/12 runtime matrix and 477 automated tests passed;
-    non-release)
--   Sprint 14 - Purchase Order Cancellation and Draft Item Editing -
-    Complete (Domain cancellation + Application workflows +
-    `PurchaseOrder.Edit`/`PurchaseOrder.Cancel` capabilities + Draft
-    item Edit page; 477 automated tests; no schema/migration change)
--   Sprint 13 - Purchasing Workflow Test Automation - Complete
-    (Application handler/validator/query tests + PurchaseOrderRepository
-    integration tests; 432 automated tests; no production changes)
--   Sprint 12 - Authorization Refinement - Complete (handler tests +
-    authorization boundary fixes; T07 EditStatus cleanup
-    deferred/blocked)
--   Sprint 10 - Dynamic Capability-Based Authorization - Complete
--   v1.6.0 released (v1.6.0 remains the current release baseline;
-    Sprints 11-20 are non-release sprints)
+- Sprint 20 - Provider-Neutral Continuous Verification - Complete/Closed (explicit TestTier contract, fail-safe classification audit, shared `scripts/verify-provider-neutral.ps1`, GitHub Actions gate with successful hosted run; provider-neutral gate 535 passing — 346 UnitTests, 63 Web.Tests, 126 ProviderNeutral IntegrationTests; 14 SqlServerRelational discovered/locked, not executed; zero LocalDB/SQL contact; technical/non-release)
+- Sprint 19 - Purchase Order Create HTTP/Razor Integration Coverage - Complete/Closed (real-pipeline H1-H5 Purchase Order Create coverage; 542 automated tests; InMemory HTTP evidence — no relational claim from the HTTP host; zero production changes; technical/non-release)
+- Sprint 18 - SQL Server Relational Verification - Complete/Closed (41 LocalDB relational tests; R1-R6; 537 automated tests at Sprint 18 closure — historical; zero production changes; technical/non-release)
+- Sprint 17 - HTTP/Razor Integration-Test Foundation - Complete/Closed (database-safe `WebApplicationFactory`, seeded-user test authentication, real antiforgery POST, Purchase Order domain-failure HTTP proof; T03-T07 integrated subset 19/19 twice, Web.Tests 58/58 twice, 496 automated tests; verification-only T08; non-release)
+- Sprint 16 - Purchase Order POST Round-Trip State and Create Failure Presentation Corrections - Complete/Closed (six Details/Edit hidden bool fields round-trip both states; expected Create `DomainException` failures render inline with restoration and no persistence; 12/12 runtime matrix and 477 automated tests passed; non-release)
+- Sprint 14 - Purchase Order Cancellation and Draft Item Editing - Complete (Domain cancellation + Application workflows + `PurchaseOrder.Edit`/`PurchaseOrder.Cancel` capabilities + Draft item Edit page; 477 automated tests; no schema/migration change)
+- Sprint 13 - Purchasing Workflow Test Automation - Complete (Application handler/validator/query tests + PurchaseOrderRepository integration tests; 432 automated tests; no production changes)
+- Sprint 12 - Authorization Refinement - Complete (handler tests + authorization boundary fixes; T07 EditStatus cleanup deferred/blocked)
+- Sprint 10 - Dynamic Capability-Based Authorization - Complete
+- v1.6.0 released (v1.6.0 remains the current release baseline; Sprints 11-18 are non-release sprints)
 
 ## Sprint 10 Closure State
 
--   T01-T14 Implementation and Documentation - Complete
--   T15 Final Verification, Retrospective & Save Point - Complete
--   Formal closure gate - PASS (Phase 26)
--   Database remediation - Complete and verified
--   v1.6.0 - Released
+- T01-T14 Implementation and Documentation - Complete
+- T15 Final Verification, Retrospective & Save Point - Complete
+- Formal closure gate - PASS (Phase 26)
+- Database remediation - Complete and verified
+- v1.6.0 - Released
 
 v1.6.0 is the current release baseline.
 
 ## Future
 
--   Additional Purchasing User Experience Improvements
--   Sales
--   Audit Logging
--   Bulk Import / Export
--   Barcode / QR
+- Additional Purchasing User Experience Improvements
+- Sales
+- Audit Logging
+- Bulk Import / Export
+- Barcode / QR
 
-------------------------------------------------------------------------
+---
 
 # Screenshots
 
@@ -1293,81 +1063,75 @@ The following screenshots demonstrate the current implementation:
 
 ![Purchase Order Details](docs/screenshots/Purchasing_details.png)
 
-![Purchase Order Details -
-Receiving](docs/screenshots/Purchasing_details2.png)
+![Purchase Order Details - Receiving](docs/screenshots/Purchasing_details2.png)
 
-![Purchase Order Details -
-Completed](docs/screenshots/Purchasing_details3.png)
+![Purchase Order Details - Completed](docs/screenshots/Purchasing_details3.png)
 
 ### Reporting
 
 #### Completed Reporting
 
--   Inventory Valuation
--   Purchase History
--   Supplier Purchase Analysis
--   Stock Movement
--   Low Stock Report
--   Inventory Movement Report
--   Product Reports
--   Excel Export
--   PDF Export
+- Inventory Valuation
+- Purchase History
+- Supplier Purchase Analysis
+- Stock Movement
+- Low Stock Report
+- Inventory Movement Report
+- Product Reports
+- Excel Export
+- PDF Export
 
 #### Final Verification
 
-Sprint 7 Additional Reporting passed final project-wide verification,
-including reporting workflows, Excel/PDF exports, empty-database
-behavior, query-failure recovery, authorization regression, and final
-solution build verification.
+Sprint 7 Additional Reporting passed final project-wide verification, including reporting workflows, Excel/PDF exports, empty-database behavior, query-failure recovery, authorization regression, and final solution build verification.
 
 #### Inventory Valuation
 
 ![Inventory Valuation](docs/screenshots/inventory_valuation.png)
 
-------------------------------------------------------------------------
+---
 
 # Learning Objectives
 
-This project is focused on applying modern enterprise development
-practices including:
+This project is focused on applying modern enterprise development practices including:
 
--   Separation of Concerns
--   SOLID Principles
--   Clean Architecture
--   Maintainable Code
--   Reusable Components
--   Enterprise Business Application Design
--   Scalable Repository Design
--   Enterprise Authentication
--   Identity Management
--   Authorization
--   Feature-based Architecture
--   CQRS-inspired Design
--   Result Pattern
--   Rule of Three Refactoring
--   Enterprise Code Review
--   Architecture Validation
--   Rich Domain Modeling
--   Workflow-driven Enterprise Applications
--   Vertical Slice Architecture
--   Aggregate Design
--   End-to-End Vertical Slice Implementation
--   Workflow-driven Presentation Design
--   Presentation-to-Application Integration
--   Business Workflow Validation
--   Read-oriented Reporting Architecture
--   DTO Projection
--   Database-side Reporting Queries
--   EF Core Query Translation
--   Reporting Vertical Slices
--   Self-Service Account Management
--   Email Verification
--   Two-Factor Authentication
--   Recovery Code Management
--   Identity Security Workflows
--   Authentication Challenge Flows
+- Separation of Concerns
+- SOLID Principles
+- Clean Architecture
+- Maintainable Code
+- Reusable Components
+- Enterprise Business Application Design
+- Scalable Repository Design
+- Enterprise Authentication
+- Identity Management
+- Authorization
+- Feature-based Architecture
+- CQRS-inspired Design
+- Result Pattern
+- Rule of Three Refactoring
+- Enterprise Code Review
+- Architecture Validation
+- Rich Domain Modeling
+- Workflow-driven Enterprise Applications
+- Vertical Slice Architecture
+- Aggregate Design
+- End-to-End Vertical Slice Implementation
+- Workflow-driven Presentation Design
+- Presentation-to-Application Integration
+- Business Workflow Validation
+- Read-oriented Reporting Architecture
+- DTO Projection
+- Database-side Reporting Queries
+- EF Core Query Translation
+- Reporting Vertical Slices
+- Self-Service Account Management
+- Email Verification
+- Two-Factor Authentication
+- Recovery Code Management
+- Identity Security Workflows
+- Authentication Challenge Flows
 
-------------------------------------------------------------------------
+---
 
 # License
 

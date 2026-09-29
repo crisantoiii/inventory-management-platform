@@ -1,4 +1,5 @@
-﻿using InventoryPlatform.Application.Interfaces.Persistence;
+﻿using FluentValidation;
+using InventoryPlatform.Application.Interfaces.Persistence;
 using InventoryPlatform.Domain.Entities;
 using InventoryPlatform.Shared.Results;
 
@@ -10,23 +11,36 @@ public sealed class CreatePurchaseOrderHandler
     private readonly ISupplierRepository _supplierRepository;
     private readonly IProductRepository _productRepository;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IValidator<CreatePurchaseOrderRequest> _validator;
 
     public CreatePurchaseOrderHandler(
         IPurchaseOrderRepository purchaseOrderRepository,
         ISupplierRepository supplierRepository,
         IProductRepository productRepository,
-        IUnitOfWork unitOfWork)
+        IUnitOfWork unitOfWork,
+        IValidator<CreatePurchaseOrderRequest> validator)
     {
         _purchaseOrderRepository = purchaseOrderRepository;
         _supplierRepository = supplierRepository;
         _productRepository = productRepository;
         _unitOfWork = unitOfWork;
+        _validator = validator;
     }
 
     public async Task<Result<CreatePurchaseOrderResponse>> HandleAsync(
         CreatePurchaseOrderRequest request,
         CancellationToken cancellationToken = default)
     {
+        var validationResult = await _validator.ValidateAsync(request, cancellationToken);
+
+        if (!validationResult.IsValid)
+        {
+            var firstFailure = validationResult.Errors[0];
+
+            return Result<CreatePurchaseOrderResponse>.Failure(
+                PurchaseOrderErrors.Validation(firstFailure.ErrorMessage));
+        }
+
         var supplier = await _supplierRepository.GetByIdAsync(
             request.SupplierId,
             cancellationToken);

@@ -2342,3 +2342,50 @@ Continuous verification runs through one shared command authority, `scripts/veri
 - The remediation that moved one misclassified probe from `ProviderNeutral` to `SqlServerRelational` (relational inventory 13 → 14, ProviderNeutral 127 → 126) is treated as resolved verification-driven hardening, not an open defect.
 - No production behavior, model/mapping, migration, startup, or configuration change is introduced.
 
+# DD-046 — Application-Boundary Input Validation With Retained Domain Authority
+
+**Status:** Implemented in Sprint 21
+
+## Context
+
+The repository carried two validation authorities but only one wired. FluentValidation validators for the Purchase Order Create request (`CreatePurchaseOrderValidator`, `CreatePurchaseOrderItemValidator`) existed and were directly unit-tested, but no production path invoked them: neither `CreatePurchaseOrderHandler` nor the Create PageModel executed validation. The enforced runtime authority was therefore the `PurchaseOrder` aggregate (`DomainException`) plus the handler's `Result` checks, while the tested validator rules were dormant. Two risks followed. First, tested rules and enforced rules could silently diverge — a green validator suite proved nothing about production behavior. Second, `CreatePurchaseOrderValidator` contained `RuleFor(x => x.Items).NotEmpty()`, so had validation ever been invoked the real Create form would have been unable to submit its legitimate zero-item-row empty Draft.
+
+The unresolved question was where validation should be invoked and how a FluentValidation failure should reach the existing presentation path. The PageModel already had a working failed-`Result` branch that added `result.Error.Message` to `ModelState` under the empty key, rendered by `asp-validation-summary="ModelOnly"`, and it already caught expected `DomainException` for inline presentation. That existing path was the compatibility constraint.
+
+## Decision
+
+Validation is invoked at the **Application handler boundary**. `CreatePurchaseOrderHandler` takes `IValidator<CreatePurchaseOrderRequest>` as a constructor dependency (already resolvable through the existing `AddValidatorsFromAssembly` registration, so no DI change was required) and calls `await _validator.ValidateAsync(request, cancellationToken)` as the literally first statement of `HandleAsync`, before any repository access. The same `cancellationToken` is forwarded to validation and to every existing downstream call.
+
+A validation failure produces a **scalar `Result`** under the frozen A1 contract: exactly one error, selected deterministically as `validationResult.Errors[0]`, surfaced as `Result<CreatePurchaseOrderResponse>.Failure(PurchaseOrderErrors.Validation(firstFailure.ErrorMessage))` with code `PurchaseOrder.Validation` and the message passed through verbatim. There is no sorting, grouping, concatenation, field-level property mapping, or prefix adapter. Determinism is guaranteed by freezing rule declaration order as the precedence order: top-level `SupplierId` → `ExpectedDeliveryDate` → `Remarks` (`MaximumLength(500)`), then the first failing item in list order with child `ProductId` → `Quantity` (`GreaterThan(0)`) → `UnitCost` (`GreaterThanOrEqualTo(0)`).
+
+Authority is explicitly split and single-owner per concern:
+
+- **Application / FluentValidation owns request-shape input validation** — supplier selection, delivery date presence, remarks length, and per-item product/quantity/cost shape.
+- **The Domain aggregate retains every invariant** — duplicate `ProductId` within one order, `Quantity > 0`, `UnitCost >= 0`, Draft-only mutation, and non-empty-Draft `Submit()`. `DomainException` is not caught or translated by the handler and still propagates; the Web layer keeps its existing inline ModelState presentation for it.
+- **Handler lookup ownership is unchanged** — supplier and product existence/active checks remain in the handler with their existing `Result` error factories. Validation is deliberately not given ownership of reference data.
+- **The Web layer owns `ModelState` presentation** and is unchanged.
+
+`RuleFor(x => x.Items).NotEmpty()` was retired with no replacement collection null/count rule. An empty item collection is valid input: `PurchaseOrder.Create` yields a Draft with an empty `Items` collection, which persists and returns success. This is deliberately distinct from `Submit()`, which remains Domain-invalid for an empty Draft.
+
+## Rejected Alternatives
+
+- **PageModel-level invocation** — rejected because validation would run in the presentation layer, would not protect any non-HTTP caller of the handler, and would have required Razor production changes.
+- **Global pipeline / decorator / behavior wrapping the handler** — rejected as framework-proportionate for one handler and one request type; it would also have hidden the invocation contract rather than making it explicit at the orchestration site.
+- **MediatR pipeline behavior** — rejected; the repository does not use MediatR and adopting it to solve this would be an unrelated architectural change.
+- **Automatic MVC FluentValidation integration** — rejected because it would be PageModel-scoped (see above) and would add a framework dependency with no benefit.
+- **A2 structured multi-error contract with field-name mapping** — rejected as disproportionate and explicitly out of scope; it would have required a `Result`/`Error` redesign, PageModel mapping work, and a different presentation shape than the existing one.
+- **A replacement item-count rule** (`NotNull()`, `Must(NotEmpty)`, minimum item count) — rejected because the real Create form can legitimately submit zero rows, and an empty Draft is a supported product state.
+- **Migrating the remaining validator rules into the Domain** — rejected because request-shape validation is not domain invariant enforcement, and duplication would have risked divergence rather than removing it.
+- **Removing the validators entirely** — rejected because the rule set is useful, and discarding tested, expressive input validation in favor of Domain-only enforcement would degrade the product.
+
+## Consequences
+
+- Validator unit tests, handler tests, and HTTP tests are now three distinct, non-substitutable evidence layers. A direct validator test proves the rule matrix; only a handler test proves invocation and the `Result` contract; only an HTTP test proves composition, model-level presentation, restoration, and no-mutation.
+- Because validation runs first, an invalid request performs zero supplier reads, zero product reads, zero `AddAsync`, and zero `SaveChangesAsync` — the failure path is now observably free of side effects rather than merely unguarded.
+- One message is surfaced at a time. A user fixing a form sees errors one at a time; this is an accepted consequence of the deliberately small A1 contract, not an oversight.
+- Purchase Order Create is the only flow with Application-boundary validation. Other features' validators remain defined and unit-tested but not invoked; extending invocation is a separate, explicitly planned concern.
+- The scalar model-level message reaches the existing `asp-validation-summary="ModelOnly"` region with no Razor or PageModel change, so the Web presentation surface is unchanged.
+- No migration, schema, package, project, configuration, CI, or release change is introduced, and no Domain, Shared `Result`/`Error`, or DI change is required.
+- Recording-only cancellation-token observation was added to two shared test fakes that already recorded call order, so handler-level token forwarding is assertable without altering fake behavior.
+
+

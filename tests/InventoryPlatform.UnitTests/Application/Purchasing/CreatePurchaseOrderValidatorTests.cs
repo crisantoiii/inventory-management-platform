@@ -200,11 +200,11 @@ public sealed class CreatePurchaseOrderValidatorTests
     }
 
     // =====================================================================
-    // Items NotEmpty
+    // Empty item collections are valid for Draft creation
     // =====================================================================
 
     [Fact]
-    public void Validate_ItemsEmpty_FailsWithExpectedPropertyAndMessage()
+    public void Validate_ItemsEmpty_ReturnsNoErrors()
     {
         // Arrange
         var validator = new CreatePurchaseOrderValidator();
@@ -218,30 +218,8 @@ public sealed class CreatePurchaseOrderValidatorTests
         var result = validator.Validate(request);
 
         // Assert
-        Assert.False(result.IsValid);
-        Assert.Contains(result.Errors, e => e.PropertyName == "Items");
-        Assert.Equal(
-            "At least one purchase order item is required.",
-            result.Errors.First(e => e.PropertyName == "Items").ErrorMessage);
-    }
-
-    [Fact]
-    public void Validate_ItemsNull_Fails()
-    {
-        // Arrange
-        var validator = new CreatePurchaseOrderValidator();
-        var request = new CreatePurchaseOrderRequest(
-            SupplierId: 1,
-            ExpectedDeliveryDate: new DateOnly(2026, 6, 1),
-            Remarks: null,
-            Items: null!);
-
-        // Act
-        var result = validator.Validate(request);
-
-        // Assert
-        Assert.False(result.IsValid);
-        Assert.Contains(result.Errors, e => e.PropertyName == "Items");
+        Assert.True(result.IsValid);
+        Assert.Empty(result.Errors);
     }
 
     // =====================================================================
@@ -291,5 +269,37 @@ public sealed class CreatePurchaseOrderValidatorTests
         // Assert
         Assert.False(result.IsValid);
         Assert.Contains(result.Errors, e => e.PropertyName == "Items[1].ProductId");
+    }
+
+    [Fact]
+    public void Validate_MultipleFailures_ReturnsErrorsInDeclarationOrder()
+    {
+        // Arrange
+        var validator = new CreatePurchaseOrderValidator();
+        var request = new CreatePurchaseOrderRequest(
+            SupplierId: 0,
+            ExpectedDeliveryDate: DateOnly.MinValue,
+            Remarks: new string('x', 501),
+            Items: new CreatePurchaseOrderItemRequest[]
+            {
+                new(0, 0m, -1m)
+            }.AsReadOnly());
+
+        // Act
+        var result = validator.Validate(request);
+
+        // Assert
+        Assert.False(result.IsValid);
+        Assert.Equal(
+            new[]
+            {
+                "SupplierId",
+                "ExpectedDeliveryDate",
+                "Remarks",
+                "Items[0].ProductId",
+                "Items[0].Quantity",
+                "Items[0].UnitCost"
+            },
+            result.Errors.Select(error => error.PropertyName));
     }
 }

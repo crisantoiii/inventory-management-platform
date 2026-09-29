@@ -1,5 +1,40 @@
 # Changelog
 
+## [Sprint 21] - Validation Invocation Architecture
+
+### Summary
+
+Closed the validation-invocation/architecture carry-forward item (C20-11, carried from Sprint 19 as C19-01). Purchase Order Create request validation is now invoked at the Application handler boundary under a recorded architecture decision, with a frozen scalar `Result` contract, an explicit Application/Domain authority split, and proof at the validator, handler, and real HTTP/Razor layers. This was technical/architecture work, not a product feature or release: no version or tag was created, and v1.6.0 remains the latest release baseline.
+
+### Added
+
+- Application-boundary validation invocation: `CreatePurchaseOrderHandler` takes `IValidator<CreatePurchaseOrderRequest>` as a constructor dependency and calls `await _validator.ValidateAsync(request, cancellationToken)` as the literally first operation of `HandleAsync`, before any repository access. The dependency resolves through the existing `AddValidatorsFromAssembly` registration, so no DI change was required.
+- `PurchaseOrderErrors.Validation(string message)` factory: code exactly `PurchaseOrder.Validation`, message passed through unchanged.
+- Architecture decision `docs/DESIGN_DECISIONS.md` DD-046 — Application-Boundary Input Validation With Retained Domain Authority — recording the invocation point, the scalar contract, the frozen rule/precedence matrix, the explicit authority split, and the rejected alternatives (PageModel invocation, global pipeline/decorator, MediatR pipeline behavior, automatic MVC FluentValidation integration, A2 structured multi-error contract with field mapping, a replacement item-count rule, migrating the rules into the Domain, and removing the validators).
+- `CreatePurchaseOrderValidatorTests` — coverage that an empty item collection produces no errors, and that multiple failures are returned in declaration order.
+- `PurchaseOrderErrorsTests.Validation_WithMessage_ReturnsExpectedCodeAndVerbatimMessage`.
+- Eight new `CreatePurchaseOrderHandlerTests` cases: validation-failure contract with zero repository/UoW interaction and an empty `CallOrder`; message exactly equal to the first FluentValidation failure; deterministic top-level precedence (SupplierId wins over ExpectedDeliveryDate, Remarks, and an all-invalid item); deterministic child precedence (ProductId wins over Quantity and UnitCost); zero quantity and negative unit cost rejected at the Application boundary before any repository read; the same cancellation token reaching `ValidateAsync` and every downstream call; and empty-items Create producing and saving an empty Draft successfully.
+- One real HTTP/Razor scenario `PostPurchaseOrderCreate_AsInventoryManager_WithOverLengthRemarks_RedisplaysModelLevelValidationErrorWithoutMutation` in the existing Sprint 19 Purchase Order Create fixture, posting a 501-character `Remarks` value through the rendered form with the real antiforgery token and preserved cookie.
+- Testing conventions section "Validation Invocation Proof Conventions (Sprint 21)" recording the three non-substitutable proof layers, invocation-first observability, the literal `Errors[0]` assertion rule, deterministic-precedence locking, the empty-collection vs. empty-Draft-Submit distinction, overlapping Application/Domain rules, token-forwarding proof, assertion-liveness proof, and the validator-only HTTP failure contract.
+
+### Changed
+
+- `CreatePurchaseOrderValidator`: `RuleFor(x => x.Items).NotEmpty()` retired with no replacement null/count rule. An empty item collection is now valid input — the real Create form can legitimately submit zero item rows, and an empty Draft is a supported product state. Retained and locked: top-level `SupplierId` → `ExpectedDeliveryDate` → `Remarks` (`MaximumLength(500)`), and child `ProductId` → `Quantity` (`GreaterThan(0)`) → `UnitCost` (`GreaterThanOrEqualTo(0)`). Error precedence follows declaration order.
+- Frozen A1 scalar `Result` contract: a validation failure returns exactly one error, `validationResult.Errors[0]`, surfaced as `Result<CreatePurchaseOrderResponse>.Failure(PurchaseOrderErrors.Validation(firstFailure.ErrorMessage))`. No sorting, grouping, concatenation, field-name mapping, or prefix adapter.
+- Authority split made explicit and single-owner per concern: Application/FluentValidation owns request-shape input validation; the `PurchaseOrder` aggregate retains duplicate-`ProductId`, `Quantity > 0`, `UnitCost >= 0`, Draft-only mutation, and non-empty-Draft `Submit()`; handler supplier/product existence and active-check ownership is unchanged; the Web layer retains `ModelState` presentation. `DomainException` is still not caught or translated by the handler.
+- Validation now runs before any side effect, so an invalid request performs zero supplier reads, zero product reads, zero `AddAsync`, and zero `SaveChangesAsync` — previously the failure path reached repository access before any rule could reject the request.
+- `HandleAsync_DuplicateProductInRequest_ThrowsDomainException` strengthened to assert that the request passes validation, that the supplier read occurred, and the exact canonical Domain message `The product already exists in this purchase order.`, with `AddAsync` = 0 and `SaveChangesAsync` = 0.
+- Recording-only cancellation-token observation (`LastAddAsyncCancellationToken`, `LastSaveChangesAsyncCancellationToken`) added to the two shared Purchasing test fakes that already recorded call order. No fake behavior changed.
+- Automated baseline: 535 → 545 passing through the provider-neutral gate (355 UnitTests, 64 Web.Tests, 126 ProviderNeutral IntegrationTests; 0 failed, 0 skipped). The 14 `SqlServerRelational` tests remain discovered and locked but are not executed by the gate; Sprint 21 makes no SQL relational-pass claim. Normal Release build: 0 warnings/0 errors, and no diagnostic originates in a Sprint 21 file. EF pending model changes: none; migration chain unchanged at 10, latest `20260831141400_CreateAuthorizationSchema`.
+- No Web/Razor/PageModel, Domain, Shared `Result`/`Error`, DI, migration, schema, package, project, configuration, CI, or release change.
+
+### Scope and Carry-Forward
+
+- Closed the C20-11 and C19-01 validation invocation/architecture carry-forward item.
+- Validation invocation was extended to Purchase Order Create only; other features' validators remain defined and rule-tested but not invoked in production, which is a separate architectural decision.
+- Remaining unassigned and unchanged: C20-01 SQL Server relational CI (hosted relational execution needs a hosted SQL Server/LocalDB endpoint decision); C20-02 broader HTTP/Razor coverage; C20-03 browser/E2E; C20-04 EditStatus authorization guard decision; C20-05 report authorization; C20-06 warning remediation (the 28-warning non-incremental baseline); C20-07 broader SQL relational/report verification; C20-08 Sales; C20-09 Audit; C20-10 import/attachment/barcode; plus the recorded observation that the seeded Viewer has broad `PurchaseOrder.*`, including `PurchaseOrder.Create` (no remediation commitment).
+- No Sprint 22 scope is selected.
+
 ## [Sprint 20] - Provider-Neutral Continuous Verification
 
 ### Summary

@@ -446,20 +446,20 @@ The script is the single command authority: it restores repository-local .NET to
 
 ## Current Test Coverage
 
-### UnitTests (346 tests)
+### UnitTests (355 tests)
 
 | Area | Subject | Tests |
 |------|---------|-------|
 | Domain | PurchaseOrder workflow (incl. Sprint 14 cancellation + draft-edit coverage) | 83 |
-| Domain | PurchaseOrderItem behavior | 39 |
+| Domain | PurchaseOrderItem behavior | 29 |
 | Domain | Product domain | 56 |
-| Domain | Capability domain | 15 |
-| Domain | AuthorizationGroup domain | 31 |
+| Domain | Capability domain | 16 |
+| Domain | AuthorizationGroup domain | 30 |
 | Application | CapabilityAuthorizationService | 15 |
-| Application | Purchasing — CreatePurchaseOrder handler (Sprint 13 T02) | 15 |
-| Application | Purchasing — CreatePurchaseOrder validator (T02) | 14 discovered cases |
-| Application | Purchasing — CreatePurchaseOrderItem validator (T02) | 13 discovered cases |
-| Application | Purchasing — PurchaseOrderErrors contracts (T02/T03) | 11 discovered cases |
+| Application | Purchasing — CreatePurchaseOrder handler (Sprint 13 T02; validation-invocation contract added Sprint 21 T02) | 23 |
+| Application | Purchasing — CreatePurchaseOrder validator (Sprint 21 T01) | 14 discovered cases |
+| Application | Purchasing — CreatePurchaseOrderItem validator (Sprint 21 T01) | 13 discovered cases |
+| Application | Purchasing — PurchaseOrderErrors contracts (incl. `Validation` contract, Sprint 21 T01) | 12 discovered cases |
 | Application | Purchasing — Submit handler (T03) | 6 |
 | Application | Purchasing — Approve handler (T03) | 6 |
 | Application | Purchasing — Receive handler (T04) | 14 |
@@ -468,7 +468,7 @@ The script is the single command authority: it restores repository-local .NET to
 | Application | Purchasing — Cancel handler (Sprint 14 T03) | 7 |
 | Application | Purchasing — UpdateItem/RemoveItem handlers (Sprint 14 T04) | 14 |
 | Infrastructure | Placeholder | 1 |
-| **Total** | | **346** |
+| **Total** | | **355** |
 
 Rows marked "discovered cases" contain `[Theory]` methods whose `[InlineData]` rows each execute as a separate case; unmarked rows are `[Fact]` methods where methods and discovered cases are equal.
 
@@ -490,9 +490,9 @@ Every IntegrationTest carries exactly one `TestTier` trait (Sprint 20). Tier cla
 | Infrastructure | Placeholder (`IntegrationTest1`) | 1 | ProviderNeutral |
 | **Total** | | **140** | **126 PN + 14 SQL** |
 
-The locked `SqlServerRelational` inventory is 14 identities (see `TierClassificationAuditTests.LockedSqlServerRelationalInventory`). The Sprint 20 provider-neutral gate executes the 126 ProviderNeutral tests and intentionally does not execute the 14 relational tests; the full local suite remains 535 + 14 tests.
+The locked `SqlServerRelational` inventory is 14 identities (see `TierClassificationAuditTests.LockedSqlServerRelationalInventory`). The provider-neutral gate executes the 126 ProviderNeutral tests and intentionally does not execute the 14 relational tests; the full local suite remains 545 + 14 tests.
 
-### Web.Tests (58 tests)
+### Web.Tests (64 tests)
 
 | Area | Subject | Tests |
 |------|---------|-------|
@@ -508,14 +508,15 @@ The locked `SqlServerRelational` inventory is 14 identities (see `TierClassifica
 | HTTP | Purchase Order Create GET authorization coverage H1-H3 (Sprint 19 T02) | 3 |
 | HTTP | Purchase Order Create valid-POST PRG/persistence H4 (Sprint 19 T03) | 1 |
 | HTTP | Purchase Order Create duplicate-product failure redisplay H5 (Sprint 19 T04) | 1 |
+| HTTP | Purchase Order Create validator-only failure redisplay H6 (Sprint 21 T03) | 1 |
 | Infrastructure | Placeholder | 1 |
-| **Total** | | **63** |
+| **Total** | | **64** |
 
-**Current total: provider-neutral gate 535 passed, 0 failed, 0 skipped** (346 UnitTests + 63 Web.Tests + 126 ProviderNeutral IntegrationTests; Sprint 20 T05 integrated verification). The 14 `SqlServerRelational` tests are discovered and locked but intentionally not executed in the gate — the full local suite remains 535 + 14 tests, and no SQL relational-pass claim is made for Sprint 20 (Sprint 18's historical relational passes remain historical evidence). The Sprint 19 historical closure total remains 542 (346 + 133 + 63, with the relational tier freshly executed against available LocalDB); the Sprint 18 historical closure total remains 537 (346 + 133 + 58); the Sprint 17 historical closure total remains 496 (346 + 92 + 58).
+**Current total: provider-neutral gate 545 passed, 0 failed, 0 skipped** (355 UnitTests + 64 Web.Tests + 126 ProviderNeutral IntegrationTests; Sprint 21 T04 integrated verification, `scripts/verify-provider-neutral.ps1` exit 0). The 14 `SqlServerRelational` tests are discovered and locked but intentionally not executed in the gate — the full local suite remains 545 + 14 tests, and no SQL relational-pass claim is made for Sprint 21. The Sprint 20 historical closure total remains 535 (346 + 63 + 126); the Sprint 19 historical closure total remains 542 (346 + 133 + 63, with the relational tier freshly executed against available LocalDB); the Sprint 18 historical closure total remains 537 (346 + 133 + 58); the Sprint 17 historical closure total remains 496 (346 + 92 + 58).
 
 The Web.Tests verification tests confirm that the `FakeCapabilityAuthorizationService` compiles against the real `ICapabilityAuthorizationService` interface and produces controlled authorization results. The T03/T04 handler tests exercise the actual `CapabilityAuthorizationHandler` and `MultiCapabilityAuthorizationHandler` production sources directly (the Sprint 14 `PurchaseOrderCapabilityPolicyRegistrationTests` additionally verify Edit/Cancel capability constants and their real `AddWeb` policy registration) (authentication gate, NameIdentifier extraction/parsing, service delegation, succeed/do-not-succeed outcomes, OR semantics with short-circuit, requirement constructor validation). Handler testing is source-level/unit-level.
 
-Since Sprint 17, Web.Tests additionally exercises the real ASP.NET Core HTTP/Razor pipeline through a database-safe `WebApplicationFactory<Program>`: real startup seeding, test-only seeded-user authentication with real GUID identities, production capability authorization, real rendered antiforgery token/cookie semantics, real model binding, challenge/forbid redirects, PRG, `DomainException` failure redisplay, and same-factory persistence are all verified through actual HTTP requests (see the Sprint 17 conventions section below). Since Sprint 19, this coverage includes the five Purchase Order Create behaviors H1-H5 (anonymous challenge, authorized manager access, real-capability denial, valid-antiforgery POST → 302 PRG → same-factory persistence, and duplicate-product Domain-failure redisplay with restoration and no mutation) — see the Sprint 19 conventions section below. Coverage is representative — one Category GET matrix, one Category successful POST, one Purchase Order domain-failure POST, and the five Purchase Order Create behaviors — not exhaustive route coverage; no relational behavior is claimed from the InMemory-based host.
+Since Sprint 17, Web.Tests additionally exercises the real ASP.NET Core HTTP/Razor pipeline through a database-safe `WebApplicationFactory<Program>`: real startup seeding, test-only seeded-user authentication with real GUID identities, production capability authorization, real rendered antiforgery token/cookie semantics, real model binding, challenge/forbid redirects, PRG, `DomainException` failure redisplay, and same-factory persistence are all verified through actual HTTP requests (see the Sprint 17 conventions section below). Since Sprint 19, this coverage includes the five Purchase Order Create behaviors H1-H5 (anonymous challenge, authorized manager access, real-capability denial, valid-antiforgery POST → 302 PRG → same-factory persistence, and duplicate-product Domain-failure redisplay with restoration and no mutation). Since Sprint 21 it additionally includes H6, a validator-only failure (over-length `Remarks`) reaching the real handler through the real composition and presented model-level. See the Sprint 19 and Sprint 21 conventions sections below. Coverage is representative — one Category GET matrix, one Category successful POST, one Purchase Order domain-failure POST, and the six Purchase Order Create behaviors — not exhaustive route coverage; no relational behavior is claimed from the InMemory-based host.
 
 ---
 
@@ -605,6 +606,21 @@ Established by Sprint 20 and authoritative for all current and future Integratio
 6. **SQL relational execution stays separate.** The provider-neutral gate never executes `TestTier=SqlServerRelational`. Relational execution remains a local, explicitly-invoked activity against `(localdb)\MSSQLLocalDB` under the Sprint 18 conventions (and remains future work for CI).
 7. **One shared command authority.** Local and CI verification both run `scripts/verify-provider-neutral.ps1`. Do not duplicate its restore/build/test/EF command sequence in CI or docs; extend the script when the verification contract changes.
 
+## Validation Invocation Proof Conventions (Sprint 21)
+
+Established by Sprint 21 (see `docs/DESIGN_DECISIONS.md` DD-046) and authoritative for all current and future validation-related test authoring:
+
+1. **A direct validator test is not proof of production invocation.** `CreatePurchaseOrderValidatorTests` / `CreatePurchaseOrderItemValidatorTests` instantiate the validator directly. They prove the rule matrix and nothing else. Before Sprint 21 the production runtime authority was the Domain aggregate and handler `Result` checks, so a fully green validator suite coexisted with a completely unwired validator. Never cite validator tests as evidence that a request is validated at runtime.
+2. **Three distinct evidence layers, none substitutable.** Validator rule tests prove *what the rules are*. Handler tests prove *that validation is invoked, that it runs first, and that the `Result` contract is honored*. HTTP tests prove *that the whole real composition invokes it and presents it correctly*. A change to invocation or the error contract must be proven at the handler layer at minimum; a change to presentation or composition must be proven at the HTTP layer.
+3. **Invocation-first is an observable, testable property.** Prove validation runs before any side effect by asserting zero supplier reads, zero product reads, zero `AddAsync`, zero `SaveChangesAsync` — and, where a shared `CallOrder` is available, that it recorded no events at all. Asserting only the returned `Result` does not prove ordering.
+4. **The scalar `Errors[0]` contract must be asserted literally.** A validation failure returns exactly one error with code `PurchaseOrder.Validation` and the verbatim first FluentValidation `ErrorMessage`. When asserting the message, do not re-derive the expectation from the same validator instance in the test and call that a proof of the contract; assert the locked message text for the deterministic cases (`A valid supplier must be selected.`, `A valid product must be selected.`, and the exact `MaximumLength(500)` text) and separately assert the "equals `Errors[0]`" property where it is the property under test.
+5. **Deterministic precedence must be locked by test, not assumed.** Rule declaration order is the frozen precedence order (see DD-046). When more than one rule can fail, add a test that fails several simultaneously and asserts which message wins — both at the top level and inside a child validator.
+6. **Empty collection and Domain-invalid empty state are different things.** `Items` empty is **valid input**: the handler creates and saves an empty Draft and returns success, and this is asserted at the handler layer. `Submit()` on an empty Draft remains **Domain-invalid** and is proven by `PurchaseOrderTests.Submit_WhenDraftWithNoItems_ThrowsDomainException` / `SubmitPurchaseOrderHandlerTests.HandleAsync_EmptyDraft_DomainExceptionPropagatesAndDoesNotSave`. Never conflate the two, and never re-add a validator-level item-count rule to express the submit rule — the Domain owns it.
+7. **Overlapping Application and Domain rules are both proven, with an explicit winner.** Quantity and UnitCost are validated at the Application boundary *and* guarded in the Domain. Test the Application rejection with zero repository interaction (validation wins), and separately test that the Domain guard still exists and still throws. Neither test substitutes for the other.
+8. **Cancellation-token forwarding is part of the invocation contract.** Assert that the same token passed to `HandleAsync` reaches `ValidateAsync` and the downstream repository/`SaveChangesAsync` calls. Where a shared fake does not expose this, add a recording-only property to a fake that already records call order — never change fake behavior to make it observable.
+9. **When asserting an exact externally-visible message, prove the assertion is live.** A deliberately mutated expected value must be observed to fail (then reverted). An exact-string assertion that has never been seen to fail is not evidence.
+10. **A validator-only failure HTTP test must use the real form.** Post the over-limit value through the rendered form with the extracted antiforgery token and preserved cookie, and assert HTTP 200 with a null `Location` (a redisplay, not a redirect), the exact message in the `asp-validation-summary="ModelOnly"` region, full restoration of options/selection/date/remarks/item row, and unchanged Purchase Order and Purchase Order Item counts from a fresh same-factory scope. Do not assert field-level mapping — the frozen contract is a single model-level message.
+
 ## Sprint 13 Conventions (Reusable)
 
 Established by the Sprint 13 Purchasing test automation and reusable for future test authoring:
@@ -662,6 +678,11 @@ Still deferred (Sprint 20 state):
 - Broader HTTP/Razor route coverage beyond the Sprint 17 representative cases and the Sprint 19 Purchase Order Create behaviors (more Category/Purchase Order routes, other modules)
 - Browser/E2E automation (carried forward; outside the provider-neutral gate)
 
+Completed:
+
+- Purchase Order Create validation invocation proof (T01-T03): the validator rule matrix (Items collection rule retired, empty collection valid; top-level and child order locked), the `PurchaseOrderErrors.Validation` scalar contract (code `PurchaseOrder.Validation`, verbatim message), 8 new handler tests covering validation-first ordering with zero repository/UoW interaction, deterministic `Errors[0]` selection at both top level and inside a child validator, the overlaps with Domain quantity/unit-cost guards, empty-Draft Create success, and cancellation-token forwarding to `ValidateAsync` plus all downstream calls, and one real HTTP/Razor scenario (H6) proving a validator-only failure reaches the user model-level with full restoration and no mutation
+- Integrated verification (T04): `scripts/verify-provider-neutral.ps1` exit `0` — **545 passed, 0 failed, 0 skipped** (355 UnitTests, 64 Web.Tests, 126 ProviderNeutral IntegrationTests; 14 SqlServerRelational discovered and locked, not executed); normal Release build 0W/0E; no pending EF model changes; 10-migration chain unchanged; zero diagnostics from any Sprint 21 file
+
 ### Future Considerations
 
 - Broader HTTP/Razor route coverage (the Sprint 17 foundation exists; only representative cases are covered)
@@ -672,7 +693,7 @@ Still deferred (Sprint 20 state):
 - Performance/load testing
 - Broader SQL Server relational integration testing beyond R1-R6 (including any future SQL Server-backed HTTP host)
 - Broader repository coverage
-- FluentValidation test coverage
+- FluentValidation coverage beyond the Sprint 21 Purchase Order Create path — that flow now has rule tests, handler invocation/contract tests, and a real HTTP composition test; other features' validators remain rule-tested only, with no production invocation, and wiring them is a separate architectural decision
 
 ---
 
@@ -693,4 +714,5 @@ Still deferred (Sprint 20 state):
 13. **Behavior-focused coverage:** Tests verify business behavior, not implementation details
 14. **Discovered-case accounting:** State whether a reported count is test methods or discovered test cases (`[Theory]` × `[InlineData]` rows); reconcile suite totals against actual execution
 15. **Exactly-one-tier IntegrationTest contract:** every IntegrationTest resolves to exactly one supported `TestTier` (`ProviderNeutral`, `SqlServerRelational`); classification follows runtime provider dependency; the audit fails closed and the 14-identity relational inventory is locked (Sprint 20)
-16. **No "all tests" language for the provider-neutral gate:** the gate executes 346 UnitTests + 63 Web.Tests + 126 ProviderNeutral IntegrationTests and explicitly does not execute the 14 `SqlServerRelational` tests or browser/E2E work — describe coverage by tier, never as "all tests pass"
+16. **No "all tests" language for the provider-neutral gate:** the gate executes 355 UnitTests + 64 Web.Tests + 126 ProviderNeutral IntegrationTests and explicitly does not execute the 14 `SqlServerRelational` tests or browser/E2E work — describe coverage by tier, never as "all tests pass"
+17. **Three non-substitutable validation proof layers:** validator rule tests prove the rule matrix, handler tests prove invocation and the scalar `Result` contract, HTTP tests prove real composition and presentation — a direct validator test is never evidence of production invocation (Sprint 21)
