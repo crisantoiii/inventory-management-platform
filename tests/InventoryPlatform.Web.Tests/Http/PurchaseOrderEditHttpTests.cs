@@ -16,10 +16,10 @@ using Xunit;
 namespace InventoryPlatform.Web.Tests.Http;
 
 /// <summary>
-/// Sprint 22 Purchase Order Edit HTTP foundation.
+/// Sprint 22 Purchase Order Edit HTTP coverage.
 ///
-/// T01 intentionally contains no behavioral xUnit test. T02 and T03 will add
-/// exactly the frozen H1-H6 cases while reusing these fixture-local helpers.
+/// T02 covers exactly the frozen H1-H3 GET/authorization cases while retaining
+/// the T01 fixture-local arrangement and extraction foundation.
 /// </summary>
 public sealed class PurchaseOrderEditHttpTests
 {
@@ -33,6 +33,123 @@ public sealed class PurchaseOrderEditHttpTests
     private const string NavigationSortBy = "OrderDate";
     private const int NavigationPageNum = 2;
     private const int NavigationPageSize = 25;
+
+    [Fact]
+    public async Task GetPurchaseOrderEdit_AsInventoryManager_ForDraft_RendersEditor()
+    {
+        await using var factory = new InventoryPlatformWebApplicationFactory();
+        var arrangement = await ArrangeOneItemPurchaseOrderAsync(factory);
+        using var client = CreateClient(factory, TestUserSelectors.InventoryManager);
+        var editPath = BuildEditPathWithNavigation(arrangement.PurchaseOrderId);
+
+        var response = await client.GetAsync(editPath);
+        var html = await response.Content.ReadAsStringAsync();
+
+        Assert.True(
+            response.StatusCode == HttpStatusCode.OK,
+            $"Expected HTTP 200 on GET {editPath} but received " +
+            $"{(int)response.StatusCode}.{Environment.NewLine}{html}");
+        Assert.Contains("Edit Purchase Order", html, StringComparison.Ordinal);
+        Assert.Contains(
+            arrangement.PurchaseOrderId.ToString(CultureInfo.InvariantCulture),
+            html,
+            StringComparison.Ordinal);
+        Assert.Contains(arrangement.SupplierName, html, StringComparison.Ordinal);
+        Assert.Contains("Draft", html, StringComparison.Ordinal);
+        Assert.Contains(arrangement.ProductSku, html, StringComparison.Ordinal);
+        Assert.Contains(arrangement.ProductName, html, StringComparison.Ordinal);
+
+        var updateForm = PurchaseOrderEditFormExtraction.ExtractUpdateForm(
+            html,
+            arrangement.ProductId);
+        var removeForm = PurchaseOrderEditFormExtraction.ExtractRemoveForm(
+            html,
+            arrangement.ProductId);
+
+        Assert.Equal(
+            $"{EditPathPrefix}{arrangement.PurchaseOrderId}?handler=UpdateItem",
+            updateForm.Action);
+        Assert.Equal(
+            $"{EditPathPrefix}{arrangement.PurchaseOrderId}?handler=RemoveItem",
+            removeForm.Action);
+        Assert.Equal("5", updateForm.Fields["quantity"]);
+        Assert.Equal("12.50", updateForm.Fields["unitCost"]);
+        AssertItemFormNavigation(updateForm, arrangement);
+        AssertItemFormNavigation(removeForm, arrangement);
+        Assert.False(string.IsNullOrWhiteSpace(
+            updateForm.Fields["__RequestVerificationToken"]));
+        Assert.False(string.IsNullOrWhiteSpace(
+            removeForm.Fields["__RequestVerificationToken"]));
+        AssertDetailsNavigation(
+            PurchaseOrderEditFormExtraction.ExtractBackToDetailsHref(html),
+            arrangement.PurchaseOrderId,
+            expectNavigation: true);
+
+        AssertPersistedStateUnchanged(
+            arrangement.InitialState,
+            await ReadStateAsync(factory, arrangement.PurchaseOrderId));
+    }
+
+    [Fact]
+    public async Task GetPurchaseOrderEdit_WithoutEditCapability_RedirectsToAccessDenied()
+    {
+        await using var factory = new InventoryPlatformWebApplicationFactory();
+        var arrangement = await ArrangeOneItemPurchaseOrderAsync(factory);
+        var deniedUserId = await ArrangeDeniedUserAsync(factory);
+
+        await using (var scope = factory.Services.CreateAsyncScope())
+        {
+            var context = scope.ServiceProvider
+                .GetRequiredService<ApplicationDbContext>();
+            Assert.False(await context.UserAuthorizationGroups
+                .AnyAsync(relationship => relationship.UserId == deniedUserId));
+        }
+
+        using var client = CreateClient(
+            factory,
+            TestUserSelectors.PurchaseOrderDenied);
+        var editPath = BuildEditPathWithNavigation(arrangement.PurchaseOrderId);
+
+        var response = await client.GetAsync(editPath);
+
+        Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
+        var location = Assert.IsType<Uri>(response.Headers.Location);
+        var destination = location.IsAbsoluteUri
+            ? location
+            : new Uri(client.BaseAddress!, location);
+        Assert.Equal("/Identity/Account/AccessDenied", destination.AbsolutePath);
+        var query = QueryHelpers.ParseQuery(destination.Query);
+        Assert.True(query.TryGetValue("ReturnUrl", out var returnUrls));
+        var returnUrl = Assert.Single(returnUrls);
+        Assert.NotNull(returnUrl);
+        AssertEditNavigation(new Uri(returnUrl, UriKind.Relative), arrangement.PurchaseOrderId);
+        AssertPersistedStateUnchanged(
+            arrangement.InitialState,
+            await ReadStateAsync(factory, arrangement.PurchaseOrderId));
+    }
+
+    [Fact]
+    public async Task GetPurchaseOrderEdit_ForSubmitted_RedirectsToDetails()
+    {
+        await using var factory = new InventoryPlatformWebApplicationFactory();
+        var arrangement = await ArrangeOneItemPurchaseOrderAsync(factory, submit: true);
+        using var client = CreateClient(factory, TestUserSelectors.InventoryManager);
+
+        var response = await client.GetAsync(
+            BuildEditPathWithNavigation(arrangement.PurchaseOrderId));
+
+        Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
+        var location = Assert.IsType<Uri>(response.Headers.Location);
+        AssertDetailsNavigation(
+            location.ToString(),
+            arrangement.PurchaseOrderId,
+            expectNavigation: false);
+        var persistedState = await ReadStateAsync(
+            factory,
+            arrangement.PurchaseOrderId);
+        Assert.Equal(PurchaseOrderStatus.Submitted, persistedState.Status);
+        AssertPersistedStateUnchanged(arrangement.InitialState, persistedState);
+    }
 
     private static async Task<PurchaseOrderEditArrangement>
         ArrangeOneItemPurchaseOrderAsync(
@@ -160,6 +277,19 @@ public sealed class PurchaseOrderEditHttpTests
                     item.ReceivedQuantity))
                 .ToArray());
 
+    private static void AssertPersistedStateUnchanged(
+        PurchaseOrderPersistedState expected,
+        PurchaseOrderPersistedState actual)
+    {
+        Assert.Equal(expected.SupplierId, actual.SupplierId);
+        Assert.Equal(expected.OrderDate, actual.OrderDate);
+        Assert.Equal(expected.ExpectedDeliveryDate, actual.ExpectedDeliveryDate);
+        Assert.Equal(expected.Remarks, actual.Remarks);
+        Assert.Equal(expected.Status, actual.Status);
+        Assert.Equal(expected.TotalAmount, actual.TotalAmount);
+        Assert.Equal(expected.Items.ToArray(), actual.Items.ToArray());
+    }
+
     private static string BuildEditPathWithNavigation(int purchaseOrderId) =>
         $"{EditPathPrefix}{purchaseOrderId}" +
         $"?Search={Uri.EscapeDataString(NavigationSearch)}" +
@@ -236,6 +366,70 @@ public sealed class PurchaseOrderEditHttpTests
         Assert.Equal(
             new DateOnly(2026, 12, 31),
             DateOnly.Parse(toDate));
+        Assert.Equal(NavigationStatus, Assert.Single(query["Status"]));
+        Assert.Equal(NavigationSortBy, Assert.Single(query["SortBy"]));
+        Assert.Equal("True", Assert.Single(query["Descending"]), ignoreCase: true);
+        Assert.Equal(
+            NavigationPageNum.ToString(CultureInfo.InvariantCulture),
+            Assert.Single(query["PageNum"]));
+        Assert.Equal(
+            NavigationPageSize.ToString(CultureInfo.InvariantCulture),
+            Assert.Single(query["PageSize"]));
+    }
+
+    private static void AssertItemFormNavigation(
+        PurchaseOrderEditForm form,
+        PurchaseOrderEditArrangement arrangement)
+    {
+        Assert.Equal(
+            arrangement.PurchaseOrderId.ToString(CultureInfo.InvariantCulture),
+            form.Fields["id"]);
+        Assert.Equal(
+            arrangement.ProductId.ToString(CultureInfo.InvariantCulture),
+            form.Fields["productId"]);
+        Assert.Equal(NavigationSearch, form.Fields["Search"]);
+        Assert.Equal(
+            new DateOnly(2026, 1, 1),
+            DateOnly.Parse(form.Fields["FromDate"]));
+        Assert.Equal(
+            new DateOnly(2026, 12, 31),
+            DateOnly.Parse(form.Fields["ToDate"]));
+        Assert.Equal(NavigationStatus, form.Fields["Status"]);
+        Assert.Equal(NavigationSortBy, form.Fields["SortBy"]);
+        Assert.Equal("true", form.Fields["Descending"], ignoreCase: true);
+        Assert.Equal(
+            NavigationPageNum.ToString(CultureInfo.InvariantCulture),
+            form.Fields["PageNum"]);
+        Assert.Equal(
+            NavigationPageSize.ToString(CultureInfo.InvariantCulture),
+            form.Fields["PageSize"]);
+    }
+
+    private static void AssertDetailsNavigation(
+        string href,
+        int purchaseOrderId,
+        bool expectNavigation)
+    {
+        var destination = new Uri(new Uri("https://localhost"), href);
+        var query = QueryHelpers.ParseQuery(destination.Query);
+
+        Assert.Equal(
+            $"/Purchasing/PurchaseOrders/Details/{purchaseOrderId}",
+            destination.AbsolutePath);
+
+        if (!expectNavigation)
+        {
+            Assert.Empty(query);
+            return;
+        }
+
+        Assert.Equal(NavigationSearch, Assert.Single(query["Search"]));
+        Assert.Equal(
+            new DateOnly(2026, 1, 1),
+            DateOnly.Parse(Assert.Single(query["FromDate"])!));
+        Assert.Equal(
+            new DateOnly(2026, 12, 31),
+            DateOnly.Parse(Assert.Single(query["ToDate"])!));
         Assert.Equal(NavigationStatus, Assert.Single(query["Status"]));
         Assert.Equal(NavigationSortBy, Assert.Single(query["SortBy"]));
         Assert.Equal("True", Assert.Single(query["Descending"]), ignoreCase: true);
