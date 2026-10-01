@@ -18,8 +18,8 @@ namespace InventoryPlatform.Web.Tests.Http;
 /// <summary>
 /// Sprint 22 Purchase Order Edit HTTP coverage.
 ///
-/// T02 covers exactly the frozen H1-H3 GET/authorization cases while retaining
-/// the T01 fixture-local arrangement and extraction foundation.
+/// T02 and T03 cover exactly the frozen H1-H6 GET, authorization, POST,
+/// persistence, and domain-failure cases while retaining the T01 foundation.
 /// </summary>
 public sealed class PurchaseOrderEditHttpTests
 {
@@ -149,6 +149,139 @@ public sealed class PurchaseOrderEditHttpTests
             arrangement.PurchaseOrderId);
         Assert.Equal(PurchaseOrderStatus.Submitted, persistedState.Status);
         AssertPersistedStateUnchanged(arrangement.InitialState, persistedState);
+    }
+
+    [Fact]
+    public async Task PostUpdateItem_WithValidValues_RedirectsAndPersistsChanges()
+    {
+        await using var factory = new InventoryPlatformWebApplicationFactory();
+        var arrangement = await ArrangeOneItemPurchaseOrderAsync(factory);
+        var cookieContainer = new CookieContainer();
+        using var client = CreateCookiePreservingManagerClient(
+            factory,
+            cookieContainer);
+
+        var getResponse = await client.GetAsync(
+            BuildEditPathWithNavigation(arrangement.PurchaseOrderId));
+        var getHtml = await getResponse.Content.ReadAsStringAsync();
+        Assert.Equal(HttpStatusCode.OK, getResponse.StatusCode);
+        var updateForm = PurchaseOrderEditFormExtraction.ExtractUpdateForm(
+            getHtml,
+            arrangement.ProductId);
+        AssertItemFormNavigation(updateForm, arrangement);
+        Assert.Equal("5", updateForm.Fields["quantity"]);
+        Assert.Equal("12.50", updateForm.Fields["unitCost"]);
+        Assert.False(string.IsNullOrWhiteSpace(
+            updateForm.Fields["__RequestVerificationToken"]));
+
+        using var content = CreateFormContent(
+            updateForm,
+            ("quantity", "8"),
+            ("unitCost", "15.75"));
+        var response = await client.PostAsync(updateForm.Action, content);
+
+        Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
+        AssertEditNavigation(
+            Assert.IsType<Uri>(response.Headers.Location),
+            arrangement.PurchaseOrderId);
+        var persistedState = await ReadStateAsync(
+            factory,
+            arrangement.PurchaseOrderId);
+        AssertUnrelatedPurchaseOrderStateUnchanged(
+            arrangement.InitialState,
+            persistedState);
+        Assert.Equal(PurchaseOrderStatus.Draft, persistedState.Status);
+        Assert.Equal(126.00m, persistedState.TotalAmount);
+        var persistedItem = Assert.Single(persistedState.Items);
+        Assert.Equal(arrangement.ProductId, persistedItem.ProductId);
+        Assert.Equal(8m, persistedItem.Quantity);
+        Assert.Equal(15.75m, persistedItem.UnitCost);
+        Assert.Equal(0m, persistedItem.ReceivedQuantity);
+    }
+
+    [Fact]
+    public async Task PostUpdateItem_WithZeroQuantity_RedisplaysErrorAndDoesNotMutate()
+    {
+        await using var factory = new InventoryPlatformWebApplicationFactory();
+        var arrangement = await ArrangeOneItemPurchaseOrderAsync(factory);
+        var cookieContainer = new CookieContainer();
+        using var client = CreateCookiePreservingManagerClient(
+            factory,
+            cookieContainer);
+
+        var getResponse = await client.GetAsync(
+            BuildEditPathWithNavigation(arrangement.PurchaseOrderId));
+        var getHtml = await getResponse.Content.ReadAsStringAsync();
+        Assert.Equal(HttpStatusCode.OK, getResponse.StatusCode);
+        var updateForm = PurchaseOrderEditFormExtraction.ExtractUpdateForm(
+            getHtml,
+            arrangement.ProductId);
+        AssertItemFormNavigation(updateForm, arrangement);
+        Assert.False(string.IsNullOrWhiteSpace(
+            updateForm.Fields["__RequestVerificationToken"]));
+
+        using var content = CreateFormContent(updateForm, ("quantity", "0"));
+        var response = await client.PostAsync(updateForm.Action, content);
+        var responseHtml = await response.Content.ReadAsStringAsync();
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Contains(
+            "Quantity must be greater than zero.",
+            PurchaseOrderEditFormExtraction.ExtractValidationSummaryText(
+                responseHtml),
+            StringComparison.Ordinal);
+        var redisplayedForm = PurchaseOrderEditFormExtraction.ExtractUpdateForm(
+            responseHtml,
+            arrangement.ProductId);
+        Assert.Equal("5", redisplayedForm.Fields["quantity"]);
+        Assert.Equal("12.50", redisplayedForm.Fields["unitCost"]);
+        AssertItemFormNavigation(redisplayedForm, arrangement);
+        AssertPersistedStateUnchanged(
+            arrangement.InitialState,
+            await ReadStateAsync(factory, arrangement.PurchaseOrderId));
+    }
+
+    [Fact]
+    public async Task PostRemoveItem_ForFinalDraftItem_RedirectsAndPersistsEmptyDraft()
+    {
+        await using var factory = new InventoryPlatformWebApplicationFactory();
+        var arrangement = await ArrangeOneItemPurchaseOrderAsync(factory);
+        Assert.Single(arrangement.InitialState.Items);
+        var cookieContainer = new CookieContainer();
+        using var client = CreateCookiePreservingManagerClient(
+            factory,
+            cookieContainer);
+
+        var getResponse = await client.GetAsync(
+            BuildEditPathWithNavigation(arrangement.PurchaseOrderId));
+        var getHtml = await getResponse.Content.ReadAsStringAsync();
+        Assert.Equal(HttpStatusCode.OK, getResponse.StatusCode);
+        var removeForm = PurchaseOrderEditFormExtraction.ExtractRemoveForm(
+            getHtml,
+            arrangement.ProductId);
+        AssertItemFormNavigation(removeForm, arrangement);
+        Assert.False(string.IsNullOrWhiteSpace(
+            removeForm.Fields["__RequestVerificationToken"]));
+
+        using var content = CreateFormContent(removeForm);
+        var response = await client.PostAsync(removeForm.Action, content);
+
+        Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
+        AssertEditNavigation(
+            Assert.IsType<Uri>(response.Headers.Location),
+            arrangement.PurchaseOrderId);
+        var persistedState = await ReadStateAsync(
+            factory,
+            arrangement.PurchaseOrderId);
+        AssertUnrelatedPurchaseOrderStateUnchanged(
+            arrangement.InitialState,
+            persistedState);
+        Assert.Equal(PurchaseOrderStatus.Draft, persistedState.Status);
+        Assert.Equal(0m, persistedState.TotalAmount);
+        Assert.Empty(persistedState.Items);
+        Assert.DoesNotContain(
+            persistedState.Items,
+            item => item.ProductId == arrangement.ProductId);
     }
 
     private static async Task<PurchaseOrderEditArrangement>
@@ -290,6 +423,30 @@ public sealed class PurchaseOrderEditHttpTests
         Assert.Equal(expected.Items.ToArray(), actual.Items.ToArray());
     }
 
+    private static void AssertUnrelatedPurchaseOrderStateUnchanged(
+        PurchaseOrderPersistedState expected,
+        PurchaseOrderPersistedState actual)
+    {
+        Assert.Equal(expected.SupplierId, actual.SupplierId);
+        Assert.Equal(expected.OrderDate, actual.OrderDate);
+        Assert.Equal(expected.ExpectedDeliveryDate, actual.ExpectedDeliveryDate);
+        Assert.Equal(expected.Remarks, actual.Remarks);
+    }
+
+    private static FormUrlEncodedContent CreateFormContent(
+        PurchaseOrderEditForm form,
+        params (string Name, string Value)[] overrides)
+    {
+        var fields = new Dictionary<string, string>(form.Fields);
+
+        foreach (var (name, value) in overrides)
+        {
+            fields[name] = value;
+        }
+
+        return new FormUrlEncodedContent(fields);
+    }
+
     private static string BuildEditPathWithNavigation(int purchaseOrderId) =>
         $"{EditPathPrefix}{purchaseOrderId}" +
         $"?Search={Uri.EscapeDataString(NavigationSearch)}" +
@@ -362,10 +519,10 @@ public sealed class PurchaseOrderEditHttpTests
         Assert.Equal(NavigationSearch, Assert.Single(query["Search"]));
         Assert.Equal(
             new DateOnly(2026, 1, 1),
-            DateOnly.Parse(fromDate));
+            DateOnly.Parse(fromDate, CultureInfo.InvariantCulture));
         Assert.Equal(
             new DateOnly(2026, 12, 31),
-            DateOnly.Parse(toDate));
+            DateOnly.Parse(toDate, CultureInfo.InvariantCulture));
         Assert.Equal(NavigationStatus, Assert.Single(query["Status"]));
         Assert.Equal(NavigationSortBy, Assert.Single(query["SortBy"]));
         Assert.Equal("True", Assert.Single(query["Descending"]), ignoreCase: true);
