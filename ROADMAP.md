@@ -22,7 +22,7 @@ v1.3  Account Management       ✅
 v1.4  Additional Reporting     ✅
 v1.5  Purchasing Enhancements  ✅
 v1.6  Dynamic Capability Auth  ✅
-(Sprint 11 Automated Testing ✅ — non-release; Sprint 12 Authorization Refinement ✅ — non-release; Sprint 13 Purchasing Workflow Test Automation ✅ — non-release; Sprint 14 Purchase Order Cancellation and Draft Item Editing ✅ — non-release; Sprint 15 Purchase Order Workflow Error Handling and UX Hardening ✅ — non-release; Sprint 16 Purchase Order POST Round-Trip State and Create Failure Presentation Corrections ✅ — non-release; Sprint 17 HTTP/Razor Integration-Test Foundation ✅ — non-release; Sprint 18 SQL Server Relational Verification ✅ — non-release; Sprint 19 Purchase Order Create HTTP/Razor Integration Coverage ✅ — non-release; Sprint 20 Provider-Neutral Continuous Verification ✅ — non-release; Sprint 21 Validation Invocation Architecture ✅ — non-release)
+(Sprint 11 Automated Testing ✅ — non-release; Sprint 12 Authorization Refinement ✅ — non-release; Sprint 13 Purchasing Workflow Test Automation ✅ — non-release; Sprint 14 Purchase Order Cancellation and Draft Item Editing ✅ — non-release; Sprint 15 Purchase Order Workflow Error Handling and UX Hardening ✅ — non-release; Sprint 16 Purchase Order POST Round-Trip State and Create Failure Presentation Corrections ✅ — non-release; Sprint 17 HTTP/Razor Integration-Test Foundation ✅ — non-release; Sprint 18 SQL Server Relational Verification ✅ — non-release; Sprint 19 Purchase Order Create HTTP/Razor Integration Coverage ✅ — non-release; Sprint 20 Provider-Neutral Continuous Verification ✅ — non-release; Sprint 21 Validation Invocation Architecture ✅ — non-release; Sprint 22 Purchase Order Draft Item Edit HTTP/Razor Coverage ✅ — non-release)
 
 ---
 
@@ -534,9 +534,35 @@ Provider-neutral gate total: **545 passed, 0 failed, 0 skipped** (Sprint 20 base
 
 Sprint 21 closed C20-11/C19-01 and reallocated none of the remaining items.
 
+## Sprint 22 - Purchase Order Draft Item Edit HTTP/Razor Coverage
+
+**Status:** Complete/Closed — technical/testing, non-release sprint; v1.6.0 remains the latest release baseline. No version or tag was created.
+
+Sprint 22 closes the bounded Purchase Order Draft Edit real-host HTTP/Razor gap. Exactly six behaviors cover authorized Draft Edit GET, denial of a persisted no-group user through the real `PurchaseOrder.Edit` policy, Submitted Edit redirect, valid UpdateItem PRG/persistence, zero-quantity Domain-failure redisplay/no-mutation, and final-item removal preserving an empty Draft with total 0. H4-H6 use rendered antiforgery tokens with matching cookies and fresh same-factory persistence inspection.
+
+### Final Verification
+
+- UnitTests: 355 passed
+- Web.Tests: 70 passed
+- ProviderNeutral IntegrationTests: 126 passed
+- Provider-neutral total: 551 passed, 0 failed, 0 skipped
+- Normal Release build: 0 warnings, 0 errors
+- Shared provider-neutral script: exit 0
+- EF pending model changes: none; 10-migration chain unchanged
+- SQL Server relational and browser/E2E/manual verification: not required or run
+- Production behavior and release surface: unchanged
+
+### Carry-Forward
+
+**Closed by Sprint 22:** the Purchase Order Draft Edit GET/UpdateItem/RemoveItem portion of C20-02 broader HTTP/Razor coverage.
+
+**Remaining unassigned:** Approve, Receive, and Cancel HTTP coverage; broader HTTP/Razor routes and Details transitions; C20-01 SQL Server relational CI; C20-03 browser/E2E; C20-04 EditStatus authorization guard decision; C20-05 report authorization; Viewer permission intent; C20-06 warning remediation; C20-07 broader SQL relational/report verification; C20-08 Sales; C20-09 Audit; C20-10 import/attachment/barcode.
+
+Sprint 22 selects no next sprint or direction.
+
 ## Next Sprint Planning
 
-Sprint 11 through Sprint 21 are complete. Sprint 20 closed the C19-02 provider-neutral continuous verification carry-forward item: the provider-neutral CI foundation exists, the hosted workflow executed successfully, and the provider-neutral gate makes zero LocalDB/SQL Server provider contact. Sprint 21 closed the C20-11/C19-01 validation invocation/architecture item: the Purchase Order Create validators are now invoked at the Application handler boundary under DD-046, proven at the handler and real HTTP/Razor layers, with the Domain invariants and handler lookup ownership retained and the empty-Draft Create behavior explicitly distinguished from Domain-invalid empty-Draft Submit. SQL Server relational CI remains future work (C20-01). The next activity requires separate planning; no Sprint 22 scope has been selected and none of the remaining Sprint 20/Sprint 21 carry-forward items are assigned to it.
+Sprint 11 through Sprint 22 are complete. Sprint 22 closed only the Purchase Order Draft Edit GET/UpdateItem/RemoveItem portion of the broader HTTP/Razor coverage gap, with six real-host behaviors and a 551-test provider-neutral baseline. Approve, Receive, Cancel, broader route/transition coverage, SQL Server relational CI, browser/E2E, authorization questions, warning remediation, broader relational/report verification, Sales, Audit, and import/attachment/barcode work remain unassigned. The next activity requires separate planning; no next sprint or direction has been selected.
 
 ## D1 - Documentation Synchronization
 
@@ -554,6 +580,12 @@ Dynamic Capability-Based Authorization remains outside the completed Purchasing 
 ---
 
 # Current Release
+
+## Version 1.6.0 - Dynamic Capability-Based Authorization
+
+Released in Sprint 10. Sprints 11-22 are completed non-release engineering sprints; Sprint 22 does not change the semantic release baseline.
+
+# Historical Release Snapshot - Sprint 8
 
 ## Version 1.5.0 - Sprint 8 Purchasing Enhancements
 
