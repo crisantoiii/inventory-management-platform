@@ -1,5 +1,30 @@
 # Changelog
 
+## [Sprint 22] - Purchase Order Draft Item Edit HTTP/Razor Coverage
+
+### Summary
+
+Closed the bounded Purchase Order Draft Edit real-host HTTP/Razor coverage gap with six tests covering the existing Edit GET, UpdateItem, and RemoveItem paths through real capability authorization, rendered antiforgery, model binding, PRG, persistence, expected Domain-failure redisplay, and no-mutation behavior. This was technical/testing work, not a product feature or release: production behavior did not change, no version or tag was created, and v1.6.0 remains the latest release baseline.
+
+### Added
+
+- `PurchaseOrderEditHttpTests` with exactly six behaviors: authorized Draft Edit GET; persisted no-group-user denial through the real `PurchaseOrder.Edit` policy; Submitted Edit redirect; valid UpdateItem POST and persistence; zero-quantity Domain-failure redisplay with no mutation; and final-item removal preserving an empty Draft with total 0.
+- `PurchaseOrderEditFormExtraction`, a narrow BCL-only helper that selects the rendered row forms, extracts their effective actions and hidden inputs including the real antiforgery token, and reads the Edit controls, validation summary, and navigation state.
+- Real POST composition proof for H4-H6 using the rendered antiforgery token with its matching cookie, followed by fresh-scope inspection from the same factory.
+
+### Verification and Scope
+
+- Provider-neutral baseline: 551 passing (355 UnitTests, 70 Web.Tests, 126 ProviderNeutral IntegrationTests; 0 failed, 0 skipped).
+- Purchase Order HTTP regressions: Edit 6/6, Create 6/6, Submit 2/2.
+- Shared provider-neutral script exited 0; normal Release build completed with 0 warnings/0 errors; EF reported no pending model changes; the 10-migration chain remains unchanged.
+- `SqlServerRelational` and browser/E2E/manual verification were outside Sprint 22 and were not executed; H1-H6 make no SQL Server or browser claim.
+- No production, Domain, Application, Web behavior, schema, migration, package, project, configuration, script, CI, or release change.
+
+### Carry-Forward
+
+- Closed only the Purchase Order Draft Edit GET/UpdateItem/RemoveItem portion of broader HTTP/Razor coverage.
+- Approve, Receive, Cancel, broader route/transition coverage, SQL Server relational CI/expansion, browser/E2E, report authorization, Viewer permission intent, EditStatus authorization, warning remediation, Sales, Audit, and import/attachment/barcode work remain unassigned.
+
 ## [Sprint 21] - Validation Invocation Architecture
 
 ### Summary
