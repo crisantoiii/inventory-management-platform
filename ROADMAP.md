@@ -22,7 +22,7 @@ v1.3  Account Management       ✅
 v1.4  Additional Reporting     ✅
 v1.5  Purchasing Enhancements  ✅
 v1.6  Dynamic Capability Auth  ✅
-(Sprint 11 Automated Testing ✅ — non-release; Sprint 12 Authorization Refinement ✅ — non-release; Sprint 13 Purchasing Workflow Test Automation ✅ — non-release; Sprint 14 Purchase Order Cancellation and Draft Item Editing ✅ — non-release; Sprint 15 Purchase Order Workflow Error Handling and UX Hardening ✅ — non-release; Sprint 16 Purchase Order POST Round-Trip State and Create Failure Presentation Corrections ✅ — non-release; Sprint 17 HTTP/Razor Integration-Test Foundation ✅ — non-release; Sprint 18 SQL Server Relational Verification ✅ — non-release; Sprint 19 Purchase Order Create HTTP/Razor Integration Coverage ✅ — non-release; Sprint 20 Provider-Neutral Continuous Verification ✅ — non-release; Sprint 21 Validation Invocation Architecture ✅ — non-release; Sprint 22 Purchase Order Draft Item Edit HTTP/Razor Coverage ✅ — non-release)
+(Sprint 11 Automated Testing ✅ — non-release; Sprint 12 Authorization Refinement ✅ — non-release; Sprint 13 Purchasing Workflow Test Automation ✅ — non-release; Sprint 14 Purchase Order Cancellation and Draft Item Editing ✅ — non-release; Sprint 15 Purchase Order Workflow Error Handling and UX Hardening ✅ — non-release; Sprint 16 Purchase Order POST Round-Trip State and Create Failure Presentation Corrections ✅ — non-release; Sprint 17 HTTP/Razor Integration-Test Foundation ✅ — non-release; Sprint 18 SQL Server Relational Verification ✅ — non-release; Sprint 19 Purchase Order Create HTTP/Razor Integration Coverage ✅ — non-release; Sprint 20 Provider-Neutral Continuous Verification ✅ — non-release; Sprint 21 Validation Invocation Architecture ✅ — non-release; Sprint 22 Purchase Order Draft Item Edit HTTP/Razor Coverage ✅ — non-release; Sprint 23 Purchase Order Lifecycle HTTP/Razor Completion ✅ — non-release)
 
 ---
 
@@ -560,9 +560,17 @@ Sprint 22 closes the bounded Purchase Order Draft Edit real-host HTTP/Razor gap.
 
 Sprint 22 selects no next sprint or direction.
 
+## Sprint 23 - Purchase Order Lifecycle HTTP/Razor Completion
+
+**Status:** Complete/Closed — technical/testing, non-release sprint; v1.6.0 remains latest.
+
+Sprint 23 closed the frozen Approve/Receive/Cancel matrix with seven real-host cases: Approve success; partial Receive to Receiving; final Receive to Completed; excess Receive atomic failure; Submitted Cancel; stale Cancel after a persisted transition to Approved; and persisted View-only Receive denial. Final provider-neutral verification passed 558 tests (355 UnitTests, 77 Web.Tests, 126 ProviderNeutral IntegrationTests; 0 failed, 0 skipped).
+
+Normal Release was 0 warnings/0 errors; forced non-incremental Release retained 28 historical warnings/0 errors with none from Sprint 23. EF reported no pending model changes across 10 migrations. Graphify finished at 12,760 nodes, 19,018 edges, and 949 communities. Exactly two test-source files changed; production and release state were unchanged. SQL Server relational and browser/E2E/manual verification were excluded.
+
 ## Next Sprint Planning
 
-Sprint 11 through Sprint 22 are complete. Sprint 22 closed only the Purchase Order Draft Edit GET/UpdateItem/RemoveItem portion of the broader HTTP/Razor coverage gap, with six real-host behaviors and a 551-test provider-neutral baseline. Approve, Receive, Cancel, broader route/transition coverage, SQL Server relational CI, browser/E2E, authorization questions, warning remediation, broader relational/report verification, Sales, Audit, and import/attachment/barcode work remain unassigned. The next activity requires separate planning; no next sprint or direction has been selected.
+Sprint 11 through Sprint 23 are complete. Sprint 23 closed the frozen Purchase Order Approve/Receive/Cancel HTTP/Razor matrix with seven behaviors and a 558-test provider-neutral baseline. Remaining work has not been assigned to Sprint 24. The next activity is fresh post-Sprint-23 repository discovery and candidate selection.
 
 ## D1 - Documentation Synchronization
 
@@ -583,7 +591,7 @@ Dynamic Capability-Based Authorization remains outside the completed Purchasing 
 
 ## Version 1.6.0 - Dynamic Capability-Based Authorization
 
-Released in Sprint 10. Sprints 11-22 are completed non-release engineering sprints; Sprint 22 does not change the semantic release baseline.
+Released in Sprint 10. Sprints 11-23 are completed non-release engineering sprints; Sprint 23 does not change the semantic release baseline.
 
 # Historical Release Snapshot - Sprint 8
 

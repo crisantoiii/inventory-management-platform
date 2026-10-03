@@ -1,5 +1,22 @@
 # Changelog
 
+## [Sprint 23] - Purchase Order Lifecycle HTTP/Razor Completion
+
+### Summary
+
+Closed the frozen real-host HTTP/Razor coverage matrix for Purchase Order Approve, Receive, and Cancel with seven behavioral tests. This was technical/testing work: production behavior did not change, no version or tag was created, and v1.6.0 remains the latest semantic release.
+
+### Added and Verified
+
+- Added `PurchaseOrderLifecycleHttpTests` and the narrow BCL-only `PurchaseOrderLifecycleFormExtraction` for exactly H1-H7.
+- Provider-neutral baseline: 558 passing (355 UnitTests, 77 Web.Tests, 126 ProviderNeutral IntegrationTests; 0 failed, 0 skipped), up from 551/70 Web.Tests.
+- Purchase Order HTTP regressions: Create 6/6, Submit 2/2, Edit 6/6, Lifecycle 7/7.
+- Normal Release: 0 warnings/0 errors. Forced non-incremental Release: 28 historical warnings/0 errors; Sprint 23 added none.
+- EF pending model changes: none; migrations unchanged at 10.
+- Graphify: 12,760 nodes, 19,018 edges, 949 communities.
+- Exactly two test-source files changed; no production or release change.
+- SQL Server relational and browser/E2E/manual verification were not executed; Sprint 23 makes no SQL Server or browser claim.
+
 ## [Sprint 22] - Purchase Order Draft Item Edit HTTP/Razor Coverage
 
 ### Summary
