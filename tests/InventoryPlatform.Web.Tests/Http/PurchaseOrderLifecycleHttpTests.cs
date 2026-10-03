@@ -110,6 +110,127 @@ public sealed class PurchaseOrderLifecycleHttpTests
             approvedBaseline, actual, PurchaseOrderStatus.Approved);
     }
 
+    [Fact]
+    public async Task PostReceive_PartialQuantity_ReceivesStockAndCreatesOneTransaction()
+    {
+        using var factory = new InventoryPlatformWebApplicationFactory();
+        var arrangement = await ArrangeApprovedAsync(factory);
+        using var client = CreateClient(
+            factory, TestUserSelectors.InventoryManager, new CookieContainer());
+        var details = await client.GetAsync(BuildDetailsPath(arrangement.PurchaseOrderId));
+        Assert.Equal(HttpStatusCode.OK, details.StatusCode);
+        var form = PurchaseOrderLifecycleFormExtraction.ExtractReceiveForm(
+            await details.Content.ReadAsStringAsync(), arrangement.ProductId);
+        AssertFormNavigation(form);
+        const decimal received = 2m;
+        var startedUtc = DateTime.UtcNow;
+
+        var response = await client.PostAsync(
+            form.Action,
+            CreateFormContent(form, ("quantity", received.ToString(CultureInfo.InvariantCulture))));
+        var finishedUtc = DateTime.UtcNow;
+
+        Assert.Equal(HttpStatusCode.Found, response.StatusCode);
+        Assert.NotNull(response.Headers.Location);
+        AssertDetailsDestination(response.Headers.Location, arrangement.PurchaseOrderId);
+        AssertReceiveTransition(
+            arrangement, await ReadStateAsync(factory, arrangement), received,
+            PurchaseOrderStatus.Receiving, startedUtc, finishedUtc);
+    }
+
+    [Fact]
+    public async Task PostReceive_FinalQuantity_CompletesOrderAndCreatesOneTransaction()
+    {
+        using var factory = new InventoryPlatformWebApplicationFactory();
+        var arrangement = await ArrangeApprovedAsync(factory);
+        using var client = CreateClient(
+            factory, TestUserSelectors.InventoryManager, new CookieContainer());
+        var details = await client.GetAsync(BuildDetailsPath(arrangement.PurchaseOrderId));
+        Assert.Equal(HttpStatusCode.OK, details.StatusCode);
+        var form = PurchaseOrderLifecycleFormExtraction.ExtractReceiveForm(
+            await details.Content.ReadAsStringAsync(), arrangement.ProductId);
+        AssertFormNavigation(form);
+        var item = Assert.Single(arrangement.InitialState.Items);
+        var remaining = item.Quantity - item.ReceivedQuantity;
+        var startedUtc = DateTime.UtcNow;
+
+        var response = await client.PostAsync(
+            form.Action,
+            CreateFormContent(form, ("quantity", remaining.ToString(CultureInfo.InvariantCulture))));
+        var finishedUtc = DateTime.UtcNow;
+
+        Assert.Equal(HttpStatusCode.Found, response.StatusCode);
+        Assert.NotNull(response.Headers.Location);
+        AssertDetailsDestination(response.Headers.Location, arrangement.PurchaseOrderId);
+        var actual = await ReadStateAsync(factory, arrangement);
+        AssertReceiveTransition(
+            arrangement, actual, remaining, PurchaseOrderStatus.Completed,
+            startedUtc, finishedUtc);
+        var receivedItem = Assert.Single(actual.Items);
+        Assert.Equal(receivedItem.Quantity, receivedItem.ReceivedQuantity);
+        Assert.Equal(0m, receivedItem.Quantity - receivedItem.ReceivedQuantity);
+    }
+
+    [Fact]
+    public async Task PostReceive_ExcessQuantity_RedisplaysErrorWithoutAnyMutation()
+    {
+        using var factory = new InventoryPlatformWebApplicationFactory();
+        var arrangement = await ArrangeApprovedAsync(factory);
+        using var client = CreateClient(
+            factory, TestUserSelectors.InventoryManager, new CookieContainer());
+        var details = await client.GetAsync(BuildDetailsPath(arrangement.PurchaseOrderId));
+        Assert.Equal(HttpStatusCode.OK, details.StatusCode);
+        var form = PurchaseOrderLifecycleFormExtraction.ExtractReceiveForm(
+            await details.Content.ReadAsStringAsync(), arrangement.ProductId);
+        AssertFormNavigation(form);
+        var item = Assert.Single(arrangement.InitialState.Items);
+        var excess = item.Quantity - item.ReceivedQuantity + 1m;
+
+        var response = await client.PostAsync(
+            form.Action,
+            CreateFormContent(form, ("quantity", excess.ToString(CultureInfo.InvariantCulture))));
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Null(response.Headers.Location);
+        var html = await response.Content.ReadAsStringAsync();
+        Assert.Contains(
+            "Received quantity cannot exceed ordered quantity.",
+            html,
+            StringComparison.Ordinal);
+        var redisplayed = PurchaseOrderLifecycleFormExtraction.ExtractReceiveForm(
+            html, arrangement.ProductId);
+        AssertFormNavigation(redisplayed);
+        AssertOnlyStatusChanged(
+            arrangement.InitialState,
+            await ReadStateAsync(factory, arrangement),
+            PurchaseOrderStatus.Approved);
+    }
+
+    [Fact]
+    public async Task PostReceive_AsPersistedViewOnlyUser_RedirectsToAccessDeniedWithoutMutation()
+    {
+        using var factory = new InventoryPlatformWebApplicationFactory();
+        var arrangement = await ArrangeApprovedAsync(factory);
+        var viewOnly = await ArrangeViewOnlyUserAsync(factory);
+        using var client = CreateClient(
+            factory, viewOnly.Selector, new CookieContainer());
+        var details = await client.GetAsync(BuildDetailsPath(arrangement.PurchaseOrderId));
+        Assert.Equal(HttpStatusCode.OK, details.StatusCode);
+        var form = PurchaseOrderLifecycleFormExtraction.ExtractReceiveForm(
+            await details.Content.ReadAsStringAsync(), arrangement.ProductId);
+        AssertFormNavigation(form);
+
+        var response = await client.PostAsync(form.Action, CreateFormContent(form));
+
+        Assert.Equal(HttpStatusCode.Found, response.StatusCode);
+        Assert.NotNull(response.Headers.Location);
+        AssertAccessDeniedDestination(response.Headers.Location, form.Action);
+        AssertOnlyStatusChanged(
+            arrangement.InitialState,
+            await ReadStateAsync(factory, arrangement),
+            PurchaseOrderStatus.Approved);
+    }
+
     private static Task<LifecycleArrangement> ArrangeSubmittedAsync(
         InventoryPlatformWebApplicationFactory factory) =>
         ArrangeAsync(factory, approve: false);
@@ -256,7 +377,17 @@ public sealed class PurchaseOrderLifecycleHttpTests
     {
         var target = Absolute(location);
         Assert.Equal("/Identity/Account/AccessDenied", target.AbsolutePath);
-        Assert.Equal(returnUrl, Assert.Single(QueryHelpers.ParseQuery(target.Query)["ReturnUrl"]));
+        var actualReturnUrl = Assert.Single(
+            QueryHelpers.ParseQuery(target.Query)["ReturnUrl"]);
+        Assert.NotNull(actualReturnUrl);
+        var expected = Absolute(new Uri(returnUrl, UriKind.RelativeOrAbsolute));
+        var actual = Absolute(new Uri(actualReturnUrl, UriKind.RelativeOrAbsolute));
+        Assert.Equal(expected.AbsolutePath, actual.AbsolutePath);
+        var expectedQuery = QueryHelpers.ParseQuery(expected.Query);
+        var actualQuery = QueryHelpers.ParseQuery(actual.Query);
+        Assert.Equal(expectedQuery.Keys.Order(), actualQuery.Keys.Order());
+        foreach (var key in expectedQuery.Keys)
+            Assert.Equal(expectedQuery[key].ToArray(), actualQuery[key].ToArray());
     }
 
     private static void AssertFormNavigation(PurchaseOrderLifecycleForm form) =>
@@ -276,6 +407,50 @@ public sealed class PurchaseOrderLifecycleHttpTests
         Assert.Equal(expected.Items, actual.Items);
         Assert.Equal(expected.Product, actual.Product);
         Assert.Equal(expected.Transactions, actual.Transactions);
+    }
+
+    private static void AssertReceiveTransition(
+        LifecycleArrangement arrangement,
+        LifecycleState actual,
+        decimal received,
+        PurchaseOrderStatus expectedStatus,
+        DateTime startedUtc,
+        DateTime finishedUtc)
+    {
+        var expected = arrangement.InitialState;
+        Assert.Equal(expectedStatus, actual.Status);
+        Assert.Equal(expected.SupplierId, actual.SupplierId);
+        Assert.Equal(expected.OrderDate, actual.OrderDate);
+        Assert.Equal(expected.ExpectedDeliveryDate, actual.ExpectedDeliveryDate);
+        Assert.Equal(expected.Remarks, actual.Remarks);
+        Assert.Equal(expected.TotalAmount, actual.TotalAmount);
+        var beforeItem = Assert.Single(expected.Items);
+        var afterItem = Assert.Single(actual.Items);
+        Assert.Equal(beforeItem.ProductId, afterItem.ProductId);
+        Assert.Equal(beforeItem.Quantity, afterItem.Quantity);
+        Assert.Equal(beforeItem.UnitCost, afterItem.UnitCost);
+        Assert.Equal(beforeItem.ReceivedQuantity + received, afterItem.ReceivedQuantity);
+        Assert.Equal(expected.Product.ProductId, actual.Product.ProductId);
+        Assert.Equal(
+            expected.Product.QuantityOnHand + received,
+            actual.Product.QuantityOnHand);
+        Assert.Equal(expected.Transactions.Count + 1, actual.Transactions.Count);
+        Assert.Equal(
+            expected.Transactions,
+            actual.Transactions.Take(expected.Transactions.Count));
+        var transaction = actual.Transactions[^1];
+        Assert.Equal(TransactionType.StockIn, transaction.TransactionType);
+        Assert.Equal(arrangement.ProductId, transaction.ProductId);
+        Assert.Equal(received, transaction.Quantity);
+        Assert.Equal($"PO-{arrangement.PurchaseOrderId}", transaction.ReferenceNumber);
+        Assert.Equal(
+            $"Purchase Order {arrangement.PurchaseOrderId} receiving",
+            transaction.Remarks);
+        Assert.NotEqual(default, transaction.TransactionDateUtc);
+        Assert.InRange(
+            transaction.TransactionDateUtc,
+            startedUtc.AddSeconds(-5),
+            finishedUtc.AddSeconds(5));
     }
 
     private static void AssertNavigation<T>(IReadOnlyDictionary<string, T> values)
