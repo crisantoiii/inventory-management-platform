@@ -42,11 +42,188 @@ The focus is not only on implementing business features but also on applying pro
 
 ## Project Status
 
-**Current Version:** v1.6.0 - Dynamic Capability-Based Authorization
+### Current Version
 
-**Historical Development Status (Sprint 20):** Sprint 20 Provider-Neutral Continuous Verification — Complete/Closed. Every IntegrationTest now carries exactly one explicit `TestTier` (`ProviderNeutral` or `SqlServerRelational`), enforced by a fail-safe classification audit that locks the 14-identity SQL-provider-bound inventory; classification follows actual runtime provider dependency, not folder placement. Verification runs through one shared command authority, `scripts/verify-provider-neutral.ps1` (repository-local `dotnet-ef 10.0.10` tool restore and resolution evidence, solution restore, normal Release build, UnitTests, Web.Tests, affirmative `TestTier=ProviderNeutral` IntegrationTests, EF `migrations has-pending-model-changes`, TRX output, explicit executed/excluded tier summary), and the GitHub Actions workflow `.github/workflows/provider-neutral-verification.yml` (PR→main, push→main, manual dispatch; `windows-latest`; .NET 10.0.x; least-privilege `contents: read`) delegates entirely to that script. The hosted job completed successfully on a clean runner, uploading a three-file `provider-neutral-verification-results` TRX artifact. T03 verification empirically exposed one misclassified LocalDB connection probe; under the runtime-dependency rule it was reclassified to `SqlServerRelational` (relational inventory 13 → 14, ProviderNeutral 127 → 126), and the final provider-neutral gate makes zero LocalDB/SQL Server provider contact (instance stopped before and after gated runs; last-start timestamp unchanged). **Provider-neutral verification baseline: 535 passing** (346 UnitTests, 63 Web.Tests, 126 ProviderNeutral IntegrationTests; 0 failed, 0 skipped); the 14 `SqlServerRelational` tests are discovered and locked but intentionally not executed in the gate — Sprint 20 makes no SQL relational-pass claim (Sprint 18's relational passes are historical). Normal Release build is 0 warnings/0 errors (the non-incremental build retains 28 unchanged historical warnings/0 errors), EF reports no pending model changes across the unchanged 10-migration chain (latest `20260831141400_CreateAuthorizationSchema`). Sprint 20 made zero production changes and was technical/non-release; v1.6.0 remains the latest release baseline.
+**v1.6.0 — Dynamic Capability-Based Authorization**
 
-**Current Development Status:** Sprint 23 Purchase Order Lifecycle HTTP/Razor Completion — Complete/Closed. Seven real-host cases cover Approve, partial/final Receive, excess-Receive atomic failure, Submitted Cancel, stale Cancel, and persisted View-only Receive denial. The provider-neutral baseline is **558 passing** (355 UnitTests, 77 Web.Tests, 126 ProviderNeutral IntegrationTests; 0 failed, 0 skipped). Normal Release is 0 warnings/0 errors; forced non-incremental Release retains 28 historical warnings/0 errors with none introduced by Sprint 23. EF reports no pending model changes across 10 migrations. SQL Server relational and browser/E2E evidence were outside scope. Production behavior is unchanged, Sprint 23 is technical/testing and non-release, and v1.6.0 remains the latest semantic release. The next activity is fresh post-Sprint-23 repository discovery and candidate selection.
+---
+
+### Current Development Status
+
+#### Sprint 23 — Purchase Order Lifecycle HTTP/Razor Completion
+
+**Status:** ✅ Complete / Closed  
+**Classification:** Technical / Testing — Non-Release  
+**Production Changes:** None  
+**Latest Semantic Release:** `v1.6.0`
+
+Sprint 23 completed the remaining real-host HTTP/Razor coverage for the Purchase Order lifecycle.
+
+#### Coverage Completed
+
+Seven real-host scenarios are now covered:
+
+- **H1** — Approve success
+- **H2** — Partial Receive → `Receiving`
+- **H3** — Final Receive → `Completed`
+- **H4** — Excess Receive atomic failure
+- **H5** — Submitted Cancel success
+- **H6** — Stale Cancel after Submitted → Approved transition
+- **H7** — Persisted View-only user denied at Receive action authorization
+
+The tests exercise real rendered Razor forms, antiforgery tokens and matching cookies, production authorization paths, and fresh same-factory persistence verification.
+
+#### Verification Baseline
+
+| Test Suite | Passed | Failed | Skipped |
+|---|---:|---:|---:|
+| UnitTests | 355 | 0 | 0 |
+| Web.Tests | 77 | 0 | 0 |
+| ProviderNeutral IntegrationTests | 126 | 0 | 0 |
+| **Provider-Neutral Total** | **558** | **0** | **0** |
+
+#### Build and Persistence Verification
+
+- Normal Release build: **0 warnings / 0 errors**
+- Forced non-incremental Release build: **28 historical warnings / 0 errors**
+- Sprint 23 introduced warnings: **0**
+- EF pending model changes: **None**
+- Migration count: **10**
+- Latest migration: `20260831141400_CreateAuthorizationSchema`
+
+#### Scope Boundaries
+
+Sprint 23 did **not** include:
+
+- SQL Server relational verification for the new lifecycle HTTP scenarios
+- Browser/E2E automation
+- Manual browser verification
+- Production behavior changes
+- Version bump or semantic release tag
+
+The accepted evidence establishes real-host HTTP/Razor composition and provider-neutral persisted behavior.
+
+#### Next Activity
+
+The next development activity is:
+
+> **Fresh post-Sprint-23 repository discovery and candidate selection**
+
+No Sprint 24 direction has been preselected.
+
+---
+
+### Historical Development Milestone
+
+#### Sprint 20 — Provider-Neutral Continuous Verification
+
+**Status:** ✅ Complete / Closed  
+**Classification:** Technical / Non-Release  
+**Production Changes:** None
+
+Sprint 20 established the repository-wide provider-neutral verification architecture.
+
+Every IntegrationTest carries exactly one explicit `TestTier`:
+
+- `ProviderNeutral`
+- `SqlServerRelational`
+
+Classification is enforced by a fail-safe audit based on actual runtime provider dependency rather than folder placement.
+
+#### Shared Verification Authority
+
+Provider-neutral verification runs through:
+
+```text
+scripts/verify-provider-neutral.ps1
+```
+
+The shared verification flow includes:
+
+- repository-local `dotnet-ef 10.0.10` restore and resolution evidence
+- solution restore
+- normal Release build
+- UnitTests
+- Web.Tests
+- affirmative `TestTier=ProviderNeutral` IntegrationTests
+- EF `migrations has-pending-model-changes`
+- TRX result generation
+- explicit executed/excluded tier summary
+
+GitHub Actions delegates entirely to the same script through:
+
+```text
+.github/workflows/provider-neutral-verification.yml
+```
+
+Workflow triggers:
+
+- pull request → `main`
+- push → `main`
+- manual dispatch
+
+Hosted execution uses:
+
+- `windows-latest`
+- .NET `10.0.x`
+- least-privilege `contents: read`
+
+The hosted job completed successfully on a clean runner and uploaded the three-file:
+
+```text
+provider-neutral-verification-results
+```
+
+TRX artifact.
+
+#### Provider Classification Correction
+
+T03 verification exposed one LocalDB connection probe that had been incorrectly classified as provider-neutral.
+
+Under the runtime-dependency classification rule, it was reclassified to:
+
+```text
+SqlServerRelational
+```
+
+This changed the inventory from:
+
+```text
+SqlServerRelational: 13 → 14
+ProviderNeutral:     127 → 126
+```
+
+The final provider-neutral gate makes **zero LocalDB / SQL Server provider contact**.
+
+The SQL Server instance remained stopped before and after gated execution, and its last-start timestamp remained unchanged.
+
+#### Sprint 20 Verification Baseline
+
+| Test Suite | Passed |
+|---|---:|
+| UnitTests | 346 |
+| Web.Tests | 63 |
+| ProviderNeutral IntegrationTests | 126 |
+| **Provider-Neutral Total** | **535** |
+
+- Failed: **0**
+- Skipped: **0**
+- `SqlServerRelational` tests discovered and locked: **14**
+- SQL relational execution during Sprint 20: **Not performed**
+
+Sprint 18 SQL relational passes remain historical evidence only.
+
+#### Build and EF State
+
+- Normal Release build: **0 warnings / 0 errors**
+- Non-incremental build: **28 historical warnings / 0 errors**
+- EF pending model changes: **None**
+- Migration count: **10**
+- Latest migration: `20260831141400_CreateAuthorizationSchema`
+
+Sprint 20 made no production changes and did not create a semantic release.
+
+`v1.6.0` remained the latest release baseline.
 
 ## Completed Modules
 
