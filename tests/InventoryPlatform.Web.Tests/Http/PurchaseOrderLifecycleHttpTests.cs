@@ -24,6 +24,92 @@ public sealed class PurchaseOrderLifecycleHttpTests
         "S23 lifecycle / retained", new DateOnly(2026, 1, 1),
         new DateOnly(2026, 12, 31), "Submitted", "OrderDate", true, 3, 25);
 
+    [Fact]
+    public async Task PostApprove_AsInventoryManager_ApprovesAndPreservesNavigation()
+    {
+        using var factory = new InventoryPlatformWebApplicationFactory();
+        var arrangement = await ArrangeSubmittedAsync(factory);
+        using var client = CreateClient(
+            factory, TestUserSelectors.InventoryManager, new CookieContainer());
+
+        var details = await client.GetAsync(BuildDetailsPath(arrangement.PurchaseOrderId));
+        Assert.Equal(HttpStatusCode.OK, details.StatusCode);
+        var form = PurchaseOrderLifecycleFormExtraction.ExtractApproveForm(
+            await details.Content.ReadAsStringAsync());
+        AssertFormNavigation(form);
+
+        var response = await client.PostAsync(form.Action, CreateFormContent(form));
+
+        Assert.Equal(HttpStatusCode.Found, response.StatusCode);
+        Assert.NotNull(response.Headers.Location);
+        AssertDetailsDestination(response.Headers.Location, arrangement.PurchaseOrderId);
+        var actual = await ReadStateAsync(factory, arrangement);
+        AssertOnlyStatusChanged(
+            arrangement.InitialState, actual, PurchaseOrderStatus.Approved);
+    }
+
+    [Fact]
+    public async Task PostCancel_AsInventoryManager_CancelsAndPreservesNavigation()
+    {
+        using var factory = new InventoryPlatformWebApplicationFactory();
+        var arrangement = await ArrangeSubmittedAsync(factory);
+        using var client = CreateClient(
+            factory, TestUserSelectors.InventoryManager, new CookieContainer());
+
+        var details = await client.GetAsync(BuildDetailsPath(arrangement.PurchaseOrderId));
+        Assert.Equal(HttpStatusCode.OK, details.StatusCode);
+        var form = PurchaseOrderLifecycleFormExtraction.ExtractCancelForm(
+            await details.Content.ReadAsStringAsync());
+        AssertFormNavigation(form);
+
+        var response = await client.PostAsync(form.Action, CreateFormContent(form));
+
+        Assert.Equal(HttpStatusCode.Found, response.StatusCode);
+        Assert.NotNull(response.Headers.Location);
+        AssertDetailsDestination(response.Headers.Location, arrangement.PurchaseOrderId);
+        var actual = await ReadStateAsync(factory, arrangement);
+        AssertOnlyStatusChanged(
+            arrangement.InitialState, actual, PurchaseOrderStatus.Cancelled);
+    }
+
+    [Fact]
+    public async Task PostStaleCancel_AfterApproval_RedisplaysForbiddenStateWithoutMutation()
+    {
+        using var factory = new InventoryPlatformWebApplicationFactory();
+        var arrangement = await ArrangeSubmittedAsync(factory);
+        using var client = CreateClient(
+            factory, TestUserSelectors.InventoryManager, new CookieContainer());
+
+        var details = await client.GetAsync(BuildDetailsPath(arrangement.PurchaseOrderId));
+        Assert.Equal(HttpStatusCode.OK, details.StatusCode);
+        var form = PurchaseOrderLifecycleFormExtraction.ExtractCancelForm(
+            await details.Content.ReadAsStringAsync());
+        AssertFormNavigation(form);
+        await AdvanceToApprovedAsync(factory, arrangement.PurchaseOrderId);
+        var approvedBaseline = await ReadStateAsync(factory, arrangement);
+        Assert.Equal(PurchaseOrderStatus.Approved, approvedBaseline.Status);
+
+        var response = await client.PostAsync(form.Action, CreateFormContent(form));
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Null(response.Headers.Location);
+        var html = await response.Content.ReadAsStringAsync();
+        Assert.Contains(
+            "Only draft or submitted purchase orders can be cancelled.",
+            html,
+            StringComparison.Ordinal);
+        Assert.Contains(
+            ">Approved<",
+            html.ReplaceLineEndings(string.Empty).Replace(" ", string.Empty));
+        var redisplayedReceiveForm =
+            PurchaseOrderLifecycleFormExtraction.ExtractReceiveForm(
+                html, arrangement.ProductId);
+        AssertFormNavigation(redisplayedReceiveForm);
+        var actual = await ReadStateAsync(factory, arrangement);
+        AssertOnlyStatusChanged(
+            approvedBaseline, actual, PurchaseOrderStatus.Approved);
+    }
+
     private static Task<LifecycleArrangement> ArrangeSubmittedAsync(
         InventoryPlatformWebApplicationFactory factory) =>
         ArrangeAsync(factory, approve: false);
@@ -176,18 +262,44 @@ public sealed class PurchaseOrderLifecycleHttpTests
     private static void AssertFormNavigation(PurchaseOrderLifecycleForm form) =>
         AssertNavigation(form.Fields);
 
+    private static void AssertOnlyStatusChanged(
+        LifecycleState expected,
+        LifecycleState actual,
+        PurchaseOrderStatus expectedStatus)
+    {
+        Assert.Equal(expectedStatus, actual.Status);
+        Assert.Equal(expected.SupplierId, actual.SupplierId);
+        Assert.Equal(expected.OrderDate, actual.OrderDate);
+        Assert.Equal(expected.ExpectedDeliveryDate, actual.ExpectedDeliveryDate);
+        Assert.Equal(expected.Remarks, actual.Remarks);
+        Assert.Equal(expected.TotalAmount, actual.TotalAmount);
+        Assert.Equal(expected.Items, actual.Items);
+        Assert.Equal(expected.Product, actual.Product);
+        Assert.Equal(expected.Transactions, actual.Transactions);
+    }
+
     private static void AssertNavigation<T>(IReadOnlyDictionary<string, T> values)
     {
         static string Value(object value) => value.ToString()!;
         Assert.Equal(Navigation.Search, Value(values["Search"]!));
-        Assert.Equal($"{Navigation.FromDate:yyyy-MM-dd}", Value(values["FromDate"]!));
-        Assert.Equal($"{Navigation.ToDate:yyyy-MM-dd}", Value(values["ToDate"]!));
+        Assert.Equal(
+            Navigation.FromDate,
+            ParseNavigationDate(Value(values["FromDate"]!)));
+        Assert.Equal(
+            Navigation.ToDate,
+            ParseNavigationDate(Value(values["ToDate"]!)));
         Assert.Equal(Navigation.Status, Value(values["Status"]!));
         Assert.Equal(Navigation.SortBy, Value(values["SortBy"]!));
         Assert.Equal(Navigation.Descending.ToString(), Value(values["Descending"]!), true);
         Assert.Equal(Navigation.PageNum.ToString(CultureInfo.InvariantCulture), Value(values["PageNum"]!));
         Assert.Equal(Navigation.PageSize.ToString(CultureInfo.InvariantCulture), Value(values["PageSize"]!));
     }
+
+    private static DateOnly ParseNavigationDate(string value) =>
+        DateOnly.ParseExact(
+            value,
+            ["yyyy-MM-dd", "dd/MM/yyyy", "MM/dd/yyyy"],
+            CultureInfo.InvariantCulture);
 
     private static Uri Absolute(Uri location) => location.IsAbsoluteUri
         ? location : new Uri(new Uri("https://localhost"), location);
