@@ -24,9 +24,19 @@ Rather than documenting daily work, it captures important architectural decision
 
 # Current Release State
 
-**Current Version:** Sprint 22 Purchase Order Draft Item Edit HTTP/Razor Coverage (technical/testing, non-release; v1.6.0 remains the latest release baseline)
+**Current Version:** Sprint 23 Purchase Order Lifecycle HTTP/Razor Completion (technical/testing, non-release; v1.6.0 remains the latest release baseline)
 
-Sprint 22 is complete and closed. The selected C2 direction and frozen Option B scope added exactly six real-host Purchase Order Draft Edit HTTP/Razor behaviors: authorized Draft Edit GET; denial of a persisted no-group user through the real `PurchaseOrder.Edit` policy; Submitted Edit redirect; valid UpdateItem PRG/persistence; zero-quantity Domain-failure HTTP 200 redisplay with the exact message and no mutation; and final-item removal preserving an empty Draft with total 0. H4-H6 use the real rendered antiforgery token and matching cookie, and persistence/no-mutation assertions use fresh scopes from the same isolated factory. T01 established the fixture/extractor, T02 delivered H1-H3, T03 delivered H4-H6, T04 accepted the integrated verification/scope audit, and T05 synchronized documentation and closed the sprint. The provider-neutral baseline is 551 passing (355 UnitTests, 70 Web.Tests, 126 ProviderNeutral IntegrationTests; 0 failed, 0 skipped); the shared gate exited 0, the normal Release build produced 0 warnings/0 errors, and EF reported no pending model changes across the unchanged 10-migration chain. SQL Server relational and browser/E2E/manual verification were outside scope and were not run. No production behavior or release surface changed. v1.6.0 remains the latest semantic release, and no next sprint or direction is selected. Retrospective: `docs/retrospectives/SPRINT_22_PURCHASE_ORDER_DRAFT_ITEM_EDIT_HTTP_COVERAGE.md`.
+Sprint 23 is complete and closed. Candidate A added exactly seven real-host Purchase Order lifecycle behaviors for Approve, Receive, and Cancel using rendered forms, matching antiforgery cookies, production authorization, semantic navigation comparison, stale-form sequencing, persisted View-only authorization, and fresh-scope persistence assertions. The provider-neutral baseline progressed from 551/70 Web.Tests to 558/77 Web.Tests (355 UnitTests and 126 ProviderNeutral IntegrationTests unchanged), with 0 failed and 0 skipped. Normal Release was 0 warnings/0 errors; forced non-incremental Release retained 28 historical warnings/0 errors and Sprint 23 added none. EF has no pending model changes across 10 migrations; Graphify is 12,760 nodes/19,018 edges/949 communities. SQL Server relational and browser/E2E/manual verification were excluded. Production and release state were unchanged; v1.6.0 remains latest. Fresh post-Sprint-23 discovery/planning is next. Retrospective: `docs/retrospectives/SPRINT_23_PO_LIFECYCLE_HTTP_RAZOR_COMPLETION.md`.
+
+# Sprint 23 - Purchase Order Lifecycle HTTP/Razor Completion
+
+**Date:** 2026-10-03  
+**Status:** Complete/Closed  
+**Classification:** Technical/testing, non-release
+
+The frozen H1-H7 matrix proves Approve success, partial and final Receive, excess-Receive atomicity, Submitted Cancel, stale Cancel, and persisted View-only Receive denial through the real HTTP/Razor pipeline. Major patterns were genuine rendered forms and antiforgery cookies, production capability authorization, semantic navigation comparison, same-factory fresh-scope inspection, exact stock and StockIn transaction deltas, and complete failure/denial no-mutation checks.
+
+Verification progressed from 551 provider-neutral tests before Sprint 23 to 558 after it: 355 UnitTests, 77 Web.Tests, and 126 ProviderNeutral IntegrationTests, with 0 failed and 0 skipped. Normal Release was clean; forced non-incremental reproduced 28 historical warnings and no Sprint 23 warning. EF reported no pending model changes, migrations remained at 10, and Graphify reached 12,760 nodes, 19,018 edges, and 949 communities. SQL Server relational and browser/E2E/manual execution were explicitly excluded. Production behavior and v1.6.0 were unchanged.
 
 # Sprint 22 - Purchase Order Draft Item Edit HTTP/Razor Coverage
 
