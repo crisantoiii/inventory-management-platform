@@ -473,7 +473,7 @@ public sealed class PurchaseOrderLifecycleHttpTests
     private static DateOnly ParseNavigationDate(string value) =>
         DateOnly.ParseExact(
             value,
-            ["yyyy-MM-dd", "dd/MM/yyyy", "MM/dd/yyyy"],
+            ["yyyy-MM-dd", "dd/MM/yyyy", "MM/dd/yyyy", "M/d/yyyy"],
             CultureInfo.InvariantCulture);
 
     private static Uri Absolute(Uri location) => location.IsAbsoluteUri
