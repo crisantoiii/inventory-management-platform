@@ -7,4 +7,5 @@
   <Project Path="../../tests/InventoryPlatform.UnitTests/InventoryPlatform.UnitTests.csproj" />
   <Project Path="../../tests/InventoryPlatform.IntegrationTests/InventoryPlatform.IntegrationTests.csproj" />
   <Project Path="../../tests/InventoryPlatform.Web.Tests/InventoryPlatform.Web.Tests.csproj" />
+  <Project Path="../../tests/InventoryPlatform.BrowserTests/InventoryPlatform.BrowserTests.csproj" />
 </Solution>
