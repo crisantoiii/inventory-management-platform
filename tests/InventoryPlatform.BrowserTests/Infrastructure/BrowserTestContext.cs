@@ -1,4 +1,5 @@
 using System.Text.Json;
+using InventoryPlatform.Infrastructure.Persistence.Context;
 using Microsoft.Playwright;
 
 namespace InventoryPlatform.BrowserTests.Infrastructure;
@@ -35,6 +36,10 @@ public sealed class BrowserTestContext : IAsyncDisposable
     public string StandardOutput => _host.CapturedStandardOutput;
 
     public string StandardError => _host.CapturedStandardError;
+
+    public string ConnectionString => _database.ConnectionString;
+
+    public ApplicationDbContext CreateDbContext() => _database.CreateDbContext();
 
     public static async Task<BrowserTestContext> StartAsync(
         CancellationToken cancellationToken = default)
@@ -243,9 +248,19 @@ public sealed class BrowserTestContext : IAsyncDisposable
 
         if (failures.Count > 0)
         {
-            throw new AggregateException(
-                $"Tearing down browser test run '{RunId}' failed.",
-                failures);
+            var unexpectedFailures = failures
+                .Where(failure =>
+                    !failure.Message.Contains("Target page, context or browser has been closed", StringComparison.Ordinal) &&
+                    (failure.InnerException is null ||
+                     !failure.InnerException.Message.Contains("Target page, context or browser has been closed", StringComparison.Ordinal)))
+                .ToList();
+
+            if (unexpectedFailures.Count > 0)
+            {
+                throw new AggregateException(
+                    $"Tearing down browser test run '{RunId}' failed.",
+                    unexpectedFailures);
+            }
         }
     }
 

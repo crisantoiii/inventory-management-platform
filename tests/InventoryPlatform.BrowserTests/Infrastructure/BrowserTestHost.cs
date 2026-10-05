@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Text.Json;
 
 namespace InventoryPlatform.BrowserTests.Infrastructure;
 
@@ -16,7 +17,11 @@ public sealed class BrowserTestHost : IAsyncDisposable
     private readonly StringBuilder _standardOutput = new();
     private readonly StringBuilder _standardError = new();
     private readonly HttpClient _httpClient = new(
-        new HttpClientHandler { AllowAutoRedirect = false })
+        new HttpClientHandler
+        {
+            AllowAutoRedirect = false,
+            ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+        })
     {
         Timeout = ReadinessRequestTimeout
     };
@@ -65,7 +70,7 @@ public sealed class BrowserTestHost : IAsyncDisposable
         ArgumentException.ThrowIfNullOrWhiteSpace(connectionString);
 
         var repositoryRoot = FindRepositoryRoot();
-        var baseUrl = $"http://127.0.0.1:{GetAvailablePort()}";
+        var baseUrl = $"https://127.0.0.1:{GetAvailablePort()}";
         var host = new BrowserTestHost(repositoryRoot, baseUrl);
 
         try
@@ -157,10 +162,13 @@ public sealed class BrowserTestHost : IAsyncDisposable
         startInfo.ArgumentList.Add("--project");
         startInfo.ArgumentList.Add(webProjectPath);
 
+        var certPath = EnsureDevelopmentCertificate();
         startInfo.Environment["ASPNETCORE_URLS"] = BaseUrl;
         startInfo.Environment["ASPNETCORE_ENVIRONMENT"] = "Development";
         startInfo.Environment["DOTNET_ENVIRONMENT"] = "Development";
         startInfo.Environment["ConnectionStrings__DefaultConnection"] = connectionString;
+        startInfo.Environment["ASPNETCORE_Kestrel__Certificates__Default__Path"] = certPath;
+        startInfo.Environment["ASPNETCORE_Kestrel__Certificates__Default__Password"] = "inventory-platform-browser-tests";
         startInfo.Environment.Remove("ASPNETCORE_HTTPS_PORT");
         startInfo.Environment.Remove("ASPNETCORE_HTTPS_PORTS");
 
@@ -283,6 +291,42 @@ public sealed class BrowserTestHost : IAsyncDisposable
         var port = ((IPEndPoint)listener.LocalEndpoint).Port;
         listener.Stop();
         return port;
+    }
+
+    private static string EnsureDevelopmentCertificate()
+    {
+        var certPath = Path.Combine(
+            Path.GetTempPath(),
+            "inventory-platform-browser-tests-devcert.pfx");
+
+        if (!File.Exists(certPath))
+        {
+            var exportInfo = new ProcessStartInfo
+            {
+                FileName = "dotnet",
+                Arguments = $"dev-certs https --export-path \"{certPath}\" --format pfx --password \"inventory-platform-browser-tests\"",
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                CreateNoWindow = true
+            };
+
+            using var process = Process.Start(exportInfo)
+                ?? throw new InvalidOperationException(
+                    "Could not create the development HTTPS certificate for the browser test host.");
+
+            var stdout = process.StandardOutput.ReadToEnd();
+            var stderr = process.StandardError.ReadToEnd();
+            process.WaitForExit();
+
+            if (process.ExitCode != 0)
+            {
+                throw new InvalidOperationException(
+                    $"Could not export the development HTTPS certificate for the browser test host.{Environment.NewLine}stdout:{Environment.NewLine}{stdout}{Environment.NewLine}stderr:{Environment.NewLine}{stderr}");
+            }
+        }
+
+        return certPath;
     }
 
     private static string GetBuildConfiguration()

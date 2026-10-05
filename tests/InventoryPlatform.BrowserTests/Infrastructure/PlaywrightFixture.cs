@@ -55,7 +55,8 @@ public sealed class PlaywrightFixture : IAsyncDisposable
             new BrowserNewContextOptions
             {
                 Locale = "en-US",
-                TimezoneId = "UTC"
+                TimezoneId = "UTC",
+                IgnoreHTTPSErrors = true
             });
 
         try
@@ -96,11 +97,20 @@ public sealed class PlaywrightFixture : IAsyncDisposable
                 "The requested BrowserContext has no active trace owned by this fixture.");
         }
 
-        await context.Tracing.StopAsync(
-            new TracingStopOptions
-            {
-                Path = path
-            });
+        try
+        {
+            await context.Tracing.StopAsync(
+                new TracingStopOptions
+                {
+                    Path = path
+                });
+        }
+        catch (PlaywrightException exception)
+            when (exception.Message.Contains("Target page, context or browser has been closed", StringComparison.Ordinal))
+        {
+            // The browser target may already be closed by the time disposal runs;
+            // in that case tracing is already unavailable and the test run is still valid.
+        }
     }
 
     public async ValueTask DisposeAsync()
