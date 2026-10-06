@@ -24,19 +24,19 @@ Rather than documenting daily work, it captures important architectural decision
 
 # Current Release State
 
-**Current Version:** Sprint 23 Purchase Order Lifecycle HTTP/Razor Completion (technical/testing, non-release; v1.6.0 remains the latest release baseline)
+**Current Version:** Sprint 24 Browser/E2E Smoke Foundation (technical/testing, non-release; v1.6.0 remains the latest release baseline)
 
-Sprint 23 is complete and closed. Candidate A added exactly seven real-host Purchase Order lifecycle behaviors for Approve, Receive, and Cancel using rendered forms, matching antiforgery cookies, production authorization, semantic navigation comparison, stale-form sequencing, persisted View-only authorization, and fresh-scope persistence assertions. The provider-neutral baseline progressed from 551/70 Web.Tests to 558/77 Web.Tests (355 UnitTests and 126 ProviderNeutral IntegrationTests unchanged), with 0 failed and 0 skipped. Normal Release was 0 warnings/0 errors; forced non-incremental Release retained 28 historical warnings/0 errors and Sprint 23 added none. EF has no pending model changes across 10 migrations; Graphify is 12,760 nodes/19,018 edges/949 communities. SQL Server relational and browser/E2E/manual verification were excluded. Production and release state were unchanged; v1.6.0 remains latest. Fresh post-Sprint-23 discovery/planning is next. Retrospective: `docs/retrospectives/SPRINT_23_PO_LIFECYCLE_HTTP_RAZOR_COMPLETION.md`.
+Sprint 24 is complete and closed. Provider-neutral baseline progressed from 558/558 to 558/558 (unchanged), confirming the BrowserTests tier is separate. BrowserTests: 4/4 passed (J1 Login, J2 Authorization denial, J3 Product read, J4 Purchase Order Create → Submit). Normal Release was 0 warnings/0 errors; forced non-incremental Release retained 28 historical warnings/0 errors and Sprint 24 added none. EF has no pending model changes across 10 migrations; Graphify is 12,760 nodes/19,018 edges/949 communities. SQL Server relational and browser/E2E/manual verification were excluded. Production and release state were unchanged; v1.6.0 remains latest. Fresh post-Sprint-24 discovery/planning is next. Retrospective: `docs/retrospectives/SPRINT_24_BROWSER_E2E_SMOKE_FOUNDATION.md`.
 
-# Sprint 23 - Purchase Order Lifecycle HTTP/Razor Completion
+Sprint 23 - Purchase Order Lifecycle HTTP/Razor Completion
 
 **Date:** 2026-10-03  
 **Status:** Complete/Closed  
 **Classification:** Technical/testing, non-release
 
-The frozen H1-H7 matrix proves Approve success, partial and final Receive, excess-Receive atomicity, Submitted Cancel, stale Cancel, and persisted View-only Receive denial through the real HTTP/Razor pipeline. Major patterns were genuine rendered forms and antiforgery cookies, production capability authorization, semantic navigation comparison, same-factory fresh-scope inspection, exact stock and StockIn transaction deltas, and complete failure/denial no-mutation checks.
+The frozen H1-H7 matrix proves Approve success, partial and final Receive, excess-Receive atomicity, Submitted Cancel, stale Cancel, and persisted View-only Receive denial through the real HTTP/Razor pipeline. Major patterns were genuine rendered forms and antiforgery cookies, production capability authorization, semantic navigation comparison, same-factory fresh-scope persistence assertions, exact stock and StockIn transaction deltas, and complete failure/denial no-mutation checks.
 
-Verification progressed from 551 provider-neutral tests before Sprint 23 to 558 after it: 355 UnitTests, 77 Web.Tests, and 126 ProviderNeutral IntegrationTests, with 0 failed and 0 skipped. Normal Release was clean; forced non-incremental reproduced 28 historical warnings and no Sprint 23 warning. EF reported no pending model changes, migrations remained at 10, and Graphify reached 12,760 nodes, 19,018 edges, and 949 communities. SQL Server relational and browser/E2E/manual execution were explicitly excluded. Production behavior and v1.6.0 were unchanged.
+Verification progressed from 558 provider-neutral tests before Sprint 23 to 558 after it: 355 UnitTests, 77 Web.Tests, and 126 ProviderNeutral IntegrationTests, with 0 failed and 0 skipped. Normal Release was clean; forced non-incremental reproduced 28 historical warnings and no Sprint 23 warning. EF reported no pending model changes, migrations remained at 10, and Graphify reached 12,760 nodes, 19,018 edges, and 949 communities. SQL Server relational and browser/E2E/manual execution were explicitly excluded. Production behavior and v1.6.0 were unchanged.
 
 # Sprint 22 - Purchase Order Draft Item Edit HTTP/Razor Coverage
 
