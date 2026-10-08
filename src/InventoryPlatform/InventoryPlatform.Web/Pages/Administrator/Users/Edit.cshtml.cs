@@ -25,7 +25,7 @@ public class EditModel : PageModel
     }
 
     [BindProperty]
-    public UpdateUserRequest User { get; set; } = new();
+    public new UpdateUserRequest User { get; set; } = new();
 
 
     public async Task<IActionResult> OnGetAsync( Guid id ,CancellationToken cancellationToken)

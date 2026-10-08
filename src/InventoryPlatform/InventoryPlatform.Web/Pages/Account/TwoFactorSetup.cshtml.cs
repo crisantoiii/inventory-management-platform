@@ -44,7 +44,7 @@ public sealed class TwoFactorSetupModel : PageModel
             return Page();
         }
 
-        AuthenticatorKey = result.Value.AuthenticatorKey;
+        AuthenticatorKey = result.Value!.AuthenticatorKey;
 
         return Page();
     }

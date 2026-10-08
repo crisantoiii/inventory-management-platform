@@ -42,7 +42,7 @@ public class EditRolesModel : PageModel
 
         await LoadRolesAsync(cancellationToken);
 
-        var userRolesSet = new HashSet<string>(user.Value.Roles, StringComparer.OrdinalIgnoreCase);
+        var userRolesSet = new HashSet<string>(user.Value!.Roles, StringComparer.OrdinalIgnoreCase);
 
         RoleOptions = RoleOptions.Select(role => new RoleOption(
             role.Name,                                 
@@ -52,7 +52,7 @@ public class EditRolesModel : PageModel
         Input = new UpdateUserRolesRequest
         {
             Id = id,
-            Roles = user.Value.Roles.ToList()
+            Roles = user.Value!.Roles.ToList()
         };
 
         return Page();

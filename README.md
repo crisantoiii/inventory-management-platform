@@ -42,45 +42,11 @@ The focus is not only on implementing business features but also on applying pro
 
 ## Project Status
 
-**Current Version:** `v1.6.0` — Dynamic Capability-Based Authorization
+**Current Version:** v1.6.0 - Dynamic Capability-Based Authorization
 
-### 🚀 Current Development Status
-**Sprint 24: Browser/E2E Smoke Foundation** — `Complete/Closed`
-* **Status Summary:** Production behavior is unchanged. Sprint 24 is a technical/testing non-release sprint. `v1.6.0` remains the latest semantic release baseline.
-* **E2E Testing:** Four browser smoke journeys passed (4/4) through the deterministic LocalDB / Kestrel / Playwright infrastructure:
-  * **J1:** Login
-  * **J2:** Authorization denial
-  * **J3:** Product read
-  * **J4:** Purchase Order Create → Submit
-* **Build Quality:** Normal Release build contains **0 warnings / 0 errors**. Forced non-incremental Release retains 28 historical warnings (0 new warnings introduced).
-* **Database & EF:** Entity Framework reports **0 pending model changes** across the 10 existing migrations. SQL Server relational and browser/E2E evidence were outside scope for this baseline.
-* **Next Steps:** Fresh post-Sprint-24 repository discovery and candidate selection.
+**Historical Development Status (Sprint 20):** Sprint 20 Provider-Neutral Continuous Verification — Complete/Closed. Every IntegrationTest now carries exactly one explicit `TestTier` (`ProviderNeutral` or `SqlServerRelational`), enforced by a fail-safe classification audit that locks the 14-identity SQL-provider-bound inventory; classification follows actual runtime provider dependency, not folder placement. Verification runs through one shared command authority, `scripts/verify-provider-neutral.ps1` (repository-local `dotnet-ef 10.0.10` tool restore and resolution evidence, solution restore, normal Release build, UnitTests, Web.Tests, affirmative `TestTier=ProviderNeutral` IntegrationTests, EF `migrations has-pending-model-changes`, TRX output, explicit executed/excluded tier summary), and the GitHub Actions workflow `.github/workflows/provider-neutral-verification.yml` (PR→main, push→main, manual dispatch; `windows-latest`; .NET 10.0.x; least-privilege `contents: read`) delegates entirely to that script. The hosted job completed successfully on a clean runner, uploading a three-file `provider-neutral-verification-results` TRX artifact. T03 verification empirically exposed one misclassified LocalDB connection probe; under the runtime-dependency rule it was reclassified to `SqlServerRelational` (relational inventory 13 → 14, ProviderNeutral 127 → 126), and the final provider-neutral gate makes zero LocalDB/SQL Server provider contact (instance stopped before and after gated runs; last-start timestamp unchanged). **Provider-neutral verification baseline: 535 passing** (346 UnitTests, 63 Web.Tests, 126 ProviderNeutral IntegrationTests; 0 failed, 0 skipped); the 14 `SqlServerRelational` tests are discovered and locked but intentionally not executed in the gate — Sprint 20 makes no SQL relational-pass claim (Sprint 18's relational passes are historical). Normal Release build is 0 warnings/0 errors (the non-incremental build retains 28 unchanged historical warnings/0 errors), EF reports no pending model changes across the unchanged 10-migration chain (latest `20260831141400_CreateAuthorizationSchema`). Sprint 20 made zero production changes and was technical/non-release; v1.6.0 remains the latest release baseline.
 
-### 📜 Historical Development Status
-**Sprint 20: Provider-Neutral Continuous Verification** — `Complete/Closed`
-* **Status Summary:** Sprint 20 made zero production changes and was technical/non-release.
-* **Test Isolation:** Every `IntegrationTest` now carries exactly one explicit `TestTier` (`ProviderNeutral` or `SqlServerRelational`). Enforced by a fail-safe classification audit that locks the 14-identity SQL-provider-bound inventory. Classification follows actual runtime provider dependency, not folder placement.
-* **Verification Gate:** Runs through one shared command authority: `scripts/verify-provider-neutral.ps1` (handles repository-local `dotnet-ef 10.0.10` tool restore, solution restore, Release build, Unit/Web tests, `TestTier=ProviderNeutral` IntegrationTests, EF migration check, and TRX output summary).
-* **CI/CD Pipeline:** GitHub Actions workflow `.github/workflows/provider-neutral-verification.yml` (PR/Push to `main`, manual dispatch) runs on `windows-latest` via .NET 10.0.x with least-privilege `contents: read` permissions. The hosted job successfully uploaded a 3-file `provider-neutral-verification-results` TRX artifact.
-* **Empirical Integrity:** T03 verification exposed one misclassified LocalDB connection probe. Under runtime-dependency rules, it was reclassified to `SqlServerRelational` (relational inventory adjusted from 13 → 14; ProviderNeutral adjusted from 127 → 126). The final provider-neutral gate makes zero LocalDB/SQL Server provider contact (instance stopped before and after gated runs; last-start timestamp unchanged).
-* **Database & EF:** Reports no pending model changes across the unchanged 10-migration chain (latest migration: `20260831141400_CreateAuthorizationSchema`).
-
----
-
-### 📊 Test Suite & Build Metrics
-
-| Metric / Test Suite | Sprint 20 (Baseline) | Sprint 24 (Current) | Status / Notes |
-| :--- | :--- | :--- | :--- |
-| **Total Passing (Provider-Neutral)** | **535** | **558** | 0 failed, 0 skipped |
-| ↳ *Unit Tests* | 346 | 355 | Passing |
-| ↳ *Web Tests* | 63 | 77 | Passing |
-| ↳ *Integration Tests (Provider-Neutral)* | 126 | 126 | Passing |
-| **SqlServerRelational Tests** | 14 | 14 | Discovered & locked; intentionally excluded from neutral gate |
-| **Browser / E2E Tests** | Excluded | 4 / 4 Journeys | Separate verified tier (Playwright) |
-| **EF Migrations** | 10 | 10 | No pending model changes |
-| **Build Warnings / Errors (New)** | 0 / 0 | 0 / 0 | Clean incremental build |
-| **Build Warnings (Historical)** | 28 | 28 | Unchanged legacy warnings |
-
+**Current Development Status:** Sprint 25 Compiler Warning Remediation — Complete/Closed. Eliminated the historical 28-warning forced non-incremental Release baseline (56 total instances across 14 files) through minimal, behavior-preserving compile-time annotations. **Provider-neutral baseline: 558 passing** (355 UnitTests, 77 Web.Tests, 126 ProviderNeutral IntegrationTests; 0 failed, 0 skipped). **BrowserTests: 4 passing** (J1-J4). **Total: 562 tests passing across two separate tiers.** Normal Release: 0 warnings/0 errors. **Forced non-incremental Release: 0 warnings/0 errors** (was 28/0). EF reports no pending model changes across 10 migrations. SQL Server relational and browser/E2E evidence were outside scope. Production behavior is unchanged, Sprint 25 is technical/testing and non-release, and v1.6.0 remains the latest semantic release. Fresh post-Sprint-25 repository discovery and candidate selection is next.
 
 ## Completed Modules
 
@@ -106,6 +72,7 @@ The focus is not only on implementing business features but also on applying pro
 - ✅ Validation Invocation Architecture (Sprint 21 — Application-boundary Purchase Order Create validation with handler and real HTTP/Razor proof; provider-neutral gate 545 passing)
 - ✅ Purchase Order Draft Item Edit HTTP/Razor Coverage (Sprint 22 — six real-host authorization/antiforgery/PRG/persistence/no-mutation/empty-Draft behaviors; provider-neutral gate 551 passing)
 - ✅ Purchase Order Lifecycle HTTP/Razor Completion (Sprint 23 — seven Approve/Receive/Cancel real-host behaviors; provider-neutral gate 558 passing)
+- ✅ Compiler Warning Remediation (Sprint 25 — 28 forced non-incremental warnings eliminated; provider-neutral gate 558 passing, BrowserTests 4 passing; total 562)
 - ✅ User Management
 - ✅ Account Management
 - ✅ Purchasing (Core Workflow + Sprint 8 P1-P7 Enhancements Complete)
@@ -967,6 +934,7 @@ Development Tools
 
 ## Current
 
+- Sprint 25 - Compiler Warning Remediation - Complete/Closed (28 forced non-incremental warnings eliminated across 14 files; provider-neutral gate 558 passing — 355 UnitTests, 77 Web.Tests, 126 ProviderNeutral IntegrationTests; BrowserTests 4 passing; **total 562 passing**; forced non-incremental Release 0 warnings/0 errors; no production changes; technical/testing, non-release)
 - Sprint 23 - Purchase Order Lifecycle HTTP/Razor Completion - Complete/Closed (seven real-host Approve/Receive/Cancel behaviors; provider-neutral gate 558 passing — 355 UnitTests, 77 Web.Tests, 126 ProviderNeutral IntegrationTests; no production changes; technical/testing, non-release)
 - Sprint 21 - Validation Invocation Architecture - Complete/Closed (Application-boundary Purchase Order Create validation with handler and real HTTP/Razor proof; provider-neutral gate 545 passing; technical/architecture, non-release)
 - Sprint 20 - Provider-Neutral Continuous Verification - Complete/Closed (explicit TestTier contract, fail-safe classification audit, shared `scripts/verify-provider-neutral.ps1`, GitHub Actions gate with successful hosted run; provider-neutral gate 535 passing — 346 UnitTests, 63 Web.Tests, 126 ProviderNeutral IntegrationTests; 14 SqlServerRelational discovered/locked, not executed; zero LocalDB/SQL contact; technical/non-release)

@@ -41,7 +41,7 @@ public class EditStatusModel : PageModel
         Input = new UpdateUserStatusRequest
         {
             Id = id,
-            IsActive = !user.Value.IsActive
+            IsActive = !user.Value!.IsActive
         };
 
         return Page();
@@ -60,7 +60,7 @@ public class EditStatusModel : PageModel
 
         if (User.IsInRole(customRoleIdentity.IdentityConstants.Roles.InventoryManager))
         {
-            if (user.Value.Id.ToString() == currentUserId)
+            if (user.Value!.Id.ToString() == currentUserId)
             {
                 return Page();
             }
@@ -68,8 +68,8 @@ public class EditStatusModel : PageModel
 
         Input = new UpdateUserStatusRequest
         {
-            Id = user.Value.Id,
-            IsActive = !user.Value.IsActive
+            Id = user.Value!.Id,
+            IsActive = !user.Value!.IsActive
         };
 
         var result = await _updateStatushandler.HandleAsync(Input, cancellationToken);

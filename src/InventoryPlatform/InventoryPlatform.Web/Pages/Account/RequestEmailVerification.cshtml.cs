@@ -43,7 +43,7 @@ public sealed class RequestEmailVerificationModel : PageModel
             return RedirectToPage("/Account/Profile");
         }
 
-        TempData["StatusMessage"] = result.Value.AlreadyVerified
+        TempData["StatusMessage"] = result.Value!.AlreadyVerified
             ? "Your email address is already verified."
             : "A verification email has been sent to your email address.";
 

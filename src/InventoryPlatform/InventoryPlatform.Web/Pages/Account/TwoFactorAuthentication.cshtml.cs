@@ -51,7 +51,7 @@ public sealed class TwoFactorAuthenticationModel : PageModel
             return NotFound();
         }
 
-        TwoFactorEnabled = result.Value.TwoFactorEnabled;
+        TwoFactorEnabled = result.Value!.TwoFactorEnabled;
 
         return Page();
     }
@@ -108,7 +108,7 @@ public sealed class TwoFactorAuthenticationModel : PageModel
 
         if (result.IsSuccess)
         {
-            TwoFactorEnabled = result.Value.TwoFactorEnabled;
+            TwoFactorEnabled = result.Value!.TwoFactorEnabled;
         }
     }
 
@@ -143,7 +143,7 @@ public sealed class TwoFactorAuthenticationModel : PageModel
         }
 
         TempData["TwoFactorRecoveryCodes"] =
-            result.Value.RecoveryCodes.ToArray();
+            result.Value!.RecoveryCodes.ToArray();
 
         return RedirectToPage(
             "/Account/TwoFactorRecoveryCodes");

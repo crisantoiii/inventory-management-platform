@@ -6,9 +6,9 @@ public sealed record GetInventoryTransactionsResponse
 
     public int ProductId { get; init; }
 
-    public string ProductName { get; init; }
+    public string ProductName { get; init; } = string.Empty;
 
-    public string Sku { get; init; }
+    public string Sku { get; init; } = string.Empty;
 
     public TransactionType TransactionType { get; init; }
 

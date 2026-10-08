@@ -16,7 +16,7 @@ public class DetailsModel : PageModel
         _handler = handler;
     }
 
-    public GetUserResponse User { get; private set; } = default!;
+    public new GetUserResponse User { get; private set; } = default!;
 
     public async Task<IActionResult> OnGetAsync(Guid id)
     {
