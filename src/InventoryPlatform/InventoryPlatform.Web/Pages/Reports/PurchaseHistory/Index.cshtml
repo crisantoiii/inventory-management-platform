@@ -226,7 +226,7 @@
                         </thead>
 
                         <tbody>
-                            @foreach (var item in Model.Result.Items)
+                            @foreach (var item in Model.Result!.Items)
                             {
                                 <tr>
                                     <td>@item.PurchaseOrderId</td>

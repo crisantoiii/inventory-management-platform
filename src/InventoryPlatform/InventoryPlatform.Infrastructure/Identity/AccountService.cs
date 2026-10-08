@@ -396,7 +396,7 @@ public sealed class AccountService : IAccountService
             new VerifyTwoFactorResponse
             {
                 Enabled = true,
-                RecoveryCodes = recoveryCodes.ToArray()
+                RecoveryCodes = recoveryCodes!.ToArray()
             });
     }
 
@@ -429,7 +429,7 @@ public sealed class AccountService : IAccountService
         return Result<GenerateTwoFactorRecoveryCodesResponse>.Success(
             new GenerateTwoFactorRecoveryCodesResponse
             {
-                RecoveryCodes = recoveryCodes.ToArray()
+                RecoveryCodes = recoveryCodes!.ToArray()
             });
     }
 
@@ -496,7 +496,7 @@ public sealed class AccountService : IAccountService
         return Result<RegenerateTwoFactorRecoveryCodesResponse>.Success(
             new RegenerateTwoFactorRecoveryCodesResponse
             {
-                RecoveryCodes = recoveryCodes.ToArray()
+                RecoveryCodes = recoveryCodes!.ToArray()
             });
     }
 }

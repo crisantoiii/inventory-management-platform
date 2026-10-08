@@ -17,14 +17,14 @@ public sealed class InventoryTransactionRepository
     {
     }
 
-    public async Task AddAsync(
+    public override async Task AddAsync(
         InventoryTransaction transaction,
         CancellationToken cancellationToken = default)
     {
         await DbSet.AddAsync(transaction, cancellationToken);
     }
 
-    public async Task<InventoryTransaction?> GetByIdAsync(
+    public override async Task<InventoryTransaction?> GetByIdAsync(
         int id,
         CancellationToken cancellationToken = default)
     {
@@ -47,7 +47,6 @@ public sealed class InventoryTransactionRepository
             .OrderByDescending(x => x.TransactionDateUtc)
             .ToListAsync(cancellationToken);
     }
-
 
 
     public async Task<PagedResult<InventoryTransaction>> GetPagedAsync(

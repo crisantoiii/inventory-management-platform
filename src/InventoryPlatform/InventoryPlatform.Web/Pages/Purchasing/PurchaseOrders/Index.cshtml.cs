@@ -30,7 +30,7 @@ public class IndexModel : PageModel
         };
 
     [BindProperty(SupportsGet = true, Name = "")]
-    public GetPurchaseOrdersRequest Request { get; set; } = new();
+    public new GetPurchaseOrdersRequest Request { get; set; } = new();
 
     public static class SortFields
     {

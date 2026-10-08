@@ -26,16 +26,16 @@ public class ResetPasswordModel : PageModel
     [BindProperty]
     public ResetPasswordRequest Input { get; set; } = new();
 
-    public string UserName { get; set; } = string.Empty;
-    public string Email { get; set; } = string.Empty;
+    public string? UserName { get; set; } = string.Empty;
+    public string? Email { get; set; } = string.Empty;
 
     public async Task<IActionResult> OnGetAsync(Guid id, CancellationToken cancellationToken)
     {
         ViewData["Title"] = "Reset Password";
         var user = await _getUserHandler.HandleAsync(id);
 
-        UserName = user.Value.Username;
-        Email = user.Value.Email;
+        UserName = user.Value!.Username;
+        Email = user.Value!.Email;
 
         Input = new ResetPasswordRequest
         {
@@ -60,8 +60,8 @@ public class ResetPasswordModel : PageModel
         {
             var user = await _getUserHandler.HandleAsync(Input.Id);
 
-            UserName = user.Value.Username;
-            Email = user.Value.Email;
+            UserName = user.Value!.Username;
+            Email = user.Value!.Email;
 
             return Page();
         }

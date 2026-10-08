@@ -66,7 +66,7 @@ public sealed class TwoFactorVerifyModel : PageModel
         }
 
         TempData["TwoFactorRecoveryCodes"] =
-            result.Value.RecoveryCodes.ToArray();
+            result.Value!.RecoveryCodes.ToArray();
 
         return RedirectToPage(
             "/Account/TwoFactorRecoveryCodes");
