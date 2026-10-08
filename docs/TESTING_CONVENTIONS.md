@@ -492,7 +492,7 @@ Every IntegrationTest carries exactly one `TestTier` trait (Sprint 20). Tier cla
 
 The locked `SqlServerRelational` inventory is 14 identities (see `TierClassificationAuditTests.LockedSqlServerRelationalInventory`). The provider-neutral gate executes the 126 ProviderNeutral tests and intentionally does not execute the 14 relational tests; the full local suite remains 545 + 14 tests.
 
-### Web.Tests (64 tests)
+### Web.Tests (77 tests)
 
 | Area | Subject | Tests |
 |------|---------|-------|
@@ -509,10 +509,14 @@ The locked `SqlServerRelational` inventory is 14 identities (see `TierClassifica
 | HTTP | Purchase Order Create valid-POST PRG/persistence H4 (Sprint 19 T03) | 1 |
 | HTTP | Purchase Order Create duplicate-product failure redisplay H5 (Sprint 19 T04) | 1 |
 | HTTP | Purchase Order Create validator-only failure redisplay H6 (Sprint 21 T03) | 1 |
+| HTTP | Purchase Order Edit HTTP coverage H1-H6 (Sprint 22) | 6 |
+| HTTP | Purchase Order Lifecycle HTTP coverage H1-H7 (Sprint 23) | 7 |
 | Infrastructure | Placeholder | 1 |
-| **Total** | | **64** |
+| **Total** | | **77** |
 
-**Current total: provider-neutral gate 545 passed, 0 failed, 0 skipped** (355 UnitTests + 64 Web.Tests + 126 ProviderNeutral IntegrationTests; Sprint 21 T04 integrated verification, `scripts/verify-provider-neutral.ps1` exit 0). The 14 `SqlServerRelational` tests are discovered and locked but intentionally not executed in the gate — the full local suite remains 545 + 14 tests, and no SQL relational-pass claim is made for Sprint 21. The Sprint 20 historical closure total remains 535 (346 + 63 + 126); the Sprint 19 historical closure total remains 542 (346 + 133 + 63, with the relational tier freshly executed against available LocalDB); the Sprint 18 historical closure total remains 537 (346 + 133 + 58); the Sprint 17 historical closure total remains 496 (346 + 92 + 58).
+> **Note:** Sprint 24 added a separate **BrowserTests** project (Playwright-based) with 4 browser/E2E smoke journeys (J1-J4). These are a separate verified tier and not included in the Web.Tests count above.
+
+**Current total: provider-neutral gate 558 passed, 0 failed, 0 skipped** (355 UnitTests + 77 Web.Tests + 126 ProviderNeutral IntegrationTests; Sprint 24 integrated verification, `scripts/verify-provider-neutral.ps1` exit 0). **BrowserTests: 4 passing** (J1-J4). **Total: 562 tests passing across two separate tiers.** The 14 `SqlServerRelational` tests are discovered and locked but intentionally not executed in the gate — the full local suite remains 558 + 4 tests, and no SQL relational-pass claim is made for Sprint 24. The Sprint 21 historical closure total remains 545 (355 + 64 + 126); the Sprint 20 historical closure total remains 535 (346 + 63 + 126); the Sprint 19 historical closure total remains 542 (346 + 133 + 63, with the relational tier freshly executed against available LocalDB); the Sprint 18 historical closure total remains 537 (346 + 133 + 58); the Sprint 17 historical closure total remains 496 (346 + 92 + 58).
 
 The Web.Tests verification tests confirm that the `FakeCapabilityAuthorizationService` compiles against the real `ICapabilityAuthorizationService` interface and produces controlled authorization results. The T03/T04 handler tests exercise the actual `CapabilityAuthorizationHandler` and `MultiCapabilityAuthorizationHandler` production sources directly (the Sprint 14 `PurchaseOrderCapabilityPolicyRegistrationTests` additionally verify Edit/Cancel capability constants and their real `AddWeb` policy registration) (authentication gate, NameIdentifier extraction/parsing, service delegation, succeed/do-not-succeed outcomes, OR semantics with short-circuit, requirement constructor validation). Handler testing is source-level/unit-level.
 

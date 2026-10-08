@@ -1,5 +1,45 @@
 # Changelog
 
+## [Sprint 25] - Compiler Warning Remediation
+
+### Summary
+
+Closed the historical 28-warning forced non-incremental Release baseline through minimal, behavior-preserving compile-time annotations across 14 files. This was technical/non-release work: production behavior did not change, no version or tag was created, and v1.6.0 remains the latest semantic release.
+
+### Eliminated
+
+- **28 distinct warning locations** (56 total instances) reduced to **0** in forced non-incremental Release build
+- **CS8618** (12 instances): Non-nullable field uninitialized → `required` / initializers
+- **CS0114** (8 instances): Member hides inherited member → explicit `override` / `new`
+- **CS0108** (4 instances): Member hides inherited member → explicit `new`
+- **CS8604** (16 instances): Possible null reference argument → `!` after verified success checks
+- **CS8601** (8 instances): Possible null reference assignment → `!` after verified success checks
+- **CS8602** (8 instances): Dereference of possibly null reference → `!` after verified success checks
+
+### Verification
+
+- Provider-neutral baseline: **558 passing** (355 UnitTests, 77 Web.Tests, 126 ProviderNeutral IntegrationTests; 0 failed, 0 skipped)
+- BrowserTests: **4 passing** (J1 Login, J2 Authorization denial, J3 Product read, J4 Purchase Order Create → Submit)
+- **Total: 562 tests passing across two separate tiers**
+- Normal Release: 0 warnings/0 errors (unchanged)
+- Forced non-incremental Release: **0 warnings/0 errors** (was 28/0)
+- EF pending model changes: none; migrations unchanged at 10
+- Graphify: 12,760 nodes, 19,018 edges, 949 communities (unchanged)
+- Exactly 14 files modified; all changes are compile-time annotations only; no production behavior, test, schema, migration, package, project, configuration, CI, or release change
+
+### Scope
+
+Sprint 25 addressed only the forced non-incremental warning baseline. It did not introduce:
+- Production feature behavior
+- Database migrations or schema changes
+- Test additions or modifications
+- CI/CD changes
+- Semantic release or version changes
+
+Latest semantic release remains **v1.6.0**.
+
+Retrospective: `docs/retrospectives/SPRINT_25_compiler_warning_remediation.md`
+
 ## [Sprint 24] - Browser/E2E Smoke Foundation
 
 ### Summary
