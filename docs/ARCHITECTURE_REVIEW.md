@@ -365,3 +365,71 @@ The Dynamic Capability-Based Authorization architecture is structurally sound an
 Findings are seed data and policy design issues, not code bugs. The authorization infrastructure (handlers, services, repositories, policies) works correctly.
 
 Sprint 9 is complete at the source/documentation level, with the runtime verification limitation explicitly retained.
+
+---
+
+# Sprint 26 — Authorization Intent & Role-Coupled Cleanup
+
+**Date:** October 2026  
+**Status:** PASS — source-verified architecture, runtime-verified behavior (562 tests passing)
+
+## Scope
+
+Sprint 26 implemented the frozen Option 1 scope with preconditions BF-Q-001 and BF-Q-002 satisfied. The sprint narrowed Viewer role Purchase Order capabilities to read-only and refactored the legacy `EditStatus` role-coupled self-deactivation guard to a capability-based model.
+
+## Changes Verified
+
+### AuthorizationSeeder (Infrastructure Layer) — PASS
+- `CapabilityCatalog.Viewer` filter narrowed: `StartsWith("PurchaseOrder.")` → exact match `"PurchaseOrder.View"`
+- Viewer capability count: 15 → 9 (7 View + PurchaseOrder.View + User.View)
+- Authorization group-capability relationships: 79 → 73 (6 Viewer PO capabilities removed)
+- No changes to Administrator (41) or InventoryManager (23) capability sets
+- Seed data change only; no migration, schema, or EF configuration changes
+
+### EditStatus.cshtml.cs (Web Layer) — PASS
+- Removed `User.IsInRole(IdentityConstants.Roles.InventoryManager)` guard (last `IsInRole` in Web project)
+- Injected `ICapabilityAuthorizationService` for capability-based self-deactivation protection
+- Self-deactivation check now uses `User.EditStatus` capability via `HasCapabilityAsync`
+- Protection applies consistently to any user with `User.EditStatus` capability (Administrator, InventoryManager groups)
+- No `User.IsInRole` calls remain in Web project
+
+### AuthorizationSeederTests (IntegrationTests) — PASS
+- 6 test expectations updated for new Viewer capability counts and PO capability assertions
+- All 126 ProviderNeutral IntegrationTests passing
+- Total test baseline maintained: 562 passing (558 provider-neutral + 4 browser)
+
+## Architecture Assessment
+
+### Consistency with Capability Model — PASS
+- The capability model remains the authoritative authorization mechanism
+- Role-coupled guard removal eliminates the last inconsistency between role-based and capability-based checks
+- Self-deactivation protection now granular: applies to capability, not role
+
+### Clean Architecture Boundaries — PASS
+- Infrastructure: Seed data change only in AuthorizationSeeder
+- Application: No changes (ICapabilityAuthorizationService unchanged)
+- Web: EditStatus page updated to use capability service (existing abstraction)
+- Domain: No changes
+
+### Verification Baseline — PASS
+- Provider-neutral gate: 558 passing (355 UnitTests, 77 Web.Tests, 126 IntegrationTests)
+- BrowserTests: 4 passing (J1-J4)
+- Normal Release build: 0 warnings / 0 errors
+- Forced non-incremental Release build: 0 warnings / 0 errors
+- EF pending model changes: none
+- 10 migrations unchanged
+
+## Known Findings (Updated)
+
+| # | Finding | Severity | Classification |
+|---|---------|----------|---------------|
+| BF-Q-001 | Viewer PO capabilities broad | P1 | **RESOLVED + IMPLEMENTED** — Viewer restricted to PurchaseOrder.View only |
+| BF-Q-002 | EditStatus role guard | Medium | **RESOLVED + IMPLEMENTED** — Refactored to User.EditStatus capability |
+| BF-Q-003 | Historical 39 vs 41 capability docs | Low | DEFERRED (documentation-only) |
+| DF1 | InventoryManager has Administration.Access in DB | P1 | RESOLVED (code fix applied) |
+| DF4 | Viewer has User.View capability | Low | DESIGN FINDING (by design) |
+| DF8 | Reports unrestricted | Low | DESIGN DECISION PENDING |
+
+## Overall Assessment
+
+The Authorization Intent & Role-Coupled Cleanup is architecturally sound. The changes reinforce the capability model as the single authoritative authorization mechanism by removing the last role-coupled `IsInRole` guard and narrowing the Viewer role to its intended read-only scope. The 562-test baseline provides strong regression coverage for these security behavior changes. No structural architectural redesign was required or introduced.

@@ -388,17 +388,17 @@ public void Dispose()
 
 ---## Authorization Seed Baseline
 
-The verified Sprint 14 seed baseline (from source, post-T05; the Sprint 11 baseline of 39 capabilities / 73 relationships is historical):
+The verified Sprint 26 seed baseline (from source, post-Sprint 26; the Sprint 14 baseline of 41 capabilities / 79 relationships is historical):
 
 ```text
 Capabilities:                    41
 Administrator capabilities:      41
 InventoryManager capabilities:   23
-Viewer capabilities:            15
-Total group-capability relationships: 79
+Viewer capabilities:            9
+Total group-capability relationships: 73
 ```
 
-**Note:** Sprint 14 T05 added `PurchaseOrder.Edit` and `PurchaseOrder.Cancel` (39 → 41 capabilities, 73 → 79 relationships); group assignment emerged from the existing filter-derived seed rules with no special-case seed logic. Earlier baselines (39/73; original planning note Viewer=12/Total=72 vs source Viewer=13/Total=73) are historical records.
+**Note:** Sprint 26 T05 narrowed Viewer `PurchaseOrder.*` capabilities to `PurchaseOrder.View` only (removed Create, Edit, Submit, Approve, Receive, Cancel). Viewer capability count: 15 → 9 (7 View + PurchaseOrder.View + User.View). Total group-capability relationships: 79 → 73 (6 Viewer PO capabilities removed). Sprint 14 T05 had added `PurchaseOrder.Edit` and `PurchaseOrder.Cancel` (39 → 41 capabilities, 73 → 79 relationships); group assignment emerges from the existing filter-derived seed rules with no special-case seed logic. Earlier baselines (39/73; original planning note Viewer=12/Total=72 vs source Viewer=13/Total=73) are historical records.
 
 ---
 
@@ -651,9 +651,8 @@ Completed:
 - Suppliers/Create authorization remediation (T06) — `ViewInventory` replaced with `InventoryManagement`
 - Integrated verification (T08) — 313 passed, 0 failed, 0 skipped
 
-Blocked/deferred:
-
-- EditStatus `User.IsInRole` cleanup (T07) — the remaining occurrence (`Pages/Administrator/Users/EditStatus.cshtml.cs`, line 61) is a reachable, behavior-affecting self-deactivation guard for supported multi-role users, NOT dead code. Removing it would change observable behavior; T07 remains blocked/deferred pending an explicit behavioral decision.
+Resolved in Sprint 26:
+- EditStatus `User.IsInRole` cleanup (T07) — refactored to capability-based self-deactivation protection using `User.EditStatus` capability via `ICapabilityAuthorizationService` (BF-Q-002 decision). The legacy `User.IsInRole(InventoryManager)` guard was reachable for multi-role users and behavior-affecting; replaced with capability-based check for consistent protection.
 
 ### Sprint 14 Outcome
 
@@ -675,12 +674,14 @@ Completed:
 
 Still deferred (Sprint 20 state):
 
-- EditStatus self-deactivation guard (above) — untouched by later sprints
 - `GetPurchaseOrdersHandler` does not copy `PagedRequest.Status` into `PagedQuery` (T05 recorded finding; no remediation authorized; re-verified against current source at Sprint 17 T09 closure)
 - SQL Server relational CI — the provider-neutral gate deliberately excludes relational execution; a hosted SQL Server/LocalDB endpoint decision is required before the relational tier can run in CI (Sprint 20 carry-forward C20-01)
 - Broader SQL Server relational verification beyond the bounded Sprint 18 R1-R6 contracts, including other constraints, workflows, reports, collation, and provider-specific behavior; the Sprint 17/Sprint 19 HTTP host remains InMemory and makes no relational claims
 - Broader HTTP/Razor route coverage beyond the Sprint 17 representative cases and the Sprint 19 Purchase Order Create behaviors (more Category/Purchase Order routes, other modules)
 - Browser/E2E automation (carried forward; outside the provider-neutral gate)
+
+Resolved in Sprint 26:
+- EditStatus self-deactivation guard — refactored to capability-based protection using `User.EditStatus` capability (BF-Q-002 decision)
 
 Completed:
 
