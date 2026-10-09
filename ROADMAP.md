@@ -22,7 +22,7 @@ v1.3  Account Management       ✅
 v1.4  Additional Reporting     ✅
 v1.5  Purchasing Enhancements  ✅
 v1.6  Dynamic Capability Auth  ✅
-(Sprint 11 Automated Testing ✅ — non-release; Sprint 12 Authorization Refinement ✅ — non-release; Sprint 13 Purchasing Workflow Test Automation ✅ — non-release; Sprint 14 Purchase Order Cancellation and Draft Item Editing ✅ — non-release; Sprint 15 Purchase Order Workflow Error Handling and UX Hardening ✅ — non-release; Sprint 16 Purchase Order POST Round-Trip State and Create Failure Presentation Corrections ✅ — non-release; Sprint 17 HTTP/Razor Integration-Test Foundation ✅ — non-release; Sprint 18 SQL Server Relational Verification ✅ — non-release; Sprint 19 Purchase Order Create HTTP/Razor Integration Coverage ✅ — non-release; Sprint 20 Provider-Neutral Continuous Verification ✅ — non-release; Sprint 21 Validation Invocation Architecture ✅ — non-release; Sprint 22 Purchase Order Draft Item Edit HTTP/Razor Coverage ✅ — non-release; Sprint 23 Purchase Order Lifecycle HTTP/Razor Completion ✅ — non-release; Sprint 24 Browser/E2E Smoke Foundation ✅ — non-release)
+(Sprint 11 Automated Testing ✅ — non-release; Sprint 12 Authorization Refinement ✅ — non-release; Sprint 13 Purchasing Workflow Test Automation ✅ — non-release; Sprint 14 Purchase Order Cancellation and Draft Item Editing ✅ — non-release; Sprint 15 Purchase Order Workflow Error Handling and UX Hardening ✅ — non-release; Sprint 16 Purchase Order POST Round-Trip State and Create Failure Presentation Corrections ✅ — non-release; Sprint 17 HTTP/Razor Integration-Test Foundation ✅ — non-release; Sprint 18 SQL Server Relational Verification ✅ — non-release; Sprint 19 Purchase Order Create HTTP/Razor Integration Coverage ✅ — non-release; Sprint 20 Provider-Neutral Continuous Verification ✅ — non-release; Sprint 21 Validation Invocation Architecture ✅ — non-release; Sprint 22 Purchase Order Draft Item Edit HTTP/Razor Coverage ✅ — non-release; Sprint 23 Purchase Order Lifecycle HTTP/Razor Completion ✅ — non-release; Sprint 24 Browser/E2E Smoke Foundation ✅ — non-release; Sprint 25 Compiler Warning Remediation ✅ — non-release; **Sprint 26 Authorization Intent & Role-Coupled Cleanup ✅ — non-release**)
 
 ---
 
@@ -568,9 +568,75 @@ Sprint 23 closed the frozen Approve/Receive/Cancel matrix with seven real-host c
 
 Normal Release was 0 warnings/0 errors; forced non-incremental Release retained 28 historical warnings/0 errors with none from Sprint 23. EF reported no pending model changes across 10 migrations. Graphify finished at 12,760 nodes, 19,018 edges, and 949 communities. Exactly two test-source files changed; production and release state were unchanged. SQL Server relational and browser/E2E/manual verification were excluded.
 
+## Sprint 26 - Authorization Intent & Role-Coupled Cleanup
+
+**Status:** Complete/Closed — security behavior/behavior-affecting, non-release sprint; v1.6.0 remains the latest release baseline. No version or tag was created.
+
+Sprint 26 implemented the frozen Option 1 scope with preconditions BF-Q-001 and BF-Q-002 satisfied. The sprint narrowed Viewer role Purchase Order capabilities to read-only and refactored the legacy `EditStatus` role-coupled self-deactivation guard to a capability-based model.
+
+### Completed
+
+- **Viewer PO Capability Narrowing:** Modified `AuthorizationSeeder.cs` `CapabilityCatalog.Viewer` filter to exclude `PurchaseOrder.Create`, `Edit`, `Submit`, `Approve`, `Receive`, `Cancel`. Viewer retains only `PurchaseOrder.View`. Viewer capability count: 15 → 9 (7 View + PurchaseOrder.View + User.View). Authorization group-capability relationships: 79 → 73 (6 Viewer PO capabilities removed).
+
+- **EditStatus Role Guard Refactor:** Removed `User.IsInRole(IdentityConstants.Roles.InventoryManager)` check from `EditStatus.cshtml.cs:61`. Replaced with capability-based authorization using `User.EditStatus` capability via `ICapabilityAuthorizationService`. Self-deactivation protection now applies consistently to all users with the `User.EditStatus` capability (not just InventoryManager role).
+
+- **Test Updates:** Updated `AuthorizationSeederTests.cs` for new Viewer capability expectations (6 test expectations updated).
+
+### Final Verification
+
+- UnitTests: 355 passed
+- Web.Tests: 77 passed
+- ProviderNeutral IntegrationTests: 126 passed
+- Provider-neutral total: 558 passed, 0 failed, 0 skipped
+- BrowserTests: 4 passed (J1-J4)
+- **Total: 562 tests passing across two separate tiers**
+- Normal Release build: 0 warnings, 0 errors
+- Forced non-incremental Release build: 0 warnings, 0 errors
+- EF pending model changes: none; 10-migration chain unchanged
+- SQL Server relational and browser/E2E evidence: outside scope
+- Production behavior: security behavior/behavior-affecting changes implemented
+- Exactly 3 files modified (AuthorizationSeeder.cs, AuthorizationSeederTests.cs, EditStatus.cshtml.cs); seed data change only
+
+### Carry-Forward
+
+**Closed by Sprint 26:** C20-04 EditStatus authorization guard decision (resolved and implemented); Viewer permission intent (BF-Q-001 resolved and implemented).
+
+**Remaining unassigned:** C20-01 SQL Server relational CI; C20-02 broader HTTP/Razor coverage (Approve, Receive, Cancel); C20-03 browser/E2E; C20-05 report authorization; C20-07 broader SQL relational/report verification; C20-08 Sales; C20-09 Audit; C20-10 import/attachment/barcode. BF-Q-003 (historical 39 vs 41 capability docs) deferred as low-impact documentation-only.
+
+Sprint 26 selects no next sprint or direction.
+
+## Sprint 25 - Compiler Warning Remediation
+
+**Status:** Complete/Closed — technical/testing, non-release sprint; v1.6.0 remains the latest release baseline. No version or tag was created.
+
+Sprint 25 eliminated the historical 28-warning forced non-incremental Release baseline (56 total instances across 14 files) through minimal, behavior-preserving compile-time annotations: CS8618 (12) → `required`/initializers, CS0114 (8) → `override`/`new`, CS0108 (4) → `new`, CS8604/CS8601/CS8602 (32) → `!` after verified success checks.
+
+### Final Verification
+
+- UnitTests: 355 passed
+- Web.Tests: 77 passed
+- ProviderNeutral IntegrationTests: 126 passed
+- Provider-neutral total: 558 passed, 0 failed, 0 skipped
+- BrowserTests: 4 passed (J1-J4)
+- **Total: 562 tests passing across two separate tiers**
+- Normal Release build: 0 warnings, 0 errors
+- Forced non-incremental Release build: **0 warnings, 0 errors** (was 28/0)
+- EF pending model changes: none; 10-migration chain unchanged
+- SQL Server relational and browser/E2E evidence: outside scope
+- Production behavior: unchanged
+- Exactly 14 files modified across Web Pages, Identity/Infrastructure, and Application DTOs; all changes are compile-time annotations only
+
+### Carry-Forward
+
+**Closed by Sprint 25:** C20-06 warning remediation (28-warning non-incremental baseline eliminated).
+
+**Remaining unassigned:** C20-01 SQL Server relational CI; C20-02 broader HTTP/Razor coverage; C20-03 browser/E2E; C20-05 report authorization; C20-07 broader SQL relational/report verification; C20-08 Sales; C20-09 Audit; C20-10 import/attachment/barcode.
+
+Sprint 25 selects no next sprint or direction.
+
 ## Next Sprint Planning
 
-Sprint 11 through Sprint 23 are complete. Sprint 23 closed the frozen Purchase Order Approve/Receive/Cancel HTTP/Razor matrix with seven behaviors and a 558-test provider-neutral baseline. Remaining work has not been assigned to Sprint 24. The next activity is fresh post-Sprint-23 repository discovery and candidate selection.
+Sprint 11 through Sprint 26 are complete. Sprint 26 closed the Authorization Intent & Role-Coupled Cleanup with Viewer PO narrowing and EditStatus capability-based refactor, maintaining the 562-test baseline (558 provider-neutral + 4 browser). Remaining work has not been assigned to Sprint 27. The next activity is fresh post-Sprint-26 repository discovery and candidate selection.
 
 ## D1 - Documentation Synchronization
 

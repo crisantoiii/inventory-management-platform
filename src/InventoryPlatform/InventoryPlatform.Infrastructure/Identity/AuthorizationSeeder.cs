@@ -191,7 +191,7 @@ public static class AuthorizationSeeder
             All
                 .Where(name =>
                     name.EndsWith(".View", StringComparison.Ordinal) ||
-                    name.StartsWith("PurchaseOrder.", StringComparison.Ordinal))
+                    name == "PurchaseOrder.View")
                 .ToArray();
 
         private static class Administration

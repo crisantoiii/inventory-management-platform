@@ -3,6 +3,7 @@ using InventoryPlatform.Application.Features.Users.GetRoles;
 using InventoryPlatform.Application.Features.Users.GetUser;
 using InventoryPlatform.Application.Features.Users.UpdateUserRoles;
 using InventoryPlatform.Application.Features.Users.UpdateUserStatus;
+using InventoryPlatform.Application.Interfaces.Authorization;
 using InventoryPlatform.Web.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -11,8 +12,6 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Security.Claims;
 
-using customRoleIdentity =  InventoryPlatform.Infrastructure.Identity;
-
 namespace InventoryPlatform.Web.Pages.Administrator.Users;
 
 [Authorize(Policy = AuthorizationPolicies.Administrator)]
@@ -20,13 +19,16 @@ public class EditStatusModel : PageModel
 {
     private readonly UpdateUserStatusHandler _updateStatushandler;
     private readonly GetUserHandler _getUserHandler;
+    private readonly ICapabilityAuthorizationService _capabilityAuthService;
 
     public EditStatusModel(
         UpdateUserStatusHandler getRolesHandler, 
-        GetUserHandler getUserHandler)
+        GetUserHandler getUserHandler,
+        ICapabilityAuthorizationService capabilityAuthService)
     {
         _updateStatushandler = getRolesHandler;
         _getUserHandler = getUserHandler;
+        _capabilityAuthService = capabilityAuthService;
     }
 
     [BindProperty]
@@ -58,9 +60,14 @@ public class EditStatusModel : PageModel
         var user = await _getUserHandler.HandleAsync(Input.Id);
         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-        if (User.IsInRole(customRoleIdentity.IdentityConstants.Roles.InventoryManager))
+        if (user.Value!.Id.ToString() == currentUserId)
         {
-            if (user.Value!.Id.ToString() == currentUserId)
+            var hasEditStatusCapability = await _capabilityAuthService.HasCapabilityAsync(
+                Guid.Parse(currentUserId),
+                "User.EditStatus",
+                cancellationToken);
+
+            if (hasEditStatusCapability)
             {
                 return Page();
             }

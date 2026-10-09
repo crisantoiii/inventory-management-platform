@@ -24,9 +24,28 @@ Rather than documenting daily work, it captures important architectural decision
 
 # Current Release State
 
-**Current Version:** Sprint 25 Compiler Warning Remediation (technical/testing, non-release; v1.6.0 remains the latest release baseline)
+**Current Version:** Sprint 26 Authorization Intent & Role-Coupled Cleanup (security behavior/behavior-affecting, non-release; v1.6.0 remains the latest release baseline)
 
-Sprint 25 is complete and closed. Eliminated the historical 28-warning forced non-incremental Release baseline (56 total instances across 14 files) through minimal, behavior-preserving compile-time annotations. **Provider-neutral baseline: 558 passing** (355 UnitTests, 77 Web.Tests, 126 ProviderNeutral IntegrationTests; 0 failed, 0 skipped). **BrowserTests: 4 passing** (J1-J4). **Total: 562 tests passing across two separate tiers.** Normal Release: 0 warnings/0 errors. Forced non-incremental Release: **0 warnings/0 errors** (was 28/0). EF: no pending model changes across 10 migrations. Graphify: 12,760 nodes, 19,018 edges, 949 communities. Zero production behavior change. v1.6.0 remains latest. Retrospective: `docs/retrospectives/SPRINT_25_compiler_warning_remediation.md`.
+Sprint 26 is complete and closed. Narrowed Viewer role Purchase Order capabilities to read-only (`PurchaseOrder.View` only) and refactored the legacy `EditStatus` role-coupled self-deactivation guard to capability-based (`User.EditStatus`). **Provider-neutral baseline: 558 passing** (355 UnitTests, 77 Web.Tests, 126 ProviderNeutral IntegrationTests; 0 failed, 0 skipped). **BrowserTests: 4 passing** (J1-J4). **Total: 562 tests passing across two separate tiers.** Normal Release: 0 warnings/0 errors. Forced non-incremental Release: 0 warnings/0 errors. EF: no pending model changes across 10 migrations. Exactly 3 files modified (AuthorizationSeeder.cs, AuthorizationSeederTests.cs, EditStatus.cshtml.cs); seed data change only. v1.6.0 remains latest. Retrospective: `docs/retrospectives/SPRINT_26_authorization_intent_cleanup.md`.
+
+# Sprint 26 - Authorization Intent & Role-Coupled Cleanup
+
+**Date:** 2026-10-09  
+**Status:** Complete/Closed  
+**Classification:** Security behavior/behavior-affecting, non-release
+
+## Engineering Lessons
+
+- **Capability-based authorization is more granular than role-based.** The `User.EditStatus` capability provides finer-grained control than the `InventoryManager` role, applying self-deactivation protection consistently regardless of role composition.
+- **Test expectations must be updated in lockstep.** The AuthorizationSeederTests required 6 distinct test updates to reflect the new Viewer capability count and relationship count.
+- **Role guards can coexist with capability model but create inconsistency.** The legacy `IsInRole(InventoryManager)` check was reachable for multi-role users and provided inconsistent protection (plain Administrators could self-deactivate). The capability-based replacement is consistent.
+- **Documented-brownfield adoption enables confident behavior changes.** The 562-test baseline (verified pre-implementation) provided strong regression coverage for security behavior changes.
+
+## Verification and Scope
+
+Sprint 26 closed on the post-implementation baseline — `scripts/verify-provider-neutral.ps1` exit `0`: UnitTests 355/355, Web.Tests 77/77, ProviderNeutral IntegrationTests 126/126 (classification audit included), BrowserTests 4/4, normal Release build 0 warnings/0 errors, EF no pending model changes, LocalDB/SQL contact none. **Total: 562 tests passing across two separate tiers.** Forced non-incremental Release: 0 warnings/0 errors. Sprint 26 changed 3 files (AuthorizationSeeder.cs, AuthorizationSeederTests.cs, EditStatus.cshtml.cs); seed data change only; no migration, schema, package, project, configuration, CI, or release change. This was security behavior/behavior-affecting, non-release work; v1.6.0 remains the latest release. Retrospective: `docs/retrospectives/SPRINT_26_authorization_intent_cleanup.md`.
+
+---
 
 # Sprint 25 - Compiler Warning Remediation
 

@@ -1,5 +1,47 @@
 # Changelog
 
+## [Sprint 26] - Authorization Intent & Role-Coupled Cleanup
+
+### Summary
+
+Narrowed Viewer role Purchase Order capabilities to read-only (`PurchaseOrder.View` only) and refactored the legacy `EditStatus` role-coupled self-deactivation guard to a capability-based model using `User.EditStatus`. This is a security behavior/behavior-affecting change implemented within the frozen Sprint 26 scope. No version or tag was created; v1.6.0 remains the latest semantic release.
+
+### Changed
+
+**Viewer Purchase Order Capability Narrowing:**
+- Modified `AuthorizationSeeder.cs` `CapabilityCatalog.Viewer` filter: Viewer now receives only `PurchaseOrder.View` (was 7 PurchaseOrder capabilities: View, Create, Edit, Submit, Approve, Receive, Cancel)
+- Viewer capability count: 15 → 9 (7 View capabilities + PurchaseOrder.View + User.View)
+- Authorization group-capability relationships: 79 → 73 (6 Viewer PO capabilities removed)
+
+**EditStatus Role Guard Refactor:**
+- Removed `User.IsInRole(IdentityConstants.Roles.InventoryManager)` check from `EditStatus.cshtml.cs:61`
+- Replaced with `User.EditStatus` capability-based self-deactivation protection via `ICapabilityAuthorizationService`
+- Self-deactivation protection now applies consistently to all users with the `User.EditStatus` capability (not just InventoryManager role)
+
+### Verification
+
+- Provider-neutral baseline: **558 passing** (355 UnitTests, 77 Web.Tests, 126 ProviderNeutral IntegrationTests; 0 failed, 0 skipped)
+- BrowserTests: **4 passing** (J1 Login, J2 Authorization denial, J3 Product read, J4 Purchase Order Create → Submit)
+- **Total: 562 tests passing across two separate tiers**
+- Normal Release: 0 warnings/0 errors (unchanged)
+- Forced non-incremental Release: 0 warnings/0 errors (unchanged)
+- EF pending model changes: none; migrations unchanged at 10
+- Graphify: 12,760 nodes, 19,018 edges, 949 communities (unchanged)
+- Exactly 3 files modified; seed data change only; no migration, schema, package, project, configuration, CI, or release change
+
+### Scope
+
+Sprint 26 addressed only the frozen Option 1 scope (Authorization Intent & Role-Coupled Cleanup) with preconditions BF-Q-001 and BF-Q-002 satisfied. It did not introduce:
+- Capability model rewrite beyond Viewer PO scope
+- Database migrations or schema changes (seed data only)
+- Test additions beyond expectation updates
+- CI/CD changes
+- Semantic release or version changes
+
+Latest semantic release remains **v1.6.0**.
+
+Retrospective: `docs/retrospectives/SPRINT_26_authorization_intent_cleanup.md`
+
 ## [Sprint 25] - Compiler Warning Remediation
 
 ### Summary

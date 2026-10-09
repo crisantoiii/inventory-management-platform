@@ -2388,4 +2388,51 @@ Authority is explicitly split and single-owner per concern:
 - No migration, schema, package, project, configuration, CI, or release change is introduced, and no Domain, Shared `Result`/`Error`, or DI change is required.
 - Recording-only cancellation-token observation was added to two shared test fakes that already recorded call order, so handler-level token forwarding is assertable without altering fake behavior.
 
+---
+
+# DD-047 — Capability-Based Self-Deactivation Protection Replacing Role-Coupled IsInRole Guard
+
+**Status:** Implemented in Sprint 26
+
+## Context
+
+The `EditStatus.cshtml.cs` page contained a legacy `User.IsInRole(IdentityConstants.Roles.InventoryManager)` guard (line 61) that blocked self-deactivation for users with the InventoryManager role. Sprint 12 source inspection established that this guard was **reachable and behavior-affecting** for supported multi-role users (plural role add/update via checkbox-based EditRoles UI, functional role claims, authorization-group membership independent of Identity roles). It was classified as a "reachable business-rule guard, NOT dead code."
+
+Two findings drove the decision:
+- **BF-Q-001 (Viewer PO intent):** Product Owner confirmed Viewer should be restricted to `PurchaseOrder.View` only (removed Create, Edit, Submit, Approve, Receive, Cancel).
+- **BF-Q-002 (EditStatus guard fate):** Product Owner confirmed refactor to capability-based authorization.
+
+## Decision
+
+Replace the `User.IsInRole(InventoryManager)` check with a capability-based self-deactivation protection using the `User.EditStatus` capability via `ICapabilityAuthorizationService.HasCapabilityAsync`.
+
+Implementation:
+1. Inject `ICapabilityAuthorizationService` into `EditStatusModel`
+2. On POST, when the current user is attempting to deactivate themselves, check `await _capabilityAuthService.HasCapabilityAsync(userId, "User.EditStatus", cancellationToken)`
+3. If the user has the capability, block the self-deactivation (return Page())
+4. The `User.EditStatus` capability is assigned through the existing AuthorizationSeeder filter rules (Administrator group receives all capabilities; InventoryManager group receives it; Viewer group does not)
+
+## Rationale
+
+- **Consistency:** The capability model is the authoritative authorization mechanism; role checks create inconsistent behavior (plain Administrator without InventoryManager role could self-deactivate, while Administrator+InventoryManager could not).
+- **Granularity:** Capability-based protection applies to any user with `User.EditStatus` capability, regardless of role composition.
+- **Maintainability:** Removes the last `User.IsInRole` call in the Web project (previously 1 occurrence), completing the T12 Razor UI visibility migration to capability-backed checks.
+- **Auditability:** Capability assignment is traceable through the AuthorizationSeeder catalog and group-capability relationships.
+
+## Rejected Alternatives
+
+- **Keep the InventoryManager role guard** — rejected because it was inconsistent and contradicted the capability model's authoritative status.
+- **Replace with `AuthorizationPolicies.InventoryManagement` policy** — rejected because the policy is an OR-composite of 9 capabilities (Product.Create/Edit, Category.Create, etc.) that is broader than the specific self-deactivation concern. The `User.EditStatus` capability is the precise, atomic permission.
+- **Add a new policy** — rejected because the existing `User.EditStatus` capability already exists in the catalog and is correctly assigned; no new policy is needed.
+
+## Consequences
+
+- Viewer capability count: 15 → 9 (6 PurchaseOrder.* capabilities removed)
+- Authorization group-capability relationships: 79 → 73 (6 Viewer PO capabilities removed)
+- Self-deactivation protection now applies to any user with `User.EditStatus` capability (Administrator and InventoryManager groups)
+- `AuthorizationSeederTests.cs` updated: 6 test expectations changed (Viewer count 15→9, relationships 79→73, PO capability assertions)
+- Total test baseline maintained: 562 passing (558 provider-neutral + 4 browser)
+- Zero production behavior change beyond the intended authorization refactor
+- No migration, schema, package, project, configuration, CI, or release change
+
 

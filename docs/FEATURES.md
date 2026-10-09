@@ -1024,11 +1024,17 @@ All admin pages require `Administration.Access` capability.
 
 ### Seed Data (T05)
 
-- ✅ 39 capabilities (Resource.Action pattern)
+- ✅ 41 capabilities (Resource.Action pattern)
 - ✅ 3 groups (Administrator, InventoryManager, Viewer)
 - ✅ Capability-to-group assignments per group
 - ✅ User-to-group assignments for 3 seeded users
 - ✅ Additive-only, idempotent seeding
+
+**Post-Sprint 26 Authorization Assignments:**
+- Administrator: 41 capabilities (all)
+- InventoryManager: 23 capabilities (excludes User.*, activation capabilities, Unit.Create, Administration.Access)
+- Viewer: 9 capabilities (7 View capabilities + PurchaseOrder.View + User.View; PurchaseOrder.Create/Edit/Submit/Approve/Receive/Cancel removed)
+- Total group-capability relationships: 73 (was 79; 6 Viewer PO capabilities removed)
 
 ### Authorization Handlers (T08)
 
@@ -1058,20 +1064,20 @@ All admin pages require `Administration.Access` capability.
 - ✅ Administrator: All admin pages accessible (200)
 - ✅ Manager: All management pages accessible (200)
 - ✅ Viewer: View pages accessible (200), management denied (302)
-- ✅ Purchasing: Per-action capabilities verified (View, Create, Submit, Approve, Receive)
+- ✅ Purchasing: Per-action capabilities verified (Administrator/InventoryManager: View, Create, Submit, Approve, Receive; Viewer: View only)
 - ✅ Reports: Accessible to all authenticated users (by design)
-- ✅ Database: 39 capabilities, 3 groups, 3 assignments verified
+- ✅ Database: 41 capabilities, 3 groups, 3 assignments verified (73 relationships post-Sprint 26)
 - ✅ AccessDenied page renders correctly
 
-### Known Findings (Deferred) — status synchronized at Sprint 13 closure (September 2026)
+### Known Findings (Deferred) — status synchronized at Sprint 26 closure (October 2026)
 
 - InventoryManager group includes Administration.Access (seed data issue) — **RESOLVED**: stale database relationship removed via authorized Phase 25 remediation; runtime reverification confirmed 0 rows
 - Categories/Edit missing [Authorize] attribute — **RESOLVED**: remediated in Sprint 12 (now requires the `InventoryManagement` capability policy)
 - InventoryManagement OR-composite grants broad access via single capability — **deferred** (accepted policy design; single capability maps to a 9-capability OR-composite)
 - Viewer has User.View capability (seed filter includes all *.View) — **deferred** (by design)
 - Reports unrestricted (design decision pending) — **deferred** (owner decision pending)
-
-Findings recorded after the list above was written: the Sprint 12 `EditStatus` `User.IsInRole(InventoryManager)` self-deactivation guard remains deferred pending an explicit behavioral decision; the Sprint 13 T05 investigation recorded that `GetPurchaseOrdersHandler` does not copy the generic `PagedRequest.Status` (`ProductStatusFilter`) into `PagedQuery` — it passes the Purchase Order-specific `PurchaseOrderStatus` separately to `GetPagedAsync` (finding only; no remediation authorized; re-verified against current source at Sprint 17 T09 closure). Sprint 13 itself made no production changes.
+- **Sprint 12 `EditStatus` `User.IsInRole(InventoryManager)` self-deactivation guard — RESOLVED**: refactored to capability-based (`User.EditStatus`) in Sprint 26 per BF-Q-002 decision
+- Sprint 13 T05 investigation: `GetPurchaseOrdersHandler` does not copy the generic `PagedRequest.Status` (`ProductStatusFilter`) into `PagedQuery` — it passes the Purchase Order-specific `PurchaseOrderStatus` separately to `GetPagedAsync` (finding only; no remediation authorized; re-verified against current source at Sprint 17 T09 closure). Sprint 13 itself made no production changes.
 
 
 ## User Administration
