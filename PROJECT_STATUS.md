@@ -135,7 +135,7 @@ Verified:
 - **Completed Modules:** 11
 - **Architecture Status:** Validated
 - **Current Milestone:** Sprint 26 — Authorization Intent & Role-Coupled Cleanup (Complete/Closed; security behavior/behavior-affecting, non-release — v1.6.0 remains the current release baseline)
-- **Next Milestone:** Sprint 27 Planning — awaits Product Owner scope selection
+- **Next Milestone:** Sprint 27 — Category Create + Update validation; 100-character limit and validator activation
 - **Automated Tests:** provider-neutral gate 558 passing (355 UnitTests, 77 Web.Tests, 126 ProviderNeutral IntegrationTests; 0 failed, 0 skipped); BrowserTests 4 passing (J1-J4); **total 562 passing across two separate tiers**; 14 SqlServerRelational tests remain discovered and locked but were intentionally not executed by the gate
 
 ---
