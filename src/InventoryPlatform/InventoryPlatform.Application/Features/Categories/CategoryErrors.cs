@@ -13,4 +13,7 @@ public static class CategoryErrors
         new(
             "Category.DuplicateName",
             "A category with the same Name already exists.");
+
+    public static Error Validation(string message) =>
+        new("Category.Validation", message);
 }

@@ -12,6 +12,6 @@ public sealed class UpdateCategoryValidator
 
         RuleFor(x => x.Name)
             .NotEmpty()
-            .MaximumLength(200);
+            .MaximumLength(100);
     }
 }

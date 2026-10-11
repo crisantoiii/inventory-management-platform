@@ -1,4 +1,5 @@
-﻿using InventoryPlatform.Application.Interfaces.Persistence;
+﻿using FluentValidation;
+using InventoryPlatform.Application.Interfaces.Persistence;
 using InventoryPlatform.Domain.Entities;
 using InventoryPlatform.Shared.Results;
 
@@ -8,19 +9,30 @@ public sealed class CreateCategoryHandler
 {
     private readonly ICategoryRepository _categoryRepository;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IValidator<CreateCategoryRequest> _validator;
 
     public CreateCategoryHandler(
         ICategoryRepository categoryRepository,
-        IUnitOfWork unitOfWork)
+        IUnitOfWork unitOfWork,
+        IValidator<CreateCategoryRequest> validator)
     {
         _categoryRepository = categoryRepository;
         _unitOfWork = unitOfWork;
+        _validator = validator;
     }
 
     public async Task<Result<CreateCategoryResponse>> HandleAsync(
         CreateCategoryRequest request,
         CancellationToken cancellationToken = default)
     {
+        var validationResult = await _validator.ValidateAsync(request, cancellationToken);
+        if (!validationResult.IsValid)
+        {
+            var firstFailure = validationResult.Errors[0];
+            return Result<CreateCategoryResponse>.Failure(
+                CategoryErrors.Validation(firstFailure.ErrorMessage));
+        }
+
         if (await _categoryRepository.ExistsByNameAsync(
             request.Name,
             cancellationToken))
