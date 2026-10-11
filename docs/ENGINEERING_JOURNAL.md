@@ -24,9 +24,30 @@ Rather than documenting daily work, it captures important architectural decision
 
 # Current Release State
 
-**Current Version:** Sprint 26 Authorization Intent & Role-Coupled Cleanup (security behavior/behavior-affecting, non-release; v1.6.0 remains the latest release baseline)
+**Current Version:** Sprint 27 Category Create + Update Validation (behavior-affecting, non-release; v1.6.0 remains the latest release baseline)
 
-Sprint 26 is complete and closed. Narrowed Viewer role Purchase Order capabilities to read-only (`PurchaseOrder.View` only) and refactored the legacy `EditStatus` role-coupled self-deactivation guard to capability-based (`User.EditStatus`). **Provider-neutral baseline: 558 passing** (355 UnitTests, 77 Web.Tests, 126 ProviderNeutral IntegrationTests; 0 failed, 0 skipped). **BrowserTests: 4 passing** (J1-J4). **Total: 562 tests passing across two separate tiers.** Normal Release: 0 warnings/0 errors. Forced non-incremental Release: 0 warnings/0 errors. EF: no pending model changes across 10 migrations. Exactly 3 files modified (AuthorizationSeeder.cs, AuthorizationSeederTests.cs, EditStatus.cshtml.cs); seed data change only. v1.6.0 remains latest. Retrospective: `docs/retrospectives/SPRINT_26_authorization_intent_cleanup.md`.
+Sprint 27 implementation complete. Activated Application-boundary validation for Category Create and Update with consistent 100-character Name limit (Update was 200). Per DD-046: validation-first at handler boundary, scalar `Category.Validation` result, first FluentValidation error verbatim, cancellation token forwarded, zero side effects on failure. **Provider-neutral baseline: 609 passing** (399 UnitTests, 84 Web.Tests, 126 ProviderNeutral IntegrationTests; 0 failed, 0 skipped). Normal Release: 0 warnings/0 errors. EF: no pending model changes across 10 migrations. **51 new tests added** (44 UnitTests, 7 Web.Tests). No migration, schema change, or version bump. v1.6.0 remains latest semantic release. Retrospective: `docs/retrospectives/SPRINT_27_CATEGORY_VALIDATOR_AUDIT.md`. Pending independent review before closure.
+
+# Sprint 27 - Category Create + Update Validation
+
+**Date:** 2026-10-11  
+**Status:** Implementation Complete / Pending Independent Review  
+**Classification:** Behavior-affecting validation change, non-release
+
+## Engineering Lessons
+
+- **DD-046 pattern scales to simple CRUD validators.** The same validation-first, scalar Result, deterministic precedence pattern established for Purchase Order Create applies cleanly to Category Create/Update with FluentValidation.
+- **Deterministic rule order is critical for scalar error contract.** With only the first error surfaced, rule declaration order becomes the frozen precedence. Tests must lock this by asserting exact message selection when multiple rules can fail.
+- **Validation-before-repository is a powerful invariant.** The handler tests prove zero repository calls on validation failure — this is now observable behavior, not just an assumption.
+- **Cancellation token forwarding is testable and essential.** The RecordingValidator pattern captures the exact token instance, proving the same token reaches validation and all downstream operations.
+- **HTTP/Razor tests validate the full stack.** The CategoryCreateValidationHttpTests and CategoryEditValidationHttpTests verify ModelOnly summary rendering, input preservation, and PRG redirect — the real user experience.
+- **Provider-neutral gate catches regressions across tiers.** 609 tests (399 + 84 + 126) passing with zero failures gives high confidence for behavior-affecting changes.
+
+## Verification and Scope
+
+Sprint 27 implementation verified — `scripts/verify-provider-neutral.ps1` exit `0`: UnitTests 399/399 (355 original + 44 Category), Web.Tests 84/84 (77 original + 7 Category), ProviderNeutral IntegrationTests 126/126 (classification audit included), normal Release build 0 warnings/0 errors, EF no pending model changes. **Total: 609 provider-neutral tests passing.** BrowserTests: NOT EXECUTED (not part of this gate). Forced non-incremental Release: 0 warnings/0 errors. Sprint 27 added 51 tests (44 UnitTests, 7 Web.Tests); changed 4 production files (CategoryErrors.cs, CreateCategoryHandler.cs, UpdateCategoryHandler.cs, UpdateCategoryValidator.cs); no migration, schema, package, project, configuration, CI, or release change. This was behavior-affecting, non-release work; v1.6.0 remains the latest release. Retrospective: `docs/retrospectives/SPRINT_27_CATEGORY_VALIDATOR_AUDIT.md`. Pending independent review before sprint closure.
+
+---
 
 # Sprint 26 - Authorization Intent & Role-Coupled Cleanup
 

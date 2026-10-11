@@ -1,5 +1,68 @@
 # Changelog
 
+## [Sprint 27] - Category Create + Update Validation
+
+### Summary
+
+Activated Application-boundary validation for Category Create and Update with a consistent 100-character Category Name limit (previously 200 for Update). This is a behavior-affecting validation change implemented per DD-046. No version or tag was created; v1.6.0 remains the latest semantic release.
+
+### Changed
+
+**Category Create Validation:**
+- `CreateCategoryHandler` now invokes `CreateCategoryValidator` as the first handler operation before any repository access
+- Returns scalar `Category.Validation` result with first FluentValidation error message verbatim
+- Forwards cancellation token to validator and all downstream operations
+- Zero repository/persistence side effects on validation failure (no ExistsByNameAsync, AddAsync, SaveChangesAsync)
+
+**Category Update Validation:**
+- `UpdateCategoryValidator` maximum Name length changed from 200 to 100 characters
+- `UpdateCategoryHandler` now invokes validator as first handler operation before GetByIdAsync
+- Returns scalar `Category.Validation` result with first FluentValidation error message verbatim
+- Deterministic rule order: Id.GreaterThan(0) → Name.NotEmpty → Name.MaximumLength(100)
+- Forwards cancellation token to validator and all downstream operations
+- Zero repository/persistence side effects on validation failure (no GetByIdAsync, SaveChangesAsync)
+
+**Error Contract:**
+- Added `CategoryErrors.Validation(string message)` factory method
+- Error code: `Category.Validation` (frozen A1 contract per DD-046)
+
+**Persistence:**
+- Category Name persistence limit remains at 100 characters (unchanged)
+- No schema migration required
+
+### Added
+
+**Test Coverage:**
+- **UnitTests:** 44 new tests (399 total: 355 original + 44 Category)
+  - CreateCategoryValidatorTests: 9 tests
+  - UpdateCategoryValidatorTests: 10 tests
+  - CreateCategoryHandlerTests: 15 tests
+  - UpdateCategoryHandlerTests: 15 tests
+- **Web.Tests:** 7 new tests (84 total: 77 original + 7 Category)
+  - CategoryCreateValidationHttpTests: 3 tests
+  - CategoryEditValidationHttpTests: 4 tests
+
+### Verification
+
+- Provider-neutral baseline: **609 passing** (399 UnitTests, 84 Web.Tests, 126 ProviderNeutral IntegrationTests; 0 failed, 0 skipped)
+- Normal Release build: 0 warnings/0 errors
+- EF pending model changes: none; migrations unchanged at 10
+- BrowserTests: NOT EXECUTED (not part of this gate)
+
+### Scope
+
+Sprint 27 addressed only the frozen Category Create + Update validation scope with Product Owner confirmed decisions. It did not introduce:
+- Global validation pipeline, PageModel validation, or field mapping
+- Multi-error contract or Domain maximum-length rule
+- Database migrations or schema changes
+- Unrelated validator families
+- CI/CD changes
+- Semantic release or version changes
+
+Latest semantic release remains **v1.6.0**.
+
+Retrospective: `docs/retrospectives/SPRINT_27_CATEGORY_VALIDATOR_AUDIT.md`
+
 ## [Sprint 26] - Authorization Intent & Role-Coupled Cleanup
 
 ### Summary
