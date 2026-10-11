@@ -1,6 +1,6 @@
 ## Overall Progress
 
-███████████████████░░ 92%
+████████████████████ 100%
 
 Foundation
 ████████████████████ 100%
@@ -30,7 +30,9 @@ Account Management
 
 **Latest Release:** v1.6.0 — Sprint 10 Dynamic Capability-Based Authorization
 
-**Sprint 26 (current sprint) — Authorization Intent & Role-Coupled Cleanup:** Complete/Closed. Narrowed Viewer role Purchase Order capabilities to read-only (`PurchaseOrder.View` only) and refactored the legacy `EditStatus` role-coupled self-deactivation guard to capability-based (`User.EditStatus`). **Provider-neutral baseline: 558 passing** (355 UnitTests, 77 Web.Tests, 126 ProviderNeutral IntegrationTests; 0 failed, 0 skipped). **BrowserTests: 4 passing** (J1-J4). **Total: 562 tests passing across two separate tiers.** Normal Release: 0 warnings/0 errors. Forced non-incremental Release: 0 warnings/0 errors. EF: no pending model changes across 10 migrations. Exactly 3 files modified (AuthorizationSeeder.cs, AuthorizationSeederTests.cs, EditStatus.cshtml.cs); seed data change only. v1.6.0 remains latest semantic release. Retrospective: `docs/retrospectives/SPRINT_26_authorization_intent_cleanup.md`.
+**Sprint 27 (current sprint) — Category Create + Update Validation:** Implementation complete. Activated Application-boundary validation for Category Create and Update with consistent 100-character Name limit (Update was 200). Per DD-046: validation-first at handler boundary, scalar `Category.Validation` result, first FluentValidation error verbatim, cancellation token forwarded, zero side effects on failure. **Provider-neutral baseline: 609 passing** (399 UnitTests, 84 Web.Tests, 126 ProviderNeutral IntegrationTests; 0 failed, 0 skipped). Normal Release: 0 warnings/0 errors. EF: no pending model changes across 10 migrations. **51 new tests added** (44 UnitTests, 7 Web.Tests). No migration, schema change, or version bump. v1.6.0 remains latest semantic release. Retrospective: `docs/retrospectives/SPRINT_27_CATEGORY_VALIDATOR_AUDIT.md`. Pending independent review before closure.
+
+**Sprint 26 (previous sprint) — Authorization Intent & Role-Coupled Cleanup:** Complete/Closed. Narrowed Viewer role Purchase Order capabilities to read-only (`PurchaseOrder.View` only) and refactored the legacy `EditStatus` role-coupled self-deactivation guard to capability-based (`User.EditStatus`). **Provider-neutral baseline: 558 passing** (355 UnitTests, 77 Web.Tests, 126 ProviderNeutral IntegrationTests; 0 failed, 0 skipped). **BrowserTests: 4 passing** (J1-J4). **Total: 562 tests passing across two separate tiers.** Normal Release: 0 warnings/0 errors. Forced non-incremental Release: 0 warnings/0 errors. EF: no pending model changes across 10 migrations. Exactly 3 files modified (AuthorizationSeeder.cs, AuthorizationSeederTests.cs, EditStatus.cshtml.cs); seed data change only. v1.6.0 remains latest semantic release. Retrospective: `docs/retrospectives/SPRINT_26_authorization_intent_cleanup.md`.
 
 **Sprint 25 (previous sprint) — Compiler Warning Remediation:** Complete/Closed. Eliminated the historical 28-warning forced non-incremental Release baseline (56 total instances across 14 files) through minimal, behavior-preserving compile-time annotations. **Provider-neutral baseline: 558 passing** (355 UnitTests, 77 Web.Tests, 126 ProviderNeutral IntegrationTests; 0 failed, 0 skipped). **BrowserTests: 4 passing** (J1-J4). **Total: 562 tests passing across two separate tiers.** Normal Release: 0 warnings/0 errors. Forced non-incremental Release: **0 warnings/0 errors** (was 28/0). EF: no pending model changes across 10 migrations. Graphify: 12,760 nodes, 19,018 edges, 949 communities. Zero production behavior change. v1.6.0 remains latest semantic release. Retrospective: `docs/retrospectives/SPRINT_25_compiler_warning_remediation.md`.
 
@@ -135,7 +137,7 @@ Verified:
 - **Completed Modules:** 11
 - **Architecture Status:** Validated
 - **Current Milestone:** Sprint 26 — Authorization Intent & Role-Coupled Cleanup (Complete/Closed; security behavior/behavior-affecting, non-release — v1.6.0 remains the current release baseline)
-- **Next Milestone:** Sprint 27 Planning — awaits Product Owner scope selection
+- **Next Milestone:** Sprint 27 — Category Create + Update validation; 100-character limit and validator activation approved, implementation authorized pending feature-branch baseline verification
 - **Automated Tests:** provider-neutral gate 558 passing (355 UnitTests, 77 Web.Tests, 126 ProviderNeutral IntegrationTests; 0 failed, 0 skipped); BrowserTests 4 passing (J1-J4); **total 562 passing across two separate tiers**; 14 SqlServerRelational tests remain discovered and locked but were intentionally not executed by the gate
 
 ---
